@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix and Bridges - issue behind restricted firewall</title>
+    <link>http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730</link>
+    <description>So I&#39;ve followed this https://www.whonix.org/wiki/Bridges using obfs4.
+I got a few questions (some may not related to Whonix though).
+1. If I supplied 3 bridges to /etc/tor/torrc, how are they being chosen? In random or first line first?
+2. If the chosen bridges, somehow, doesn&#39;t work (rejecting or broken). Will there be risk of leak? And what will happen - packet is dropped or Tor will choose a new one from the list and continue without dropping (no need to resend).
+3. Is it recommended to put as many bridges as possible in /etc/tor/torrc?
+4. Is it recommended to change list of bridges often?
+5. If using bridges &quot;makes things harder for your ISP to know that you&#39;re using Tor&quot;, then everyone should be using bridges whenever possible? If not, are bridges more vulnerable to attacks compared with entry guards?
+
+Thanks.</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 20 Jan 2016 15:52:09 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix and Bridges - issue behind restricted firewall</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>The <code>FascistFirewall</code> option is now fully documented here:</p>
+<p><a href="https://www.whonix.org/wiki/Bridges#Better_Connectivity_without_real_Censorship_Circumvention">https://www.whonix.org/wiki/Bridges#Better_Connectivity_without_real_Censorship_Circumvention</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/7</link>
+        <pubDate>Wed, 20 Jan 2016 15:52:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1730-7</guid>
+        <source url="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730.rss">Whonix and Bridges - issue behind restricted firewall</source>
+      </item>
+      <item>
+        <title>Whonix and Bridges - issue behind restricted firewall</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks! It’s good to understand these reports so we can document this better.</p>
+<p>sdwdate log looks like expected in such a situation, no issue there.</p>
+<p>Your description indicates that this issue is not caused by Whonix but by the workplace firewall. I speculate, that they likely block these outgoing ports that your bridge is using for any connection. Try using some [private] [obfuscated] bridges on port 80 or 443.</p>
+<p>(<br>
+In case you don’t know already, or for other readers, this is what is defined as IP / port in this context. Example:<br>
+172.245.230.92:42061<br>
+IP:PORT</p>
+<p>IP would be 172.245.230.92. Port would be 42061.<br>
+)</p>
+<p>(Less likely, I speculate, that they detect and block Tor bridge traffic.)</p>
+<p>Or if you do not try to hide being a Tor user, you could try not using bridges. Use the public Tor network. And the following setting in /etc/tor/torrc, which will limit Tor’s outgoing ports to 80 and 443.</p>
+<pre><code class="lang-auto">FascistFirewall 1
+</code></pre>
+<p>Please report if this solves it for you.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/6</link>
+        <pubDate>Wed, 20 Jan 2016 15:19:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1730-6</guid>
+        <source url="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730.rss">Whonix and Bridges - issue behind restricted firewall</source>
+      </item>
+      <item>
+        <title>Whonix and Bridges - issue behind restricted firewall</title>
+        <dc:creator><![CDATA[mutsuura]]></dc:creator>
+        <description><![CDATA[
+            <p>Patrick - thx for quick response.</p>
+<p>I’m running Whonix 12 via Virtualbox Version 5.0.10 r104061 on Windows 10.</p>
+<p>re: network settings - no I didn’t make any changes<br>
+re: /usr/share/tor/tor-service-defaults-torrc - no changes</p>
+<p>re: /var/run/tor/log - I config’d torrc w/ new bridges and rebooted Gateway</p>
+<pre><code>Jan 20 12:42:48.000 [notice] Delaying directory fetches: No running bridges
+Jan 20 12:42:48.000 [notice] Signaled readiness to systemd
+Jan 20 12:42:50.000 [notice] Bootstrapped 5%: Connecting to directory server
+Jan 20 12:42:50.000 [notice] Bootstrapped 10%: Finishing handshake with directory server
+Jan 20 12:42:51.000 [warn] Proxy Client: unable to connect to 172.245.230.92:42061 ("server rejected connection")
+Jan 20 12:42:51.000 [warn] Proxy Client: unable to connect to 94.242.249.8:33842 ("server rejected connection")
+</code></pre>
+<p>re:user@host:/var/log$ tail -f sdwdate.log</p>
+<pre><code>1351: sdwdate (not timesync!): signal SIGTERM received...
+1351: sdwdate (not timesync!): signal SIGTERM received. Cleaning up...
+1351: sdwdate (not timesync!): signal SIGTERM received. Exiting.
+1338: Running sdwdate... pid: 1338 | LD_PRELOAD:
+1338: sdwdate_preparation: who_ami is set to user.
+1338: dispatching DISPATCH_PRE (SDW_MODE: startup): /usr/lib/timesync/timesync_pre --autostart --identifier "timesync" --progressbaridx "$ID" --mode "$SDW_MODE" --whoami "$who_ami"
+1338: dispatching DISPATCH_PRE done.
+1338: SDWDATE_CURRENT_POOL: SDWDATE_POOL_ONE | array_length: 14 | allowed_member_failures: 5 | temp: 4.76 | array_length_remember: 0
+1338: dispatching DISPATCH_PREREQUISITE (SDW_MODE: startup) (LD_PRELOAD: ): /usr/lib/anon-shared-helper-scripts/te_pe_tb_check
+1338: DISPATCH_PREREQUISITE exited 2 | Tor is not yet fully bootstrapped. 10 % done. Tor reports: NOTICE BOOTSTRAP PROGRESS=10 TAG=handshake_dir SUMMARY="Finishing handshake with directory server" | waiting...
+</code></pre>
+<hr>
+<p>Meanwhile… I have reinstalled Gateway 12 VM from ~.ova. Using identical bridge setup I get same problems when I try to connect in restricted environment [behind workplace firewall] whereas there are no problems connecting Gateway to TOR network using same bridges when I’m in an unrestricted/public environment.</p>
+<p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/1X/24b319312494ec5f53a4b5e6e9fb80b0430ae040.jpg" data-download-href="//forums.whonix.org/uploads/default/24b319312494ec5f53a4b5e6e9fb80b0430ae040" title="2016-01-20 09_13_10-TouchMousePointer.jpg"><img src="//forums.whonix.org/uploads/default/optimized/1X/24b319312494ec5f53a4b5e6e9fb80b0430ae040_2_690x69.jpg" width="690" height="69" srcset="//forums.whonix.org/uploads/default/optimized/1X/24b319312494ec5f53a4b5e6e9fb80b0430ae040_2_690x69.jpg, //forums.whonix.org/uploads/default/optimized/1X/24b319312494ec5f53a4b5e6e9fb80b0430ae040_2_1035x103.jpg 1.5x, //forums.whonix.org/uploads/default/optimized/1X/24b319312494ec5f53a4b5e6e9fb80b0430ae040_2_1380x138.jpg 2x" data-small-upload="//forums.whonix.org/uploads/default/optimized/1X/24b319312494ec5f53a4b5e6e9fb80b0430ae040_2_10x10.png"></a></div><p></p>
+<p>…<br>
+</p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/1X/060da4be5c58d0a4f9eb274b215326e82f42bf6e.jpg" data-download-href="//forums.whonix.org/uploads/default/060da4be5c58d0a4f9eb274b215326e82f42bf6e" title="2016-01-20 09_09_39-TouchMousePointer.jpg"><img src="//forums.whonix.org/uploads/default/optimized/1X/060da4be5c58d0a4f9eb274b215326e82f42bf6e_2_690x172.jpg" width="690" height="172" srcset="//forums.whonix.org/uploads/default/optimized/1X/060da4be5c58d0a4f9eb274b215326e82f42bf6e_2_690x172.jpg, //forums.whonix.org/uploads/default/optimized/1X/060da4be5c58d0a4f9eb274b215326e82f42bf6e_2_1035x258.jpg 1.5x, //forums.whonix.org/uploads/default/optimized/1X/060da4be5c58d0a4f9eb274b215326e82f42bf6e_2_1380x344.jpg 2x" data-small-upload="//forums.whonix.org/uploads/default/optimized/1X/060da4be5c58d0a4f9eb274b215326e82f42bf6e_2_10x10.png"></a></div><p></p>
+<p>Hope some of this helps.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/5</link>
+        <pubDate>Wed, 20 Jan 2016 15:05:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1730-5</guid>
+        <source url="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730.rss">Whonix and Bridges - issue behind restricted firewall</source>
+      </item>
+      <item>
+        <title>Whonix and Bridges - issue behind restricted firewall</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>What platform / virtualizer?</p>
+<p>Did you change any networking related settings? Don’t change stuff that is not in documentation. (If you did undo and if you don’t know how then reinstall Whonix.)</p>
+<p>Check /var/run/tor/log for any useful messages.</p>
+<pre><code>kdesudo kwrite /var/run/tor/log
+</code></pre>
+<p>Any messages about the clock or other hints there?</p>
+<p>(Some of these messages are non-issues: <a href="https://www.whonix.org/wiki/Tor#Log_Analysis">https://www.whonix.org/wiki/Tor#Log_Analysis</a>)</p>
+          <p><a href="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/4</link>
+        <pubDate>Tue, 19 Jan 2016 20:01:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1730-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730.rss">Whonix and Bridges - issue behind restricted firewall</source>
+      </item>
+      <item>
+        <title>Whonix and Bridges - issue behind restricted firewall</title>
+        <dc:creator><![CDATA[mutsuura]]></dc:creator>
+        <description><![CDATA[
+            <p>Patrick et al</p>
+<p>I’ve managed to add bridges to standalone Tor browser and it works in a censored/restricted environment. However, I’ve tried mod’ing /etc/tor/torrc file per instructions for Whonix 12 - no luck. Here is excerpt of my torrc re: bridges:…</p>
+<hr>
+<pre><code>UseBridges 1
+ClientTransportPlugin obfs2,obfs3 exec /usr/bin/obfsproxy managed
+ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy managed
+
+bridge obfs4 194.132.208.56:20486 06BE67AF09C5DCEA36551D2EDF231AE6605D4C5F cert=B60Hxey0otVnZ1jFtAJFXvoyLV/4fBRYMrXzT49A8kQtqpZOR6ab0Nwzo7PJae4kWvknNg iat-mode=0
+bridge obfs4 95.215.44.119:59105 1F1C600CE1E854E18123422EAD9267A5943815A4 cert=eDgQIFzrZzadFhWwB4Z9fl3Qlw9NDtbCUUmOsIDcO+73ait26Y0akfaCxL1ppBdKCM8WDw iat-mode=0
+</code></pre>
+<hr>
+<p>I’m running Whonix 12. The bridges were freshly obtained/added. I’ve tried reloading TOR and also tried restarting the Gateway. Have also tried regular bridges and other forms of bridges  - none work, same results every which way. Note image below - ARM shows no message traffic.</p>
+<p>Suggestion? Advice? - thx!</p>
+<p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/1X/6012b52a038888d09f060fb8b645b673e283d6ec.jpg" data-download-href="//forums.whonix.org/uploads/default/6012b52a038888d09f060fb8b645b673e283d6ec" title="2016-01-19 07_44_54-Action center.jpg"><img src="//forums.whonix.org/uploads/default/optimized/1X/6012b52a038888d09f060fb8b645b673e283d6ec_2_690x373.jpg" width="690" height="373" srcset="//forums.whonix.org/uploads/default/optimized/1X/6012b52a038888d09f060fb8b645b673e283d6ec_2_690x373.jpg, //forums.whonix.org/uploads/default/optimized/1X/6012b52a038888d09f060fb8b645b673e283d6ec_2_1035x559.jpg 1.5x, //forums.whonix.org/uploads/default/optimized/1X/6012b52a038888d09f060fb8b645b673e283d6ec_2_1380x746.jpg 2x" data-small-upload="//forums.whonix.org/uploads/default/optimized/1X/6012b52a038888d09f060fb8b645b673e283d6ec_2_10x10.png"></a></div><p></p>
+          <p><a href="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/3</link>
+        <pubDate>Tue, 19 Jan 2016 13:05:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1730-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730.rss">Whonix and Bridges - issue behind restricted firewall</source>
+      </item>
+      <item>
+        <title>Whonix and Bridges - issue behind restricted firewall</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Whonix does not modify Tor.<br>
+( <a href="https://www.whonix.org/wiki/FAQ#Does_Whonix_modify_Tor.3F">https://www.whonix.org/wiki/FAQ#Does_Whonix_modify_Tor.3F</a> )</p>
+<p>Therefore most of your questions should not be duplicated here as per:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Support#Free_Support_Principle" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/9/98/Support-487515640.jpg" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://www.whonix.org/wiki/Support#Free_Support_Principle" target="_blank" rel="nofollow noopener">Support</a></h3>
+
+<p>Various Ways to get Help with Whonix. Free and Professional Support available.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>And should be asked in the more appropriate Tor support places.<br>
+( <a href="https://www.whonix.org/wiki/Support">https://www.whonix.org/wiki/Support</a> )</p>
+<aside class="quote" data-post="1" data-topic="1730">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/848f3c/40.png" class="avatar"> tammor:</div>
+<blockquote>
+<p>If the chosen bridges, somehow, doesn’t work (rejecting or broken). Will there be risk of leak?</p>
+</blockquote>
+</aside>
+<p>No.</p>
+<aside class="quote" data-post="1" data-topic="1730">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/848f3c/40.png" class="avatar"> tammor:</div>
+<blockquote>
+<p>If using bridges “makes things harder for your ISP to know that you’re using Tor”, then everyone should be using bridges whenever possible? If not, are bridges more vulnerable to attacks compared with entry guards?</p>
+</blockquote>
+</aside>
+<p>Quote from <a href="https://www.whonix.org/wiki/Bridges#Additional_info_and_recommendations:">https://www.whonix.org/wiki/Bridges#Additional_info_and_recommendations:</a></p>
+<blockquote>
+<p><i>Bridges are less reliable and tend to have lower performance than other entry points. If you live in a uncensored area, they are not necessarily more secure than entry guards.</i> <i>Source: <a target="_blank" href="https://lists.torproject.org/pipermail/tor-talk/2012-May/024378.html">bridge vs non-bridge users anonymity</a>.</i></p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/2</link>
+        <pubDate>Mon, 07 Dec 2015 17:42:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1730-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730.rss">Whonix and Bridges - issue behind restricted firewall</source>
+      </item>
+      <item>
+        <title>Whonix and Bridges - issue behind restricted firewall</title>
+        <dc:creator><![CDATA[tammor]]></dc:creator>
+        <description><![CDATA[
+            <p>So I’ve followed this <a href="https://www.whonix.org/wiki/Bridges" rel="nofollow noopener">https://www.whonix.org/wiki/Bridges</a> using obfs4.<br>
+I got a few questions (some may not related to Whonix though).</p>
+<ol>
+<li>If I supplied 3 bridges to /etc/tor/torrc, how are they being chosen? In random or first line first?</li>
+<li>If the chosen bridges, somehow, doesn’t work (rejecting or broken). Will there be risk of leak? And what will happen - packet is dropped or Tor will choose a new one from the list and continue without dropping (no need to resend).</li>
+<li>Is it recommended to put as many bridges as possible in /etc/tor/torrc?</li>
+<li>Is it recommended to change list of bridges often?</li>
+<li>If using bridges “makes things harder for your ISP to know that you’re using Tor”, then everyone should be using bridges whenever possible? If not, are bridges more vulnerable to attacks compared with entry guards?</li>
+</ol>
+<p>Thanks.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730/1</link>
+        <pubDate>Mon, 07 Dec 2015 17:32:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1730-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-and-bridges-issue-behind-restricted-firewall/1730.rss">Whonix and Bridges - issue behind restricted firewall</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>The Effect of DNS on Tor&#39;s Anonymity</title>
+    <link>http://forums.whonix.org/t/the-effect-of-dns-on-tors-anonymity/3030</link>
+    <description>https://nymity.ch/tor-dns/tor-dns.pdf
+
+**Abstract** (my emphasis throughout)
+
+&gt; Previous attacks that link the sender and receiver of traffic in the Tor network (“correlation attacks”) have generally relied  on  analyzing  traffic  from  TCP  connections.  The  TCP connections  of  a  typical  client  application,  however,  are  often accompanied  by  DNS  requests  and  responses.  This  additional traffic  presents  more  opportunities  for  correlation  attacks. 
+
+&gt; This paper quantifies how DNS traffic can make Tor users more vulnerable to correlation attacks. **We investigate how incorporating DNS traffic can make existing correlation attacks more powerful and  how  DNS  lookups  can  leak  information  to  third  parties about  anonymous  communication.**  We (i) develop  a  method  to identify  the  DNS  resolvers  of  Tor  exit  relays; (ii) develop  a  new set of correlation attacks (DefecTor attacks) that incorporate DNS traffic to improve precision; (iii) analyze the Internet-scale effects of  these  new  attacks  on  Tor  users;  and  (iv)  develop  improved methods to evaluate correlation attacks. First, we find that there exist adversaries who can mount DefecTor attacks: for example, **Google’s DNS resolver observes almost 40% of all DNS requests exiting  the  Tor  network.**  
+
+&gt; We  also  find  that  DNS  requests  often traverse  ASes  that  the  corresponding  TCP  connections  do  not transit,  enabling  additional  ASes  to  gain  information  about  Tor users’ traffic. **We then show that an adversary who can mount a DefecTor attack can often determine the website that a Tor user is  visiting  with  perfect  precision,  particularly  for  less  popular websites where the set of DNS names associated with that website may  be  unique  to  the  site.**  We  also  use  the  Tor  Path  Simulator (TorPS) in combination with traceroute data from vantage points co-located with Tor exit relays to estimate the power of AS-level adversaries  who  might  mount  DefecTor  attacks  in  practice.
+
+**Key Take Home Messages**
+
+I&#39;ll save you reading the academic paper if you are time-poor:
+
+**1.** Correlation Attacks using TCP flows are greatly enhanced by also doing DNS request traffic correlation.
+**2.** Attackers observing occasional DNS requests may still be able to link both ends of the communication, even if they can&#39;t observe TCP traffic between the Tor exit and the server.
+**3.** Loading a single webpage can generate hundreds of DNS requests to many different domains.
+**4.** The way Tor exit relays are currently configured means that Google (yes, your good friend Google) are in a central position to deanonymize Tor users if they so wished, as 40% of the Tor bandwidth uses Google&#39;s public DNS servers to resolve DNS queries.
+**5.** Note: simply increasing the scale of the Tor network itself is not much of a defense against this fingerprinting technique.
+**6.** Less frequently visited websites - the kind that privacy-conscious people like to visit e.g. Wikileaks, Whonix etc. - are more prone to deanonymization.
+**7.** Not all Tor client (browser) locations are equal. The data suggests you will be de-anonymized in a shorter average period due to network effects in France, Germany and Russia than in (ironically) the US or UK.
+**8.** Website Tor fingerprinting defenses are needed now more than ever, due to the increased precision possible with this attack. That is, Tor developers need to ASAP implement padding as per Torspec #254. See:
+https://gitweb.torproject.org/torspec.git/tree/proposals/254-padding-negotiation.txt*
+
+*This comes with significant network overhead and requires specific fine-tuning, which is why it hasn&#39;t yet been implemented.
+
+**Short-term solutions for Tor developers and Tor exit relay operators:**
+
+&gt; **Exit relay operators should avoid public resolvers such as Google and OpenDNS.** Instead, they should either use the resolvers provided by their ISP, or run their own, particularly if the operator’s ISP already  hosts  many  other  exit  relays.  Local  resolvers  can  further  be optimized to minimize information leakage, by (for example) enabling QNAME minimization.
+
+&gt; In addition to making recommendations to exit relay operators, we can remotely influence the cache of each exit relay’s resolver.  For  example,  using exitmap,  we  can  continuously resolve potentially sensitive domains over each exit relay, right before its TTL is about to expire. In such a setup, an attacker gains no advantage from observing DNS traffic from the exit relays  because  the  domain  is  always  in  every  exit  relay’s resolver  cache.  This  approach  scales  poorly,  considering  the potentially large number of domain names that would need to be cached (recall that the long tail of unpopular sites are most vulnerable  to  DefecTor  attacks),  but  it  allows  us  to  eliminate DNS-based correlation attacks for a select number of sites.
+
+&gt; Finally,  Tor  can  fix  the  Tor  clipping  bug  we  discovered and  consider  significantly  increasing  the  minimum  TTL  for the  DNS  cache  at  exit  relays  to  make  DefecTor  attacks  less precise. This adjustment requires finding the longest acceptable TTL  that  does  not  have  a  notable  negative  detriment  to  user experience.  Further,  as  soon  as  the  clipping  bug  is  fixed,website operators of sensitive websites can opt to increase the TTL of their DNS records.
+
+**Long-term solutions for Tor developers:**
+
+&gt; **Zhu et  al. proposed  T-DNS,  which  employs several TCP optimizations to transport the DNS protocol over  TLS  and  TCP.**  The  TLS  layer  provides  confidentiality between exit relays and their resolvers. **Finally, site operators whose  users  are  particularly  concerned  about  safety  should**
+&gt; **offer an onion service as an alternative.** Facebook, for example, set  up facebookcorewwwi.onion.  When  connecting  to  the onion service, Tor users never leave the Tor network, and hence do not need DNS (as long as the onion service does not embed non-onion service content).
+
+&gt; **Deploying  defenses  against  website  fingerprinting  attacks in  Tor [noted in point 8 above] should  be  an  important  long-term  goal,  as  well.**  Although  growing  the  Tor  network  will  help  defend  against DefecTor  attacks  to  some  degree,  the  most  important  change is  to  deploy  defenses  against  these  attacks  in  the  first  place. Since   DefecTor   attacks   significantly   increase   precision   of website fingerprinting attacks, defenses should be designed to significantly reduce the recall of website fingerprinting attacks, even  when  the  website  fingerprinting  attack  is  configured  to sacrifice precision for recall.</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 05 Oct 2016 20:00:41 +0000</lastBuildDate>
+    <category>General Tor and Anonymity Talk</category>
+    <atom:link href="http://forums.whonix.org/t/the-effect-of-dns-on-tors-anonymity/3030.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>The Effect of DNS on Tor&#39;s Anonymity</title>
+        <dc:creator><![CDATA[Ego]]></dc:creator>
+        <description><![CDATA[
+            
+          <p><a href="http://forums.whonix.org/t/the-effect-of-dns-on-tors-anonymity/3030/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/the-effect-of-dns-on-tors-anonymity/3030/3</link>
+        <pubDate>Wed, 05 Oct 2016 20:01:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3030-3</guid>
+        <source url="http://forums.whonix.org/t/the-effect-of-dns-on-tors-anonymity/3030.rss">The Effect of DNS on Tor&#39;s Anonymity</source>
+      </item>
+      <item>
+        <title>The Effect of DNS on Tor&#39;s Anonymity</title>
+        <dc:creator><![CDATA[Ego]]></dc:creator>
+        <description><![CDATA[
+            <p>3 posts were merged into an existing topic: <a href="http://forums.whonix.org/t/tor-exit-dns-harms-privacy/3009">Tor Exit DNS Harms Privacy</a></p>
+          <p><a href="http://forums.whonix.org/t/the-effect-of-dns-on-tors-anonymity/3030/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/the-effect-of-dns-on-tors-anonymity/3030/2</link>
+        <pubDate>Wed, 05 Oct 2016 20:01:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3030-2</guid>
+        <source url="http://forums.whonix.org/t/the-effect-of-dns-on-tors-anonymity/3030.rss">The Effect of DNS on Tor&#39;s Anonymity</source>
+      </item>
+      <item>
+        <title>The Effect of DNS on Tor&#39;s Anonymity</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox pdf">
+  <header class="source">
+      <a href="https://nymity.ch/tor-dns/tor-dns.pdf" target="_blank" rel="nofollow noopener">nymity.ch</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://nymity.ch/tor-dns/tor-dns.pdf" target="_blank" rel="nofollow noopener"><span class="pdf-onebox-logo"></span></a>
+<h3><a href="https://nymity.ch/tor-dns/tor-dns.pdf" target="_blank" rel="nofollow noopener">tor-dns.pdf</a></h3>
+
+<p class="filesize">423.83 KB</p>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p><strong>Abstract</strong> (my emphasis throughout)</p>
+<blockquote>
+<p>Previous attacks that link the sender and receiver of traffic in the Tor network (“correlation attacks”) have generally relied  on  analyzing  traffic  from  TCP  connections.  The  TCP connections  of  a  typical  client  application,  however,  are  often accompanied  by  DNS  requests  and  responses.  This  additional traffic  presents  more  opportunities  for  correlation  attacks.</p>
+</blockquote>
+<blockquote>
+<p>This paper quantifies how DNS traffic can make Tor users more vulnerable to correlation attacks. <strong>We investigate how incorporating DNS traffic can make existing correlation attacks more powerful and  how  DNS  lookups  can  leak  information  to  third  parties about  anonymous  communication.</strong>  We (i) develop  a  method  to identify  the  DNS  resolvers  of  Tor  exit  relays; (ii) develop  a  new set of correlation attacks (DefecTor attacks) that incorporate DNS traffic to improve precision; (iii) analyze the Internet-scale effects of  these  new  attacks  on  Tor  users;  and  (iv)  develop  improved methods to evaluate correlation attacks. First, we find that there exist adversaries who can mount DefecTor attacks: for example, <strong>Google’s DNS resolver observes almost 40% of all DNS requests exiting  the  Tor  network.</strong></p>
+</blockquote>
+<blockquote>
+<p>We  also  find  that  DNS  requests  often traverse  ASes  that  the  corresponding  TCP  connections  do  not transit,  enabling  additional  ASes  to  gain  information  about  Tor users’ traffic. <strong>We then show that an adversary who can mount a DefecTor attack can often determine the website that a Tor user is  visiting  with  perfect  precision,  particularly  for  less  popular websites where the set of DNS names associated with that website may  be  unique  to  the  site.</strong>  We  also  use  the  Tor  Path  Simulator (TorPS) in combination with traceroute data from vantage points co-located with Tor exit relays to estimate the power of AS-level adversaries  who  might  mount  DefecTor  attacks  in  practice.</p>
+</blockquote>
+<p><strong>Key Take Home Messages</strong></p>
+<p>I’ll save you reading the academic paper if you are time-poor:</p>
+<p><strong>1.</strong> Correlation Attacks using TCP flows are greatly enhanced by also doing DNS request traffic correlation.<br>
+<strong>2.</strong> Attackers observing occasional DNS requests may still be able to link both ends of the communication, even if they can’t observe TCP traffic between the Tor exit and the server.<br>
+<strong>3.</strong> Loading a single webpage can generate hundreds of DNS requests to many different domains.<br>
+<strong>4.</strong> The way Tor exit relays are currently configured means that Google (yes, your good friend Google) are in a central position to deanonymize Tor users if they so wished, as 40% of the Tor bandwidth uses Google’s public DNS servers to resolve DNS queries.<br>
+<strong>5.</strong> Note: simply increasing the scale of the Tor network itself is not much of a defense against this fingerprinting technique.<br>
+<strong>6.</strong> Less frequently visited websites - the kind that privacy-conscious people like to visit e.g. Wikileaks, Whonix etc. - are more prone to deanonymization.<br>
+<strong>7.</strong> Not all Tor client (browser) locations are equal. The data suggests you will be de-anonymized in a shorter average period due to network effects in France, Germany and Russia than in (ironically) the US or UK.<br>
+<strong>8.</strong> Website Tor fingerprinting defenses are needed now more than ever, due to the increased precision possible with this attack. That is, Tor developers need to ASAP implement padding as per Torspec <span class="hashtag">#254</span>. See:<br>
+<a href="https://gitweb.torproject.org/torspec.git/tree/proposals/254-padding-negotiation.txt*" class="onebox" target="_blank">https://gitweb.torproject.org/torspec.git/tree/proposals/254-padding-negotiation.txt*</a></p>
+<p>*This comes with significant network overhead and requires specific fine-tuning, which is why it hasn’t yet been implemented.</p>
+<p><strong>Short-term solutions for Tor developers and Tor exit relay operators:</strong></p>
+<blockquote>
+<p><strong>Exit relay operators should avoid public resolvers such as Google and OpenDNS.</strong> Instead, they should either use the resolvers provided by their ISP, or run their own, particularly if the operator’s ISP already  hosts  many  other  exit  relays.  Local  resolvers  can  further  be optimized to minimize information leakage, by (for example) enabling QNAME minimization.</p>
+</blockquote>
+<blockquote>
+<p>In addition to making recommendations to exit relay operators, we can remotely influence the cache of each exit relay’s resolver.  For  example,  using exitmap,  we  can  continuously resolve potentially sensitive domains over each exit relay, right before its TTL is about to expire. In such a setup, an attacker gains no advantage from observing DNS traffic from the exit relays  because  the  domain  is  always  in  every  exit  relay’s resolver  cache.  This  approach  scales  poorly,  considering  the potentially large number of domain names that would need to be cached (recall that the long tail of unpopular sites are most vulnerable  to  DefecTor  attacks),  but  it  allows  us  to  eliminate DNS-based correlation attacks for a select number of sites.</p>
+</blockquote>
+<blockquote>
+<p>Finally,  Tor  can  fix  the  Tor  clipping  bug  we  discovered and  consider  significantly  increasing  the  minimum  TTL  for the  DNS  cache  at  exit  relays  to  make  DefecTor  attacks  less precise. This adjustment requires finding the longest acceptable TTL  that  does  not  have  a  notable  negative  detriment  to  user experience.  Further,  as  soon  as  the  clipping  bug  is  fixed,website operators of sensitive websites can opt to increase the TTL of their DNS records.</p>
+</blockquote>
+<p><strong>Long-term solutions for Tor developers:</strong></p>
+<blockquote>
+<p><strong>Zhu et  al. proposed  T-DNS,  which  employs several TCP optimizations to transport the DNS protocol over  TLS  and  TCP.</strong>  The  TLS  layer  provides  confidentiality between exit relays and their resolvers. <strong>Finally, site operators whose  users  are  particularly  concerned  about  safety  should</strong><br>
+<strong>offer an onion service as an alternative.</strong> Facebook, for example, set  up facebookcorewwwi.onion.  When  connecting  to  the onion service, Tor users never leave the Tor network, and hence do not need DNS (as long as the onion service does not embed non-onion service content).</p>
+</blockquote>
+<blockquote>
+<p><strong>Deploying  defenses  against  website  fingerprinting  attacks in  Tor [noted in point 8 above] should  be  an  important  long-term  goal,  as  well.</strong>  Although  growing  the  Tor  network  will  help  defend  against DefecTor  attacks  to  some  degree,  the  most  important  change is  to  deploy  defenses  against  these  attacks  in  the  first  place. Since   DefecTor   attacks   significantly   increase   precision   of website fingerprinting attacks, defenses should be designed to significantly reduce the recall of website fingerprinting attacks, even  when  the  website  fingerprinting  attack  is  configured  to sacrifice precision for recall.</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/the-effect-of-dns-on-tors-anonymity/3030/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/the-effect-of-dns-on-tors-anonymity/3030/1</link>
+        <pubDate>Wed, 05 Oct 2016 12:00:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3030-1</guid>
+        <source url="http://forums.whonix.org/t/the-effect-of-dns-on-tors-anonymity/3030.rss">The Effect of DNS on Tor&#39;s Anonymity</source>
+      </item>
+  </channel>
+</rss>

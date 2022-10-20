@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>SOLVED: Issue T100: KEYEXPIRED Error upon apt-get update from Whonix Repository</title>
+    <link>http://forums.whonix.org/t/solved-issue-t100-keyexpired-error-upon-apt-get-update-from-whonix-repository/826</link>
+    <description>[b]SOLVED: Issue T100: KEYEXPIRED Error upon apt-get update from Whonix Repository[/b]
+
+Issue present in versions up to Whonix 9.4 with the Whonix binary update repository enabled.
+
+Forum Discussion:
+- https://www.whonix.org/forum/index.php/topic,892.0.html
+
+
+[hr]
+
+
+[u][b]Whonix Qubes Solution[/b][/u]
+
+
+[u]Whonix-Workstation TemplateVM[/u]
+
+In Dom0 --&gt; Qubes Manager:
+- Connect the TemplateVM to a Whonix-Gateway VM and enable internet connections.
+
+In TemplateVM --&gt; Terminal:
+[code]
+fpr=&quot;916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA&quot;
+
+gpg --recv-keys &quot;$fpr&quot;
+
+gpg --fingerprint &quot;$fpr&quot; 
+
+gpg --export &quot;$fpr&quot; | sudo apt-key add -
+[/code]
+
+Then a normal update/upgrade should work without the KEYEXPIRED error...
+[code]
+sudo apt-get update
+sudo apt-get dist-upgrade
+[/code]
+
+
+[u]Whonix-Gateway TemplateVM[/u]
+
+[u]Method #1[/u]
+
+The Whonix-Gateway TemplateVM may not let you connect to the internet, except through the OS update service. So this first method may not work and you may need to try an additional method below.
+
+In Dom0 --&gt; Qubes Manager:
+- Connect the TemplateVM to a Whonix-Gateway VM and enable internet connections.
+
+In TemplateVM --&gt; Terminal:
+[code]
+fpr=&quot;916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA&quot;
+
+gpg --recv-keys &quot;$fpr&quot;
+
+gpg --fingerprint &quot;$fpr&quot; 
+
+gpg --export &quot;$fpr&quot; | sudo apt-key add -
+[/code]
+
+Then a normal update/upgrade should work without the KEYEXPIRED error...
+[code]
+sudo apt-get update
+sudo apt-get dist-upgrade
+[/code]
+
+[u]Method #2[/u]
+
+The faketime method will probably work for a long time, but it should not be used for a long time, because then we&#39;d ignore the valid-until field for too long.
+
+[code]
+sudo faketime 2015-01-15 apt-get update
+
+sudo apt-get dist-upgrade
+[/code]
+
+Then a normal update/upgrade should work without the KEYEXPIRED error...
+[code]
+sudo apt-get update
+sudo apt-get dist-upgrade
+[/code]
+
+[u]Method #3[/u]
+
+In Whonix-Workstation VM --&gt; Terminal:
+[code]
+wget https://www.whonix.org/patrick.asc
+[/code]
+
+In Whonix-Workstation VM --&gt; Files:
+- Browse to directory containing patrick.asc
+- Right click file patrick.asc
+- Copy to other AppVM
+- Enter the destination domain name as the name of your Whonix-Gateway TemplateVM
+- Yes to approve file copy
+
+In Whonix-Workstation TemplateVM --&gt; Terminal:
+[code]
+cd /home/user/QubesIncoming/&lt;name-of-your-whonix-workstation-vm&gt;/
+[/code]
+[code]
+sudo apt-key add patrick.asc
+[/code]
+
+Then a normal update/upgrade should work without the KEYEXPIRED error...
+[code]
+sudo apt-get update
+sudo apt-get dist-upgrade
+[/code]
+
+
+[hr]
+
+
+[b]Issue T100: KEYEXPIRED Error upon apt-get update from Whonix Repository
+
+Posted by @WhonixQubes
+
+January 17, 2015
+
+https://phabricator.whonix.org/T100[/b]
+
+&lt;blockquote&gt;KEYEXPIRED error upon apt-get update from Whonix repository reported and confirmed as happening in Qubes + Whonix.
+
+W: GPG error: http://sourceforge.net wheezy Release: The following signatures were invalid: KEYEXPIRED 1421449064 KEYEXPIRED 1421449064 KEYEXPIRED 1421449064 KEYEXPIRED 1421449659 KEYEXPIRED 1421449659 KEYEXPIRED 1421449064 KEYEXPIRED 1421449064 KEYEXPIRED 1421449064 KEYEXPIRED 1421449659 KEYEXPIRED 1421449064 KEYEXPIRED 1421449064 KEYEXPIRED 1421449064 KEYEXPIRED 1421449659&lt;/blockquote&gt;
+
+Forum Discussion:
+- https://www.whonix.org/forum/index.php/topic,892.0.html</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 23 Jan 2015 20:36:16 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/solved-issue-t100-keyexpired-error-upon-apt-get-update-from-whonix-repository/826.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>SOLVED: Issue T100: KEYEXPIRED Error upon apt-get update from Whonix Repository</title>
+        <dc:creator><![CDATA[WhonixQubes]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="2" data-topic="826">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>The faketime method will probably work for a long time, but it should not be used for a long time, because then we’d ignore the valid-until field for too long. Please feel free to delete this post and to add this info above.</p>
+</blockquote>
+</aside>
+<p>Thanks Patrick! <img src="//forums.whonix.org/images/emoji/twitter/smiley.png?v=5" title=":smiley:" class="emoji" alt=":smiley:"></p>
+<p>Included above.</p>
+          <p><a href="http://forums.whonix.org/t/solved-issue-t100-keyexpired-error-upon-apt-get-update-from-whonix-repository/826/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-issue-t100-keyexpired-error-upon-apt-get-update-from-whonix-repository/826/3</link>
+        <pubDate>Fri, 23 Jan 2015 20:36:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-826-3</guid>
+        <source url="http://forums.whonix.org/t/solved-issue-t100-keyexpired-error-upon-apt-get-update-from-whonix-repository/826.rss">SOLVED: Issue T100: KEYEXPIRED Error upon apt-get update from Whonix Repository</source>
+      </item>
+      <item>
+        <title>SOLVED: Issue T100: KEYEXPIRED Error upon apt-get update from Whonix Repository</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>The faketime method will probably work for a long time, but it should not be used for a long time, because then we’d ignore the valid-until field for too long. Please feel free to delete this post and to add this info above.</p>
+          <p><a href="http://forums.whonix.org/t/solved-issue-t100-keyexpired-error-upon-apt-get-update-from-whonix-repository/826/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-issue-t100-keyexpired-error-upon-apt-get-update-from-whonix-repository/826/2</link>
+        <pubDate>Fri, 23 Jan 2015 09:10:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-826-2</guid>
+        <source url="http://forums.whonix.org/t/solved-issue-t100-keyexpired-error-upon-apt-get-update-from-whonix-repository/826.rss">SOLVED: Issue T100: KEYEXPIRED Error upon apt-get update from Whonix Repository</source>
+      </item>
+      <item>
+        <title>SOLVED: Issue T100: KEYEXPIRED Error upon apt-get update from Whonix Repository</title>
+        <dc:creator><![CDATA[WhonixQubes]]></dc:creator>
+        <description><![CDATA[
+            <p><span class="bbcode-b">SOLVED: Issue T100: KEYEXPIRED Error upon apt-get update from Whonix Repository</span></p>
+<p>Issue present in versions up to Whonix 9.4 with the Whonix binary update repository enabled.</p>
+<p>Forum Discussion:</p>
+<ul>
+<li><a href="https://www.whonix.org/forum/index.php/topic,892.0.html" rel="nofollow noopener">https://www.whonix.org/forum/index.php/topic,892.0.html</a></li>
+</ul>
+<p>[hr]</p>
+<p><span class="bbcode-u"><span class="bbcode-b">Whonix Qubes Solution</span></span></p>
+<p><span class="bbcode-u">Whonix-Workstation TemplateVM</span></p>
+<p>In Dom0 --&gt; Qubes Manager:</p>
+<ul>
+<li>Connect the TemplateVM to a Whonix-Gateway VM and enable internet connections.</li>
+</ul>
+<p>In TemplateVM --&gt; Terminal:</p>
+<pre><code class="lang-auto">fpr="916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA"
+
+gpg --recv-keys "$fpr"
+
+gpg --fingerprint "$fpr" 
+
+gpg --export "$fpr" | sudo apt-key add -</code></pre>
+<p>Then a normal update/upgrade should work without the KEYEXPIRED error…</p>
+<pre><code class="lang-auto">sudo apt-get update
+sudo apt-get dist-upgrade</code></pre>
+<p><span class="bbcode-u">Whonix-Gateway TemplateVM</span></p>
+<p><span class="bbcode-u">Method <span class="hashtag">#1</span></span></p>
+<p>The Whonix-Gateway TemplateVM may not let you connect to the internet, except through the OS update service. So this first method may not work and you may need to try an additional method below.</p>
+<p>In Dom0 --&gt; Qubes Manager:</p>
+<ul>
+<li>Connect the TemplateVM to a Whonix-Gateway VM and enable internet connections.</li>
+</ul>
+<p>In TemplateVM --&gt; Terminal:</p>
+<pre><code class="lang-auto">fpr="916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA"
+
+gpg --recv-keys "$fpr"
+
+gpg --fingerprint "$fpr" 
+
+gpg --export "$fpr" | sudo apt-key add -</code></pre>
+<p>Then a normal update/upgrade should work without the KEYEXPIRED error…</p>
+<pre><code class="lang-auto">sudo apt-get update
+sudo apt-get dist-upgrade</code></pre>
+<p><span class="bbcode-u">Method <span class="hashtag">#2</span></span></p>
+<p>The faketime method will probably work for a long time, but it should not be used for a long time, because then we’d ignore the valid-until field for too long.</p>
+<pre><code class="lang-auto">sudo faketime 2015-01-15 apt-get update
+
+sudo apt-get dist-upgrade</code></pre>
+<p>Then a normal update/upgrade should work without the KEYEXPIRED error…</p>
+<pre><code class="lang-auto">sudo apt-get update
+sudo apt-get dist-upgrade</code></pre>
+<p><span class="bbcode-u">Method <span class="hashtag">#3</span></span></p>
+<p>In Whonix-Workstation VM --&gt; Terminal:</p>
+<pre><code class="lang-auto">wget https://www.whonix.org/patrick.asc</code></pre>
+<p>In Whonix-Workstation VM --&gt; Files:</p>
+<ul>
+<li>Browse to directory containing patrick.asc</li>
+<li>Right click file patrick.asc</li>
+<li>Copy to other AppVM</li>
+<li>Enter the destination domain name as the name of your Whonix-Gateway TemplateVM</li>
+<li>Yes to approve file copy</li>
+</ul>
+<p>In Whonix-Workstation TemplateVM --&gt; Terminal:</p>
+<pre><code class="lang-auto">cd /home/user/QubesIncoming/&lt;name-of-your-whonix-workstation-vm&gt;/</code></pre>
+<pre><code class="lang-auto">sudo apt-key add patrick.asc</code></pre>
+<p>Then a normal update/upgrade should work without the KEYEXPIRED error…</p>
+<pre><code class="lang-auto">sudo apt-get update
+sudo apt-get dist-upgrade</code></pre>
+<p>[hr]</p>
+<p>[b]Issue T100: KEYEXPIRED Error upon apt-get update from Whonix Repository</p>
+<p>Posted by <a class="mention" href="http://forums.whonix.org/u/whonixqubes">@WhonixQubes</a></p>
+<p>January 17, 2015</p>
+<p><a href="https://phabricator.whonix.org/T100%5B/b%5D" class="onebox" target="_blank" rel="nofollow noopener">https://phabricator.whonix.org/T100[/b]</a></p>
+<blockquote>KEYEXPIRED error upon apt-get update from Whonix repository reported and confirmed as happening in Qubes + Whonix.
+<p>W: GPG error: <a href="http://sourceforge.net" rel="nofollow noopener">http://sourceforge.net</a> wheezy Release: The following signatures were invalid: KEYEXPIRED 1421449064 KEYEXPIRED 1421449064 KEYEXPIRED 1421449064 KEYEXPIRED 1421449659 KEYEXPIRED 1421449659 KEYEXPIRED 1421449064 KEYEXPIRED 1421449064 KEYEXPIRED 1421449064 KEYEXPIRED 1421449659 KEYEXPIRED 1421449064 KEYEXPIRED 1421449064 KEYEXPIRED 1421449064 KEYEXPIRED 1421449659</p>
+</blockquote>
+<p>Forum Discussion:</p>
+<ul>
+<li><a href="https://www.whonix.org/forum/index.php/topic,892.0.html" rel="nofollow noopener">https://www.whonix.org/forum/index.php/topic,892.0.html</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/solved-issue-t100-keyexpired-error-upon-apt-get-update-from-whonix-repository/826/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-issue-t100-keyexpired-error-upon-apt-get-update-from-whonix-repository/826/1</link>
+        <pubDate>Fri, 23 Jan 2015 06:08:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-826-1</guid>
+        <source url="http://forums.whonix.org/t/solved-issue-t100-keyexpired-error-upon-apt-get-update-from-whonix-repository/826.rss">SOLVED: Issue T100: KEYEXPIRED Error upon apt-get update from Whonix Repository</source>
+      </item>
+  </channel>
+</rss>

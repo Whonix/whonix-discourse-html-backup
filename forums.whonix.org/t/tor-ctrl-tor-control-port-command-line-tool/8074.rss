@@ -1,0 +1,1142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>tor-ctrl - Tor control port command line tool</title>
+    <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074</link>
+    <description>I was thinking of using tor-ctrl SETEVENTS GUARD but figuring out exactly what to do on what events would require a lot of testing.
+GETINFO entry-guards shows 3 &#39;up&#39; out of 20. When I reboot in immutable mode it&#39;s the same 3 but it seems to favor a different guard for most circuits according to GETINFO circuit-status.
+
+Anyway, tor-ctrl (or something) should have a socat dependency since it&#39;s somehow not installed on Whonix-Gateway-CLI.
+I added a monitor mode to tor-ctrl where it does not exit but simply continues to output events. Something like
+https://pastebin.com/83RLKxHi
+
+[code]
+100a101,104
+&gt;        [-w]           = wait instead of exiting after command
+&gt;                         default: not set
+&gt;                         notice: implies verbose. Useful with SETEVENTS.
+&gt; 
+146c150,154
+&lt;         sendcmd &quot;QUIT&quot;
+---
+&gt;         if [ -z &quot;$WAIT&quot; ]; then
+&gt;                 sendcmd &quot;QUIT&quot;
+&gt;         else
+&gt;                 while sleep 3600; do :; done
+&gt;         fi
+159,163c167,174
+&lt;         STR=&quot;$(cat)&quot;
+&lt;         vecho &quot;$STR&quot;
+&lt; 
+&lt;         echo &quot;$STR&quot; | if [ &quot;$(grep -c ^&quot;250 &quot;)&quot; = 3 ]; then
+&lt;                 exit 0
+---
+&gt;         if [ -z &quot;$WAIT&quot; ]; then
+&gt;                 STR=&quot;$(cat)&quot;
+&gt;                 vecho &quot;$STR&quot;
+&gt;                 echo &quot;$STR&quot; | if [ &quot;$(grep -c ^&quot;250 &quot;)&quot; = 3 ]; then
+&gt;                         exit 0
+&gt;                 else
+&gt;                         exit 1
+&gt;                 fi
+165c176
+&lt;                 exit 1
+---
+&gt;                 cat
+179c190
+&lt; while getopts &quot;:a:c:s:p:P:f:vh&quot; Option
+---
+&gt; while getopts &quot;:a:c:s:p:P:f:vwh&quot; Option
+188a200
+&gt;                 w) WAIT=1;;
+194c206
+&lt; if [ -e &quot;$FILE&quot; ]; then
+---
+&gt; if [ -e &quot;$FILE&quot; -o &quot;$FILE&quot; = &quot;-&quot; ]; then
+[/code]
+
+I don&#39;t know what the option should be called, wait? filepipe could also wait but the user can keep the pipe open to work around that. I don&#39;t know an elegant way of not exiting in cmdpipe. And piping to cat is inefficient but?
+
+Posting here since I see Patrick is the maintainer and the website listed in the script doesn&#39;t exist.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 16 Oct 2022 21:35:16 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>Made some minor upgrades to tor-ctrl, now it will not hang on the workstation and the temporary files will be saved on tmp, on the the curdir.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/62">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/62</link>
+        <pubDate>Sun, 16 Oct 2022 21:35:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-62</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="280" data-topic="3912">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img loading="lazy" alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/missing-libre-illustrative-images/3912/280">Missing Libre Illustrative Images</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/website/6"><span class="badge-category-bg" style="background-color: #0E76BD;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Issues and improvements with the Whonix website. (website devs) (user documentation devs)">Website</span></a>
+  </div>
+  <blockquote>
+    Needs a different image. It’s not so much about being a controller. More about being an observer. Perhaps a magnifying glass? But we’re using a magnifying glass elsewhere on the Whonix homepage already. Perhaps a telescope? Other ideas?
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/61">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/61</link>
+        <pubDate>Tue, 09 Aug 2022 19:22:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-61</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>tor-ctrl-observer - Tor Connection Destination Viewer is now mentioned on the Whonix homepage as a feature.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/60">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/60</link>
+        <pubDate>Tue, 09 Aug 2022 19:18:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-60</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>nyxnor via Whonix Forum:</p>
+<blockquote>
+<aside class="quote no-group" data-username="Patrick" data-post="55" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Because now using <code>%include /etc/torrc.d/*.conf</code>. Fortunately, Tor has now wildcard (<code>*</code>) support. Hence, extraneous files such as these back editors (ending with <code>~</code>) or those by dpkg (<code>.dpkg-old</code>) are now ignored by Tor. (If using the wildcard support which is very, very much recommended.)</p>
+<p>Therefore fortunately any hacks to find and remove extraneous files can now be removed. The reason this was implemented was only as a stopgap because at the time Tor did’t have wildcard config parsing support.</p>
+</blockquote>
+</aside>
+<p>I will remove printing the systemd service.<br>
+But I’d still prefer to show extraneous files, it is more clean, it helps to see which file are in tor directories but are not loaded.</p>
+</blockquote>
+<p>Ok. Let’s keep (restore) the showing. But the auto delete (which was<br>
+removed already) should stay removed since that is intrusive and was<br>
+only a hack.</p>
+<blockquote>
+<blockquote>
+<p>Maybe in this case it’s better to revert the use of <code>tee</code> due to the slowdown?</p>
+</blockquote>
+<p>tee is not causing this, I was still using &gt;&gt;, the “problem” is actually not a problem, because it takes more time to parse the files correctly. Try it out alongside anon-verify to see the output difference.</p>
+<p>I don’t like the script taking more than before, but it is what it takes to make it print information, parse correctly.</p>
+</blockquote>
+<p>Alright, good to know.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/59">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/59</link>
+        <pubDate>Fri, 15 Jul 2022 12:49:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-59</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="55" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Because now using <code>%include /etc/torrc.d/*.conf</code>. Fortunately, Tor has now wildcard (<code>*</code>) support. Hence, extraneous files such as these back editors (ending with <code>~</code>) or those by dpkg (<code>.dpkg-old</code>) are now ignored by Tor. (If using the wildcard support which is very, very much recommended.)</p>
+<p>Therefore fortunately any hacks to find and remove extraneous files can now be removed. The reason this was implemented was only as a stopgap because at the time Tor did’t have wildcard config parsing support.</p>
+</blockquote>
+</aside>
+<p>I will remove printing the systemd service.<br>
+But I’d still prefer to show extraneous files, it is more clean, it helps to see which file are in tor directories but are not loaded.</p>
+<blockquote>
+<p>Maybe in this case it’s better to revert the use of <code>tee</code> due to the slowdown?</p>
+</blockquote>
+<p>tee is not causing this, I was still using &gt;&gt;, the “problem” is actually not a problem, because it takes more time to parse the files correctly. Try it out alongside anon-verify to see the output difference.</p>
+<p>I don’t like the script taking more than before, but it is what it takes to make it print information, parse correctly.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/58">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/58</link>
+        <pubDate>Fri, 15 Jul 2022 12:23:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-58</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>If there’s a signed upstream git tag that would certainly help a ton. Is there?</p>
+</blockquote>
+<p>Yes.</p><aside class="onebox githubblob" data-onebox-src="https://github.com/nyxnor/carml-deb/blob/5a078f314162a49f4cd227ceb988034ee1e73a4c/build.sh#L28">
+  <header class="source">
+
+      <a href="https://github.com/nyxnor/carml-deb/blob/5a078f314162a49f4cd227ceb988034ee1e73a4c/build.sh#L28" target="_blank" rel="noopener nofollow ugc">github.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <h4><a href="https://github.com/nyxnor/carml-deb/blob/5a078f314162a49f4cd227ceb988034ee1e73a4c/build.sh#L28" target="_blank" rel="noopener nofollow ugc">nyxnor/carml-deb/blob/5a078f314162a49f4cd227ceb988034ee1e73a4c/build.sh#L28</a></h4>
+
+
+
+    <pre class="onebox">      <code class="lang-sh">
+        <ol class="start lines" start="18" style="counter-reset: li-counter 17 ;">
+            <li>
+            </li>
+<li>if test -d carml-git; then</li>
+            <li>  git -C carml-git checkout master</li>
+            <li>  git -C carml-git pull --ff-only || msg err "git pull failed"</li>
+            <li>else</li>
+            <li>  git clone "${git_url}" carml-git || msg err "git clone failed"</li>
+            <li>fi</li>
+            <li>
+            </li>
+<li>cd carml-git || msg err "changing to git directory failed"</li>
+            <li>
+            </li>
+<li class="selected">git verify-tag "${carml_version}" 2&gt;&amp;1 \</li>
+            <li>| grep -e "${tag_key}" -e "Good signature from \"meejah &lt;meejah@meejah.ca&gt;\"" \</li>
+            <li>|| msg err "git tag verification failed"</li>
+            <li>msg info "tag verification suceeded"</li>
+            <li>
+            </li>
+<li>git -c advice.detachedHead=false checkout "${carml_version}"</li>
+            <li>
+            </li>
+<li>python3 setup.py build</li>
+            <li>## remove old dir to be sure no file names changed and unwanted files stay</li>
+            <li>rm -rf ../usr/lib/python3/dist-packages/carml</li>
+            <li>mkdir -p ../usr/lib/python3/dist-packages/carml</li>
+        </ol>
+      </code>
+    </pre>
+
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>
+<p>Hm… How complex would the maintenance work be? Since it’s using <code>setup.py</code> it could be quite a bit harder over time. Don’t know.</p>
+</blockquote>
+<p>My simple <a href="https://github.com/nyxnor/carml-deb/blob/master/build.sh#L28" rel="noopener nofollow ugc">carml-deb</a> is working. But I know it is not the correct way to build python packages for debian.</p>
+<p>That way is working, but if I do a proper debian python package, with pybuild, dh_python3, it is not working, it is assigning wrong dependencies versions.</p>
+<hr>
+<p><a href="https://alioth-lists.debian.net/pipermail/pkg-privacy-maintainers/2022/004003.html" class="onebox" target="_blank" rel="noopener nofollow ugc">https://alioth-lists.debian.net/pipermail/pkg-privacy-maintainers/2022/004003.html</a></p>
+<aside class="onebox githubissue" data-onebox-src="https://github.com/meejah/carml/issues/51">
+  <header class="source">
+
+      <a href="https://github.com/meejah/carml/issues/51" target="_blank" rel="noopener nofollow ugc">github.com/meejah/carml</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/meejah/carml/issues/51" target="_blank" rel="noopener nofollow ugc">Debian packaging, any plans?</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2022-07-14" data-time="14:51:00" data-timezone="UTC">02:51PM - 14 Jul 22 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="https://github.com/nyxnor" target="_blank" rel="noopener nofollow ugc">
+          <img alt="nyxnor" src="https://avatars.githubusercontent.com/u/69700936?v=4" class="onebox-avatar-inline" width="20" height="20">
+          nyxnor
+        </a>
+      </div>
+    </div>
+
+    <div class="labels">
+        <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">
+          enhancement
+        </span>
+        <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">
+          help wanted
+        </span>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">https://carml.readthedocs.io/en/latest/installation.html#signatures
+&gt; Note: a m<span class="show-more-container"><a href="http://forums.whonix.org" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">uch easier and arguably better way to get this on Debian or Ubuntu would be for someone to package it in Debian…
+
+Any plans to package it to debian of `someone else` to do it still stands?</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>
+<p>Did you consider to try to upstream this to Debain, to become a DD (Debian Developer)?</p>
+</blockquote>
+<p>nyxnor was not private since the beggining, not using tor every time either, so if I quit, I don’t want to leave burden for other people.<br>
+The packages I am doing to whonix I’m trying to leave as bug free as possible, that won’t break with upgrades.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/57">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/57</link>
+        <pubDate>Fri, 15 Jul 2022 12:13:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-57</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="nyxnor" data-post="52" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>use gpg to verify upstream git tag</p>
+</blockquote>
+</aside>
+<p>If there’s a signed upstream git tag that would certainly help a ton. Is there?</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="52" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>would you be willing to substitue tor-ctrl for that?</p>
+</blockquote>
+</aside>
+<p>Hm… How complex would the maintenance work be? Since it’s using <code>setup.py</code> it could be quite a bit harder over time. Don’t know.<br>
+Then that would be two additional packages added to Kicksecure / Whonix repo, onionwash and carml. Trying to keep the number of packages low to not generated too much maintenance workload.<br>
+~ 67 Kicksecure / Whonix packages already (and counting…)</p>
+<aside class="quote no-group quote-modified" data-username="nyxnor" data-post="53" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p><a href="https://github.com/nyxnor/carml-deb">https://github.com/nyxnor/carml-deb</a></p>
+</blockquote>
+</aside>
+<p>The packaging will be (quite a bit or so) harder because <code>carml</code> uses python <code>setup.py</code>. It doesn’t have the simplified folder structure that Kicksecure / Whonix which makes packaging a lot easier.</p>
+<p>Debian request for packaging (RFP):<br>
+<a href="https://bugs.debian.org/890004" class="onebox" target="_blank" rel="noopener">https://bugs.debian.org/890004</a></p>
+<p>Did you consider to try to upstream this to Debain, to become a DD (Debian Developer)?</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/56">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/56</link>
+        <pubDate>Fri, 15 Jul 2022 11:56:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-56</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="nyxnor" data-post="54" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>Should I drop improvements of it on <a href="https://github.com/nyxnor/onionwash/blob/master/usr/bin/onion-parser">https://github.com/nyxnor/onionwash/blob/master/usr/bin/onion-parser</a><br>
+?</p>
+</blockquote>
+</aside>
+<p>I forgot about this code duplication. Ideally, onion-parser would be upstreamed. Meaning, anon-gw-anonymizer (which ideally wouldn’t need to exist) shouldn’t have it. If it can be upstreamed to onionwash, that would be good. PR welcome.</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="54" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>Would you rather use the anon-gw-anonymizer-config repo?</p>
+</blockquote>
+</aside>
+<p>Actually better if upstreamed (to onionwash).</p>
+<p>That included anon-verify.</p>
+<aside class="quote no-group quote-modified" data-username="nyxnor" data-post="54" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>Why was this service removed?</p>
+<p><a href="https://github.com/Whonix/anon-gw-anonymizer-config/commit/f36573aadb188820cdbd1be569bd595070b466df" class="inline-onebox">output · Whonix/anon-gw-anonymizer-config@f36573a · GitHub</a></p>
+</blockquote>
+</aside>
+<p>Because now using <code>%include /etc/torrc.d/*.conf</code>. Fortunately, Tor has now wildcard (<code>*</code>) support. Hence, extraneous files such as these back editors (ending with <code>~</code>) or those by dpkg (<code>.dpkg-old</code>) are now ignored by Tor. (If using the wildcard support which is very, very much recommended.)</p>
+<p>Therefore fortunately any hacks to find and remove extraneous files can now be removed. The reason this was implemented was only as a stopgap because at the time Tor did’t have wildcard config parsing support.</p>
+<aside class="quote no-group quote-modified" data-username="nyxnor" data-post="54" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p><a href="https://github.com/Whonix/anon-gw-anonymizer-config/commit/d619a1bf3edeb463dfb75dde15f870e910da6965" class="inline-onebox">improve anon-verify output · Whonix/anon-gw-anonymizer-config@d619a1b · GitHub</a></p>
+</blockquote>
+</aside>
+<p>This was added to ease debugging because the actual fix was quite difficult to figure out and took me a long time.</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="54" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>s’ &gt;&gt; ’ | tee -a 'g ------ doing this now</p>
+</blockquote>
+</aside>
+<p>I prefer <code>tee</code> because than the <code>xtrace</code> (debugging output) (<code>set -x</code> or <code>bash -x</code>) is more self-explanatory.</p>
+<p>Maybe in this case it’s better to revert the use of <code>tee</code> due to the slowdown?</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/55">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/55</link>
+        <pubDate>Fri, 15 Jul 2022 11:49:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-55</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>I see some commits on <a href="https://github.com/Whonix/anon-gw-anonymizer-config/commits/master/usr/libexec/anon-gw-anonymizer-config/torrc-parser" class="inline-onebox" rel="noopener nofollow ugc">History for usr/libexec/anon-gw-anonymizer-config/torrc-parser - Whonix/anon-gw-anonymizer-config · GitHub</a></p>
+<p>Should I drop improvements of it on <a href="https://github.com/nyxnor/onionwash/blob/master/usr/bin/onion-parser" rel="noopener nofollow ugc">https://github.com/nyxnor/onionwash/blob/master/usr/bin/onion-parser</a><br>
+?</p>
+<p>onion-parser takes longer</p>
+<pre><code class="lang-auto">real	0m1.217s
+user	0m0.434s
+sys     0m0.637s
+</code></pre>
+<p>than anon-verify</p>
+<pre><code class="lang-auto">real	0m0.118s
+user	0m0.064s
+sys	    0m0.026s
+</code></pre>
+<p>It takes longer to parse but it does the job correctly, it includes all files parsed and prints correctly the extraneous files.</p>
+<p>Would you rather use the anon-gw-anonymizer-config repo?</p>
+<p>Why was this service removed?</p><aside class="onebox githubcommit" data-onebox-src="https://github.com/Whonix/anon-gw-anonymizer-config/commit/f36573aadb188820cdbd1be569bd595070b466df">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/anon-gw-anonymizer-config/commit/f36573aadb188820cdbd1be569bd595070b466df" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/anon-gw-anonymizer-config</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/anon-gw-anonymizer-config/commit/f36573aadb188820cdbd1be569bd595070b466df" target="_blank" rel="noopener nofollow ugc">output</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2022-07-09" data-time="12:20:14" data-timezone="UTC">12:20PM - 09 Jul 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener nofollow ugc">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 2 deletions">
+        <a href="https://github.com/Whonix/anon-gw-anonymizer-config/commit/f36573aadb188820cdbd1be569bd595070b466df" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+1</span>
+          <span class="removed">-2</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p>Done this already, seems like the work is overlapping.</p><aside class="onebox githubcommit" data-onebox-src="https://github.com/Whonix/anon-gw-anonymizer-config/commit/d619a1bf3edeb463dfb75dde15f870e910da6965">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/anon-gw-anonymizer-config/commit/d619a1bf3edeb463dfb75dde15f870e910da6965" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/anon-gw-anonymizer-config</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/anon-gw-anonymizer-config/commit/d619a1bf3edeb463dfb75dde15f870e910da6965" target="_blank" rel="noopener nofollow ugc">improve anon-verify output</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2022-07-09" data-time="12:26:20" data-timezone="UTC">12:26PM - 09 Jul 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener nofollow ugc">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+
+      <div class="lines" title="changed 1 files with 8 additions and 1 deletions">
+        <a href="https://github.com/Whonix/anon-gw-anonymizer-config/commit/d619a1bf3edeb463dfb75dde15f870e910da6965" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+8</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>s’ &gt;&gt; ’ | tee -a 'g ------ doing this now</p><aside class="onebox githubcommit" data-onebox-src="https://github.com/Whonix/anon-gw-anonymizer-config/commit/02f368f72e03e202f1b4e749678d48c4b6396eba">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/anon-gw-anonymizer-config/commit/02f368f72e03e202f1b4e749678d48c4b6396eba" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/anon-gw-anonymizer-config</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/anon-gw-anonymizer-config/commit/02f368f72e03e202f1b4e749678d48c4b6396eba" target="_blank" rel="noopener nofollow ugc">anon-verify: fix enumeration of all Tor config drop-in snippets</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2022-07-09" data-time="12:18:39" data-timezone="UTC">12:18PM - 09 Jul 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener nofollow ugc">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+
+      <div class="lines" title="changed 2 files with 30 additions and 16 deletions">
+        <a href="https://github.com/Whonix/anon-gw-anonymizer-config/commit/02f368f72e03e202f1b4e749678d48c4b6396eba" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+30</span>
+          <span class="removed">-16</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">for new `%include /etc/torrc.d/*.conf` syntax</p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/54">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/54</link>
+        <pubDate>Fri, 15 Jul 2022 10:38:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-54</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox allowlistedgeneric" data-onebox-src="https://github.com/nyxnor/carml-deb">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="32" height="32">
+
+      <a href="https://github.com/nyxnor/carml-deb" target="_blank" rel="noopener nofollow ugc">GitHub</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://opengraph.githubassets.com/71c1e7980592686667861d5ac892c5624c695d449027c0a07e7f07e4e13dc0ed/nyxnor/carml-deb" class="thumbnail" width="" height="">
+
+<h3><a href="https://github.com/nyxnor/carml-deb" target="_blank" rel="noopener nofollow ugc">GitHub - nyxnor/carml-deb: Unofficial Debian packaging for Carml</a></h3>
+
+  <p>Unofficial Debian packaging for Carml. Contribute to nyxnor/carml-deb development by creating an account on GitHub.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/53">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/53</link>
+        <pubDate>Thu, 14 Jul 2022 18:59:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-53</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>If I make a debian build dir for <a href="https://github.com/meejah/carml" rel="noopener nofollow ugc">https://github.com/meejah/carml</a>, use gpg to verify upstream git tag, would you be willing to substitue tor-ctrl for that?</p>
+<p>tor-ctrl-observer with carml is much better: <code>$ carml monitor --no-circuits --no-guards</code>.<br>
+It prints exit nodes, but we can contribute upstream to add an option to hide that or even use grep -v ourselves.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/52">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/52</link>
+        <pubDate>Thu, 14 Jul 2022 16:01:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-52</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group quote-modified" data-username="Patrick" data-post="50" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<aside class="quote no-group" data-username="nyxnor" data-post="48" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>How can I know the original IP, the qube ip for example, that requested the proxy on port 8082? Is it possible?</p>
+</blockquote>
+</aside>
+<p>I don’t know. Perhaps best to ask a Whonix-unspecified question at Qubes?</p>
+</blockquote>
+</aside>
+<p>Did that on <a href="https://forum.qubes-os.org/t/how-to-identify-which-template-requested-to-use-the-update-proxy/12432" class="inline-onebox" rel="noopener nofollow ugc">How to identify which template requested to use the update proxy? - User Support - Qubes OS Forum</a><br>
+At the time of the writing above, I did not understand it was upstream issue.</p>
+<aside class="quote no-group quote-modified" data-username="Patrick" data-post="50" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<aside class="quote no-group" data-username="nyxnor" data-post="48" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>I am thinking of a way to identify which was the client that made the call to the proxy, because if someone is updating a bunch of vms together, then it will get difficult to know which one did a shady request to some domain.</p>
+</blockquote>
+</aside>
+<p>Yes, awesome idea!</p>
+</blockquote>
+</aside>
+<aside class="onebox githubcommit" data-onebox-src="https://github.com/nyxnor/tor-ctrl/commit/3c8291a6c0198956a04439d6a329e132ffb37127">
+  <header class="source">
+
+      <a href="https://github.com/nyxnor/tor-ctrl/commit/3c8291a6c0198956a04439d6a329e132ffb37127" target="_blank" rel="noopener nofollow ugc">github.com/nyxnor/tor-ctrl</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/nyxnor/tor-ctrl/commit/3c8291a6c0198956a04439d6a329e132ffb37127" target="_blank" rel="noopener nofollow ugc">source_addr</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2022-07-09" data-time="00:09:59" data-timezone="UTC">12:09AM - 09 Jul 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/nyxnor" target="_blank" rel="noopener nofollow ugc">
+          <img alt="nyxnor" src="https://avatars.githubusercontent.com/u/69700936?v=4" class="onebox-avatar-inline" width="20" height="20">
+          nyxnor
+        </a>
+      </div>
+
+      <div class="lines" title="changed 2 files with 32 additions and 19 deletions">
+        <a href="https://github.com/nyxnor/tor-ctrl/commit/3c8291a6c0198956a04439d6a329e132ffb37127" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+32</span>
+          <span class="removed">-19</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">https://github.com/nyxnor/tor-ctrl/issues/32</p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+<p>
+This does not filter for update proxy, was related above, it is very difficult to know because it first uses <code>127.0.0.1</code> for DNS requests and then <code>GW qube ip</code> to CONNECT. So this is not very clean and for now there is only the option to specify one client ip to filter.</p>
+<aside class="quote no-group quote-modified" data-username="Patrick" data-post="50" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<aside class="quote no-group" data-username="nyxnor" data-post="49" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>Do you think this would leak information of the client IP if the gateway is in a remote location?</p>
+</blockquote>
+</aside>
+<p>Maybe document this risk at tor-ctrl-observer startup?<br>
+Perhaps two different start menu entries?</p>
+<p>User has to take care of not posting unredacted tor-ctrl-observer logs anyhow in public since these reveal user activity. Some warning(s) would be nice.</p>
+</blockquote>
+</aside>
+<p>tor-ctrl-stream now has the option to specify client ip. Didn’t implement on -observer yet.<br>
+Thinking about it, if someone knows how to setup a remote tor gateway, they probably have some abilities, but yes, mistakes can occurr when posting logs.<br>
+I can do warnings anyway.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/51">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/51</link>
+        <pubDate>Sat, 09 Jul 2022 13:41:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-51</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="nyxnor" data-post="48" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>I am thinking of including <code>SOURCE_ADDR</code>, <a href="https://gitweb.torproject.org/torspec.git/tree/control-spec.txt#n2501">docs </a>, to tor-ctrl.</p>
+<p>It seems useful as it can indicate the client that sent the connection.<br>
+If the client is using the GW as the proxy vm, then it will show the correct WS IP assigned to the qube. e.g. 10.137.0.15 or another IP is not qubes.</p>
+</blockquote>
+</aside>
+<p>Seems highly useful.</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="48" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>How can I know the original IP, the qube ip for example, that requested the proxy on port 8082? Is it possible?</p>
+</blockquote>
+</aside>
+<p>I don’t know. Perhaps best to ask a Whonix-unspecified question at Qubes?</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="48" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>I am thinking of a way to identify which was the client that made the call to the proxy, because if someone is updating a bunch of vms together, then it will get difficult to know which one did a shady request to some domain.</p>
+</blockquote>
+</aside>
+<p>Yes, awesome idea!</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="48" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>Also, I think this is a great addition because maybe I could put an option to only show streams of a certain source_addr, for example: if multiple WS are connected to the same GW, then we can run tor-ctrl on 2 terminals and filter by connections made by the WS qube ip, this way it is easier to distinguish where may be some leaks.</p>
+<p>What do you think?</p>
+</blockquote>
+</aside>
+<p>Awesome!</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="49" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>Do you think this would leak information of the client IP if the gateway is in a remote location?</p>
+</blockquote>
+</aside>
+<p>Maybe document this risk at tor-ctrl-observer startup?<br>
+Perhaps two different start menu entries?</p>
+<p>User has to take care of not posting unredacted tor-ctrl-observer logs anyhow in public since these reveal user activity. Some warning(s) would be nice.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/50">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/50</link>
+        <pubDate>Sat, 09 Jul 2022 12:34:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-50</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>Dropped the qubes update proxy firewall thinkering, not possible to filter and is an upstream issue.</p>
+<p><span class="mention">@adrelanos</span> Should <code>tor-ctrl-observer</code> have a SOURCE_ADDR field? Do you think this would leak information of the client IP if the gateway is in a remote location?</p>
+<p>For GW and WS on the same machine or LAN this is not a problem, only for remote GW.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/49">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/49</link>
+        <pubDate>Sat, 09 Jul 2022 00:09:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-49</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>I am thinking of including <code>SOURCE_ADDR</code>, <a href="https://gitweb.torproject.org/torspec.git/tree/control-spec.txt#n2501" rel="noopener nofollow ugc">docs</a>, to tor-ctrl.</p>
+<p>It seems useful as it can indicate the client that sent the connection.<br>
+If the client is using the GW as the proxy vm, then it will show the correct WS IP assigned to the qube. e.g. 10.137.0.15 or another IP is not qubes.</p>
+<p>But if the client is just using the GW as proxy to update on the template, then it will show a connection to localhost. e.g. 127.0.0.1:5999. The port is random.</p>
+<p>How can I know the original IP, the qube ip for example, that requested the proxy on port 8082? Is it possible?</p>
+<p>I am thinking of a way to identify which was the client that made the call to the proxy, because if someone is updating a bunch of vms together, then it will get difficult to know which one did a shady request to some domain. Of course qubes update tool runs one at a time, but any way…</p>
+<p>Also, I think this is a great addition because maybe I could put an option to only show streams of a certain source_addr, for example: if multiple WS are connected to the same GW, then we can run tor-ctrl on 2 terminals and filter by connections made by the WS qube ip, this way it is easier to distinguish where may be some leaks.</p>
+<p>What do you think?</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/48">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/48</link>
+        <pubDate>Thu, 07 Jul 2022 19:44:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-48</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I guess any keys are OK as long as the program says so. Bonus points for following standards / conventions as much as possible.</p>
+<p>derivative-maker (previously Whonix build script) taps ctrl + c (sigterm) and shows a custom error handler once pressed. Does not necessarily end the script. One could even have a sigterm trap and do nothing, whatever that would be useful for.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/47">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/47</link>
+        <pubDate>Mon, 27 Jun 2022 22:03:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-47</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>seeing again, eof (^D) is not a trap action, so it cannot execute another thing after being called, it will simply ignore or not ignore eof.</p>
+<ul>
+<li><a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_25" rel="noopener nofollow ugc">set</a></li>
+<li><a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_28" rel="noopener nofollow ugc">trap</a></li>
+</ul>
+<p>But QUIT is an action (^), altough kind weird, it works the <code>Ctrl+\</code> (backslash).<br>
+The commands can be found with <code>stty -a</code>.</p>
+<p>In this way I am thinking that <code>^C</code> INT should interrupt the script and print summary and <code>^\</code> QUIT should quit the script immediately.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/46">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/46</link>
+        <pubDate>Mon, 27 Jun 2022 21:05:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-46</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes, the signals can be “shuffled” to what makes most sense / easiest to use for the user. Usage of signals could be documented by adding a short console output message at script startup.</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="44" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p><a href="https://unix.stackexchange.com/a/512864">posible and plausible </a></p>
+</blockquote>
+</aside>
+<p>That seems like a good solution.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/45">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/45</link>
+        <pubDate>Mon, 27 Jun 2022 13:58:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-45</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>For me, if I press Ctrl+C during tor-control-observe, I get the summary and the script terminates.</p>
+</blockquote>
+<p>That is expected when calling from the command line.<br>
+The problem is when using the Desktop file, when using Ctrl+C, it will kill the terminal emulator.</p>
+<p>The Ctrl+D option <a href="https://github.com/nyxnor/tor-ctrl/issues/20#issuecomment-1160208056" rel="noopener nofollow ugc">mentioned on gh</a> seems to be <a href="https://unix.stackexchange.com/a/512864" rel="noopener nofollow ugc">posible and plausible</a>.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/44">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/44</link>
+        <pubDate>Sun, 26 Jun 2022 22:18:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-44</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>For me, if I press Ctrl+C during tor-control-observe, I get the summary and the script terminates. Bug?</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/43">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/43</link>
+        <pubDate>Mon, 20 Jun 2022 09:34:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-43</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>issues corrected.</p>
+<p>about the logo, I am not proficient in arts.</p>
+<p>In the <a href="https://www.whonix.org/wiki/Tor-ctrl-observe#Usage" rel="noopener nofollow ugc">whonix usage page</a></p>
+<pre><code class="lang-auto">**3.** Terminate `tor-ctrl-observe` with signal sigint.
+
+Press keyboard keys `Ctrl` + `C`.
+</code></pre>
+<p>Ctrl+C will not terminate the whole script, just listening the stream, and then a summary will be shown.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/42">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/42</link>
+        <pubDate>Sun, 19 Jun 2022 17:18:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-42</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>tor-control-observe documentation written:</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://www.whonix.org/wiki/Tor-ctrl-observe">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/a/a4/Whonix-home-favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://www.whonix.org/wiki/Tor-ctrl-observe" target="_blank" rel="noopener" title="10:02AM - 19 June 2022">Whonix – 19 Jun 22</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:400/250;"><img src="https://www.whonix.org/w/images/5/54/Screenshot_arm_page1_cropped.png" class="thumbnail" width="400" height="250"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Tor-ctrl-observe" target="_blank" rel="noopener">tor-ctrl-observe</a></h3>
+
+  <p>Ever wanted to know which information is sent by an application? tor-ctrl-observe shows connection information of applications using Tor.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>(The thumbnail is outdated, cached by this forum.)</p>
+<p>If some screenshots / thumbnail / project logo was  freely available, I’d add it to the wiki page.</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/41">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/41</link>
+        <pubDate>Sun, 19 Jun 2022 10:05:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-41</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubissue" data-onebox-src="https://github.com/nyxnor/tor-ctrl/issues/31">
+  <header class="source">
+
+      <a href="https://github.com/nyxnor/tor-ctrl/issues/31" target="_blank" rel="noopener">github.com/nyxnor/tor-ctrl</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/nyxnor/tor-ctrl/issues/31" target="_blank" rel="noopener">messages improvement</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2022-06-19" data-time="09:32:18" data-timezone="UTC">09:32AM - 19 Jun 22 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+
+    <div class="labels">
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">tor-ctrl-observer 
+
+&gt; tor-ctrl-observer: [info]: subscribed to Tor stream even<span class="show-more-container"><a href="http://forums.whonix.org" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">ts, as soon as streams are created, output will be shown below.
+
+Good.
+
+&gt; tor-ctrl: [notice] connecting to socket with command: nc -U /run/tor/control
+
+Good.
+
+&gt; attempting to connect to
+
+[1] attempting to connect to... To what? And did it succeed? I guess so. But still a bit confusing.
+
+&gt; stop listening with Ctrl+C
+
+Maybe rather write
+`To stop listening and show a summary, please Ctrl+C.`
+?
+
+User could further think, yeah, sure, with Ctrl+C I can exit this. Thanks for the tip. But instead, I could also just close the window. But that's wrong, the Ctrl+C will actually show additional information.
+
+&gt; connecting to socket with
+
+connecting to socket with... With what? And did it succeed? I guess so. But still a bit confusing. Similar to [1].</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/40">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/40</link>
+        <pubDate>Sun, 19 Jun 2022 09:32:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-40</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>I was looking tor command line tools and found <a href="https://github.com/meejah/carml" rel="noopener nofollow ugc">carml</a>.<br>
+It is very nice the <code>monitor</code> command, the log messages are easy to read not raw, even though you can still see raw with <code>events</code> command.<br>
+Carml is built upon <a href="https://github.com/meejah/txtorcon" rel="noopener nofollow ugc">txtorcon</a>, both by <a href="https://github.com/meejah" rel="noopener nofollow ugc">Meejah</a>.</p>
+<p>Unfortunately carml does not have a debian package, but txtorcon the library has, so possible that in the feature he provides pushes it to <a href="http://debian.org" rel="noopener nofollow ugc">debian.org</a>.</p>
+<p>interesting commands:</p>
+<ul>
+<li>
+<a href="https://carml.readthedocs.io/en/latest/command-monitor.html" rel="noopener nofollow ugc">monitor</a> → beautify events</li>
+<li>
+<a href="https://carml.readthedocs.io/en/latest/command-onion.html" rel="noopener nofollow ugc">onion</a> → create onion services</li>
+<li>
+<a href="https://carml.readthedocs.io/en/latest/command-newid.html" rel="noopener nofollow ugc">newid</a> → newnym</li>
+<li>
+<a href="https://carml.readthedocs.io/en/latest/command-cmd.html" rel="noopener nofollow ugc">cmd</a> → any controller command</li>
+</ul>
+<h2>
+<a name="thoughts-1" class="anchor" href="http://forums.whonix.org#thoughts-1"></a>Thoughts:</h2>
+<p>Much better than tor-ctrl of course in terms of user friendliness, interpreting events, has a whole library.<br>
+Not available on <a href="http://deb.debian.org" rel="noopener nofollow ugc">deb.debian.org</a> so one would need to maintain the package. Has some dependencies not available on debian repos such as <a href="https://github.com/verigak/colors/" rel="noopener nofollow ugc">ansicolors</a>.</p>
+<p>It is a great tool and I hope it becomes available on debian soon, but it it on version 21.1.0, so maybe there is something blocking.</p>
+<h2>
+<a name="docs-2" class="anchor" href="http://forums.whonix.org#docs-2"></a>Docs</h2>
+<p><a href="https://carml.readthedocs.io/en/latest/" class="onebox" target="_blank" rel="noopener nofollow ugc">https://carml.readthedocs.io/en/latest/</a></p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/39">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/39</link>
+        <pubDate>Fri, 18 Mar 2022 12:17:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-39</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+      <item>
+        <title>tor-ctrl - Tor control port command line tool</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="nyxnor" data-post="35" data-topic="8074">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>Made the edit but yet, it feels like needing a separate wiki page.</p>
+</blockquote>
+</aside>
+<p>Created an empty <a href="https://www.whonix.org/wiki/Tor-ctrl-observe" class="inline-onebox">Tor-ctrl-observe - Whonix</a> just now. (The page name can certainly be modified/moved if there are better suggestions.)</p>
+          <p><a href="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/38">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/38</link>
+        <pubDate>Sat, 26 Feb 2022 09:18:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8074-38</guid>
+        <source url="http://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074.rss">tor-ctrl - Tor control port command line tool</source>
+      </item>
+  </channel>
+</rss>

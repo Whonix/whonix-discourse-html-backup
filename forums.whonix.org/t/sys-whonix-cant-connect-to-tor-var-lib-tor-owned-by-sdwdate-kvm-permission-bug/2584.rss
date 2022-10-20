@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</title>
+    <link>http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584</link>
+    <description>Yesterday I did a clean install of the Whonix template (workstation and gateway) and now `sys-whonix` can&#39;t connect to Tor. I ran `sdwdate-gui` to sync the time before I executed the following commands.
+
+$ sudo whonixsetup
+&gt; &quot;sudo service tor@default status&quot; returned non-zero exit code , which means Tor does NOT work.
+
+&gt; Maybe your Whonix-Gateway has only one network card attached? Most likely there is something wrong with your /etc/tor/torrc.
+
+&gt; You can try to manually edit /etc/tor/torrc: 
+
+&gt;     Start Menu -&gt; Applications -&gt; Torrc
+
+&gt; Running: 
+
+&gt;     sudo service tor@default restart
+
+&gt; might help with troubleshooting.
+
+$ sudo service tor@default restart
+&gt; Job for tor@default.service failed. See &#39;systemctl status tor@default.service&#39; and &#39;journalctl -xn&#39; for details.
+
+$ systemctl status tor@default.service
+    &gt;     ● tor@default.service - Anonymizing overlay network for TCP
+    &gt;        Loaded: loaded (/lib/systemd/system/tor@default.service; static)
+    &gt;        Active: failed (Result: start-limit) since Fri 2016-06-10 16:40:24 UTC; 6s ago
+    &gt;       Process: 9869 ExecStartPre=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0 --verify-config (code=exited, status=1/FAILURE)
+    &gt;       Process: 9866 ExecStartPre=/usr/bin/install -Z -m 02750 -o debian-tor -g debian-tor -d /var/run/tor (code=exited, status=0/SUCCESS)
+
+$ journalctl -xn
+&gt; No journal files were found
+
+$ cat /etc/tor/torrc
+&gt;     # This file is part of Whonix
+&gt;     # Copyright (C) 2012 - 2013 adrelanos &lt;adrelanos at riseup dot net&gt;
+&gt;     # See the file COPYING for copying conditions.
+
+&gt;     # Use this file for your user customizations.
+&gt;     # Please see /etc/tor/torrc.examples for help, options, comments etc.
+
+&gt;     # Anything here will override Whonix&#39;s own Tor config customizations in
+&gt;     # /usr/share/tor/tor-service-defaults-torrc
+
+&gt;     # Enable Tor through whonixsetup or manually uncomment &quot;#DisableNetwork 0&quot; by
+&gt;     # removing the # in front of it.
+&gt;     DisableNetwork 0
+
+I can now use `whonixcheck` after running `whonixsetup`.
+
+$ whonixcheck
+&gt;     [INFO] [whonixcheck] sys-whonix | Whonix-Gateway | whonix-gw Template-Based ProxyVM | Fri Jun 10 16:46:04 UTC 2016
+&gt;     [ERROR] [whonixcheck] Tor Config Check Result:
+&gt;     Your /etc/tor/torrc file contains at least one error.
+
+&gt;     (Tor exit code: 1)
+
+&gt;     Tor reports:
+&gt;     Jun 10 16:46:06.876 [notice] Tor v0.2.7.6 (git-605ae665009853bd) running on Linux with Libevent 2.0.21-stable, OpenSSL 1.0.1t and Zlib 1.2.8.
+&gt;     Jun 10 16:46:06.876 [notice] Tor can&#39;t help you if you use it wrong! Learn how to be safe at https://www.torproject.org/download/download#warning
+&gt;     Jun 10 16:46:06.876 [notice] Read configuration file &quot;/etc/tor/torrc&quot;.
+&gt;     Jun 10 16:46:06.879 [warn] Directory /var/lib/tor/.tor cannot be read: Permission denied
+&gt;     Jun 10 16:46:06.879 [warn] Failed to parse/validate config: Couldn&#39;t access/create private data directory &quot;/var/lib/tor/.tor&quot;
+&gt;     Jun 10 16:46:06.879 [err] Reading config failed--see warnings above.
+
+&gt;     You have to fix this error, before you can use Tor.
+
+&gt;     Try to look at this report yourself by running.
+
+&gt;     dom0 -&gt; Start Menu -&gt; ServiceVM: sys-whonix -&gt; Terminal
+
+&gt;     sudo -u debian-tor tor --verify-config
+
+&gt;     And.
+
+&gt;     sudo -u debian-tor tor --verify-config -f /etc/tor/torrc
+
+&gt;     To try to fix this, please open your Tor config file.
+
+&gt;         dom0 -&gt; Start Menu -&gt; ServiceVM: sys-whonix -&gt; Torrc
+&gt;         or in Terminal: sudo nano /etc/tor/torrc
+
+&gt;     Please restart Tor after fixing this error.
+
+&gt;         dom0 -&gt; Start Menu -&gt; ServiceVM: sys-whonix -&gt; Restart Tor
+&gt;         or in Terminal: sudo service tor@default restart
+
+&gt;     Restart whonixcheck after fixing this error.
+
+&gt;         dom0 -&gt; Start Menu -&gt; ServiceVM: sys-whonix -&gt; Whonix Check
+&gt;         or in Terminal: whonixcheck
+
+&gt;     If you know what you are doing or if this is a false positive, feel free to disable this check.
+&gt;     Create a file /etc/whonix.d/50_whonixcheck_user and add:
+&gt;     whonixcheck_skip_functions+=&quot; check_tor_config &quot;
+&gt;     user@host:~$ cat /etc/tor/torrc
+&gt;     # This file is part of Whonix
+&gt;     # Copyright (C) 2012 - 2013 adrelanos &lt;adrelanos at riseup dot net&gt;
+&gt;     # See the file COPYING for copying conditions.
+
+&gt;     # Use this file for your user customizations.
+&gt;     # Please see /etc/tor/torrc.examples for help, options, comments etc.
+
+&gt;     # Anything here will override Whonix&#39;s own Tor config customizations in
+&gt;     # /usr/share/tor/tor-service-defaults-torrc
+
+&gt;     # Enable Tor through whonixsetup or manually uncomment &quot;DisableNetwork 0&quot; by
+&gt;     # removing the # in front of it.
+&gt;     DisableNetwork 0
+
+$ sudo -u debian-tor tor --verify-config
+&gt;     Jun 10 16:50:07.808 [notice] Tor v0.2.7.6 (git-605ae665009853bd) running on Linux with Libevent 2.0.21-stable, OpenSSL 1.0.1t and Zlib 1.2.8.
+&gt;     Jun 10 16:50:07.808 [notice] Tor can&#39;t help you if you use it wrong! Learn how to be safe at https://www.torproject.org/download/download#warning
+&gt;     Jun 10 16:50:07.808 [notice] Read configuration file &quot;/etc/tor/torrc&quot;.
+&gt;     Jun 10 16:50:07.811 [warn] Directory /var/lib/tor/.tor cannot be read: Permission denied
+&gt;     Jun 10 16:50:07.811 [warn] Failed to parse/validate config: Couldn&#39;t access/create private data directory &quot;/var/lib/tor/.tor&quot;
+&gt;     Jun 10 16:50:07.811 [err] Reading config failed--see warnings above.
+
+$ sudo -u debian-tor --verify-config -f /etc/tor/torrc
+&gt;     Jun 10 16:51:26.821 [notice] Tor v0.2.7.6 (git-605ae665009853bd) running on Linux with Libevent 2.0.21-stable, OpenSSL 1.0.1t and Zlib 1.2.8.
+&gt;     Jun 10 16:51:26.821 [notice] Tor can&#39;t help you if you use it wrong! Learn how to be safe at https://www.torproject.org/download/download#warning
+&gt;     Jun 10 16:51:26.821 [notice] Read configuration file &quot;/etc/tor/torrc&quot;.
+&gt;     Jun 10 16:51:26.823 [warn] Directory /var/lib/tor/.tor cannot be read: Permission denied
+&gt;     Jun 10 16:51:26.823 [warn] Failed to parse/validate config: Couldn&#39;t access/create private data directory &quot;/var/lib/tor/.tor&quot;
+&gt;     Jun 10 16:51:26.823 [err] Reading config failed--see warnings above.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 14 Aug 2016 16:19:35 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>Reproduced this issue by accident:</p>
+<ol>
+<li>Installed clean Qubes 3.1 including Whonix Templates.</li>
+<li>Created sys-whonix ProxyVM.</li>
+<li>Updated all Templates + dom0.</li>
+<li>Encountered Meta-Package warning, then remembered that Qubes 3.1 still installs Whonix 12.</li>
+<li>Reassigned sys-whonix to temporary Template.</li>
+<li>Removed Whonix 12 Templates.</li>
+<li>Installed Whonix 13 Templates.</li>
+<li>Attached existing sys-whonix to new Whonix 13 Template.</li>
+<li>Starting sys-whonix produced this exact issue.</li>
+</ol>
+<p>Edit: Wrong order 2&lt;-&gt;3</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/8</link>
+        <pubDate>Sat, 13 Aug 2016 21:23:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2584-8</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584.rss">sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</source>
+      </item>
+      <item>
+        <title>sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve experienced this <code>/var/lib/tor</code> permission issue myself today. Starting fresh with all Whonix templates and Whonix based VMs using a fresh build. Since then I was unable to reproduce this. Added two enhancements to ease debugging this which will be deployed in Whonix 14.</p>
+<ul>
+<li><a href="https://phabricator.whonix.org/T535">https://phabricator.whonix.org/T535</a></li>
+<li><a href="https://phabricator.whonix.org/T537">https://phabricator.whonix.org/T537</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/7</link>
+        <pubDate>Thu, 04 Aug 2016 23:14:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2584-7</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584.rss">sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</source>
+      </item>
+      <item>
+        <title>sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I have been able to reproduce this issue and was investigating.</p>
+<p><code>python-stem might mess up permissions in	/var/lib/tor folder?</code><br>
+<a href="https://www.whonix.org/pipermail/whonix-devel/2016-June/000653.html" class="onebox" target="_blank">https://www.whonix.org/pipermail/whonix-devel/2016-June/000653.html</a></p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/6</link>
+        <pubDate>Fri, 10 Jun 2016 21:10:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2584-6</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584.rss">sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</source>
+      </item>
+      <item>
+        <title>sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</title>
+        <dc:creator><![CDATA[dumbl3d0re]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="4" data-topic="2584">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>I wonder how you managed to get a /var/lib/tor/.tor folder? Did you try to restore a file backup?</p>
+</blockquote>
+</aside>
+<p>No. I just wanted to reinstall whonix to get a clean workstation template. I’ve never touched <code>whonix-gw</code> or <code>sys-whonix</code>.</p>
+<ol>
+<li>Cloned <code>whonix-gw</code>
+</li>
+<li>Changed <code>sys-whonix</code>'s template to the clone (<code>whonix-gw-old</code>)</li>
+<li>Remove whonix templates</li>
+<li>Install whonix templates</li>
+<li>Change <code>sys-whonix</code>'s template back to <code>whonix-gw</code>
+</li>
+</ol>
+<aside class="quote" data-post="4" data-topic="2584">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>sudo ls -la /var/lib/tor</p>
+</blockquote>
+</aside>
+<pre><code>total 8520
+drwx--S---  2 sdwdate kvm     4096 Jun  9 20:26 .
+drwxr-xr-x 50 root    root    4096 Jun 10 08:33 ..
+-rw-------  1 sdwdate kvm    20442 Jun  5 06:01 cached-certs
+-rw-------  1 sdwdate kvm  1398944 Jun  9 20:19 cached-microdesc-consensus
+-rw-------  1 sdwdate kvm  6937506 Jun  9 06:22 cached-microdescs
+-rw-------  1 sdwdate kvm   345295 Jun  9 20:21 cached-microdescs.new
+-rw-------  1 sdwdate kvm        0 Jun  9 19:31 lock
+-rw-------  1 sdwdate kvm     3538 Jun  9 20:26 state
+</code></pre>
+<aside class="quote" data-post="4" data-topic="2584">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>sudo chown --recursive debian-tor:debian-tor /var/lib/tor</p>
+</blockquote>
+</aside>
+<p>It did the magic! Works now without any problems.</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/5</link>
+        <pubDate>Fri, 10 Jun 2016 19:15:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2584-5</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584.rss">sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</source>
+      </item>
+      <item>
+        <title>sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="2584">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/d/ba8739/40.png" class="avatar"> dumbl3d0re:</div>
+<blockquote>
+<p>/var/lib/tor/.tor</p>
+</blockquote>
+</aside>
+<p>I wonder how you managed to get a /var/lib/tor/.tor folder? Did you try to restore a file backup?</p>
+<p>Please run the following command.</p>
+<pre><code>sudo ls -la /var/lib/tor
+</code></pre>
+<p>The following command should fix the permission issues.</p>
+<pre><code>sudo chown --recursive debian-tor:debian-tor /var/lib/tor</code></pre>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/4</link>
+        <pubDate>Fri, 10 Jun 2016 18:36:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2584-4</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584.rss">sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</source>
+      </item>
+      <item>
+        <title>sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Disregard my last message. I did not notice you edited your message.</p>
+<aside class="quote" data-post="1" data-topic="2584">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/d/ba8739/40.png" class="avatar"> dumbl3d0re:</div>
+<blockquote>
+<p>journalctl -xn</p>
+</blockquote>
+</aside>
+<p>This required sudo btw. Not required at the moment.</p>
+<p>More answers soon…</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/3</link>
+        <pubDate>Fri, 10 Jun 2016 18:21:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2584-3</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584.rss">sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</source>
+      </item>
+      <item>
+        <title>sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Check Tor logs for error messages.</p>
+<p>( <a href="https://www.whonix.org/wiki/Tor#Log_Analysis">https://www.whonix.org/wiki/Tor#Log_Analysis</a> )</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/2</link>
+        <pubDate>Fri, 10 Jun 2016 18:08:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2584-2</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584.rss">sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</source>
+      </item>
+      <item>
+        <title>sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</title>
+        <dc:creator><![CDATA[dumbl3d0re]]></dc:creator>
+        <description><![CDATA[
+            <p>Yesterday I did a clean install of the Whonix template (workstation and gateway) and now <code>sys-whonix</code> can’t connect to Tor. I ran <code>sdwdate-gui</code> to sync the time before I executed the following commands.</p>
+<p>$ sudo whonixsetup</p>
+<blockquote>
+<p>“sudo service tor@default status” returned non-zero exit code , which means Tor does NOT work.</p>
+</blockquote>
+<blockquote>
+<p>Maybe your Whonix-Gateway has only one network card attached? Most likely there is something wrong with your /etc/tor/torrc.</p>
+</blockquote>
+<blockquote>
+<p>You can try to manually edit /etc/tor/torrc:</p>
+</blockquote>
+<blockquote>
+<pre><code>Start Menu -&gt; Applications -&gt; Torrc
+</code></pre>
+</blockquote>
+<blockquote>
+<p>Running:</p>
+</blockquote>
+<blockquote>
+<pre><code>sudo service tor@default restart
+</code></pre>
+</blockquote>
+<blockquote>
+<p>might help with troubleshooting.</p>
+</blockquote>
+<p>$ sudo service tor@default restart</p>
+<blockquote>
+<p>Job for tor@default.service failed. See ‘systemctl status tor@default.service’ and ‘journalctl -xn’ for details.</p>
+</blockquote>
+<p>$ systemctl status tor@default.service<br>
+&gt;     ● tor@default.service - Anonymizing overlay network for TCP<br>
+&gt;        Loaded: loaded (/lib/systemd/system/tor@default.service; static)<br>
+&gt;        Active: failed (Result: start-limit) since Fri 2016-06-10 16:40:24 UTC; 6s ago<br>
+&gt;       Process: 9869 ExecStartPre=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0 --verify-config (code=exited, status=1/FAILURE)<br>
+&gt;       Process: 9866 ExecStartPre=/usr/bin/install -Z -m 02750 -o debian-tor -g debian-tor -d /var/run/tor (code=exited, status=0/SUCCESS)</p>
+<p>$ journalctl -xn</p>
+<blockquote>
+<p>No journal files were found</p>
+</blockquote>
+<p>$ cat /etc/tor/torrc</p>
+<blockquote>
+<pre><code># This file is part of Whonix
+# Copyright (C) 2012 - 2013 adrelanos &lt;adrelanos at riseup dot net&gt;
+# See the file COPYING for copying conditions.
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code># Use this file for your user customizations.
+# Please see /etc/tor/torrc.examples for help, options, comments etc.
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code># Anything here will override Whonix's own Tor config customizations in
+# /usr/share/tor/tor-service-defaults-torrc
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code># Enable Tor through whonixsetup or manually uncomment "#DisableNetwork 0" by
+# removing the # in front of it.
+DisableNetwork 0
+</code></pre>
+</blockquote>
+<p>I can now use <code>whonixcheck</code> after running <code>whonixsetup</code>.</p>
+<p>$ whonixcheck</p>
+<blockquote>
+<pre><code>[INFO] [whonixcheck] sys-whonix | Whonix-Gateway | whonix-gw Template-Based ProxyVM | Fri Jun 10 16:46:04 UTC 2016
+[ERROR] [whonixcheck] Tor Config Check Result:
+Your /etc/tor/torrc file contains at least one error.
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>(Tor exit code: 1)
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>Tor reports:
+Jun 10 16:46:06.876 [notice] Tor v0.2.7.6 (git-605ae665009853bd) running on Linux with Libevent 2.0.21-stable, OpenSSL 1.0.1t and Zlib 1.2.8.
+Jun 10 16:46:06.876 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://www.torproject.org/download/download#warning
+Jun 10 16:46:06.876 [notice] Read configuration file "/etc/tor/torrc".
+Jun 10 16:46:06.879 [warn] Directory /var/lib/tor/.tor cannot be read: Permission denied
+Jun 10 16:46:06.879 [warn] Failed to parse/validate config: Couldn't access/create private data directory "/var/lib/tor/.tor"
+Jun 10 16:46:06.879 [err] Reading config failed--see warnings above.
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>You have to fix this error, before you can use Tor.
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>Try to look at this report yourself by running.
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>dom0 -&gt; Start Menu -&gt; ServiceVM: sys-whonix -&gt; Terminal
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>sudo -u debian-tor tor --verify-config
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>And.
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>sudo -u debian-tor tor --verify-config -f /etc/tor/torrc
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>To try to fix this, please open your Tor config file.
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>    dom0 -&gt; Start Menu -&gt; ServiceVM: sys-whonix -&gt; Torrc
+    or in Terminal: sudo nano /etc/tor/torrc
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>Please restart Tor after fixing this error.
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>    dom0 -&gt; Start Menu -&gt; ServiceVM: sys-whonix -&gt; Restart Tor
+    or in Terminal: sudo service tor@default restart
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>Restart whonixcheck after fixing this error.
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>    dom0 -&gt; Start Menu -&gt; ServiceVM: sys-whonix -&gt; Whonix Check
+    or in Terminal: whonixcheck
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>If you know what you are doing or if this is a false positive, feel free to disable this check.
+Create a file /etc/whonix.d/50_whonixcheck_user and add:
+whonixcheck_skip_functions+=" check_tor_config "
+user@host:~$ cat /etc/tor/torrc
+# This file is part of Whonix
+# Copyright (C) 2012 - 2013 adrelanos &lt;adrelanos at riseup dot net&gt;
+# See the file COPYING for copying conditions.
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code># Use this file for your user customizations.
+# Please see /etc/tor/torrc.examples for help, options, comments etc.
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code># Anything here will override Whonix's own Tor config customizations in
+# /usr/share/tor/tor-service-defaults-torrc
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code># Enable Tor through whonixsetup or manually uncomment "DisableNetwork 0" by
+# removing the # in front of it.
+DisableNetwork 0
+</code></pre>
+</blockquote>
+<p>$ sudo -u debian-tor tor --verify-config</p>
+<blockquote>
+<pre><code>Jun 10 16:50:07.808 [notice] Tor v0.2.7.6 (git-605ae665009853bd) running on Linux with Libevent 2.0.21-stable, OpenSSL 1.0.1t and Zlib 1.2.8.
+Jun 10 16:50:07.808 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://www.torproject.org/download/download#warning
+Jun 10 16:50:07.808 [notice] Read configuration file "/etc/tor/torrc".
+Jun 10 16:50:07.811 [warn] Directory /var/lib/tor/.tor cannot be read: Permission denied
+Jun 10 16:50:07.811 [warn] Failed to parse/validate config: Couldn't access/create private data directory "/var/lib/tor/.tor"
+Jun 10 16:50:07.811 [err] Reading config failed--see warnings above.
+</code></pre>
+</blockquote>
+<p>$ sudo -u debian-tor --verify-config -f /etc/tor/torrc</p>
+<blockquote>
+<pre><code>Jun 10 16:51:26.821 [notice] Tor v0.2.7.6 (git-605ae665009853bd) running on Linux with Libevent 2.0.21-stable, OpenSSL 1.0.1t and Zlib 1.2.8.
+Jun 10 16:51:26.821 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://www.torproject.org/download/download#warning
+Jun 10 16:51:26.821 [notice] Read configuration file "/etc/tor/torrc".
+Jun 10 16:51:26.823 [warn] Directory /var/lib/tor/.tor cannot be read: Permission denied
+Jun 10 16:51:26.823 [warn] Failed to parse/validate config: Couldn't access/create private data directory "/var/lib/tor/.tor"
+Jun 10 16:51:26.823 [err] Reading config failed--see warnings above.</code></pre>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584/1</link>
+        <pubDate>Fri, 10 Jun 2016 16:05:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2584-1</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-cant-connect-to-tor-var-lib-tor-owned-by-sdwdate-kvm-permission-bug/2584.rss">sys-whonix can&#39;t connect to Tor / /var/lib/tor owned by sdwdate:kvm permission bug</source>
+      </item>
+  </channel>
+</rss>

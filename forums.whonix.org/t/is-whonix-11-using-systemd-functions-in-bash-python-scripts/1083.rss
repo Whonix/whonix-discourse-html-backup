@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Is Whonix 11 using systemd functions in bash, python scripts?</title>
+    <link>http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083</link>
+    <description>Does Whonix 11 use systemd functions for checking status and such from within Whonix bash scripts?
+
+Even though there are compatibility functions for old sysinitv configuration files, they are not always reliable.
+
+[code]
+systemctl is-enabled tor
+systemctl is-active tor
+systemctl is-failed tor
+systemctl status tor
+systemctl mask tor  # Make service impossible to run
+[/code]
+
+In python, there is a systemd library that can be used to interface with systems, or use of python-sh
+
+I don&#39;t get notifications of topics, so maybe create a task if this not complete</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 30 May 2015 12:59:28 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Is Whonix 11 using systemd functions in bash, python scripts?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Done. No issues.</p>
+          <p><a href="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083/6</link>
+        <pubDate>Sat, 30 May 2015 12:59:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1083-6</guid>
+        <source url="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083.rss">Is Whonix 11 using systemd functions in bash, python scripts?</source>
+      </item>
+      <item>
+        <title>Is Whonix 11 using systemd functions in bash, python scripts?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>I had issues using service.  I was using them in qubes-whonix and services were not being enable/disabled properly when there was an alias and both sysinit and systemd files.  I can't recall exactly what was giving me issues, it was either control-port..-python or Tor or both.  It was only enabling the sysinitv configurations when using service and not systemd unit files.</blockquote>
+Probably not an issue with 'service'. Probably it was the "don't use spaces in systemd unit files" issue:
+- https://phabricator.whonix.org/T316
+- https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=786418
+- https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=786421
+<p>[hr]</p>
+<p>Created a ticket as reminder for this…<br>
+check if invocations of ‘service’ by Whonix scripts in Whonix 11 is functional:<br>
+<a href="https://phabricator.whonix.org/T331" class="onebox" target="_blank">https://phabricator.whonix.org/T331</a></p>
+          <p><a href="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083/5</link>
+        <pubDate>Thu, 28 May 2015 16:49:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1083-5</guid>
+        <source url="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083.rss">Is Whonix 11 using systemd functions in bash, python scripts?</source>
+      </item>
+      <item>
+        <title>Is Whonix 11 using systemd functions in bash, python scripts?</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:3, topic:1083”]Good point.</p>
+<aside class="quote">
+<blockquote>
+<p>Does Whonix 11 use systemd functions for checking status and such from within Whonix bash scripts?</p>
+<p>Even though there are compatibility functions for old sysinitv configuration files, they are not always reliable.</p>
+</blockquote>
+</aside>
+<p>Yes. From ./packages folder…</p>
+<pre><code class="lang-auto">grep -r --exclude-dir '.git*' --exclude README.md --exclude changelog.upstream --exclude GPLv3 "service " *</code></pre>
+<p>I would like to keep ‘service’  if sane/possible. ‘service’ seems to be an agnostic wrapper that works with sysvinit, upstart and systemd. Using ‘systemctl’ would make the package systemd-only. And would also require loads of package changes. Maybe let’s only change it where needed.</p>
+<p>‘service’ seems like a not-too-difficult-to-grasp ™ sh script that is easy to debug.</p>
+<pre><code class="lang-auto">sudo sh -x /usr/sbin/service sdwdate status</code></pre>
+<p>Will check if all that stuff is still functional.<br>
+Will also check for related sysvinit-utils (contains ‘service’) bugs.<br>
+<a href="https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=sysvinit-utils;dist=unstable%5B/quote%5D" class="onebox" target="_blank" rel="nofollow noopener">https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=sysvinit-utils;dist=unstable[/quote]</a></p>
+<p>I had issues using service.  I was using them in qubes-whonix and services were not being enable/disabled properly when there was an alias and both sysinit and systemd files.  I can’t recall exactly what was giving me issues, it was either control-port…-python or Tor or both.  It was only enabling the sysinitv configurations when using service and not systemd unit files.</p>
+          <p><a href="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083/4</link>
+        <pubDate>Sat, 16 May 2015 04:09:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1083-4</guid>
+        <source url="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083.rss">Is Whonix 11 using systemd functions in bash, python scripts?</source>
+      </item>
+      <item>
+        <title>Is Whonix 11 using systemd functions in bash, python scripts?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Good point.</p>
+<p>[quote=“nrgaway, post:1, topic:1083”]Does Whonix 11 use systemd functions for checking status and such from within Whonix bash scripts?</p>
+<p>Even though there are compatibility functions for old sysinitv configuration files, they are not always reliable.[/quote]</p>
+<p>Yes. From ./packages folder…</p>
+<pre><code class="lang-auto">grep -r --exclude-dir '.git*' --exclude README.md --exclude changelog.upstream --exclude GPLv3 "service " *</code></pre>
+<p>I would like to keep ‘service’  if sane/possible. ‘service’ seems to be an agnostic wrapper that works with sysvinit, upstart and systemd. Using ‘systemctl’ would make the package systemd-only. And would also require loads of package changes. Maybe let’s only change it where needed.</p>
+<p>‘service’ seems like a not-too-difficult-to-grasp ™ sh script that is easy to debug.</p>
+<pre><code class="lang-auto">sudo sh -x /usr/sbin/service sdwdate status</code></pre>
+<p>Will check if all that stuff is still functional.<br>
+Will also check for related sysvinit-utils (contains ‘service’) bugs.<br>
+<a href="https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=sysvinit-utils;dist=unstable" class="onebox" target="_blank">https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=sysvinit-utils;dist=unstable</a></p>
+          <p><a href="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083/3</link>
+        <pubDate>Sat, 16 May 2015 02:23:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1083-3</guid>
+        <source url="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083.rss">Is Whonix 11 using systemd functions in bash, python scripts?</source>
+      </item>
+      <item>
+        <title>Is Whonix 11 using systemd functions in bash, python scripts?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="1083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"> nrgaway:</div>
+<blockquote>
+<p>I don’t get notifications of topics, so maybe create a task if this not complete</p>
+</blockquote>
+</aside>
+<p>Please see:<br>
+<a href="https://www.whonix.org/forum/index.php/topic,1229.0.html" class="onebox" target="_blank">https://www.whonix.org/forum/index.php/topic,1229.0.html</a></p>
+          <p><a href="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083/2</link>
+        <pubDate>Fri, 15 May 2015 21:31:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1083-2</guid>
+        <source url="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083.rss">Is Whonix 11 using systemd functions in bash, python scripts?</source>
+      </item>
+      <item>
+        <title>Is Whonix 11 using systemd functions in bash, python scripts?</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>Does Whonix 11 use systemd functions for checking status and such from within Whonix bash scripts?</p>
+<p>Even though there are compatibility functions for old sysinitv configuration files, they are not always reliable.</p>
+<pre><code class="lang-auto">systemctl is-enabled tor
+systemctl is-active tor
+systemctl is-failed tor
+systemctl status tor
+systemctl mask tor  # Make service impossible to run</code></pre>
+<p>In python, there is a systemd library that can be used to interface with systems, or use of python-sh</p>
+<p>I don’t get notifications of topics, so maybe create a task if this not complete</p>
+          <p><a href="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083/1</link>
+        <pubDate>Fri, 15 May 2015 19:48:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1083-1</guid>
+        <source url="http://forums.whonix.org/t/is-whonix-11-using-systemd-functions-in-bash-python-scripts/1083.rss">Is Whonix 11 using systemd functions in bash, python scripts?</source>
+      </item>
+  </channel>
+</rss>

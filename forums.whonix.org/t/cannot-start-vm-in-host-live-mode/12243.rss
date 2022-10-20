@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Cannot start VM in host-live mode</title>
+    <link>http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243</link>
+    <description>I have installed Debian 10 to a USB drive, and then morphed it into KickSecure. I installed and configured Whonix KVM and have both of the Gateway and Workstation VMs in running condition.
+
+However, when I try to start the VMs with KickSecure in live mode, I get an error message that says:
+
+&gt; Error starting domain: internal error: child reported (status=125): unable to set user and group to &#39;64055:64055&#39; on &#39;/var/lib/libvirt/images/Whonix-Gateway.qcow2&#39; : No space left on device
+
+I am wondering if maybe since they are sparse files that whatever operation (I&#39;m assuming chown) that is being performed on them is basically undoing the sparse-ness (for lack of a better term) and trying to fill up the drive with the full 100 gb of the image. The USB drive I am using is only a 32 GB so this could definitely result in no free space being left.
+
+Otherwise I have no idea why it is doing this, because I can write information to the ramdisk. I even &#39;touched&#39; an empty file in the same directory as the .qcow2 image to make sure it was not somehow related to the path.
+
+Host OS: Debian 10.10 Buster morphed to KickSecure
+qemu-kvm: 1:3.1+dfsg-8+deb10u8
+Whonix-KVM: 15.0.1.9.3</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 18 Oct 2021 22:56:15 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Cannot start VM in host-live mode</title>
+        <dc:creator><![CDATA[SilentBob]]></dc:creator>
+        <description><![CDATA[
+            <p>I had a little bit of time to experiment and read this thread a little bit more closely.</p>
+<p><a href="https://phabricator.whonix.org/T914" class="onebox" target="_blank" rel="noopener nofollow ugc">https://phabricator.whonix.org/T914</a></p>
+<p>I set the permissions on the .qcow image files to 0444 while in persistent-boot mode, and then rebooted the host to live-mode. After that, both VMs started up fine.</p>
+<p>So I suppose installing the whonix-libvirt package simply did not work as I had expected. I might try to setup the systemd services manually later to test, but for now I am satisfied with simply manually changing the permissions back and forth.</p>
+<p>Thanks!</p>
+          <p><a href="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/9</link>
+        <pubDate>Mon, 18 Oct 2021 22:56:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12243-9</guid>
+        <source url="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243.rss">Cannot start VM in host-live mode</source>
+      </item>
+      <item>
+        <title>Cannot start VM in host-live mode</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="7" data-topic="12243">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>was this fixed in 16.0.3.1?</p>
+</blockquote>
+</aside>
+<p>Yes but also before also fixed after stable upgrades. If stable upgrades don’t fix it, a new build likely won’t fix it either.</p>
+          <p><a href="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/8</link>
+        <pubDate>Tue, 21 Sep 2021 22:02:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12243-8</guid>
+        <source url="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243.rss">Cannot start VM in host-live mode</source>
+      </item>
+      <item>
+        <title>Cannot start VM in host-live mode</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> was this fixed in 16.0.3.1? If so I’ll make a new build in a few days. Hopefully I’ll confirm the cli mode fix by then.</p>
+          <p><a href="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/7</link>
+        <pubDate>Tue, 21 Sep 2021 15:38:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12243-7</guid>
+        <source url="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243.rss">Cannot start VM in host-live mode</source>
+      </item>
+      <item>
+        <title>Cannot start VM in host-live mode</title>
+        <dc:creator><![CDATA[SilentBob]]></dc:creator>
+        <description><![CDATA[
+            <p>Hmm okay, I tried to follow that discussion but am a little unsure I understood. I tried installing the whonix-libvirt package on my KickSecure host to get those systemd services installed, but afterwards I encountered the same behavior when trying to start the gateway VM. Should I have tried to set these services up manually instead?</p>
+<p>I suppose it could be too little RAM. I only have 8 GB on this machine. Still I would have thought that would be enough to run the host in live mode and also at least boot the gateway VM.</p>
+          <p><a href="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/6</link>
+        <pubDate>Sat, 18 Sep 2021 00:27:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12243-6</guid>
+        <source url="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243.rss">Cannot start VM in host-live mode</source>
+      </item>
+      <item>
+        <title>Cannot start VM in host-live mode</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://forums.whonix.org/t/bullseye-live-boot-needs-grub-disable-linux-uuid-true-parameter-in-etc-grub-d-11-linux-live/9066/6" class="inline-onebox">Bullseye: live-boot needs GRUB_DISABLE_LINUX_UUID="true" parameter in /etc/grub.d/11_linux_live - #6 by Patrick</a> is a general bug breaking this way earlier but solution avaialble.</p>
+<aside class="quote no-group quote-modified" data-username="SilentBob" data-post="1" data-topic="12243">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/3ab097/40.png" class="avatar"> SilentBob:</div>
+<blockquote>
+<blockquote>
+<p>Error starting domain: internal error: child reported (status=125): unable to set user and group to ‘64055:64055’ on ‘/var/lib/libvirt/images/Whonix-Gateway.qcow2’ : No space left on device</p>
+</blockquote>
+</blockquote>
+</aside>
+<p>This could be a KVM specific issue?</p>
+<ul>
+<li><a href="https://phabricator.whonix.org/T914" class="inline-onebox">⚓ T914 Whonix Host Live - enable KVM readonly mode - virt-xml vm-name --edit --disk readonly=on</a></li>
+<li><a href="https://github.com/Whonix/whonix-libvirt/blob/master/lib/systemd/system/whonix-libvirt-set-live-to-readonly.service">https://github.com/Whonix/whonix-libvirt/blob/master/lib/systemd/system/whonix-libvirt-set-live-to-readonly.service</a></li>
+<li><a href="https://github.com/Whonix/whonix-libvirt/blob/master/lib/systemd/system/whonix-libvirt-set-persistent-mode-to-read-write.service">https://github.com/Whonix/whonix-libvirt/blob/master/lib/systemd/system/whonix-libvirt-set-persistent-mode-to-read-write.service</a></li>
+<li><a href="https://github.com/Whonix/whonix-libvirt/blob/master/usr/libexec/whonix-libvirt/live-mode-to-read-only">https://github.com/Whonix/whonix-libvirt/blob/master/usr/libexec/whonix-libvirt/live-mode-to-read-only</a></li>
+<li><a href="https://github.com/Whonix/whonix-libvirt/blob/master/lib/systemd/system/whonix-libvirt-set-persistent-mode-to-read-write.service">https://github.com/Whonix/whonix-libvirt/blob/master/lib/systemd/system/whonix-libvirt-set-persistent-mode-to-read-write.service</a></li>
+</ul>
+<p>Or could be simply too less host RAM. But even then, above might help.</p>
+<p>//cc <a class="mention" href="http://forums.whonix.org/u/onion_knight">@onion_knight</a></p>
+          <p><a href="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/5</link>
+        <pubDate>Wed, 15 Sep 2021 06:58:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12243-5</guid>
+        <source url="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243.rss">Cannot start VM in host-live mode</source>
+      </item>
+      <item>
+        <title>Cannot start VM in host-live mode</title>
+        <dc:creator><![CDATA[SilentBob]]></dc:creator>
+        <description><![CDATA[
+            <p>My apologies, I think I was unclear, because the issue you referenced seems to be for something unrelated to my issue.</p>
+<p>I am trying to run the host in live mode, but when doing so I am unable to start the guest VMs.</p>
+          <p><a href="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/4</link>
+        <pubDate>Wed, 15 Sep 2021 05:55:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12243-4</guid>
+        <source url="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243.rss">Cannot start VM in host-live mode</source>
+      </item>
+      <item>
+        <title>Cannot start VM in host-live mode</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>See:</p>
+<aside class="quote quote-modified" data-post="6" data-topic="9066">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/bullseye-live-boot-needs-grub-disable-linux-uuid-true-parameter-in-etc-grub-d-11-linux-live/9066/6">Bullseye: live-boot needs GRUB_DISABLE_LINUX_UUID="true" parameter in /etc/grub.d/11_linux_live</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development/8"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    grub-live broken in <a href="https://forums.whonix.org/t/whonix-16-has-been-released-debian-11-bullseye-based-for-virtualbox-major-release/12297" class="inline-onebox">Whonix 16 has been Released! (Debian 11 bullseye based) - for VirtualBox - Major Release</a>. 
+
+Actually required… 
+Debian bug report: 
+kernel command line (grub) UUID=... and PARTUUID=... Can not mount on filesystem /run/live/rootfs/filesystem since Debian bullseye 
+<a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=994138" class="onebox" target="_blank" rel="noopener">https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=994138</a>
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/3</link>
+        <pubDate>Sun, 12 Sep 2021 18:20:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12243-3</guid>
+        <source url="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243.rss">Cannot start VM in host-live mode</source>
+      </item>
+      <item>
+        <title>Cannot start VM in host-live mode</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="SilentBob" data-post="1" data-topic="12243">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/3ab097/40.png" class="avatar"> SilentBob:</div>
+<blockquote>
+<p>I am wondering if maybe since they are sparse files that whatever operation (I’m assuming chown) that is being performed on them is basically undoing the sparse-ness (for lack of a better term) and trying to fill up the drive with the full 100 gb of the image. The USB drive I am using is only a 32 GB so this could definitely result in no free space being left.</p>
+</blockquote>
+</aside>
+<p>Yeah I think so too. I think we were progressing on this same problem for grub-live on the host, but I’m unsure as to what the status is now.</p>
+<p>cc/  <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a></p>
+          <p><a href="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/2</link>
+        <pubDate>Sun, 12 Sep 2021 16:46:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12243-2</guid>
+        <source url="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243.rss">Cannot start VM in host-live mode</source>
+      </item>
+      <item>
+        <title>Cannot start VM in host-live mode</title>
+        <dc:creator><![CDATA[SilentBob]]></dc:creator>
+        <description><![CDATA[
+            <p>I have installed Debian 10 to a USB drive, and then morphed it into KickSecure. I installed and configured Whonix KVM and have both of the Gateway and Workstation VMs in running condition.</p>
+<p>However, when I try to start the VMs with KickSecure in live mode, I get an error message that says:</p>
+<blockquote>
+<p>Error starting domain: internal error: child reported (status=125): unable to set user and group to ‘64055:64055’ on ‘/var/lib/libvirt/images/Whonix-Gateway.qcow2’ : No space left on device</p>
+</blockquote>
+<p>I am wondering if maybe since they are sparse files that whatever operation (I’m assuming chown) that is being performed on them is basically undoing the sparse-ness (for lack of a better term) and trying to fill up the drive with the full 100 gb of the image. The USB drive I am using is only a 32 GB so this could definitely result in no free space being left.</p>
+<p>Otherwise I have no idea why it is doing this, because I can write information to the ramdisk. I even ‘touched’ an empty file in the same directory as the .qcow2 image to make sure it was not somehow related to the path.</p>
+<p>Host OS: Debian 10.10 Buster morphed to KickSecure<br>
+qemu-kvm: 1:3.1+dfsg-8+deb10u8<br>
+Whonix-KVM: 15.0.1.9.3</p>
+          <p><a href="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243/1</link>
+        <pubDate>Sun, 05 Sep 2021 02:50:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12243-1</guid>
+        <source url="http://forums.whonix.org/t/cannot-start-vm-in-host-live-mode/12243.rss">Cannot start VM in host-live mode</source>
+      </item>
+  </channel>
+</rss>

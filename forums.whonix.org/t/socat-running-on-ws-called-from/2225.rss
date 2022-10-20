@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>socat running on ws - called from ?</title>
+    <link>http://forums.whonix.org/t/socat-running-on-ws-called-from/2225</link>
+    <description>I see socat running on whonix-workstation. I&#39;m not objecting, I&#39;m just curious as to what&#39;s starting it.
+
+netstat says rinetd has the ports, ps shows socat running the ports. Is rinetd calling socat?
+
+Tor Browser?</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 14 Mar 2016 18:18:18 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>socat running on ws - called from ?</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>D’OH. socat listening to file, not port. Thanks.</p>
+<p>So, socat listens to file, forwards to port, rinet listens to port, redirecting as configured.</p>
+<p>Thanks.</p>
+          <p><a href="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/9</link>
+        <pubDate>Mon, 14 Mar 2016 18:18:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2225-9</guid>
+        <source url="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225.rss">socat running on ws - called from ?</source>
+      </item>
+      <item>
+        <title>socat running on ws - called from ?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Socat opens a unix domain socket listener file <code>/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9050.soc</code>. And forwards to local port 9050. No port listener.</p>
+<p>Rinetd creates a local port listener on 9050.</p>
+<p>As an exercise of de-mystification.</p>
+<pre><code>sudo service anon-ws-disable-stacked-tor stop
+
+sudo bash -x /usr/lib/anon-ws-disable-stacked-tor/socat-unix-sockets
+</code></pre>
+<p>Learn the actual command being run is the following.</p>
+<pre><code>socat -t100 UNIX-LISTEN:/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9050.sock,mode=777,reuseaddr,fork TCP4:127.0.0.1:9050
+</code></pre>
+<p>Run that command in some non-Whonix VM and see what it does. (Make sure the var run … folder exists.)</p>
+          <p><a href="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/8</link>
+        <pubDate>Mon, 14 Mar 2016 18:10:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2225-8</guid>
+        <source url="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225.rss">socat running on ws - called from ?</source>
+      </item>
+      <item>
+        <title>socat running on ws - called from ?</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>I’m not following something, then.</p>
+<p>I see, running ps on ws, socat’s such as: socat -t100 UNIX-LISTEN:/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9050.sock,mode=777,reuseaddr,fork TCP4:127.0.0.1:9050</p>
+<p>- which feels like it’s setting up a listener on localhost:9050</p>
+<p>rinetd.conf has: 127.0.0.1 9050 10.152.152.10 9050</p>
+<p>and netstat shows: tcp 127.0.0.1:9050 0.0.0.0:* LISTEN /rinetd</p>
+<p>So I’m missing something. Is socat not setting up a listener? (Getting superseded by rinet?)</p>
+          <p><a href="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/7</link>
+        <pubDate>Mon, 14 Mar 2016 17:48:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2225-7</guid>
+        <source url="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225.rss">socat running on ws - called from ?</source>
+      </item>
+      <item>
+        <title>socat running on ws - called from ?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>rinetd / socat currently are unrelated. One does not start the other.</p>
+<p>rinetd is the existing solution to get workstation port 9150 redirected to the gateway 9150 etc.</p>
+<ul>
+<li><a href="https://github.com/Whonix/anon-ws-disable-stacked-tor">https://github.com/Whonix/anon-ws-disable-stacked-tor</a></li>
+<li><a href="https://github.com/Whonix/anon-ws-disable-stacked-tor/blob/master/etc/rinetd.conf.anondist">https://github.com/Whonix/anon-ws-disable-stacked-tor/blob/master/etc/rinetd.conf.anondist</a></li>
+</ul>
+<p>In future, rinetd should be replaced with scoat. ( <a href="https://phabricator.whonix.org/T464">https://phabricator.whonix.org/T464</a></p>
+<hr>
+<p>socat unix domain sockets are currently in place to cope up with TBB’s upcoming SocksSocket feature. To get the unix domain socket running on the workstation redirected a gateway Tor port in future.</p>
+          <p><a href="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/6</link>
+        <pubDate>Mon, 14 Mar 2016 17:33:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2225-6</guid>
+        <source url="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225.rss">socat running on ws - called from ?</source>
+      </item>
+      <item>
+        <title>socat running on ws - called from ?</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>Perfect, thanks for that / pointing me to the right link.</p>
+<p>So, in essence, socat is being run as a dummy to capture control of the ports before tor can.</p>
+<p>But I’m still missing how rinetd can come along and wrest control of those ports from socat to do its own thing. Hmmm.</p>
+<p>Race condition? i.e. rinetd gets there first (so socat calls fail - yet, why still running?), on ws, and does the desired, while rinetd not set to run on gateway (?), where tor has the ports, as desired - as tor over tor isn’t an issue there?</p>
+          <p><a href="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/5</link>
+        <pubDate>Mon, 14 Mar 2016 17:19:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2225-5</guid>
+        <source url="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225.rss">socat running on ws - called from ?</source>
+      </item>
+      <item>
+        <title>socat running on ws - called from ?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>The rationale becomes clear in the following ticket.</p>
+<p><code>TBB's use of SocksSocket will break Whonix's Tor Browser implementation</code><br>
+<a href="https://phabricator.whonix.org/T192" class="onebox" target="_blank">https://phabricator.whonix.org/T192</a></p>
+<p>It’s not fully functional / in use yet, because it’s not clear yet how TPO will proceed. However, when TBB starts using SocksSocket, half of the implementation will be already done. And this may require a stable upgrade. The delete to be introduced then will be smaller.</p>
+          <p><a href="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/4</link>
+        <pubDate>Mon, 14 Mar 2016 17:13:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2225-4</guid>
+        <source url="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225.rss">socat running on ws - called from ?</source>
+      </item>
+      <item>
+        <title>socat running on ws - called from ?</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>No idea. My search skills are better than my comprehension skills. Maybe this helps: <a href="https://www.whonix.org/wiki/Dev/Whonix_Packages#anon-ws-disable-stacked-tor">https://www.whonix.org/wiki/Dev/Whonix_Packages#anon-ws-disable-stacked-tor</a></p>
+<blockquote>
+<p>rinetd (soon to be replaced by socat) listens on Tor’s default ports.  system Tor’s 127.0.0.1:9050, 127.0.0.1:9051 and TBB’s 127.0.0.1:9150, 127.0.0.1:9051, which prevents the default Tor Browser Bundle or Tor package by The Tor Project from opening these default ports, which will result in Tor failing to open its listening port and therefore exiting, thus preventing Tor over Tor.</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/3</link>
+        <pubDate>Mon, 14 Mar 2016 16:59:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2225-3</guid>
+        <source url="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225.rss">socat running on ws - called from ?</source>
+      </item>
+      <item>
+        <title>socat running on ws - called from ?</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>D’OH. OK, so started by /usr/lib/anon-ws-disable-stacked-tor/socat-unix-sockets</p>
+<p>So, what’s happening here / how is this working - rinetd does the redirecting, and socat does the catching / content processing? er, rinet redirects and socat is the actual listener, redirecting elsewhere?</p>
+          <p><a href="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/2</link>
+        <pubDate>Mon, 14 Mar 2016 16:45:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2225-2</guid>
+        <source url="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225.rss">socat running on ws - called from ?</source>
+      </item>
+      <item>
+        <title>socat running on ws - called from ?</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>I see socat running on whonix-workstation. I’m not objecting, I’m just curious as to what’s starting it.</p>
+<p>netstat says rinetd has the ports, ps shows socat running the ports. Is rinetd calling socat?</p>
+<p>Tor Browser?</p>
+          <p><a href="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/socat-running-on-ws-called-from/2225/1</link>
+        <pubDate>Mon, 14 Mar 2016 16:37:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2225-1</guid>
+        <source url="http://forums.whonix.org/t/socat-running-on-ws-called-from/2225.rss">socat running on ws - called from ?</source>
+      </item>
+  </channel>
+</rss>

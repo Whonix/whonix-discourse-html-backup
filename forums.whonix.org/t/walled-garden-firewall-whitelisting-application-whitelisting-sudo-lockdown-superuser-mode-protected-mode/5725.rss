@@ -1,0 +1,579 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+    <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725</link>
+    <description>Using Empire, I generated a bash launcher and saved it on the target (Whonix workstation 13). Added +x and ran it. This launcher runs a base64 encoded python script.
+
+The steps above require some convincing aka social engineering (or just being naive about security of this or that system). The rest doesn&#39;t.
+
+Seconds after the script silently runs (and deletes itself) I have a shell into Whonix Workstation.
+I use a ruby keylogger module, and hey, I&#39;m lucky today, the user runs sudo apt-get update and I get his password with the keylogger.
+The password is changeme. I probably could have skipped the last step :slight_smile:
+I use the sudo_spawn module with the password and get a new agent with root permissions.
+I use a persistence module (add a file under ~/.config/autostart, or alternatively a cron tab), restart the workstation and voila I have persistent access.
+
+Point #1: all the default payloads in metasploit and empire are detected and automatically removed by Windows 10 defender.
+Point #2: I didn&#39;t use more than the standard payloads of a system that was mostly written in 2015 / 2016 and is accessible to anyone with basic linux knowledge.
+Point #3: I don&#39;t imply Whonix workstation is less secure than windows, but I do hope the above is food for thought. We can&#39;t discount human mistakes.
+Point #4: I will try that on Tails too.</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 13 Sep 2019 07:53:03 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Great points!</p>
+<aside class="quote no-group" data-post="15" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/a183cd/40.png" class="avatar"> Algernon:</div>
+<blockquote>
+<p>Whonix would be responsible for all updates (requires timely rebuild and upload)</p>
+</blockquote>
+</aside>
+<p>Yeah. I am not discounting the idea just yet but seems a pretty big burden.</p>
+<aside class="quote no-group" data-post="15" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/a183cd/40.png" class="avatar"> Algernon:</div>
+<blockquote>
+<p>You need some data partition for apps (flatpak, snaps, appimage) anyway.</p>
+</blockquote>
+</aside>
+<p>Yes, which then wouldn’t be included in verified boot.</p>
+<aside class="quote no-group" data-post="15" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/a183cd/40.png" class="avatar"> Algernon:</div>
+<blockquote>
+<p>Everyone runs the same OS which could easily be verified.</p>
+</blockquote>
+</aside>
+<p>Yes, this would be big. Since Debian isn’t stateless, everyone has kinda their very own unique Debian system with no easy way to see the difference in files between distribution default and user customization. Upgraded builds aren’t guaranteed to match newly created builds. Perhaps a majority of issues come from that.</p>
+<p>Just now created:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/Stateless" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    
+
+<h3><a href="https://www.whonix.org/wiki/Dev/Stateless" target="_blank" rel="nofollow noopener">Dev/Stateless</a></h3>
+
+<p>Factory Reset, Stateless Systems, Reproducible Systems, Verifiable Systems, Clear Linux, NixOS, Fedora Silverblue</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>On verified boot:</p>
+<aside class="quote quote-modified" data-post="32" data-topic="7894">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/enable-linux-kernel-gpg-verification-in-grub-and-or-enable-secure-boot-by-default/7894/32">enable Linux kernel gpg verification in grub and/or enable Secure Boot by default</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    <a href="https://www.whonix.org/wiki/Verified_Boot#Hash_Check_all_Files_at_Boot" rel="nofollow noopener">Hash Check all Files at Boot</a> 
+
+Higher security level as Secure Boot. 
+Talking about VMs only in this concept. 
+We could boot from a virtual, read-only (write protected) boot medium such as another virtual HDD or ISO. Such a boot medium which runs a minimal linux distribution which then compares against checksums from Debian repository on the main boot drive: 
+
+The MBR (master boot record)
+The VBR (volume boot record)
+[A] the booloader
+[B] the partition table
+[C] the kernel
+[D] the initrd
+[E] …
+  </blockquote>
+</aside>
+
+<p>I am wondering if we hit the maximum of what is doable with Debian. A stateless system and verified boot sequence might require porting Whonix to another linux distribution. It’s not clear to me which Linux distribution has it all. Ideally, it would also support reproducible (deterministic) builds or work on that and provide that in the future.</p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/16</link>
+        <pubDate>Fri, 13 Sep 2019 07:53:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-16</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[Algernon]]></dc:creator>
+        <description><![CDATA[
+            <p>I have been thinking about the “ChromeOS” version a bit.<br>
+When starting from a complete OS (including host) you could have some filesystem image or iso (like the current live iso) with bootloader + kernel + initrd + squashfs. This brings up the Whonix host. From there you can boot the GW and WS either via the qcow2 files or in a similar way as the host with kernel + initrd  +squashfs.<br>
+Host and guests are all based on a minimal Debian XFCE installation so share much of the same code.<br>
+You could then maybe make use of this:<br>
+<a href="https://askubuntu.com/questions/109413/how-do-i-use-overlayfs" rel="nofollow noopener">https://askubuntu.com/questions/109413/how-do-i-use-overlayfs</a> (first answer)<br>
+and this<br>
+<a href="https://tails.boum.org/contribute/design/incremental_upgrades/archive/" rel="nofollow noopener">https://tails.boum.org/contribute/design/incremental_upgrades/archive/</a><br>
+to create a squashfs with a smaller size (maybe 1-1.5GB).<br>
+In this way maybe (!) future updates to this system could be smaller in size. The update would be a binary patch to the host filesystem (either just the squashfs or the whole filesystem image). You probably want some A/B mechanism where you update system B from A and then boot B, or if it does not boot, fall back to A again.</p>
+<p>Problem is:<br>
+It would be a completely new setup. Whonix would be responsible for all updates (requires timely rebuild and upload)<br>
+Devs would need to keep a base image around all the time to have something to diff against.<br>
+Larger changes to the base would require rebuilding. Some config stuff which is unlikely to break could maybe be kept on a persistent overlay.<br>
+You need some data partition  for apps (flatpak, snaps, appimage) anyway. Some messengers like qtox are available in that form, also programs for cryptocurrencies like electrum or monero-daemon are available. There are more, but beyond that everything else requires a rebuild or someone creating an “app”  for that program.<br>
+Upgrades need to be done from the host or maybe from within the guest if you still have some ro root of trust (ro grub somewhere, or BIOS?)</p>
+<p>Advantage would be:<br>
+Everyone runs the same OS which could easily be verified.<br>
+This is maybe not always an advantage (see recent iOS exploits) but currently most users would share the same OS anyways (plus maybe some programs they installed manually). Each reboot would bring the whole system back to a sane state.<br>
+squashfs with some patches can be build reproducible. If you build from debian snapshots or some kind of git repo with all the required packages then you could also distribute the trust to some extend and others could rebuild the exact OS.</p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/15</link>
+        <pubDate>Thu, 12 Sep 2019 18:55:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-15</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="13" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Root could be locked down</p>
+</blockquote>
+</aside>
+<aside class="quote quote-modified" data-post="1" data-topic="7998">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/untrusted-root-does-it-make-sense-to-try-to-improve-security-by-restricting-root/7998/1">Untrusted Root - does it make sense to try to improve security by restricting root?</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    Is it currently being argued towards Untrusted Root? 
+I.e. do you think it is a good idea to try to restrict malware which gained root access? 
+examples which may point into that direction: 
+
+<a href="https://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/8" class="inline-onebox">Blacklist more kernel modules to reduce attack surface</a>
+<a href="https://forums.whonix.org/t/allow-loading-signed-kernel-modules-by-default-disallow-kernel-module-loading-by-default/7880" class="inline-onebox">allow loading signed kernel modules by default / disallow kernel module loading by default</a>
+<a href="https://forums.whonix.org/t/enable-linux-kernel-gpg-verification-in-grub-and-or-enable-secure-boot-by-default/7894" class="inline-onebox">enable Linux kernel gpg verification in grub and/or enable Secure Boot by default</a>
+
+
+
+Goal of untrusted root could be: 
+
+to protect the virtualizer (and in effect,…
+  </blockquote>
+</aside>
+
+<aside class="quote quote-modified" data-post="1" data-topic="7658">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar">
+    <a href="https://forums.whonix.org/t/restrict-root-access/7658/1">Restrict root access</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    It would be good to restrict root access to make it a lot harder to login as root. 
+Uncommenting, auth required pam_wheel.so in /etc/pam.d/su will make it so only users in the root group can use su. This can prevent a compromised system user (e.g. the whonixcheck user) from switching to another user and/or gaining root. The user user can be added to the root group so they can use su normally or they can also be restricted and will have to use sudo. 
+Emptying the /etc/securetty file can prevent s…
+  </blockquote>
+</aside>
+
+<aside class="quote no-group" data-post="13" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>A lot of dangerous binaries (su, sudo etc.) could be disabled by setting their mode to 000.</p>
+</blockquote>
+</aside>
+<aside class="quote quote-modified" data-post="1" data-topic="7706">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/disable-suid-binaries/7706">Disable SUID Binaries</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    <a href="https://github.com/QubesOS/qubes-issues/issues/2695" rel="nofollow noopener">https://github.com/QubesOS/qubes-issues/issues/2695</a> has interesting ideas. 
+Quote Solar Designer (someone that Joanna Rutkowska respects): 
+
+Ideally, there should be no SUID binaries reachable from the user account, as otherwise significant extra attack surface inside the VM is exposed (dynamic linker, libc startup, portions of Linux kernel including ELF loader, etc.) 
+
+No idea yet. 
+Related: 
+<a href="https://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725" class="inline-onebox">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protecte…</a>
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/14</link>
+        <pubDate>Tue, 10 Sep 2019 05:59:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-14</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>Creating a completely locked down system wouldn’t be too hard.</p>
+<p>You could block all outgoing traffic by default, run each application as their own user and whitelist the applications through the firewall based on the UID.</p>
+<p>Root could be locked down pretty easily so root can only be gained via a chroot from another device (assuming no privilege escalation exploits occur).</p>
+<p>They keylogger in this post could likely be defeated by running everything in an X11 sandbox or using wayland.</p>
+<p>A lot of dangerous binaries (su, sudo etc.) could be disabled by setting their mode to 000.</p>
+<p>Setting process limits with something like /etc/security/limits.conf may help by preventing more than a few programs being run at the same time.</p>
+<p>This could all probably be enabled via a boot parameter like <code>lockdown=on</code>.</p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/13</link>
+        <pubDate>Sun, 30 Jun 2019 00:07:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-13</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>//cc <a class="mention" href="http://forums.whonix.org/u/madaidan">@madaidan</a></p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/12</link>
+        <pubDate>Sat, 29 Jun 2019 23:45:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-12</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[goldstein-otg]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="10" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/df705f/40.png" class="avatar"> Henry:</div>
+<blockquote>
+<p>This is something easily avoidable if it is checked by user</p>
+</blockquote>
+</aside>
+<p>That is what i meant, these “treats” are easily avoidable by the User.</p>
+<aside class="quote no-group" data-post="10" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/df705f/40.png" class="avatar"> Henry:</div>
+<blockquote>
+<p>Blacklisting / signature-based identification is pretty basic really but it does help many people.</p>
+</blockquote>
+</aside>
+<p>I disagree with that, it gives a false sense of security, users stop thinking about treats and blindly trust these systems.<br>
+These basic “security systems” are easily avoided by a real treat and the user wouldn’t think about checking them because his Antivirus hasn’t warned him.</p>
+<p>Antivirus is a lost cause, just look at the snake oil/antivirus market, nothing there can really secure your stuff,it just give you a false sense of security, while exposing your system to their crappy software that often creates a bigger attack surface  than before.</p>
+<aside class="quote no-group" data-post="10" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/df705f/40.png" class="avatar"> Henry:</div>
+<blockquote>
+<p>When we aim to have Windows users move to Whonix for greater anonymity and privacy my opinion is we need to think about providing at least the same level of security if not higher.</p>
+</blockquote>
+</aside>
+<p>We got that by default with Linux, if the user isn’t doing stuff he isn’t supposed to do, like install or run something before checking it…</p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/11</link>
+        <pubDate>Mon, 27 Aug 2018 08:15:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-11</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[Henry]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group quote-modified" data-post="9" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/g/df705f/40.png" class="avatar"> goldstein-otg:</div>
+<blockquote>
+<blockquote>
+<p>Of course new threats or anything crafted for a specific target will not be affected by that. Handling known threats will already be an important step.</p>
+</blockquote>
+<p>What known threats ? If you run something that you aren’t supposed to run it isn’t a “known threat”…</p>
+</blockquote>
+</aside>
+<p>By “Known threat” I don’t mean expressly known to the specific user running them, obviously, but a malware already circulating around, that was discovered and included in places such as virustotal. This is something easily avoidable if it is checked by user / any protection system on the OS. Not dealing with known threats, with the reason being existence of many unknown threats, doesn’t make much sense to me. The known threats are a cheap tool in an eyes of an attacker.</p>
+<p>I won’t be so quick to use words such as stupidity. Even a well informed person can be tricked in time of need to run something he isn’t supposed to, modesty in this respect is more useful than vanity.</p>
+<p>Yes, I guess the practical solutions for security minded people is more isolation of applications and similar schemes. I do that myself. However this also has increased costs in terms of resources, time spent, required level of knowledge.</p>
+<p>Blacklisting / signature-based identification is pretty basic really but it does help many people. You can call them stupid if you like. Not only Win10 Defender does it, also Firefox and Chrome with “attack sites” lists, as well as gmail (they won’t allow attachments of known threats or anything suspicious enough and there is no way to turn that protection off).</p>
+<p>When we aim to have Windows users move to Whonix for greater anonymity and privacy my opinion is we need to think about providing at least the same level of security if not higher.</p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/10</link>
+        <pubDate>Mon, 27 Aug 2018 05:06:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-10</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[goldstein-otg]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="1" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/d/e99b99/40.png" class="avatar"> despair:</div>
+<blockquote>
+<p>Point <span class="hashtag">#1:</span> all the default payloads in metasploit and empire are detected and automatically removed by Windows 10 defender.</p>
+</blockquote>
+</aside>
+<p>Of course they are (signature detection), try a custom Payload and see how useless the Windows “Defender” is…</p>
+<aside class="quote no-group" data-post="1" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/d/e99b99/40.png" class="avatar"> despair:</div>
+<blockquote>
+<p>Point <span class="hashtag">#2:</span> I didn’t use more than the standard payloads of a system that was mostly written in 2015 / 2016 and is accessible to anyone with basic linux knowledge.</p>
+</blockquote>
+</aside>
+<p>A simple Reverse SSH shell would have done the same…</p>
+<aside class="quote no-group" data-post="1" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/d/e99b99/40.png" class="avatar"> despair:</div>
+<blockquote>
+<p>Point <span class="hashtag">#3:</span> I don’t imply Whonix workstation is less secure than windows, but I do hope the above is food for thought. We can’t discount human mistakes.</p>
+</blockquote>
+</aside>
+<p>True but we can’t try to mitigate Human stupidity, social engineering can’t be stopped by software. If you can convince someone to do these stupid things, you can make them disable every security we throw in their way.</p>
+<p>Everything can be exploited if the Person using it is not educated enough to know the dos and don’ts, there is no mitigation for that.<br>
+Just look at most Malware that runs on Windows, they use no 0days or advanced exploits, they use the stupidity of the User to execute something for them. Nothing can fix that except Education…</p>
+<p>I think it is a waste of time to try to create a walled garden, because the same user is going to disable all that because the Attacker told them to do so.</p>
+<p>For the security minded People there are enough ways to prevent that (qubes dvm’s, air gapped pc’s, sandboxes etc)</p>
+<aside class="quote no-group" data-post="7" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/df705f/40.png" class="avatar"> Henry:</div>
+<blockquote>
+<p>Of course new threats or anything crafted for a specific target will not be affected by that. Handling known threats will already be an important step.</p>
+</blockquote>
+</aside>
+<p>What known threats ? If you run something that you aren’t supposed to run it isn’t a “known threat”…</p>
+<p>TLDR:<br>
+People are stupid and the Cost outweighs the benefit</p>
+<p>My 2 satoshis</p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/9</link>
+        <pubDate>Sun, 26 Aug 2018 23:09:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-9</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Henry:</p>
+<blockquote>
+<p>Could Whonix keep this flexibility and still allow only certified applications in a “walled garden” version?</p>
+</blockquote>
+<p>Yes.</p>
+<p>“wallet garden” mode would only be activated if some condition is met.<br>
+[1] Under consideration I have kernel parameters and/or Qubes qvm<br>
+service files.</p>
+<p>To get back to flexibility: disable “walled garden” - which would mean<br>
+disable that kernel parameter and/or Qubes qvm service.</p>
+<p>[1] In a later version these conditions could be set by default.</p>
+<p>One form of a non-contentious implementation of “wallet garden” for<br>
+example would be if a Qubes-Whonix VM on Qubes with the appendix<br>
+<code>-only-torbrowser</code> in its VM name could result in user <code>user</code> only being<br>
+able to run <code>torbrowser</code> and no other application. Or perhaps a qvm<br>
+service “allow-torbrowser” would be better. It’s just brainstorming at<br>
+this stage. First, identify ways a user can run an application: a<br>
+terminal emulator or better said shell, dom0 qvm-run, … Qubes gives a<br>
+lot flexibility. Perhaps at boot time /usr/bin and others could be made<br>
+unreadable for user <code>user</code> using linux user permission access rights.</p>
+<p>The tool how to disable “walled garden” could be along the lines “better<br>
+don’t this today if the first time you got the idea of doing this,<br>
+research this using search engines, don’t run commands you don’t<br>
+understand, ask multiple people for advice on this”. Advanced users<br>
+could always have a one or two clicks “yes, i know what I am doing,<br>
+disable wallet garden and never ask me again”.</p>
+<p>(All presupposes integration with<br>
+<a href="https://github.com/tasket/Qubes-VM-hardening" rel="nofollow noopener">https://github.com/tasket/Qubes-VM-hardening</a>)</p>
+<blockquote>
+<p>Of course new threats or anything crafted for a specific target will not be affected by that. Handling known threats will already be an important step.</p>
+</blockquote>
+<p>Handling known threads sounds like signature detection which sounds like<br>
+antivirus. Now, making Whonix into a signature chasing project is<br>
+unsustainable. Others have failed to do so. If anywhere, antivirus would<br>
+be a better place to try that. See also on why antivirus are failing<br>
+concept:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="" height="">
+      <a href="https://www.whonix.org/wiki/Malware" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:611/500;"><img src="//forums.whonix.org/uploads/default/original/2X/1/1b27d3d329ba87292f3ff04c75cddb3811f43c80.jpeg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Malware" target="_blank" rel="nofollow noopener">Malware</a></h3>
+
+<p>Which Antivirus should I use?</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/8</link>
+        <pubDate>Sun, 26 Aug 2018 10:20:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-8</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[Henry]]></dc:creator>
+        <description><![CDATA[
+            <p>I agree that a) doesn’t solve the social engineering aspect and b) is too restrictive. I’m not sure option c) is practical. What I’ve found is that to enjoy the benefits of Whonix sooner or later you need to revise some of the scripts, install something. If it’s for the sake of Tor before VPN or for setting up onion sites.  Could Whonix keep this flexibility and still allow only certified applications in a “walled garden” version?</p>
+<p>I think detection of known threats is important, if at all possible. A walled garden mode is too restrictive and often requires ways around it, as you described.</p>
+<p>Of course new threats or anything crafted for a specific target will not be affected by that. Handling known threats will already be an important step.</p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/7</link>
+        <pubDate>Sun, 26 Aug 2018 05:28:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-7</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="1" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/d/e99b99/40.png" class="avatar"> despair:</div>
+<blockquote>
+<p>Added +x and ran it. This launcher runs a base64 encoded python script.</p>
+</blockquote>
+</aside>
+<p>r u trying to be smart or Moran? u run the program with allow root execution/installation inside whonix and you are saying “oh hey look at the payload its working?”</p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/6</link>
+        <pubDate>Fri, 24 Aug 2018 19:54:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-6</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>In theory, we could make Whonix a walled garden like Apple iPhone where the user may run only certified (by software vendor) commands / programs. However, users would request a superuser mode. What we do then?</p>
+<ul>
+<li>a) explain how to enable the superuser mode?</li>
+<li>b) become like apple and make that only accessible to users who have the level of using jailbreaks or let them download superuser mode software-forked Whonix elsewhere?</li>
+<li>c) provide two flavors of Whonix, Whonix walled garden edition and Whonix superuser edition?</li>
+</ul>
+<p>In case of a):<br>
+What would prevent the social engineering to include “you need to enable superuser mode”?</p>
+<p>In case of b):<br>
+Is that what you are suggesting?</p>
+<p>In case of c)<br>
+How does that sound?</p>
+<p>Option b) is not going to happen. Purely theoretical discussion. I wouldn’t be in Libre Software if I would be compatible with non-opt out (or obfuscated difficult opt-out) nanny software restrictions.</p>
+<p>Option c) is unlikely but let’s see the discussion.</p>
+<p>The supermode vs non-supermode is actually not that theoretic. There could be “safe-boot” and supermode boot. Similar to Tails greater has by default “disable root login” (still has probably?). <a href="https://github.com/tasket/Qubes-VM-hardening">https://github.com/tasket/Qubes-VM-hardening</a> seems like a nice balance.</p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/5</link>
+        <pubDate>Fri, 24 Aug 2018 16:46:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-5</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[Henry]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="2" data-topic="5725">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Any suggestions?</p>
+</blockquote>
+</aside>
+<p>Perhaps:</p>
+<ul>
+<li>Initial firewall whitelisting of applications</li>
+<li>Every new app will require expressed whitelisting</li>
+<li>This will include not only sudo but also a comparison of app’s hash to some online DB of threats’ hashes (unless user expressly accepts the risk). Alternatively keep it local and regularly update.</li>
+</ul>
+<p>Eventually everything can be turned off. If the user turns off defender’s virus protection / anti virus, ignores browser warnings about attack sites etc, there is nothing that can help him.</p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/4</link>
+        <pubDate>Fri, 24 Aug 2018 08:51:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-4</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <p>“if you can convince a user to run a payload, their system is compromised.” ok.</p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/3</link>
+        <pubDate>Thu, 23 Aug 2018 11:31:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-3</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>It’s not a multi user operating system. Rather, multi VM.</p>
+<p>Any linux distribution that handles that better?</p>
+<p>Perhaps Qubes with <a href="https://github.com/tasket/Qubes-VM-hardening">https://github.com/tasket/Qubes-VM-hardening</a></p>
+<p>Any suggestions?</p>
+<p>Whonix 13 is outdated. Whonix 14 was released. But I doubt it makes any differences for these purposes.</p>
+<p>Related:</p>
+<p><a href="https://blog.invisiblethings.org/2011/04/23/linux-security-circus-on-gui-isolation.html" class="onebox" target="_blank">https://blog.invisiblethings.org/2011/04/23/linux-security-circus-on-gui-isolation.html</a></p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/2</link>
+        <pubDate>Thu, 23 Aug 2018 07:17:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-2</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+      <item>
+        <title>walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</title>
+        <dc:creator><![CDATA[despair]]></dc:creator>
+        <description><![CDATA[
+            <p>Using Empire, I generated a bash launcher and saved it on the target (Whonix workstation 13). Added +x and ran it. This launcher runs a base64 encoded python script.</p>
+<p>The steps above require some convincing aka social engineering (or just being naive about security of this or that system). The rest doesn’t.</p>
+<p>Seconds after the script silently runs (and deletes itself) I have a shell into Whonix Workstation.<br>
+I use a ruby keylogger module, and hey, I’m lucky today, the user runs sudo apt-get update and I get his password with the keylogger.<br>
+The password is changeme. I probably could have skipped the last step <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"><br>
+I use the sudo_spawn module with the password and get a new agent with root permissions.<br>
+I use a persistence module (add a file under ~/.config/autostart, or alternatively a cron tab), restart the workstation and voila I have persistent access.</p>
+<p>Point <span class="hashtag">#1:</span> all the default payloads in metasploit and empire are detected and automatically removed by Windows 10 defender.<br>
+Point <span class="hashtag">#2:</span> I didn’t use more than the standard payloads of a system that was mostly written in 2015 / 2016 and is accessible to anyone with basic linux knowledge.<br>
+Point <span class="hashtag">#3:</span> I don’t imply Whonix workstation is less secure than windows, but I do hope the above is food for thought. We can’t discount human mistakes.<br>
+Point <span class="hashtag">#4:</span> I will try that on Tails too.</p>
+          <p><a href="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725/1</link>
+        <pubDate>Tue, 21 Aug 2018 15:59:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5725-1</guid>
+        <source url="http://forums.whonix.org/t/walled-garden-firewall-whitelisting-application-whitelisting-sudo-lockdown-superuser-mode-protected-mode/5725.rss">walled garden, firewall whitelisting, application whitelisting, sudo lockdown, superuser mode, protected mode</source>
+      </item>
+  </channel>
+</rss>

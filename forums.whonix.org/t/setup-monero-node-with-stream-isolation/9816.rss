@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Setup Monero Node with Stream Isolation</title>
+    <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816</link>
+    <description>Hello, if you want to run a monero node via Tor you have currently two methods.
+
+1) Application Proxy Settings: [Monero Anonymity Network](https://github.com/monero-project/monero/blob/master/ANONYMITY_NETWORKS.md)
+
+`./monerod --tx-proxy tor,127.0.0.1:9050,10 --add-peer=[onionservice]:[port]`
+
+(1) transaction broadcasts (tx) go through Tor to onion peers
+(2) blockchain sync goes through clearnet to seed nodes.
+-&gt; (2) is undesirable as public ip address gets exposed
+
+2) torsocks: [Monero Using Tor](https://github.com/monero-project/monero#using-tor)
+
+`DNS_PUBLIC=tcp torsocks monerod --p2p-bind-ip 127.0.0.1 --no-igd` 
+
+(1) every outgoing connections goes through Tor to seed nodes and leave Tor on Tor exit node
+-&gt; this is undesirable as it could potentially lead to identity correlation
+
+If you want to setup monero node on Whonix-Workstation and want to setup proper [stream isolation](https://www.whonix.org/wiki/Stream_Isolation) I assume that the following setup is currently the preferred approach.
+
+Starting monero node with custom socks ports prepared for custom installed applications without IsolateDestAddr and without IsolateDestPort.
+
+`./monerod --tx-proxy tor,10.152.152.10:9153,10 --add-peer=[onionservice]:[port]`
+
+(1) transaction broadcasts (tx) go through Tor via Whonix-Gateway to onion peers
+(2) blockchain sync goes with Transport via Whonix-Gateway through Tor  to seed nodes and leave Tor on Tor exit node
+-&gt; IP/DNS leaks prevented by Whonix-Gateway
+-&gt; stream isolation for (1)
+-&gt; no stream isolation for (2) unless there are no additional connections through Transport from same Whonix-Workstation. If there are additional connections through Transport from the same Whonix-Workstation you have to avoid that applications are connected to a kind of the same pseudonym to prevent identity correlation.
+
+Do you agree?
+
+Thanks.</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 22 Sep 2020 14:05:07 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[lovewhonix]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks a lot for your response.</p>
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/13</link>
+        <pubDate>Tue, 22 Sep 2020 14:05:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-13</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="lovewhonix" data-post="11" data-topic="9816">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/a5b964/40.png" class="avatar"> lovewhonix:</div>
+<blockquote>
+<p>Please excuse me if it is obvious but is the “TransPort” port 9050</p>
+</blockquote>
+</aside>
+<p>No.</p>
+<p>Tor <code>TransPort</code> is port <code>9040</code> on Whonix-Gateway and cannot directly be accessed. System default networking (TCP) originating form Whonix-Workstation will be redirected to that port.</p>
+<p><a href="https://www.whonix.org/wiki/Stream_Isolation#TransPort">https://www.whonix.org/wiki/Stream_Isolation#TransPort</a></p>
+<aside class="quote no-group" data-username="lovewhonix" data-post="11" data-topic="9816">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/a5b964/40.png" class="avatar"> lovewhonix:</div>
+<blockquote>
+<p>As port 9153 is a custom socks port I assume that I found a mistake on the following page and section:<br>
+<a href="https://www.whonix.org/wiki/Dev/anon-ws-disable-stacked-tor#systemd-socket-proxyd_listening_port_redirection">https://www.whonix.org/wiki/Dev/anon-ws-disable-stacked-tor#systemd-socket-proxyd_listening_port_redirection</a> Here is stated that port 9153 is used by Tor Messenger and forwarded to Whonix Gateway. From my understanding this is not the case as on the streamline isolation page it is stated that 9153 can be used as custom socks port for own application.</p>
+</blockquote>
+</aside>
+<p>That is confusing indeed.<br>
+9153 in workstation was Tor Messenger default ControlPort being redirected to gateway 9051 ControlPort (actually control port filter proxy, onion-grater).<br>
+9153 on the gateway is a custom SocksPort.<br>
+A bit messy but no longer an issue since Tor Messenger was deprecated years ago.</p>
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/12</link>
+        <pubDate>Thu, 17 Sep 2020 10:05:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-12</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[lovewhonix]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello Patrick,</p>
+<p>Thank you very much for your response. Slowly I get a deeper understanding.</p>
+<p>Please excuse me if it is obvious but is the “TransPort” port 9050 or another port (if it is another which and where is it documented)? Thank you.</p>
+<p>As port 9153 is a custom socks port I assume that I found a mistake on the following page and section:<br>
+<a href="https://www.whonix.org/wiki/Dev/anon-ws-disable-stacked-tor#systemd-socket-proxyd_listening_port_redirection" rel="nofollow noopener">https://www.whonix.org/wiki/Dev/anon-ws-disable-stacked-tor#systemd-socket-proxyd_listening_port_redirection</a> Here is stated that port 9153 is used by Tor Messenger and forwarded to Whonix Gateway. From my understanding this is not the case as on the streamline isolation page it is stated that 9153 can be used as custom socks port for own application.</p>
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/11</link>
+        <pubDate>Wed, 16 Sep 2020 15:19:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-11</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="lovewhonix" data-post="9" data-topic="9816">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/a5b964/40.png" class="avatar"> lovewhonix:</div>
+<blockquote>
+<p>Would it be beneficial to run <strong>./monerod --tx-proxy tor,10.152.152.10:9153,10</strong> instead?</p>
+</blockquote>
+</aside>
+<p>It <a href="https://www.whonix.org/wiki/Stream_Isolation#How_to_mitigate_identity_correlation">might</a> be.</p>
+<aside class="quote no-group" data-username="lovewhonix" data-post="9" data-topic="9816">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/a5b964/40.png" class="avatar"> lovewhonix:</div>
+<blockquote>
+<p>Does any other whonix standard application use this port by default to get torified?</p>
+</blockquote>
+</aside>
+<p>9050, no.</p>
+<aside class="quote no-group" data-username="lovewhonix" data-post="9" data-topic="9816">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/a5b964/40.png" class="avatar"> lovewhonix:</div>
+<blockquote>
+<p>What happens if we use port 9050 instead of 9153?</p>
+</blockquote>
+</aside>
+<p>Basically same but higher risk something else uses that port too without user knowing.</p>
+<aside class="quote no-group" data-username="lovewhonix" data-post="9" data-topic="9816">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/a5b964/40.png" class="avatar"> lovewhonix:</div>
+<blockquote>
+<p>Port 9153 is custom socks port according to stream isolation page.</p>
+</blockquote>
+</aside>
+<p>Indeed.</p>
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/10</link>
+        <pubDate>Wed, 16 Sep 2020 07:47:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-10</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[lovewhonix]]></dc:creator>
+        <description><![CDATA[
+            <p>Independent from the above discussion and as conclusion: When running monerod (monero node) within an onion service operated on Whonix with</p>
+<p><strong>./monerod --tx-proxy tor,127.0.0.1:9050,10</strong></p>
+<p>Then according to<br>
+<a href="https://github.com/Whonix/anon-ws-disable-stacked-tor" rel="nofollow noopener">https://github.com/Whonix/anon-ws-disable-stacked-tor</a> and <a href="https://www.whonix.org/wiki/Stream" rel="nofollow noopener">https://www.whonix.org/wiki/Stream</a> Isolation#Footnotes</p>
+<p>127.0.0.1:9050 gets redirected to 10.152.152.10:9050 by anon-ws-disable-stacked-tor especially to prevent Tor on Tor scenarios.</p>
+<p>Would it be beneficial to run <strong>./monerod --tx-proxy tor,10.152.152.10:9153,10</strong> instead?</p>
+<p>What would be different in terms of security? What happens if we use port 9050 instead of 9153? Does any other whonix standard application use this port by default to get torified?</p>
+<p>Port 9153 is custom socks port according to stream isolation page.</p>
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/9</link>
+        <pubDate>Tue, 15 Sep 2020 19:46:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-9</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[lovewhonix]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for your posts as this is a very interesting topic.</p>
+<p>To apply this for running an monerod service using Whonix the approach of “Better Protection” is not applicable as <em>“All applications not configured to use a SocksPort by socks proxy settings or forced to use a SocksPort by a socksifier will not be able to establish connections.”</em></p>
+<p>Because according to <a href="https://github.com/monero-project/monero/blob/master/ANONYMITY_NETWORKS.md#behavior" rel="nofollow noopener">Monero Anonymity Networks</a> and <a href="https://monerodocs.org/interacting/monerod-reference/#tori2p" rel="nofollow noopener">Monero Reference</a> using Whonix custom socks ports with <code>./monerod --tx-proxy tor,10.152.152.10:9153,10 --add-peer=[onionservice]:[port]</code> still means that blockchain sync and forwarded transactions (those not originating from connected wallet) go still through clearnet to seed nodes.</p>
+<p>Therefore if changing firewall settings according to “Better Protection” blockchain sync and forwarded transactions are not possible.</p>
+<p>And using “Better Protection” configuration with this command <code>DNS_PUBLIC=tcp torsocks monerod --p2p-bind-ip 127.0.0.1 --no-igd</code> will work, but every outgoing connections especially transactions goes through Tor to seed nodes and leave Tor on Tor exit node which is undesirable as it could potentially lead to identity correlation by leaving Tor exit nodes.</p>
+<p>To summarize currently this is the most beneficial way to run monerod on Whonix: <code>./monerod --tx-proxy tor,10.152.152.10:9153,10 --add-peer=[onionservice]:[port]</code></p>
+<p>Do you agree?</p>
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/8</link>
+        <pubDate>Fri, 26 Jun 2020 17:54:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-8</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>For best protection against <em>identity correlation</em>:<br>
+<a href="https://www.whonix.org/wiki/Stream_Isolation#Better_Protection">https://www.whonix.org/wiki/Stream_Isolation#Better_Protection</a><br>
+^ by following these instructions, either proxy settings are adhered one way or another (socks proxy settings or socksifier such as torsocks) or no traffic at all.</p>
+<p>What’s better, using a socksifier or proxy settings method? Nobody is researching that to my knowledge. In Whonix, the risk is traffic going through Tor’s <code>TransPort</code> (transparent torification) instead thorough a dedicated Tor <code>SocksPort</code>. That risk is way too theoretic, obscure to anyone making it a priority to work on.</p>
+<p>I would expect something such as orjail might be better suited for torification (non-Whonix use case) or better stream isolation enforcement (Whonix use case). orjail / torsocks as kinda “mini Whonix netwoking”.</p>
+<p>More on orjail:<br>
+<a href="https://forums.whonix.org/t/managing-programs-without-tor-dns-support-orjail/4840" class="inline-onebox">Managing programs without Tor DNS Support / orjail</a></p>
+<p>Non-trivial.</p>
+<p>Therefore asking here will probably not make significant progress on stream isolation.</p>
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/7</link>
+        <pubDate>Fri, 26 Jun 2020 13:40:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-7</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="lovewhonix" data-post="1" data-topic="9816">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/a5b964/40.png" class="avatar"> lovewhonix:</div>
+<blockquote>
+<p>no stream isolation for (2) unless there are no additional connections through Transport from same Whonix-Workstation.</p>
+</blockquote>
+</aside>
+<p>I read it carefully this time. Every Onion connection has isolated streams by default. Nothing else needs to be done.</p>
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/6</link>
+        <pubDate>Fri, 26 Jun 2020 12:54:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-6</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[lovewhonix]]></dc:creator>
+        <description><![CDATA[
+            <p>Perhaps I did not express myself very well. I do not want to isolate streams by IP address.</p>
+<p>I want to use the custom socks ports prepared in /usr/share/tor/tor-service-defaults-torrc for custom installed applications. In this case for monerod.</p>
+<p>Therefore I wantet to use port 9153: <code>./monerod --tx-proxy tor,10.152.152.10:9153,10 --add-peer=[onionservice]:[port]</code></p>
+<p>This is described as default here <a href="https://www.whonix.org/wiki/Stream_Isolation#How_to_mitigate_identity_correlation" rel="nofollow noopener">https://www.whonix.org/wiki/Stream_Isolation#How_to_mitigate_identity_correlation</a></p>
+<p>Could you please clarify whats wrong with this approach as I am trying to follow the official instructions?</p>
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/5</link>
+        <pubDate>Fri, 26 Jun 2020 10:47:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-5</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Unless you configured Tor to isolate streams by IP address (resource intensive and not a default AFAIK), you won’t be getting the anonymity you want.</p>
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/4</link>
+        <pubDate>Wed, 24 Jun 2020 10:56:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-4</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[lovewhonix]]></dc:creator>
+        <description><![CDATA[
+            <p>Why is it beneficial to create uwt stream isolation wrapper for monero node instead of set up application SOCKS port and configure application to use that SOCKS port?</p>
+<p>Example: <code>./monerod --tx-proxy tor,10.152.152.10:9153,10 --add-peer=[onionservice]:[port]</code></p>
+<p>10.152.152.10:9153 would be the application SOCKS ports for monero configured in Whonix-Gateway <code>/usr/share/tor/tor-service-defaults-torrc</code>.</p>
+<p>This approach is preconfigured for many preinstalled applications and described here: <a href="https://www.whonix.org/wiki/Stream_Isolation#How_to_mitigate_identity_correlation" rel="nofollow noopener">Stream Isolation: How to mitigate identity correlation</a> and according to Tor Project the <a href="https://trac.torproject.org/projects/tor/wiki/doc/TorifyHOWTO#Classicalcommonway:usetheapplicationsproxysettings" rel="nofollow noopener">Common Way: Use the applications proxy settings</a>. I assumed using separate SOCKS port is the default way to ensure stream isolation for applications in Whonix.</p>
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/3</link>
+        <pubDate>Mon, 22 Jun 2020 14:09:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-3</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Follow the instructions here to create a uwt stream isolation wrapper for Monero.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Stream_Isolation#Add_new_uwt_wrapper" target="_blank" title="11:58PM - 19 June 2020">Whonix – 19 Jun 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:82/106;"><img src="https://www.whonix.org/w/images/e/eb/Streamisolationme.jpg" class="thumbnail" width="82" height="106"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Stream_Isolation#Add_new_uwt_wrapper" target="_blank">Stream Isolation</a></h3>
+
+<p>Prevent Identity Correlation through Circuit Sharing by using Tor Stream Isolation</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/2</link>
+        <pubDate>Mon, 22 Jun 2020 12:24:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-2</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+      <item>
+        <title>Setup Monero Node with Stream Isolation</title>
+        <dc:creator><![CDATA[lovewhonix]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello, if you want to run a monero node via Tor you have currently two methods.</p>
+<ol>
+<li>Application Proxy Settings: <a href="https://github.com/monero-project/monero/blob/master/ANONYMITY_NETWORKS.md" rel="nofollow noopener">Monero Anonymity Network</a>
+</li>
+</ol>
+<p><code>./monerod --tx-proxy tor,127.0.0.1:9050,10 --add-peer=[onionservice]:[port]</code></p>
+<p>(1) transaction broadcasts (tx) go through Tor to onion peers<br>
+(2) blockchain sync goes through clearnet to seed nodes.<br>
+-&gt; (2) is undesirable as public ip address gets exposed</p>
+<ol start="2">
+<li>torsocks: <a href="https://github.com/monero-project/monero#using-tor" rel="nofollow noopener">Monero Using Tor</a>
+</li>
+</ol>
+<p><code>DNS_PUBLIC=tcp torsocks monerod --p2p-bind-ip 127.0.0.1 --no-igd</code></p>
+<p>(1) every outgoing connections goes through Tor to seed nodes and leave Tor on Tor exit node<br>
+-&gt; this is undesirable as it could potentially lead to identity correlation</p>
+<p>If you want to setup monero node on Whonix-Workstation and want to setup proper <a href="https://www.whonix.org/wiki/Stream_Isolation" rel="nofollow noopener">stream isolation</a> I assume that the following setup is currently the preferred approach.</p>
+<p>Starting monero node with custom socks ports prepared for custom installed applications without IsolateDestAddr and without IsolateDestPort.</p>
+<p><code>./monerod --tx-proxy tor,10.152.152.10:9153,10 --add-peer=[onionservice]:[port]</code></p>
+<p>(1) transaction broadcasts (tx) go through Tor via Whonix-Gateway to onion peers<br>
+(2) blockchain sync goes with Transport via Whonix-Gateway through Tor  to seed nodes and leave Tor on Tor exit node<br>
+-&gt; IP/DNS leaks prevented by Whonix-Gateway<br>
+-&gt; stream isolation for (1)<br>
+-&gt; no stream isolation for (2) unless there are no additional connections through Transport from same Whonix-Workstation. If there are additional connections through Transport from the same Whonix-Workstation you have to avoid that applications are connected to a kind of the same pseudonym to prevent identity correlation.</p>
+<p>Do you agree?</p>
+<p>Thanks.</p>
+          <p><a href="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816/1</link>
+        <pubDate>Mon, 22 Jun 2020 11:40:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9816-1</guid>
+        <source url="http://forums.whonix.org/t/setup-monero-node-with-stream-isolation/9816.rss">Setup Monero Node with Stream Isolation</source>
+      </item>
+  </channel>
+</rss>

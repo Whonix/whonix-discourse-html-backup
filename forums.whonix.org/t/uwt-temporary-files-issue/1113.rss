@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Uwt temporary files issue</title>
+    <link>http://forums.whonix.org/t/uwt-temporary-files-issue/1113</link>
+    <description>[quote=&quot;nrgaway, post:6, topic:1085&quot;]The only immediate issue I has was permission problem of /tmp/uwt directory which gave an initial whonixcheck error.  The uwt directory was owned by root.root 775 (rwxrwxr-x). I changed the ownership to user.user and re-ran whonixcheck okay.[/quote]
+
+Seems like a bug in uwt. One that was never noticed by anyone. Perhaps because in Whonix, uwt first runs as user while in qubes-whonix it first runs as root. Setting ownership to user:user is a limited workaround. Would fail as soon as other user accounts start using uwt. Needs a fix in uwt.
+
+Related to these ~20 lines of code:
+https://github.com/Whonix/uwt/blob/c93bffdc64042ff885556eefd19d5c6b27044ff8/usr/bin/uwt#L183-201
+
+The following code is non-ideal.
+
+[code]
+if [ ! -d &quot;/tmp/uwt&quot; ]; then
+   mkdir --parents --mode=g+rw &quot;/tmp/uwt&quot;
+fi
+[/code]
+
+[hr]
+
+Background:
+What&#39;s uwt good for anyhow?
+
+torsocks has no options for passing ip/port by command line [for [url=https://www.whonix.org/wiki/Stream_Isolation]stream isolation[/url]]. Neither an option to pass a config file by command line. The only option to set a configuration file is setting the TORSOCKS_CONF_FILE environment variable. ([url=https://trac.torproject.org/projects/tor/ticket/11726]upstream feature request[/url])
+
+uwt dynamically generates a torsocks config file and sets that environment variable. The problem with that approach was a massive amount of tmp.xxx files piling up /tmp where users wondered about. Therefore a sub folder /tmp/uwt was created to aggregate all those config files there. Why wasn&#39;t the config file deleted? Because &#39;torsocks&#39; was called by using &#39;exec&#39; and there is no way to cleanup after.
+
+[hr]
+
+I attempted a fix. Abolished use of exec. No longer using a sub folder. Temporary torsocks configuration files are now cleaned up by an EXIT trap.
+
+[hr]
+
+Long story short:
+Should be fixed in uwt &gt;= 1.7-1.
+
+Hopefully not more issues were introduced than fixed. Needs testing.
+
+In Whonix 11.0.0.2.2-developers-only (not yet tested) from
+
+[code]qubes-linux-template-builder/scripts_debian/wheezy+whonix/02_install_groups_packages_installed.sh[/code]
+
+the following can be deleted.
+
+[code]sudo mkdir --parents --mode=g+rw &quot;/tmp/uwt&quot;[/code]</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 01 Jun 2015 14:20:13 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/uwt-temporary-files-issue/1113.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Uwt temporary files issue</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>but but the need for use of UWT?</blockquote>
+Because when users type or scripts call for example [font=courier]apt-get [...][/font]*, what really needs to happen is [font=courier]torsocks -t  -p  apt-get [...][/font]. Why? So socksification with proper stream isolation is applied. For that, a wrapper is required. uwt is an implementation of such a collection of wrappers.
+<p>[size=8pt]* apt-get itself does not support proxy settings.**<br>
+** [font=courier]Acquire:<img src="//forums.whonix.org/images/emoji/twitter/socks.png?v=5" title=":socks:" class="emoji" alt=":socks:">:proxy[/font] is a disproved*** myth.<br>
+*** Disproved because apt-get’s source code does not mention [font=courier]socks[/font] and because apt-get developers also confirmed, that there is no such feature.[/size]</p>
+          <p><a href="http://forums.whonix.org/t/uwt-temporary-files-issue/1113/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uwt-temporary-files-issue/1113/11</link>
+        <pubDate>Mon, 01 Jun 2015 14:20:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1113-11</guid>
+        <source url="http://forums.whonix.org/t/uwt-temporary-files-issue/1113.rss">Uwt temporary files issue</source>
+      </item>
+      <item>
+        <title>Uwt temporary files issue</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="9" data-topic="1113">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>[quote]So from what I gather tor socks is already able to configure itself for port/ip via TORSOCKS_CONF_FILE environment variable only and not via CLI. torsocks is written in C code.</p>
+</blockquote>
+</aside>
+<p>Correct.</p>
+<aside class="quote">
+<blockquote>
+<p>It is further suggested that providing a command line interface to torsocks would eliminate the need for UWT?</p>
+</blockquote>
+</aside>
+<p>Would eliminate need for creation of a temporary configuration file.[/quote]<br>
+but but the need for use of UWT?</p>
+<blockquote>[quote]It seems like a real trivial task to implement a CLI for torsocks if it already has the inner-workings to reconfigure itself via ENV variable.[/quote]
+For someone who speaks C, yes...
+<aside class="quote">
+<blockquote>
+<p>If my assumptions are correct, then why don’t we just modify torsocks to allow CLI and provide patch upstream?</p>
+</blockquote>
+</aside>
+<p>Do you speak C or know anyone contributing this in C?</p>
+</blockquote><br>
+I do speak C, just not as well as python <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:">
+          <p><a href="http://forums.whonix.org/t/uwt-temporary-files-issue/1113/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uwt-temporary-files-issue/1113/10</link>
+        <pubDate>Mon, 01 Jun 2015 03:57:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1113-10</guid>
+        <source url="http://forums.whonix.org/t/uwt-temporary-files-issue/1113.rss">Uwt temporary files issue</source>
+      </item>
+      <item>
+        <title>Uwt temporary files issue</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>So from what I gather tor socks is already able to configure itself for port/ip via TORSOCKS_CONF_FILE environment variable only and not via CLI. torsocks is written in C code.</blockquote>
+Correct.
+<blockquote>It is further suggested that providing a command line interface to torsocks would eliminate the need for UWT?</blockquote>
+Would eliminate need for creation of a temporary configuration file.
+<blockquote>It seems like a real trivial task to implement a CLI for torsocks if it already has the inner-workings to reconfigure itself via ENV variable.</blockquote>
+For someone who speaks C, yes...
+<blockquote>If my assumptions are correct, then why don't we just modify torsocks to allow CLI and provide patch upstream?</blockquote>
+Do you speak C or know anyone contributing this in C?
+          <p><a href="http://forums.whonix.org/t/uwt-temporary-files-issue/1113/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uwt-temporary-files-issue/1113/9</link>
+        <pubDate>Sun, 31 May 2015 20:24:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1113-9</guid>
+        <source url="http://forums.whonix.org/t/uwt-temporary-files-issue/1113.rss">Uwt temporary files issue</source>
+      </item>
+      <item>
+        <title>Uwt temporary files issue</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>So from what I gather tor socks is already able to configure itself for port/ip via TORSOCKS_CONF_FILE environment variable only and not via CLI. torsocks is written in C code.</p>
+<p>It is further suggested that providing a command line interface to torsocks would eliminate the need for UWT?</p>
+<p>It seems like a real trivial task to implement a CLI for torsocks if it already has the inner-workings to reconfigure itself via ENV variable.</p>
+<p>If my assumptions are correct, then why don’t we just modify torsocks to allow CLI and provide patch upstream?</p>
+          <p><a href="http://forums.whonix.org/t/uwt-temporary-files-issue/1113/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uwt-temporary-files-issue/1113/8</link>
+        <pubDate>Sun, 31 May 2015 19:37:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1113-8</guid>
+        <source url="http://forums.whonix.org/t/uwt-temporary-files-issue/1113.rss">Uwt temporary files issue</source>
+      </item>
+      <item>
+        <title>Uwt temporary files issue</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Is there anything better than UWT?</blockquote>
+Not that I know. Last time I checked, Tails also had no better solution or even idea.
+<p>Ideally applications support socks proxy settings. Then it’s simple and socksification by uwtwrapper -&gt; uwt -&gt; torsocks  is not required. But if they don’t, there is just torsocks. And uwtwrappers / uwt help setting them up by default.</p>
+<blockquote>Why would it be so difficult to re-route packets; can't iptable rules be set up or something similar? Hooking into the kernel or network device would allow some advanced routing? Use a dummy device?</blockquote>
+Because for stream isolation, traffic has to be distinguished at application level. Those levels are too low. Let's say, at least no one published a great idea how it could be solved.
+<blockquote>Guess one day I should look into the inner workings of exactly what is required.  It would be nice to not have so many uwt wrappers.</blockquote>
+Implementing https://trac.torproject.org/projects/tor/ticket/11726 (C code) would certainly help abolish the temporary config file creation hack.
+          <p><a href="http://forums.whonix.org/t/uwt-temporary-files-issue/1113/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uwt-temporary-files-issue/1113/7</link>
+        <pubDate>Sun, 31 May 2015 12:37:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1113-7</guid>
+        <source url="http://forums.whonix.org/t/uwt-temporary-files-issue/1113.rss">Uwt temporary files issue</source>
+      </item>
+      <item>
+        <title>Uwt temporary files issue</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:1, topic:1113”]Long story short:<br>
+Should be fixed in uwt &gt;= 1.7-1.</p>
+<p>Hopefully not more issues were introduced than fixed. Needs testing.</p>
+<p>In Whonix 11.0.0.2.2-developers-only (not yet tested) from</p>
+<pre><code class="lang-auto"></code></pre>
+<p>the following can be deleted.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>FYI, I had removed Whonix from qubes-linux-template-builder a few months ago and placed it into its own package (qubes-template-whonix) <a href="https://github.com/nrgaway/qubes-template-whonix/tree/Whonix11" data-bbcode="true" rel="nofollow noopener">https://github.com/nrgaway/qubes-template-whonix/tree/Whonix11</a></p>
+          <p><a href="http://forums.whonix.org/t/uwt-temporary-files-issue/1113/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uwt-temporary-files-issue/1113/6</link>
+        <pubDate>Sat, 30 May 2015 23:56:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1113-6</guid>
+        <source url="http://forums.whonix.org/t/uwt-temporary-files-issue/1113.rss">Uwt temporary files issue</source>
+      </item>
+      <item>
+        <title>Uwt temporary files issue</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>Is there anything better than UWT?</p>
+<p>Why would it be so difficult to re-route packets; can’t iptable rules be set up or something similar? Hooking into the kernel or network device would allow some advanced routing? Use a dummy device?</p>
+<p>Guess one day I should look into the inner workings of exactly what is required.  It would be nice to not have so many uwt wrappers.</p>
+          <p><a href="http://forums.whonix.org/t/uwt-temporary-files-issue/1113/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uwt-temporary-files-issue/1113/5</link>
+        <pubDate>Sat, 30 May 2015 23:26:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1113-5</guid>
+        <source url="http://forums.whonix.org/t/uwt-temporary-files-issue/1113.rss">Uwt temporary files issue</source>
+      </item>
+      <item>
+        <title>Uwt temporary files issue</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Back to per-user temporary folders in uwt &gt;= 1.9-1. Not the most pretty solution, but all test cases are functional.</p>
+          <p><a href="http://forums.whonix.org/t/uwt-temporary-files-issue/1113/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uwt-temporary-files-issue/1113/4</link>
+        <pubDate>Sat, 30 May 2015 13:53:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1113-4</guid>
+        <source url="http://forums.whonix.org/t/uwt-temporary-files-issue/1113.rss">Uwt temporary files issue</source>
+      </item>
+      <item>
+        <title>Uwt temporary files issue</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Worked on signal handling in uwt &gt;= 1.8-1. But that doesn’t work either.</p>
+<p>Test cases.</p>
+<ol>
+<li>
+</li>
+</ol>
+<pre><code class="lang-auto"></code></pre>
+<ol start="2">
+<li>
+</li>
+</ol>
+<pre><code class="lang-auto"></code></pre>
+<p>(Over ssh! Because git is torified by uwt which uses ssh which is torified as well.)</p>
+<p>Test case 1 is functional, while test case 2 is not.</p>
+          <p><a href="http://forums.whonix.org/t/uwt-temporary-files-issue/1113/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uwt-temporary-files-issue/1113/3</link>
+        <pubDate>Fri, 29 May 2015 21:31:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1113-3</guid>
+        <source url="http://forums.whonix.org/t/uwt-temporary-files-issue/1113.rss">Uwt temporary files issue</source>
+      </item>
+      <item>
+        <title>Uwt temporary files issue</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>That won’t be it.</p>
+<p>I remember why ‘exec’ was being used in the first place. Without ‘exec’ progressing unix signals (sigterm etc.) does not work. Not sure if there is a solution to that.</p>
+<p>And when using ‘exec’ there is no way to cleanup afterwards.</p>
+          <p><a href="http://forums.whonix.org/t/uwt-temporary-files-issue/1113/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uwt-temporary-files-issue/1113/2</link>
+        <pubDate>Fri, 29 May 2015 16:22:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1113-2</guid>
+        <source url="http://forums.whonix.org/t/uwt-temporary-files-issue/1113.rss">Uwt temporary files issue</source>
+      </item>
+      <item>
+        <title>Uwt temporary files issue</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="6" data-topic="1085">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"><a href="//forums.whonix.org/t/whonix11-development-status-for-qubes-3-0/1085/6">Whonix11 Development Status For Qubes 3.0</a>
+</div>
+<blockquote>
+<p>The only immediate issue I has was permission problem of /tmp/uwt directory which gave an initial whonixcheck error.  The uwt directory was owned by root.root 775 (rwxrwxr-x). I changed the ownership to user.user and re-ran whonixcheck okay.</p>
+</blockquote>
+</aside>
+<p>Seems like a bug in uwt. One that was never noticed by anyone. Perhaps because in Whonix, uwt first runs as user while in qubes-whonix it first runs as root. Setting ownership to user:user is a limited workaround. Would fail as soon as other user accounts start using uwt. Needs a fix in uwt.</p>
+<p>Related to these ~20 lines of code:<br>
+</p><aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/uwt/blob/c93bffdc64042ff885556eefd19d5c6b27044ff8/usr/bin/uwt#L183-201" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/uwt/blob/c93bffdc64042ff885556eefd19d5c6b27044ff8/usr/bin/uwt#L183-201" target="_blank" rel="nofollow noopener">Whonix/uwt/blob/c93bffdc64042ff885556eefd19d5c6b27044ff8/usr/bin/uwt#L183-201</a></h4>
+<pre class="onebox"><code class="lang-"><ol class="start lines" start="173" style="counter-reset: li-counter 172 ;">
+<li>fi</li>
+<li>
+</li>
+<li>true "UWT: We are armed with the following torsocks: $TORSOCKS"</li>
+<li>
+</li>
+<li>dpkg_query_exit_code="0"</li>
+<li>torsocks_installed_version="$(dpkg-query --show --showformat='${Version}' "torsocks")" || { dpkg_query_exit_code="$?" ; true; };</li>
+<li>
+</li>
+<li>dpkg_compare_versions_equals_exit_code="0"</li>
+<li>dpkg --compare-versions "$torsocks_installed_version" ge "2" || { dpkg_compare_versions_equals_exit_code="$?" ; true; };</li>
+<li>
+</li>
+<li class="selected">if [ ! -d "/tmp/uwt" ]; then</li>
+<li>mkdir --parents --mode=g+rw "/tmp/uwt"</li>
+<li>fi</li>
+<li>
+</li>
+<li>## Define our torsocks config file.</li>
+<li>TORSOCKS_CONF_FILE="$(mktemp --tmpdir="/tmp/uwt")"</li>
+<li>if [ ! "$?" = "0" ]; then</li>
+<li>echo "mktemp failed with exit code $?!"</li>
+<li>exit 1</li>
+<li>fi</li>
+<li>export TORSOCKS_CONF_FILE</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>The following code is non-ideal.</p>
+<pre><code class="lang-auto">if [ ! -d "/tmp/uwt" ]; then
+   mkdir --parents --mode=g+rw "/tmp/uwt"
+fi</code></pre>
+<p>[hr]</p>
+<p>Background:<br>
+What’s uwt good for anyhow?</p>
+<p>torsocks has no options for passing ip/port by command line [for <a href="https://www.whonix.org/wiki/Stream_Isolation" data-bbcode="true">stream isolation</a>]. Neither an option to pass a config file by command line. The only option to set a configuration file is setting the TORSOCKS_CONF_FILE environment variable. (<a href="https://trac.torproject.org/projects/tor/ticket/11726" data-bbcode="true">upstream feature request</a>)</p>
+<p>uwt dynamically generates a torsocks config file and sets that environment variable. The problem with that approach was a massive amount of tmp.xxx files piling up /tmp where users wondered about. Therefore a sub folder /tmp/uwt was created to aggregate all those config files there. Why wasn’t the config file deleted? Because ‘torsocks’ was called by using ‘exec’ and there is no way to cleanup after.</p>
+<p>[hr]</p>
+<p>I attempted a fix. Abolished use of exec. No longer using a sub folder. Temporary torsocks configuration files are now cleaned up by an EXIT trap.</p>
+<p>[hr]</p>
+<p>Long story short:<br>
+Should be fixed in uwt &gt;= 1.7-1.</p>
+<p>Hopefully not more issues were introduced than fixed. Needs testing.</p>
+<p>In Whonix 11.0.0.2.2-developers-only (not yet tested) from</p>
+<pre><code class="lang-auto"></code></pre>
+<p>the following can be deleted.</p>
+<pre><code class="lang-auto"></code></pre>
+          <p><a href="http://forums.whonix.org/t/uwt-temporary-files-issue/1113/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uwt-temporary-files-issue/1113/1</link>
+        <pubDate>Fri, 29 May 2015 14:50:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1113-1</guid>
+        <source url="http://forums.whonix.org/t/uwt-temporary-files-issue/1113.rss">Uwt temporary files issue</source>
+      </item>
+  </channel>
+</rss>

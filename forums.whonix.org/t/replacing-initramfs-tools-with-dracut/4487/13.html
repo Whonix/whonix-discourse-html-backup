@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>replacing initramfs-tools with dracut - #13 by TNT_BOM_BOM - Development - Whonix Forum</title>
+    <meta name="description" content="If we want to implement a live boot option for Whonix we maybe need to change the default tool for generating the initramfs from the current initramfs-tools to dracut. Therefore, also some minor changes to the build scri&amp;hellip;">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="../4487.html" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../../c/news/21.html">NEWS</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;replacing initramfs-tools with dracut&#39;" href="../4487.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/replacing-initramfs-tools-with-dracut/4487/13" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/replacing-initramfs-tools-with-dracut/4487/13" />
+<meta property="og:title" content="replacing initramfs-tools with dracut" />
+<meta name="twitter:title" content="replacing initramfs-tools with dracut" />
+<meta property="og:description" content="tested on whonix kvm (with live mode/read only)= working good.  but in qubes it gonna remove more/important packages:  root@host:~# apt install dracut Reading package lists... Done Building dependency tree... Done Reading state information... Done The following packages were automatically installed and are no longer required:   dctrl-tools dkms gettext-base grub-common grub2-common initramfs-tools-core   klibc-utils libefiboot1 libefivar1 libklibc linux-base os-prober   python3-distro python3-j..." />
+<meta name="twitter:description" content="tested on whonix kvm (with live mode/read only)= working good.  but in qubes it gonna remove more/important packages:  root@host:~# apt install dracut Reading package lists... Done Building dependency tree... Done Reading state information... Done The following packages were automatically installed and are no longer required:   dctrl-tools dkms gettext-base grub-common grub2-common initramfs-tools-core   klibc-utils libefiboot1 libefivar1 libklibc linux-base os-prober   python3-distro python3-j..." />
+<meta property="article:published_time" content="2021-09-01T01:58:46+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../../index.html">
+          <img src="../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="../4487.html">replacing initramfs-tools with dracut</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../../c/development/8.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #25AAE2'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>Development</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Algernon'><span itemprop='name'>Algernon</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2017-11-03T22:02:28Z' class='post-time'>
+                November 3, 2017, 10:02pm
+              </time>
+              <meta itemprop='dateModified' content='2020-02-06T09:42:03Z'>
+          <span itemprop='position'>#1</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>If we want to implement a <a href="../../../../external.html?link=https://phabricator.whonix.org/T714" rel="nofollow noopener">live boot</a> option for Whonix we maybe need to change the default tool for generating the initramfs from the current initramfs-tools to <a href="../../../../external.html?link=https://dracut.wiki.kernel.org/index.php/Main_Page" rel="nofollow noopener">dracut</a>. Therefore, also some minor changes to the build scripts are required.</p>
+<p>Dracut is mostly used by everything Fedora based (RedHat, CentOS, Qubes) and OpenSuse. Initramfs-tools is used by Debian and derivatives by default.<br>
+I couldn’t find any important differences between both, which doesn’t mean they don’t exist. Dracut is also in the Debian repos and seems to be well maintained.</p>
+<p>The current patches for live boot are based on the dracut version in testing. Compared to the version from stable/stretch the major difference for us is the lack of overlayfs support which is present in testing. However, live systems are still possible with device mapper which should be the default imho.<br>
+For differences between overlayfs  and devicemapper see <a href="../../../../external.html?link=https://phabricator.whonix.org/T714#14714" rel="nofollow noopener">here</a> .<br>
+In contrast, initramfs-tools from debian supports overlayfs but not device-mapper. But in principle it should also be possible to have such a live system with initramfs-tools.</p>
+<p>I currently don’t expect any major issues from changing initramfs-tools to dracut though including the patches it might be more tricky.<br>
+We have several options:</p>
+<ol>
+<li>
+</li>
+</ol>
+<p>Use the version from stable/stretch and patch it so we can use live systems with device mapper.<br>
+Pro: Would have the lowest risk of breaking something.<br>
+Con: Somewhat lower functionality/flexibility since no overlayfs.</p>
+<ol start="2">
+<li>
+</li>
+</ol>
+<p>Wait for the testing package to be backported and then use this + our patches.<br>
+Pro: Would have overlayfs support. Low risk of breaking something.<br>
+Con: There is a backport from the current version for jessie. Not sure if there will be one for the version we need. Maybe ask the maintainer of the package.</p>
+<ol start="3">
+<li>
+</li>
+</ol>
+<p>Use the package from testing + add our patches.<br>
+Pro: Would have overlayfs support. We don’t have to wait for a backport.<br>
+Con: We need to watch out for upstream changes. Need to ensure the right version is used or adapt the patch. Higher risk that something might break.<br>
+I’m not sure if it is possible to install a package from testing during an upgrade where the testing package is an exact version and is listed as “Depends” in the control file. This is relevant if we want to go from Whonix 13 to Whonix 14 + dracut.</p>
+<ol start="4">
+<li>
+</li>
+</ol>
+<p>Maintain our own dracut from testing with patches already included<br>
+Pro: Would have overlayfs support. We don’t have to wait for a backport.<br>
+We don’t need an extra live patch package.<br>
+Con: We probably still need to look out for changes when some package which dracut depends on gets changed. Maybe higher maintenence burden.</p>
+<ol start="5">
+<li>
+</li>
+</ol>
+<p>Take a look at initramfs-tools again and try to implement our live mode there.<br>
+Pro: Fewer changes. Initramfs-tools is debian default.<br>
+Con: Only overlayfs support. Probably also some patches required.</p>
+<p>The patches deal only with the live system. If something breaks due to a new upstream package then only the live system should break. Normal boot should still work.<br>
+At the moment I mostly dealt with option 3 and 1 going to look at 5 again. Dracut itself depends only on a few packages and I don’t know if anything would break if it suddenly would pull in dependencies with a higher version number than currently installed.</p>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+          <meta itemprop='keywords' content=''>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+            <div class='crawler-linkback-list' itemscope itemtype='../../../../external.html?link=http://schema.org/ItemList'>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../../is-ram-wipe-possible-inside-whonix-cold-boot-attack-defense/5596/35.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../../is-ram-wipe-possible-inside-whonix-cold-boot-attack-defense/5596/35.html'>
+                      <span itemprop='name'>Is RAM Wipe possible inside Whonix? Cold Boot Attack Defense</span>
+                    </a>
+                    <meta itemprop='position' content='4'>
+                  </div>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../../bullseye-live-boot-needs-grub-disable-linux-uuid-true-parameter-in-etc-grub-d-11-linux-live/9066/7.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../../bullseye-live-boot-needs-grub-disable-linux-uuid-true-parameter-in-etc-grub-d-11-linux-live/9066/7.html'>
+                      <span itemprop='name'>Bullseye: live-boot needs GRUB_DISABLE_LINUX_UUID=&quot;true&quot; parameter in /etc/grub.d/11_linux_live</span>
+                    </a>
+                    <meta itemprop='position' content='5'>
+                  </div>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../../whonix-live-mode-amnesia-amnesic-non-persistent-anti-forensics/3894/235.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../../whonix-live-mode-amnesia-amnesic-non-persistent-anti-forensics/3894/235.html'>
+                      <span itemprop='name'>Whonix live mode / amnesia / amnesic / non-persistent / anti-forensics</span>
+                    </a>
+                    <meta itemprop='position' content='6'>
+                  </div>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../../kernel-hardening/7296/459.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../../kernel-hardening/7296/459.html'>
+                      <span itemprop='name'>Kernel Hardening</span>
+                    </a>
+                    <meta itemprop='position' content='7'>
+                  </div>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../../whonix-live-mode-amnesia-amnesic-non-persistent-anti-forensics/3894/233.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../../whonix-live-mode-amnesia-amnesic-non-persistent-anti-forensics/3894/233.html'>
+                      <span itemprop='name'>Whonix live mode / amnesia / amnesic / non-persistent / anti-forensics</span>
+                    </a>
+                    <meta itemprop='position' content='8'>
+                  </div>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../../kernel-hardening/7296/336.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../../kernel-hardening/7296/336.html'>
+                      <span itemprop='name'>Kernel Hardening</span>
+                    </a>
+                    <meta itemprop='position' content='9'>
+                  </div>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../../kernel-hardening/7296/360.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../../kernel-hardening/7296/360.html'>
+                      <span itemprop='name'>Kernel Hardening</span>
+                    </a>
+                    <meta itemprop='position' content='10'>
+                  </div>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../../testing-to-please-myself-live-mode-user/11706/14.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../../testing-to-please-myself-live-mode-user/11706/14.html'>
+                      <span itemprop='name'>Testing (to please myself) Live Mode User</span>
+                    </a>
+                    <meta itemprop='position' content='11'>
+                  </div>
+            </div>
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2017-11-04T01:50:30Z' class='post-time'>
+                November 4, 2017,  1:50am
+              </time>
+              <meta itemprop='dateModified' content='2017-11-04T01:50:30Z'>
+          <span itemprop='position'>#2</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Any reasons against moving to dracut? <a class="mention" href="../../../../external.html?link=https://forums.whonix.org/u/hulahoop">@HulaHoop</a></p>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/HulaHoop'><span itemprop='name'>HulaHoop</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2017-11-05T03:10:49Z' class='post-time'>
+                November 5, 2017,  3:10am
+              </time>
+              <meta itemprop='dateModified' content='2017-11-05T03:10:49Z'>
+          <span itemprop='position'>#3</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Thumbs up to Dracut. Its the modern, standardized successor to intramfs-tools</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://lwn.net/images/favicon.png" class="site-icon" width="32" height="32">
+      <a href="../../../../external.html?link=https://lwn.net/Articles/317793/" target="_blank" rel="nofollow noopener">lwn.net</a>
+  </header>
+  <article class="onebox-body">
+    
+
+<h3><a href="../../../../external.html?link=https://lwn.net/Articles/317793/" target="_blank" rel="nofollow noopener">Dracut looks to replace the initramfs patchwork [LWN.net]</a></h3>
+
+<p>Creating initramfs images, for use by the kernel at "early boot" time, is a
+rather messy business.  It is made more so by the fact that each individual
+distribution has its own tools to build the image, as well as its own set
+of tools inside it.  At...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2017-11-05T23:41:36Z' class='post-time'>
+                November 5, 2017, 11:41pm
+              </time>
+              <meta itemprop='dateModified' content='2017-11-05T23:41:36Z'>
+          <span itemprop='position'>#4</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Alright, please change the Whonix default to <code>dracut</code> by submitting a pull request. <a class="mention" href="../../../../external.html?link=https://forums.whonix.org/u/algernon">@Algernon</a></p>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-02-03T07:03:45Z' class='post-time'>
+                February 3, 2020,  7:03am
+              </time>
+              <meta itemprop='dateModified' content='2020-02-03T07:03:45Z'>
+          <span itemprop='position'>#5</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>In <a href="../../kernel-hardening/7296/360.html" class="inline-onebox">Kernel Hardening</a> I was wondering:</p>
+<p>Or pass on dracut too and wait until minitrd is available from <a href="../../../../external.html?link=http://packages.debian.org/">packages.debian.org</a>?</p>
+<aside class="quote" data-post="1" data-topic="8865">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar">
+    <a href="../../minitrd-a-minimal-initramfs/8865.html">Minitrd - A minimal initramfs</a> <a class="badge-wrapper  bullet" href="../../../c/development/8.html"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    minitrd is 20 times faster than dracut. It is part of the experimental distri distro that is about implementing fast package management with no goal to make it readily support other OSs. 
+<a href="../../../../external.html?link=https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/" class="onebox" target="_blank">https://michael.stapelberg.ch/posts/2020-01-21-initramfs-from-scratch-golang/</a> 
+<a href="../../../../external.html?link=https://www.phoronix.com/scan.php?page=news_item&amp;px=Slow-Dracut-Minitrd-Faster" class="onebox" target="_blank">https://www.phoronix.com/scan.php?page=news_item&amp;px=Slow-Dracut-Minitrd-Faster</a>
+  </blockquote>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/HulaHoop'><span itemprop='name'>HulaHoop</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-02-03T14:44:06Z' class='post-time'>
+                February 3, 2020,  2:44pm
+              </time>
+              <meta itemprop='dateModified' content='2020-02-03T14:44:06Z'>
+          <span itemprop='position'>#6</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Patrick" data-post="360" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Or pass on dracut too and wait until minitrd is available from <a href="../../../../external.html?link=http://packages.debian.org/">packages.debian.org</a>?</p>
+</blockquote>
+</aside>
+<p>I wouldn’t hold my breath for minitrd unless the author tells you he’s going to put it in Debian for sure.</p>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+            <div class='crawler-linkback-list' itemscope itemtype='../../../../external.html?link=http://schema.org/ItemList'>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../../kernel-hardening/7296/361.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../../kernel-hardening/7296/361.html'>
+                      <span itemprop='name'>Kernel Hardening</span>
+                    </a>
+                    <meta itemprop='position' content='1'>
+                  </div>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../../testing-to-please-myself-live-mode-user/11706/14.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../../testing-to-please-myself-live-mode-user/11706/14.html'>
+                      <span itemprop='name'>Testing (to please myself) Live Mode User</span>
+                    </a>
+                    <meta itemprop='position' content='2'>
+                  </div>
+            </div>
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-03-07T17:29:22Z' class='post-time'>
+                March 7, 2020,  5:29pm
+              </time>
+              <meta itemprop='dateModified' content='2020-03-07T17:29:22Z'>
+          <span itemprop='position'>#7</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Quote:</p>
+<blockquote>
+<p>Oh, and one last question before closing: instead of implementing these features in your own distro’s initrd, may I suggest just using Dracut instead? It’s all already implemented there!</p>
+</blockquote>
+<p>Source:<br>
+<a href="../../../../external.html?link=https://www.freedesktop.org/wiki/Software/systemd/InitrdInterface/" class="onebox" target="_blank">https://www.freedesktop.org/wiki/Software/systemd/InitrdInterface/</a></p>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+            <div class='crawler-linkback-list' itemscope itemtype='../../../../external.html?link=http://schema.org/ItemList'>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../../re-mount-home-and-other-with-noexec-and-nosuid-among-other-useful-mount-options-for-better-security/7707/33.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../../re-mount-home-and-other-with-noexec-and-nosuid-among-other-useful-mount-options-for-better-security/7707/33.html'>
+                      <span itemprop='name'>(re-)mount home [and other?] with noexec (and nosuid [among other useful mount options]) for better security?</span>
+                    </a>
+                    <meta itemprop='position' content='2'>
+                  </div>
+            </div>
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-07-19T16:49:29Z' class='post-time'>
+                July 19, 2021,  4:49pm
+              </time>
+              <meta itemprop='dateModified' content='2021-07-19T16:49:29Z'>
+          <span itemprop='position'>#8</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I haven’t found out that dpkg trigger:</p>
+<blockquote>
+<p>activate dracut</p>
+</blockquote>
+<p>exists. We can likely keep:</p>
+<blockquote>
+<p>activate update-initramfs</p>
+</blockquote>
+<hr>
+<p><a href="../../../../external.html?link=https://packages.debian.org/bullseye/dracut-live" class="onebox" target="_blank" rel="noopener">https://packages.debian.org/bullseye/dracut-live</a></p>
+<hr>
+<p>/etc/dracut.conf.d/10-debian.conf as suggested by <a class="mention" href="../../../../external.html?link=https://forums.whonix.org/u/algernon">@Algernon</a></p>
+<pre><code class="lang-auto">do_prelink=no
+hostonly=no
+add_dracutmodules+=" dmsquash-live pollcdrom crypt crypt-loop "
+</code></pre>
+<hr>
+<pre><code class="lang-auto">apt-file list dracut-config-rescue
+dracut-config-rescue: /etc/dracut.conf.d/20-rescue.conf
+</code></pre>
+<pre><code class="lang-auto">cat /etc/dracut.conf.d/20-rescue.conf
+dracut_rescue_image="yes"
+</code></pre>
+<hr>
+<pre><code class="lang-auto">apt-file list dracut-config-generic 
+dracut-config-generic: /etc/dracut.conf.d/20-generic-image.conf
+</code></pre>
+<pre><code class="lang-auto">cat /etc/dracut.conf.d/20-generic-image.conf
+hostonly="no"
+</code></pre>
+<hr>
+<p>grml-debootstrap will probably need (calls update-initramfs):</p>
+<pre><code class="lang-auto">export INITRD='no'
+</code></pre>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-07-19T17:24:47Z' class='post-time'>
+                July 19, 2021,  5:24pm
+              </time>
+              <meta itemprop='dateModified' content='2021-07-19T17:24:47Z'>
+          <span itemprop='position'>#9</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubissue">
+  <header class="source">
+
+      <a href="../../../../external.html?link=https://github.com/dracutdevs/dracut/issues/1565" target="_blank" rel="noopener">github.com/dracutdevs/dracut</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewbox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/dracutdevs/dracut/issues/1565" target="_blank" rel="noopener">Boot Existing, Usual Linux Installation from Hard Disk in Live Mode / read-only mode with dracut</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2021-07-19" data-time="17:24:30" data-timezone="UTC">05:24PM - 19 Jul 21 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+
+    <div class="labels">
+        <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">enhancement</span>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">Feature request. What I would like to do:
+
+1. Install Debian to HDD with encry<span class="show-more-container"><a href="#" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">pted lvm using the usual installer.
+2. Make any persistent changes normally.
+3. Add dracut parameters to boot into non-persistent live mode.
+(add an additional grub boot menu entry for ease of use to have a choice to boot into persistent mode or live (read-only) mode) 
+
+Similar to [this](https://forums.opensuse.org/showthread.php/540709-Booting-a-persistent-USB-Live-15-1-stick-without-further-persistence) (alternative way to phrase this question).
+
+Is this already possible with dracut?
+
+By comparison, this is possible with initramfs-tools and grub.
+
+* [Essentially just only 1 grub configuration drop-in file.](https://gitlab.com/whonix/grub-live/-/blob/master/etc/grub.d/11_linux_live) + `sudo update-grub`
+* [Screenshots here.](https://www.whonix.org/wiki/Grub-live)</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-08-28T10:22:37Z' class='post-time'>
+                August 28, 2021, 10:22am
+              </time>
+              <meta itemprop='dateModified' content='2021-08-28T10:22:37Z'>
+          <span itemprop='position'>#10</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>This was sent to me:</p>
+<pre><code class="lang-auto">hostonly="yes"
+kernel_cmdline="rootovl"
+filesystems+=overlay
+</code></pre>
+<pre><code>sudo dracut /boot/nonp.img
+</code></pre>
+<blockquote>
+<p>Here is the boot entry I added to grub.cfg, which is just the regular boot entry with a different initrd.</p>
+</blockquote>
+<pre><code>menuentry 'Debian GNU/Linux Non-Persistent Live Mode' --class debian
+--class gnu-linux --class gnu --class os $menuentry_id_option
+'gnulinux-simple-845ea599-84cb-40c4-b556-f999fa4d389a' {
+
+load_video
+
+insmod gzio
+
+if [ x$grub_platform = xxen ]; then insmod xzio; insmod lzopio; fi
+
+insmod part_msdos
+
+insmod ext2
+
+set root='hd0,msdos1'
+
+if [ x$feature_platform_search_hint = xy ]; then
+
+  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos1
+--hint-efi=hd0,msdos1 --hint-baremetal=ahci0,msdos1
+e04cb268-48ff-46ef-8335-e7a954f6a9bd
+
+else
+
+  search --no-floppy --fs-uuid --set=root
+e04cb268-48ff-46ef-8335-e7a954f6a9bd
+
+fi
+
+echo 'Loading Linux 5.10.0-8-amd64 ...'
+
+linux /vmlinuz-5.10.0-8-amd64 root=/dev/mapper/magian--vg-root ro  quiet ro
+rd.live.image
+
+echo 'Loading initial ramdisk ...'
+
+initrd /nonp.img #MY NEW IMAGE CREATED WITH sudo dracut /boot/nonp.img
+--force
+
+}
+</code></pre>
+<p>Untested.</p>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-08-29T19:25:20Z' class='post-time'>
+                August 29, 2021,  7:25pm
+              </time>
+              <meta itemprop='dateModified' content='2021-08-29T19:25:20Z'>
+          <span itemprop='position'>#11</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://gitlab.com/assets/favicon-7901bd695fb93edb07975966062049829afb56cf11511236e61bcf425070e36e.png" class="site-icon" width="16" height="16">
+
+      <a href="../../../../external.html?link=https://gitlab.com/whonix/grub-live/-/commit/1989d6e12ac4e5eec03ed3b492c4c84fd6695fd9" target="_blank" rel="noopener">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="../../../../external.html?link=https://gitlab.com/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png" class="thumbnail onebox-avatar" width="16" height="16">
+
+<h3><a href="../../../../external.html?link=https://gitlab.com/whonix/grub-live/-/commit/1989d6e12ac4e5eec03ed3b492c4c84fd6695fd9" target="_blank" rel="noopener">add dracut support (1989d6e1) · Commits · Whonix / grub-live</a></h3>
+
+  <p>Based on, and thanks to @friedrich12! https://github.com/friedrich12/dracut-grub-live https://forums.whonix.org/t/replacing-initramfs-tools-with-dracut/4487/10</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://gitlab.com/assets/favicon-7901bd695fb93edb07975966062049829afb56cf11511236e61bcf425070e36e.png" class="site-icon" width="16" height="16">
+
+      <a href="../../../../external.html?link=https://gitlab.com/whonix/grub-live/-/commit/3bded2153eb311ee6f8571bf67483d3514d97ed0" target="_blank" rel="noopener">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="../../../../external.html?link=https://gitlab.com/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png" class="thumbnail onebox-avatar" width="16" height="16">
+
+<h3><a href="../../../../external.html?link=https://gitlab.com/whonix/grub-live/-/commit/3bded2153eb311ee6f8571bf67483d3514d97ed0" target="_blank" rel="noopener">remove dracut `hostonly="yes"` since that's Debian default anyhow (3bded215)...</a></h3>
+
+  <p>optional grub live boot menu entry as second option https://www.whonix.org/wiki/Grub-live</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://gitlab.com/assets/favicon-7901bd695fb93edb07975966062049829afb56cf11511236e61bcf425070e36e.png" class="site-icon" width="16" height="16">
+
+      <a href="../../../../external.html?link=https://gitlab.com/whonix/grub-live/-/commit/cb94f18bd47a56d0427e9ae822f966f32fd55f2e" target="_blank" rel="noopener">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="../../../../external.html?link=https://gitlab.com/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png" class="thumbnail onebox-avatar" width="16" height="16">
+
+<h3><a href="../../../../external.html?link=https://gitlab.com/whonix/grub-live/-/commit/cb94f18bd47a56d0427e9ae822f966f32fd55f2e" target="_blank" rel="noopener">fix, remove dracut `kernel_cmdline="rootovl"` (cb94f18b) · Commits · Whonix /...</a></h3>
+
+  <p>since that is conditionally set in grub boot menu anyhow and otherwise the system would always boot into live mode</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://gitlab.com/assets/favicon-7901bd695fb93edb07975966062049829afb56cf11511236e61bcf425070e36e.png" class="site-icon" width="16" height="16">
+
+      <a href="../../../../external.html?link=https://gitlab.com/whonix/kicksecure-meta-packages/-/commit/3b67c5c18981c7a3072ece594f94f98e9537cb1f" target="_blank" rel="noopener">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="../../../../external.html?link=https://gitlab.com/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png" class="thumbnail onebox-avatar" width="16" height="16">
+
+<h3><a href="../../../../external.html?link=https://gitlab.com/whonix/kicksecure-meta-packages/-/commit/3b67c5c18981c7a3072ece594f94f98e9537cb1f" target="_blank" rel="noopener">remove initramfs-tools from non-qubes-vm-enhancements-cli (3b67c5c1) · Commits...</a></h3>
+
+  <p>for dracut support</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-08-29T19:41:26Z' class='post-time'>
+                August 29, 2021,  7:41pm
+              </time>
+              <meta itemprop='dateModified' content='2021-08-29T19:41:26Z'>
+          <span itemprop='position'>#12</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Whonix has now dracut support.<br>
+grub-live has now dracut support as well.<br>
+Available in all Whonix 16 repositories.<br>
+To test:</p>
+<pre><code>sudo apt install --no-install-recommends dracut
+</code></pre>
+<p><code>--no-install-recommends</code> is mandatory. Otherwise some package <code>Recommends:</code> <code>exim</code> (or MTA) which results in a dependency mess.</p>
+<p>Whonix 16 might come with dracut by default.</p>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/TNT_BOM_BOM'><span itemprop='name'>TNT_BOM_BOM</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-09-01T01:58:46Z' class='post-time'>
+                September 1, 2021,  1:58am
+              </time>
+              <meta itemprop='dateModified' content='2021-09-01T01:58:46Z'>
+          <span itemprop='position'>#13</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Patrick" data-post="235" data-topic="3894">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>grub-live dracut support has been implemented.</p>
+</blockquote>
+</aside>
+<p>tested on whonix kvm (with live mode/read only)= working good.</p>
+<p>but in qubes it gonna remove more/important packages:</p>
+<pre><code>root@host:~# apt install dracut
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+  dctrl-tools dkms gettext-base grub-common grub2-common initramfs-tools-core
+  klibc-utils libefiboot1 libefivar1 libklibc linux-base os-prober
+  python3-distro python3-jinja2 python3-markupsafe python3-msgpack
+  python3-pycryptodome python3-zmq qubes-core-agent-thunar
+  qubes-input-proxy-sender qubes-kernel-vm-support
+  qubes-mgmt-salt-vm-connector qubes-usb-proxy salt-common salt-ssh usbutils
+Use 'apt autoremove' to remove them.
+The following additional packages will be installed:
+  console-setup console-setup-linux cryptsetup cryptsetup-bin
+  cryptsetup-initramfs cryptsetup-run dmeventd dmraid dracut-core exim4-base
+  exim4-config exim4-daemon-light gsasl-common guile-2.2-libs kbd kpartx
+  libaio1 libdevmapper-event1.02.1 libdmraid1.0.0.rc16 libgnutls-dane0
+  libgsasl7 liblvm2cmd2.03 libmailutils7 libmariadb3 libntlm0 libunbound8 lvm2
+  mailutils mailutils-common mariadb-common mdadm mysql-common pigz pkg-config
+  thin-provisioning-tools
+Suggested packages:
+  dosfstools keyutils dracut-network exim4-doc-html | exim4-doc-info eximon4
+  spf-tools-perl swaks dns-root-data mailutils-mh mailutils-doc
+The following packages will be REMOVED:
+  initramfs-tools qubes-whonix-gateway
+  qubes-whonix-shared-packages-recommended
+The following NEW packages will be installed:
+  console-setup console-setup-linux cryptsetup cryptsetup-bin
+  cryptsetup-initramfs cryptsetup-run dmeventd dmraid dracut dracut-core
+  exim4-base exim4-config exim4-daemon-light gsasl-common guile-2.2-libs kbd
+  kpartx libaio1 libdevmapper-event1.02.1 libdmraid1.0.0.rc16 libgnutls-dane0
+  libgsasl7 liblvm2cmd2.03 libmailutils7 libmariadb3 libntlm0 libunbound8 lvm2
+  mailutils mailutils-common mariadb-common mdadm mysql-common pigz pkg-config
+  thin-provisioning-tools
+0 upgraded, 36 newly installed, 3 to remove and 0 not upgraded.
+Need to get 17.4 MB of archives.
+After this operation, 77.3 MB of additional disk space will be used.
+Do you want to continue? [Y/n]</code></pre>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+            <div class='crawler-linkback-list' itemscope itemtype='../../../../external.html?link=http://schema.org/ItemList'>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../../whonix-live-mode-amnesia-amnesic-non-persistent-anti-forensics/3894/236.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../../whonix-live-mode-amnesia-amnesic-non-persistent-anti-forensics/3894/236.html'>
+                      <span itemprop='name'>Whonix live mode / amnesia / amnesic / non-persistent / anti-forensics</span>
+                    </a>
+                    <meta itemprop='position' content='1'>
+                  </div>
+            </div>
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-09-01T15:48:04Z' class='post-time'>
+                September 1, 2021,  3:48pm
+              </time>
+              <meta itemprop='dateModified' content='2021-09-01T15:48:04Z'>
+          <span itemprop='position'>#14</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>This post is Qubes specific only:</p>
+<p>Trying to fix the Qubes-Whonix side:</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+
+      <a href="../../../../external.html?link=https://github.com/Whonix/qubes-whonix/commit/683c5ee6247dd562fa52789c5475621f43a95377" target="_blank" rel="noopener">github.com/Whonix/qubes-whonix</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewbox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/qubes-whonix/commit/683c5ee6247dd562fa52789c5475621f43a95377" target="_blank" rel="noopener">drop initramfs-tools from qubes-whonix-shared-packages-recommended</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-09-01" data-time="15:16:03" data-timezone="UTC">03:16PM - 01 Sep 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/qubes-whonix/commit/683c5ee6247dd562fa52789c5475621f43a95377" target="_blank" rel="noopener">
+          <span class="added">+1</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">
+leave that to Qubes
+
+for dracut support
+
+https://forums.whonix.org/t/replacing-<span class="show-more-container"><a href="../../../../external.html?link=https://github.com/Whonix/qubes-whonix/commit/683c5ee6247dd562fa52789c5475621f43a95377" target="_blank" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">initramfs-tools-with-dracut/4487/13</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>That fix was useful but not sure is sufficient. Qubes-Whonix side of fixing this should be complete. But I don’t know if Qubes Debian templates support dracut. If the answer is yes, it would be sufficient for Qubes-Whonix too. Otherwise still not.</p>
+<p>Without using Qubes VM kernel initramfs-tools vs dracut is meaningless.</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://www.qubes-os.org/attachment/icons/512x512/apps/qubes-logo-icon.png" class="site-icon" width="16" height="16">
+
+      <a href="../../../../external.html?link=https://www.qubes-os.org/doc/managing-vm-kernels/#using-kernel-installed-in-the-vm" target="_blank" rel="noopener">Qubes OS</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="../../../../external.html?link=https://www.qubes-os.org/attachment/icons/qubes-logo-icon-name-slogan-fb.png" class="thumbnail onebox-avatar" width="16" height="16">
+
+<h3><a href="../../../../external.html?link=https://www.qubes-os.org/doc/managing-vm-kernels/#using-kernel-installed-in-the-vm" target="_blank" rel="noopener">Managing qube kernels</a></h3>
+
+  <p>By default, VMs kernels are provided by dom0. (See here for information about upgrading kernels in dom0.) This means that: You can select the kernel version (using GUI VM Settings tool or qvm-prefs commandline tool); You can modify kernel options...</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-username="Patrick" data-post="12" data-topic="4487">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">sudo apt install --no-install-recommends dracut
+</code></pre>
+<p><code>--no-install-recommends</code> is mandatory.</p>
+</blockquote>
+</aside>
+<p>Maybe not mandatory but <code>--no-install-recommends</code> highly recommended here.</p>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-09-01T17:16:52Z' class='post-time'>
+                September 1, 2021,  5:16pm
+              </time>
+              <meta itemprop='dateModified' content='2021-09-01T17:16:52Z'>
+          <span itemprop='position'>#15</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>dracut advantages:</p>
+<ul>
+<li>early sysctl settings by default (<a href="../../kernel-hardening/7296/459.html" class="inline-onebox">Kernel Hardening - #459 by Patrick</a>)</li>
+<li><a href="../../../../external.html?link=https://www.freedesktop.org/wiki/Software/systemd/InitrdInterface/" class="inline-onebox">InitrdInterface</a></li>
+<li>arm64 initramfs build issues experienced by <a class="mention" href="../../../../external.html?link=https://forums.whonix.org/u/hulahoop">@HulaHoop</a> might not be happening with dracut</li>
+<li>easier to implement Wipe RAM on shutdown (<a href="../../is-ram-wipe-possible-inside-whonix-cold-boot-attack-defense/5596.html" class="inline-onebox">Is RAM Wipe possible inside Whonix? Cold Boot Attack Defense</a>)</li>
+<li>maybe easier to implement <a href="../../re-mount-home-and-other-with-noexec-and-nosuid-among-other-useful-mount-options-for-better-security/7707.html" class="inline-onebox">(re-)mount home [and other?] with noexec (and nosuid [among other useful mount options]) for better security?</a>
+</li>
+<li>maybe faster since dracut is using systemd at initramfs stage already</li>
+</ul>
+<p>dracut is kinda a “pre operating system” (“preOS”) as well as a “post operating system” (“postOS”). Similar to initramfs-tools but with an easier to use interface. initramfs-tools as far as I know also lacks a “postOS” feature.</p>
+<hr>
+<p><a href="../../../../external.html?link=https://wiki.gentoo.org/wiki/Dracut#List_of_modules" class="onebox" target="_blank" rel="noopener">https://wiki.gentoo.org/wiki/Dracut#List_of_modules</a></p>
+<p><a href="../../../../external.html?link=https://mirrors.edge.kernel.org/pub/linux/utils/boot/dracut/dracut.html#_description_6" class="onebox" target="_blank" rel="noopener">https://mirrors.edge.kernel.org/pub/linux/utils/boot/dracut/dracut.html#_description_6</a></p>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-09-02T23:22:39Z' class='post-time'>
+                September 2, 2021, 11:22pm
+              </time>
+              <meta itemprop='dateModified' content='2021-09-02T23:22:39Z'>
+          <span itemprop='position'>#16</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubissue">
+  <header class="source">
+
+      <a href="../../../../external.html?link=https://github.com/grml/grml-debootstrap/issues/186" target="_blank" rel="noopener">github.com/grml/grml-debootstrap</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewbox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/grml/grml-debootstrap/issues/186" target="_blank" rel="noopener">dracut support</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2021-09-02" data-time="23:22:00" data-timezone="UTC">11:22PM - 02 Sep 21 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+
+    <div class="labels">
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">Could you add dracut support please?
+
+https://packages.debian.org/dracut
+</p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-09-05T00:51:17Z' class='post-time'>
+                September 5, 2021, 12:51am
+              </time>
+              <meta itemprop='dateModified' content='2021-09-05T00:51:17Z'>
+          <span itemprop='position'>#17</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubissue">
+  <header class="source">
+
+      <a href="../../../../external.html?link=https://github.com/dracutdevs/dracut/issues/1596" target="_blank" rel="noopener">github.com/dracutdevs/dracut</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewbox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/dracutdevs/dracut/issues/1596" target="_blank" rel="noopener">document how to install dracut in a chroot</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2021-09-05" data-time="00:50:56" data-timezone="UTC">12:50AM - 05 Sep 21 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+
+    <div class="labels">
+        <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">documents</span>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">I'd like to create a bootable VM image with dracut using chroot. Cannot find any<span class="show-more-container"><a href="#" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden"> documentation except [this](https://piiis.blogspot.com/2013/07/fedora-dracut-in-chroot-environment.html) which doesn't work for me.
+
+After the VM is booted, dracut takes a long time to timeout and then in the debut shell I can see that folder `/dev/disk` does not exist.
+
+How to install dracut inside a chroot?</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Dark_Coder'><span itemprop='name'>Dark_Coder</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-10-03T20:39:24Z' class='post-time'>
+                October 3, 2021,  8:39pm
+              </time>
+              <meta itemprop='dateModified' content='2021-10-03T20:39:24Z'>
+          <span itemprop='position'>#18</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Having made many initramfs … by hand, <code>update-initramfs</code> seems the fastest (but of course).</p>
+<p>I remember the days of Kconfig trimming until got it to work without modules yet still does PGP signing (mostly for WiFi country code frequency database.</p>
+<p>Is this what you meant by “live mode” in this thread? Where on directly boots into kernel and stays in there the first time?</p>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-10-04T13:27:02Z' class='post-time'>
+                October 4, 2021,  1:27pm
+              </time>
+              <meta itemprop='dateModified' content='2021-10-04T13:27:02Z'>
+          <span itemprop='position'>#19</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Dark_Coder" data-post="18" data-topic="4487">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/dark_coder/40/2788_2.jpg" class="avatar"> Dark_Coder:</div>
+<blockquote>
+<p>Is this what you meant by “live mode” in this thread? Where on directly boots into kernel and stays in there the first time?</p>
+</blockquote>
+</aside>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="../../../../external.html?link=https://www.whonix.org/wiki/VM_Live_Mode" target="_blank" rel="noopener" title="03:47PM - 28 April 2021">Whonix – 28 Apr 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/72;"><img src="../../../../external.html?link=https://www.whonix.org/w/images/b/bf/Live_boot.png" class="thumbnail" width="131" height="72"></div>
+
+<h3><a href="../../../../external.html?link=https://www.whonix.org/wiki/VM_Live_Mode" target="_blank" rel="noopener">VM Live Mode: Stop Persistent Malware</a></h3>
+
+  <p>Read-only mode. Make all writes go to non-persistent memory (RAM) instead of the hard disk. This is NOT an anti-forensics feature! For anti-forensics, check out Host Live Mode.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="../../../../external.html?link=https://www.whonix.org/wiki/Host_Live_Mode" target="_blank" rel="noopener" title="08:37PM - 11 September 2021">Whonix – 11 Sep 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/101;"><img src="../../../../external.html?link=https://www.whonix.org/w/images/b/b3/Hostlive.png" class="thumbnail" width="131" height="101"></div>
+
+<h3><a href="../../../../external.html?link=https://www.whonix.org/wiki/Host_Live_Mode" target="_blank" rel="noopener">Host Live Mode: Boot existing Host Operating System into Live Mode</a></h3>
+
+  <p>Add a Live Mode entry to the grub boot menu on your existing Debian host platform. Stop Persistent Malware. Read-only mode. Make all writes go to non-persistent storage (RAM) instead of the hard disk.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="../../../../external.html?link=https://www.whonix.org/wiki/grub-live" target="_blank" rel="noopener" title="04:13PM - 16 September 2021">Whonix – 16 Sep 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/87;"><img src="../../../../external.html?link=https://www.whonix.org/w/images/a/a6/Grublive123123.jpg" class="thumbnail" width="131" height="87"></div>
+
+<h3><a href="../../../../external.html?link=https://www.whonix.org/wiki/grub-live" target="_blank" rel="noopener">grub-live: Boot existing Host Operating System or VM into Live Mode</a></h3>
+
+  <p>Add a Live Mode entry to the grub boot menu on your existing Debian host platform. Stop Persistent Malware. Read-only mode. Make all writes go to non-persistent storage (RAM) instead of the hard disk.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-username="Dark_Coder" data-post="18" data-topic="4487">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/dark_coder/40/2788_2.jpg" class="avatar"> Dark_Coder:</div>
+<blockquote>
+<p>Having made many initramfs … by hand, <code>update-initramfs</code> seems the fastest (but of course).</p>
+<p>I remember the days of Kconfig trimming until got it to work without modules yet still does PGP signing (mostly for WiFi country code frequency database.</p>
+</blockquote>
+</aside>
+<p>Could you help please getting Whonix build process compatible with dracut?</p>
+<p>Currently the issue is that it won’t boot. Won’t find root device. This is because dracut even with <code>dracut-config-generic</code> installed fails to create a generic initramfs. Got the issue that either drivers used on the build host system are leaked into the VMs initramfs or that the VMs initramfs is lacking essential drivers such as <code>ext4.ko</code> and whatnot.</p>
+<p>Didn’t manage to write a full bug report for dracut yet since it’s really complex.</p>
+<p>Dracut would need to create a generic + reproducible (deterministic) initramfs inside the build chroot.</p>
+<p>Simplified, desired output is: grml-debootstrap + grub + dracut → Whonix VirtualBox bootable VM image.</p>
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../4487.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2022-07-03T10:05:41Z' class='post-time'>
+                July 3, 2022, 10:05am
+              </time>
+              <meta itemprop='dateModified' content='2022-07-03T10:05:41Z'>
+          <span itemprop='position'>#20</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Good progress.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="17" data-topic="4487">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>document how to install dracut in a chroot</p>
+</blockquote>
+</aside>
+<ul>
+<li><a href="../../../../external.html?link=https://github.com/dracutdevs/dracut/issues/1596#issuecomment-1166326409">https://github.com/dracutdevs/dracut/issues/1596#issuecomment-1166326409</a></li>
+</ul>
+<aside class="quote no-group" data-username="Patrick" data-post="16" data-topic="4487">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>dracut support</p>
+</blockquote>
+</aside>
+<ul>
+<li><a href="../../../../external.html?link=https://github.com/grml/grml-debootstrap/issues/186#issuecomment-1167412137">https://github.com/grml/grml-debootstrap/issues/186#issuecomment-1167412137</a></li>
+</ul>
+<aside class="onebox githubpullrequest" data-onebox-src="../../../../external.html?link=https://github.com/grml/grml-debootstrap/pull/196">
+  <header class="source">
+
+      <a href="../../../../external.html?link=https://github.com/grml/grml-debootstrap/pull/196" target="_blank" rel="noopener">github.com/grml/grml-debootstrap</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewbox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/grml/grml-debootstrap/pull/196" target="_blank" rel="noopener">Add dracut support</a>
+    </h4>
+
+    <div class="branches">
+      <code>grml:master</code> ← <code>DanWin:dracut-support</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2022-07-01" data-time="20:06:39" data-timezone="UTC">08:06PM - 01 Jul 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/DanWin" target="_blank" rel="noopener">
+          <img alt="DanWin" src="../../../../external.html?link=https://avatars.githubusercontent.com/u/3327912?v=4" class="onebox-avatar-inline" width="20" height="20">
+          DanWin
+        </a>
+      </div>
+
+      <div class="lines" title="1 commits changed 3 files with 14 additions and 2 deletions">
+        <a href="../../../../external.html?link=https://github.com/grml/grml-debootstrap/pull/196/files" target="_blank" rel="noopener">
+          <span class="added">+14</span>
+          <span class="removed">-2</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">Implements #186</p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='replacing initramfs-tools with dracut'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

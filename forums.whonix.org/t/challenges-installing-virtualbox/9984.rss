@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Challenges Installing VirtualBox</title>
+    <link>http://forums.whonix.org/t/challenges-installing-virtualbox/9984</link>
+    <description>Time of writing `23 July 2020` .
+
+Goal: Upgrading the VirtualBox host software to its recent release `6.1.12` with functional VirtualBox guest additions.
+
+This is currently very difficult due to many issues of which none is caused by Whonix ™. The purpose of this chapter is to document the upcoming implementation for those wondering why it has been implemented this way and perhaps hearing if there are any better alternatives. Here is a summary of these issues:
+
+[VirtualBox is unavailable in Debian stable and backports due to Debian stable security maintenance Issues](https://www.whonix.org/wiki/Dev/VirtualBox#VirtualBox_Unavailable_in_Debian_stable_and_backports_due_to_Debian_Stable_Security_Maintenance_Issues).
+
+[Custom Debian backport building failing due to dependency issues](https://forums.whonix.org/t/missing-dependencies-on-buster-for-virtualbox-6-1-6/9634/6) [[archive]](https://web.archive.org/web/https://forums.whonix.org/t/missing-dependencies-on-buster-for-virtualbox-6-1-6/9634/6). [Very difficult](https://forums.whonix.org/t/missing-dependencies-on-buster-for-virtualbox-6-1-6/9634/7) [[archive]](https://web.archive.org/web/https://forums.whonix.org/t/missing-dependencies-on-buster-for-virtualbox-6-1-6/9634/7). Even if that was solved, there would still be the [broken compilation from source code issue](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942873) [[archive]](https://web.archive.org/web/https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942873).
+
+The [Lucas Nussbaum Debian buster backport repository](https://people.debian.org/~lucas/virtualbox-buster) [[archive]](https://web.archive.org/web/https://people.debian.org/~lucas/virtualbox-buster) is not an option either. [[2]](https://www.whonix.org/wiki/Dev/VirtualBox#cite_note-2) In 23 July 2020 VirtualBox latest version in Lucas Nussbaum repository was
+`virtualbox_6.1.4-dfsg-1~~bpo10+1_amd64.deb 2020-02-22 07:52` while upstream virtualbox.org was at
+`virtualbox-6.1_6.1.12-139181~Debian~buster_amd64.deb` .
+
+[VirtualBox is not available from Debian fasttrack yet](https://salsa.debian.org/fasttrack-team/support/issues/10) [[archive]](https://web.archive.org/web/https://salsa.debian.org/fasttrack-team/support/issues/10).
+
+[VirtualBox Guest Additions Debian Packages are unavailable from upstream virtualbox.org Debian repository](https://www.virtualbox.org/ticket/734) [[archive]](https://web.archive.org/web/https://www.virtualbox.org/ticket/734).
+
+Call for help:
+
+* https://forums.whonix.org/t/missing-dependencies-on-buster-for-virtualbox-6-1-6/9634/5 [[archive]](https://web.archive.org/web/https://forums.whonix.org/t/missing-dependencies-on-buster-for-virtualbox-6-1-6/9634/5)
+* https://twitter.com/Whonix/status/1268525273852661765 [[archive]](https://web.archive.org/web/https://twitter.com/Whonix/status/1268525273852661765)
+* https://www.facebook.com/Whonix/posts/3899452270096999 [[archive]](https://web.archive.org/web/https://www.facebook.com/Whonix/posts/3899452270096999)
+
+What is the importance VirtualBox on Debian `buster` matter? It is the base distribution which Whonix ™ is based on and the distribution used to build Whonix ™ for VirtualBox for [Linux](https://www.whonix.org/wiki/Linux), [Windows](https://www.whonix.org/wiki/Windows) and [macOS](https://www.whonix.org/wiki/MacOS) from source code.
+
+To be able to continue providing [Whonix ™ for VirtualBox](https://www.whonix.org/wiki/VirtualBox), from Whonix ™ `15.0.1.4.1` and above the following changes will be made:
+
+* VirtualBox Host Software
+  * Whonix ™ build script will download VirtualBox host software package `virtualbox-6.1` from [upstream virtualbox.org Debian repository](https://www.virtualbox.org/wiki/Linux_Downloads) [[archive]](https://web.archive.org/web/https://www.virtualbox.org/wiki/Linux_Downloads). [[3]](https://www.whonix.org/wiki/Dev/VirtualBox#cite_note-3) That repository contains recent, functional backports for Debian `buster` .
+    * repository: https://download.virtualbox.org/virtualbox/debian [[archive]](https://web.archive.org/web/https://download.virtualbox.org/virtualbox/debian)
+    * `Packages` file: https://download.virtualbox.org/virtualbox/debian/dists/buster/contrib/binary-amd64/Packages [[archive]](https://web.archive.org/web/https://download.virtualbox.org/virtualbox/debian/dists/buster/contrib/binary-amd64/Packages)
+      * At time of writing contained `virtualbox-6.1_6.1.12-139181~Debian~buster_amd64.deb` (Scroll down. Ignore `Package: virtualbox-5.2` .). I.e. VirtualBox version `6.1.12` .
+  * Users of Debian `buster` will be advised to install the VirtualBox from the Whonix ™ APT repository.
+* VirtualBox Guest Additions
+  * Whonix ™ build script will download package [virtualbox-guest-additions-iso](https://packages.debian.org/sid/virtualbox-guest-additions-iso) [[archive]](https://web.archive.org/web/https://packages.debian.org/sid/virtualbox-guest-additions-iso) from Debian sid (unstable) and upload to Whonix ™ APT repository. That package provides file `/usr/share/virtualbox/VBoxGuestAdditions.iso` .
+  * At time of writing contained VirtualBox guest additions ISO version `6.1.12-1` . In short, `6.1.12` . Ignore the `-1` which is a Debian package revision number and not the upstream (virtualbox.org) version number.
+  * virtualbox.org homepage also advertised version `6.1.12` .
+  * Package `virtualbox-guest-additions-iso` will be installed by default in new Whonix ™ VirtualBox builds.
+  * Related: [VirtualBox Guest Additions ISO Freedom vs Non-Freedom](https://www.whonix.org/wiki/Dev/VirtualBox#VirtualBox_Guest_Additions_ISO_Freedom_vs_Non-Freedom)
+* This is
+  * to allow Whonix ™ developers test newer versions of VirtualBox host software before these are installed on user&#39;s computer and,
+  * to allow updating VirtualBox host software and VirtualBox guest additions at the same time, using compatible versions.
+* It is yet to be researched/developed how/if existing Whonix ™ VirtualBox builds can be upgraded and whether that would be an automated (by Whonix ™ a package) or manual (user has to do) process.
+* It is yet to be researched/developed how to make use of `/usr/share/virtualbox/VBoxGuestAdditions.iso` , i.e. mount, install, update, and automate this process using a script shipped by default in Whonix ™.
+* Other [supported platforms](https://www.whonix.org/wiki/Download) such as [Qubes-Whonix](https://www.whonix.org/wiki/Qubes-Whonix) or [Whonix ™ KVM](https://www.whonix.org/wiki/KVM) are unaffected.
+
+----
+
+Added just now to wiki.
+ https://www.whonix.org/wiki/Dev/VirtualBox#VirtualBox_Installation_Challenges</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 25 Aug 2021 09:03:35 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/challenges-installing-virtualbox/9984.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Challenges Installing VirtualBox</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group quote-modified" data-username="Patrick" data-post="5" data-topic="9984">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<h3><a href="https://salsa.debian.org/fasttrack-team/support/-/issues/23">please add VirtualBox to bullseye-fasttrack (#23) · Issues · Debian Fast Track… </a></h3>
+</blockquote>
+</aside>
+<p>Yay! This was done.<br>
+Switching Whonix 16 from Debian sid as source for VirtualBox to Debian fasttrack as source for VirtualBox. Now we have a reliable source for VirtualBox and guest additions packages. VirtualBox guest additions iso is no longer required for the time being.</p>
+          <p><a href="http://forums.whonix.org/t/challenges-installing-virtualbox/9984/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/challenges-installing-virtualbox/9984/7</link>
+        <pubDate>Wed, 25 Aug 2021 09:03:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9984-7</guid>
+        <source url="http://forums.whonix.org/t/challenges-installing-virtualbox/9984.rss">Challenges Installing VirtualBox</source>
+      </item>
+      <item>
+        <title>Challenges Installing VirtualBox</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>VirtualBox bullseye packages neither available form Debian fasttrack nor upstream <a href="http://virtualbox.org">virtualbox.org</a>. (See above.)</p>
+<p>As a stopgap perhaps these need to be downloaded from Debian sid and uploaded to Whonix bullseye repository.</p>
+          <p><a href="http://forums.whonix.org/t/challenges-installing-virtualbox/9984/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/challenges-installing-virtualbox/9984/6</link>
+        <pubDate>Thu, 12 Aug 2021 23:28:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9984-6</guid>
+        <source url="http://forums.whonix.org/t/challenges-installing-virtualbox/9984.rss">Challenges Installing VirtualBox</source>
+      </item>
+      <item>
+        <title>Challenges Installing VirtualBox</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://salsa.debian.org/uploads/-/system/appearance/favicon/1/gitlabian_32.png" class="site-icon" width="16" height="16">
+
+      <a href="https://salsa.debian.org/fasttrack-team/support/-/issues/23" target="_blank" rel="noopener">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://salsa.debian.org/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png" class="thumbnail onebox-avatar" width="16" height="16">
+
+<h3><a href="https://salsa.debian.org/fasttrack-team/support/-/issues/23" target="_blank" rel="noopener">please add VirtualBox to bullseye-fasttrack (#23) · Issues · Debian Fast Track...</a></h3>
+
+  <p>Could you please upload VirtualBox to bullseye-fasttrack? It's already available in buster-fasttrack. (</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/challenges-installing-virtualbox/9984/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/challenges-installing-virtualbox/9984/5</link>
+        <pubDate>Thu, 12 Aug 2021 20:52:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9984-5</guid>
+        <source url="http://forums.whonix.org/t/challenges-installing-virtualbox/9984.rss">Challenges Installing VirtualBox</source>
+      </item>
+      <item>
+        <title>Challenges Installing VirtualBox</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>VirtualBox <code>6.1.26</code> from <a href="http://virtualbox.org">virtualbox.org</a> Debian <code>buster</code> repository cannot be installed on Debian <code>bullseye</code> repository due to dependency issues.</p>
+<p>Will try and probably use Debian fasttrack repository for Whonix 16 which will be Debian <code>bullseye</code> based.</p>
+<p>(<a href="https://forums.whonix.org/t/installing-virtualbox-on-debian-10-debian-buster-buster-backports-fasttrack/7716" class="inline-onebox">Installing VirtualBox on Debian 10 / Debian buster / buster-backports / fasttrack</a>)<br>
+(<a href="https://forums.whonix.org/t/install-debian-fasttrack-archive-keyring-by-default/11456" class="inline-onebox">Install Debian fasttrack-archive-keyring by default?</a>)</p>
+          <p><a href="http://forums.whonix.org/t/challenges-installing-virtualbox/9984/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/challenges-installing-virtualbox/9984/4</link>
+        <pubDate>Tue, 10 Aug 2021 22:15:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9984-4</guid>
+        <source url="http://forums.whonix.org/t/challenges-installing-virtualbox/9984.rss">Challenges Installing VirtualBox</source>
+      </item>
+      <item>
+        <title>Challenges Installing VirtualBox</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><code>add Debian 11 / bullseye to Linux Downloads / APT repository</code><br>
+<a href="https://www.virtualbox.org/ticket/20475" class="onebox" target="_blank" rel="noopener">https://www.virtualbox.org/ticket/20475</a></p>
+          <p><a href="http://forums.whonix.org/t/challenges-installing-virtualbox/9984/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/challenges-installing-virtualbox/9984/3</link>
+        <pubDate>Sat, 24 Jul 2021 15:00:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9984-3</guid>
+        <source url="http://forums.whonix.org/t/challenges-installing-virtualbox/9984.rss">Challenges Installing VirtualBox</source>
+      </item>
+      <item>
+        <title>Challenges Installing VirtualBox</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="11456">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/install-debian-fasttrack-archive-keyring-by-default/11456">Install Debian fasttrack-archive-keyring by default?</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development/8"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    Installation of <a href="https://packages.debian.org/bullseye/fasttrack-archive-keyring">fasttrack-archive-keyring</a> by default would simplify enabling the <a href="https://fasttrack.debian.net">Debian fasttrack repository</a>. 
+Enabling the <a href="https://fasttrack.debian.net">Debian fasttrack repository</a> is out of scope for this forum discussion. 
+
+<a href="https://wiki.debian.org/FastTrack">https://wiki.debian.org/FastTrack</a>
+<a href="https://fasttrack.debian.net">https://fasttrack.debian.net</a>
+<a href="https://fasttrack.debian.net/debian/pool/">https://fasttrack.debian.net/debian/pool/</a>
+
+
+Related: 
+
+<a href="https://forums.whonix.org/t/challenges-upgrading-virtualbox-to-6-1-12-on-debian-buster-installation-from-upstream-virtualbox-org-apt-repository/9984/1" class="inline-onebox">Challenges Upgrading VirtualBox to 6.1.12 on Debian Buster - installation from upstream virtualbox.org APT repository</a>
+  </blockquote>
+</aside>
+
+<aside class="quote no-group" data-username="Patrick" data-post="1" data-topic="9984">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><a href="https://salsa.debian.org/fasttrack-team/support/issues/10">VirtualBox is not available from Debian fasttrack yet</a> <a href="https://web.archive.org/web/https://salsa.debian.org/fasttrack-team/support/issues/10">[archive]</a>.</p>
+</blockquote>
+</aside>
+<p>Now available.</p>
+<p><a href="https://salsa.debian.org/fasttrack-team/support/-/issues/10#note_229773">https://salsa.debian.org/fasttrack-team/support/-/issues/10#note_229773</a></p>
+          <p><a href="http://forums.whonix.org/t/challenges-installing-virtualbox/9984/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/challenges-installing-virtualbox/9984/2</link>
+        <pubDate>Sun, 18 Apr 2021 10:05:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9984-2</guid>
+        <source url="http://forums.whonix.org/t/challenges-installing-virtualbox/9984.rss">Challenges Installing VirtualBox</source>
+      </item>
+      <item>
+        <title>Challenges Installing VirtualBox</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Time of writing <code>23 July 2020</code> .</p>
+<p>Goal: Upgrading the VirtualBox host software to its recent release <code>6.1.12</code> with functional VirtualBox guest additions.</p>
+<p>This is currently very difficult due to many issues of which none is caused by Whonix ™. The purpose of this chapter is to document the upcoming implementation for those wondering why it has been implemented this way and perhaps hearing if there are any better alternatives. Here is a summary of these issues:</p>
+<p><a href="https://www.whonix.org/wiki/Dev/VirtualBox#VirtualBox_Unavailable_in_Debian_stable_and_backports_due_to_Debian_Stable_Security_Maintenance_Issues">VirtualBox is unavailable in Debian stable and backports due to Debian stable security maintenance Issues</a>.</p>
+<p><a href="https://forums.whonix.org/t/missing-dependencies-on-buster-for-virtualbox-6-1-6/9634/6">Custom Debian backport building failing due to dependency issues</a> <a href="https://web.archive.org/web/https://forums.whonix.org/t/missing-dependencies-on-buster-for-virtualbox-6-1-6/9634/6">[archive]</a>. <a href="https://forums.whonix.org/t/missing-dependencies-on-buster-for-virtualbox-6-1-6/9634/7">Very difficult</a> <a href="https://web.archive.org/web/https://forums.whonix.org/t/missing-dependencies-on-buster-for-virtualbox-6-1-6/9634/7">[archive]</a>. Even if that was solved, there would still be the <a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942873">broken compilation from source code issue</a> <a href="https://web.archive.org/web/https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942873">[archive]</a>.</p>
+<p>The <a href="https://people.debian.org/~lucas/virtualbox-buster">Lucas Nussbaum Debian buster backport repository</a> <a href="https://web.archive.org/web/https://people.debian.org/~lucas/virtualbox-buster">[archive]</a> is not an option either. <a href="https://www.whonix.org/wiki/Dev/VirtualBox#cite_note-2">[2]</a> In 23 July 2020 VirtualBox latest version in Lucas Nussbaum repository was<br>
+<code>virtualbox_6.1.4-dfsg-1~~bpo10+1_amd64.deb 2020-02-22 07:52</code> while upstream <a href="http://virtualbox.org">virtualbox.org</a> was at<br>
+<code>virtualbox-6.1_6.1.12-139181~Debian~buster_amd64.deb</code> .</p>
+<p><a href="https://salsa.debian.org/fasttrack-team/support/issues/10">VirtualBox is not available from Debian fasttrack yet</a> <a href="https://web.archive.org/web/https://salsa.debian.org/fasttrack-team/support/issues/10">[archive]</a>.</p>
+<p><a href="https://www.virtualbox.org/ticket/734">VirtualBox Guest Additions Debian Packages are unavailable from upstream virtualbox.org Debian repository</a> <a href="https://web.archive.org/web/https://www.virtualbox.org/ticket/734">[archive]</a>.</p>
+<p>Call for help:</p>
+<ul>
+<li>
+<a href="https://forums.whonix.org/t/missing-dependencies-on-buster-for-virtualbox-6-1-6/9634/5" class="inline-onebox">Missing dependencies on Buster for Virtualbox 6.1.6 - #5 by Patrick</a> <a href="https://web.archive.org/web/https://forums.whonix.org/t/missing-dependencies-on-buster-for-virtualbox-6-1-6/9634/5">[archive]</a>
+</li>
+<li>
+<a href="https://twitter.com/Whonix/status/1268525273852661765">https://twitter.com/Whonix/status/1268525273852661765</a> <a href="https://web.archive.org/web/https://twitter.com/Whonix/status/1268525273852661765">[archive]</a>
+</li>
+<li>
+<a href="https://www.facebook.com/Whonix/posts/3899452270096999" class="inline-onebox">Redirecting...</a> <a href="https://web.archive.org/web/https://www.facebook.com/Whonix/posts/3899452270096999">[archive]</a>
+</li>
+</ul>
+<p>What is the importance VirtualBox on Debian <code>buster</code> matter? It is the base distribution which Whonix ™ is based on and the distribution used to build Whonix ™ for VirtualBox for <a href="https://www.whonix.org/wiki/Linux">Linux</a>, <a href="https://www.whonix.org/wiki/Windows">Windows</a> and <a href="https://www.whonix.org/wiki/MacOS">macOS</a> from source code.</p>
+<p>To be able to continue providing <a href="https://www.whonix.org/wiki/VirtualBox">Whonix ™ for VirtualBox</a>, from Whonix ™ <code>15.0.1.4.1</code> and above the following changes will be made:</p>
+<ul>
+<li>VirtualBox Host Software
+<ul>
+<li>Whonix ™ build script will download VirtualBox host software package <code>virtualbox-6.1</code> from <a href="https://www.virtualbox.org/wiki/Linux_Downloads">upstream virtualbox.org Debian repository</a> <a href="https://web.archive.org/web/https://www.virtualbox.org/wiki/Linux_Downloads">[archive]</a>. <a href="https://www.whonix.org/wiki/Dev/VirtualBox#cite_note-3">[3]</a> That repository contains recent, functional backports for Debian <code>buster</code> .
+<ul>
+<li>repository: <a href="https://download.virtualbox.org/virtualbox/debian" class="inline-onebox">Index of http://download.virtualbox.org/virtualbox/debian</a> <a href="https://web.archive.org/web/https://download.virtualbox.org/virtualbox/debian">[archive]</a>
+</li>
+<li>
+<code>Packages</code> file: <a href="https://download.virtualbox.org/virtualbox/debian/dists/buster/contrib/binary-amd64/Packages">https://download.virtualbox.org/virtualbox/debian/dists/buster/contrib/binary-amd64/Packages</a> <a href="https://web.archive.org/web/https://download.virtualbox.org/virtualbox/debian/dists/buster/contrib/binary-amd64/Packages">[archive]</a>
+<ul>
+<li>At time of writing contained <code>virtualbox-6.1_6.1.12-139181~Debian~buster_amd64.deb</code> (Scroll down. Ignore <code>Package: virtualbox-5.2</code> .). I.e. VirtualBox version <code>6.1.12</code> .</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Users of Debian <code>buster</code> will be advised to install the VirtualBox from the Whonix ™ APT repository.</li>
+</ul>
+</li>
+<li>VirtualBox Guest Additions
+<ul>
+<li>Whonix ™ build script will download package <a href="https://packages.debian.org/sid/virtualbox-guest-additions-iso">virtualbox-guest-additions-iso</a> <a href="https://web.archive.org/web/https://packages.debian.org/sid/virtualbox-guest-additions-iso">[archive]</a> from Debian sid (unstable) and upload to Whonix ™ APT repository. That package provides file <code>/usr/share/virtualbox/VBoxGuestAdditions.iso</code> .</li>
+<li>At time of writing contained VirtualBox guest additions ISO version <code>6.1.12-1</code> . In short, <code>6.1.12</code> . Ignore the <code>-1</code> which is a Debian package revision number and not the upstream (<a href="http://virtualbox.org">virtualbox.org</a>) version number.</li>
+<li>
+<a href="http://virtualbox.org">virtualbox.org</a> homepage also advertised version <code>6.1.12</code> .</li>
+<li>Package <code>virtualbox-guest-additions-iso</code> will be installed by default in new Whonix ™ VirtualBox builds.</li>
+<li>Related: <a href="https://www.whonix.org/wiki/Dev/VirtualBox#VirtualBox_Guest_Additions_ISO_Freedom_vs_Non-Freedom">VirtualBox Guest Additions ISO Freedom vs Non-Freedom</a>
+</li>
+</ul>
+</li>
+<li>This is
+<ul>
+<li>to allow Whonix ™ developers test newer versions of VirtualBox host software before these are installed on user’s computer and,</li>
+<li>to allow updating VirtualBox host software and VirtualBox guest additions at the same time, using compatible versions.</li>
+</ul>
+</li>
+<li>It is yet to be researched/developed how/if existing Whonix ™ VirtualBox builds can be upgraded and whether that would be an automated (by Whonix ™ a package) or manual (user has to do) process.</li>
+<li>It is yet to be researched/developed how to make use of <code>/usr/share/virtualbox/VBoxGuestAdditions.iso</code> , i.e. mount, install, update, and automate this process using a script shipped by default in Whonix ™.</li>
+<li>Other <a href="https://www.whonix.org/wiki/Download">supported platforms</a> such as <a href="https://www.whonix.org/wiki/Qubes-Whonix">Qubes-Whonix</a> or <a href="https://www.whonix.org/wiki/KVM">Whonix ™ KVM</a> are unaffected.</li>
+</ul>
+<hr>
+<p>Added just now to wiki.<br>
+<a href="https://www.whonix.org/wiki/Dev/VirtualBox#VirtualBox_Installation_Challenges" class="inline-onebox">Dev/VirtualBox - Whonix</a></p>
+          <p><a href="http://forums.whonix.org/t/challenges-installing-virtualbox/9984/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/challenges-installing-virtualbox/9984/1</link>
+        <pubDate>Thu, 23 Jul 2020 15:42:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9984-1</guid>
+        <source url="http://forums.whonix.org/t/challenges-installing-virtualbox/9984.rss">Challenges Installing VirtualBox</source>
+      </item>
+  </channel>
+</rss>

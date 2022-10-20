@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</title>
+    <link>http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276</link>
+    <description>(https://github.com/Whonix/Whonix/commit/867a481710077f6bf4e14a5d8c87471e81db85df)
+
+&gt; E: Failed to fetch https://deb.debian.org/debian-security/dists/stretch/updates/main/binary-amd64/Packages  Received HTTP code 403 from proxy after CONNECT
+
+To be expected:
+
+https://www.unix-ag.uni-kl.de/~bloch/acng/html/howtos.html#ssluse
+
+Perhaps the `&quot;tell-me-what-you-need method&quot;` mentioned there would help.
+
+This makes also enabling https (SSL / TLS) in anon-apt-soures-list (/etc/apt/sources.list.d/debian.list) difficult. `&quot;tell-me-what-you-need method&quot;` is hard to add in /etc/apt/sources.list.d/debian.list but it is being used during build of Whonix.
+
+(https://github.com/Whonix/anon-apt-sources-list/commit/9f08431be63b4977931fe2db57b067e660828997)</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 31 Jan 2022 12:08:32 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>A post was split to a new topic: <a href="http://forums.whonix.org/t/whonix-build-error-error-host-home-user-whonix-build-sources-debian-stable-current-clearnet-list-does-not-match-chroot-etc-apt-sources-list/13272">Whonix build error - ERROR: Host /home/user/Whonix/build_sources/debian_stable_current_clearnet.list does not match chroot /etc/apt/sources.list</a></p>
+          <p><a href="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/7</link>
+        <pubDate>Mon, 31 Jan 2022 16:02:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6276-7</guid>
+        <source url="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276.rss">https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</source>
+      </item>
+      <item>
+        <title>https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This was fixed a long time ago indeed.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="1" data-topic="6276">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Perhaps the <code>"tell-me-what-you-need method"</code> mentioned there would help.</p>
+</blockquote>
+</aside>
+<p>This was implemented. Example:</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/Whonix/blob/master/build_sources/debian_stable_current_clearnet.list#L13" target="_blank" rel="noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/Whonix/blob/master/build_sources/debian_stable_current_clearnet.list#L13" target="_blank" rel="noopener">Whonix/Whonix/blob/master/build_sources/debian_stable_current_clearnet.list#L13</a></h4>
+<pre class="onebox"><code class="lang-list"><ol class="start lines" start="3" style="counter-reset: li-counter 2 ;">
+<li></li><li>## Using specific codenames (for example: "buster") rather than generic code</li><li>## names (for example: "stable") because grml-debootstrap did not support</li><li>## generic code names for --release. See also:</li><li>## github.com/grml/grml-debootstrap/issues/37</li><li></li><li>## Using contrib, because it contains virtualbox-guest-x11.</li><li></li><li>## Added deb-src so source package can also be downloaded.</li><li></li><li class="selected">deb http://HTTPS///deb.debian.org/debian-security/ buster/updates main contrib non-free</li><li>deb-src http://HTTPS///deb.debian.org/debian-security/ buster/updates main contrib non-free</li><li></li><li>deb http://HTTPS///deb.debian.org/debian buster-updates main contrib non-free</li><li>deb-src http://HTTPS///deb.debian.org/debian buster-updates main contrib non-free</li><li></li><li>deb http://HTTPS///deb.debian.org/debian buster main contrib non-free</li><li>deb-src http://HTTPS///deb.debian.org/debian buster main contrib non-free</li><li></li><li>## Last entry must be a "good" one since whonix_build_apt_stable_release is set</li><li>## from last line starting with 'deb'. Should be "buster" (stable) and not</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>APT sources during build (chroot) (<code>build_sources</code>) and APT sources used when actually booting a VM (<code>anon-apt-sources-list</code>) are using the same APT repositories (manually keeping sync) but different format.</p>
+<ul>
+<li><a href="https://github.com/Whonix/Whonix/blob/master/build_sources">https://github.com/Whonix/Whonix/blob/master/build_sources</a></li>
+<li><a href="https://github.com/Whonix/anon-apt-sources-list">https://github.com/Whonix/anon-apt-sources-list</a></li>
+</ul>
+<p>Not great but there’s no better solution.</p>
+          <p><a href="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/6</link>
+        <pubDate>Sun, 02 May 2021 14:28:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6276-6</guid>
+        <source url="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276.rss">https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</source>
+      </item>
+      <item>
+        <title>https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>This issue solved long time ago, Currently everything in whonix is either pure Onion or TLS.</p>
+          <p><a href="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/5</link>
+        <pubDate>Sun, 02 May 2021 14:20:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6276-5</guid>
+        <source url="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276.rss">https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</source>
+      </item>
+      <item>
+        <title>https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>many distros that i know use ssl by default for their repos like parrotsec, trisquel…etc so maybe check their code or how they implemented that and see if it can fit to our distro.</p>
+          <p><a href="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/4</link>
+        <pubDate>Thu, 17 Jan 2019 15:21:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6276-4</guid>
+        <source url="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276.rss">https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</source>
+      </item>
+      <item>
+        <title>https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Not a Debian bug. Known and documented limitation. An (apt package)<br>
+caching proxy can’t cache end-to-end encrypted SSL’ed connections by<br>
+design. Not easy without hacks.</p>
+          <p><a href="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/3</link>
+        <pubDate>Thu, 08 Nov 2018 16:39:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6276-3</guid>
+        <source url="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276.rss">https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</source>
+      </item>
+      <item>
+        <title>https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>maybe if you fill that as a bug to debian , might consider to look/change something which will help the build.</p>
+          <p><a href="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/2</link>
+        <pubDate>Thu, 08 Nov 2018 14:27:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6276-2</guid>
+        <source url="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276.rss">https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</source>
+      </item>
+      <item>
+        <title>https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>(<a href="https://github.com/Whonix/Whonix/commit/867a481710077f6bf4e14a5d8c87471e81db85df">https://github.com/Whonix/Whonix/commit/867a481710077f6bf4e14a5d8c87471e81db85df</a>)</p>
+<blockquote>
+<p>E: Failed to fetch <a href="https://deb.debian.org/debian-security/dists/stretch/updates/main/binary-amd64/Packages">https://deb.debian.org/debian-security/dists/stretch/updates/main/binary-amd64/Packages</a>  Received HTTP code 403 from proxy after CONNECT</p>
+</blockquote>
+<p>To be expected:</p>
+<p><a href="https://www.unix-ag.uni-kl.de/~bloch/acng/html/howtos.html#ssluse" class="onebox" target="_blank" rel="noopener">https://www.unix-ag.uni-kl.de/~bloch/acng/html/howtos.html#ssluse</a></p>
+<p>Perhaps the <code>"tell-me-what-you-need method"</code> mentioned there would help.</p>
+<p>This makes also enabling https (SSL / TLS) in anon-apt-soures-list (/etc/apt/sources.list.d/debian.list) difficult. <code>"tell-me-what-you-need method"</code> is hard to add in /etc/apt/sources.list.d/debian.list but it is being used during build of Whonix.</p>
+<p>(<a href="https://github.com/Whonix/anon-apt-sources-list/commit/9f08431be63b4977931fe2db57b067e660828997">https://github.com/Whonix/anon-apt-sources-list/commit/9f08431be63b4977931fe2db57b067e660828997</a>)</p>
+          <p><a href="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276/1</link>
+        <pubDate>Thu, 08 Nov 2018 11:17:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6276-1</guid>
+        <source url="http://forums.whonix.org/t/https-ssl-tls-by-default-broke-apt-cacher-ng-apt-package-caching-during-build/6276.rss">https (SSL / TLS) by default broke apt-cacher-ng apt package caching during build</source>
+      </item>
+  </channel>
+</rss>

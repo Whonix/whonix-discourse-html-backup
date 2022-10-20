@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>VPN (on the host) question</title>
+    <link>http://forums.whonix.org/t/vpn-on-the-host-question/8197</link>
+    <description>I read the Whonix links about using Whonix with a VPN. After reading them, it seems as though adding a VPN to Whonix will worsen one&#39;s anonymity, but I could be wrong.
+
+The question is this: If a VPN is used on the host device (such as Windows or a Mac), and Whonix is used within VirtualBox, what kind of configuration is that? Is that a &quot;User → VPN → Tor → Internet&quot; connection, or is that a &quot;User → Tor → VPN → Internet&quot; connection? With that configuration, is Tor traffic routed through the VPN, or is VPN traffic routed through Tor?
+
+Also, if that configuration is used (VPN on host machine while using Whonix in VirtualBox), what would the VPN provider see? Would they see the person&#39;s real IP Address, or would they see the IP Address of a Tor node? Would visited websites see the VPN provider&#39;s IP Address, or would they see a Tor node IP address?
+
+How would one create a &quot;User → Tor → VPN → Internet&quot; configuration?</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 25 Sep 2019 07:02:53 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/vpn-on-the-host-question/8197.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>VPN (on the host) question</title>
+        <dc:creator><![CDATA[sheep]]></dc:creator>
+        <description><![CDATA[
+            <p>I’d use Patrick’s VPN Firewall in this case.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://github.com/adrelanos/VPN-Firewall" target="_blank" rel="nofollow noopener">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars1.githubusercontent.com/u/1985040?s=400&amp;amp;v=4" class="thumbnail" width="" height="">
+
+<h3><a href="https://github.com/adrelanos/VPN-Firewall" target="_blank" rel="nofollow noopener">adrelanos/vpn-firewall</a></h3>
+
+<p>Leak Protection (Fail Safe Mechanism) for (Open)VPN - adrelanos/vpn-firewall</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/VPN-Firewall#How_to_use_VPN-Firewall" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    
+
+<h3><a href="https://www.whonix.org/wiki/VPN-Firewall#How_to_use_VPN-Firewall" target="_blank" rel="nofollow noopener">VPN-Firewall</a></h3>
+
+<p>Instructions on how to use VPN-Firewall. A Fail Closed Mechanism for VPNs. Prevent leaks when using VPNs. Force all connections through VPNs. Prevents...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/vpn-on-the-host-question/8197/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-on-the-host-question/8197/5</link>
+        <pubDate>Wed, 25 Sep 2019 05:32:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8197-5</guid>
+        <source url="http://forums.whonix.org/t/vpn-on-the-host-question/8197.rss">VPN (on the host) question</source>
+      </item>
+      <item>
+        <title>VPN (on the host) question</title>
+        <dc:creator><![CDATA[anonytor]]></dc:creator>
+        <description><![CDATA[
+            <p>Personally I do not have any experience with that provider. Since each user has a different set of requirements and a different threat matrix, instead of recommending a specific provider, I can give some pointers that apply to all (good) providers.</p>
+<p>Make sure that the protocol is OpenVPN.  Look for SHA512 (control channel hmac auth) SHA256 is ok if the version of OpenVPN uses tls-crypt instead of tls-auth<br>
+Ensure control channel uses only up to date tls ciphers<br>
+The data channel should use AES256-GCM or AES256-CBC for encryption of the payload<br>
+You need to have some way of implementing a killswitch so that if the vpn server loses connection, your traffic stops right away. In Linux, iptables can do this well.<br>
+Make sure there is certificate-based authentication, a client cert, a server cert and a pre shared key.<br>
+Control channel should be 4096 bit RSA or 384 or 512,521 bit (if using elliptic curve crypto) If RSA is used, the server should use a 4096 bit diffie-hellman key and providers should list this.<br>
+Forward secrecy is important so use ephemeral keys to establish control channel sessions (ECDHE)<br>
+Make sure provider uses DNS that is encrypted, dedicated and goes through the vpn tunnel (to prevent leaks)</p>
+<p>That should serve as good reference as far as what to look for in a competent provider. Please remember, there are things that you cannot control like do they keep logs or not, this is impossible to know. Also you cannot be sure about the sysadmin; is he competent or not? again nobody but the company knows.<br>
+Just some things to keep in mind. But following the reference above will at least ensure good, strong crypto. The rest is up to you</p>
+          <p><a href="http://forums.whonix.org/t/vpn-on-the-host-question/8197/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-on-the-host-question/8197/4</link>
+        <pubDate>Wed, 25 Sep 2019 03:38:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8197-4</guid>
+        <source url="http://forums.whonix.org/t/vpn-on-the-host-question/8197.rss">VPN (on the host) question</source>
+      </item>
+      <item>
+        <title>VPN (on the host) question</title>
+        <dc:creator><![CDATA[Aby1]]></dc:creator>
+        <description><![CDATA[
+            <p>Do you think TunnelBear is a good VPN?</p>
+<p>(Also, at this point I’m thinking I will use only Whonix and not a VPN, but I’m not sure. How many Whonix users use a VPN in addition to Whonix?)</p>
+          <p><a href="http://forums.whonix.org/t/vpn-on-the-host-question/8197/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-on-the-host-question/8197/3</link>
+        <pubDate>Wed, 25 Sep 2019 03:05:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8197-3</guid>
+        <source url="http://forums.whonix.org/t/vpn-on-the-host-question/8197.rss">VPN (on the host) question</source>
+      </item>
+      <item>
+        <title>VPN (on the host) question</title>
+        <dc:creator><![CDATA[anonytor]]></dc:creator>
+        <description><![CDATA[
+            <p>If you have a vpn active on your host and your routing is all traffic goes through the tun or tap virtual device you will have this:<br>
+User --vpn–Tor network</p>
+<p>The way that Virtualbox does the NAT networking is all traffic generated from Whonix activity in Workstation routes via the internal network (eth1) to the Gateway (Tor) and your host will send the received packets to the vpn server. Virtualbox uses a NAT engine (address 10.0.2.2) that collects the Gateway’s traffic and sends it to the host<br>
+To be really secure it is important to have a leak free setup on your host. A good firewall is essential.<br>
+When vpn is on the host set to route everything through the vpn server, you have a “vpn through Tor” (user-vpn-Tor) direction. It is important that ALL host traffic is routed through vpn. You can check that by making sure (on host) traffic goes through a TAP interface if Windows, and tun0 if on Linux. This interface should be the default gateway, usually 10.8.x.x or 10.7.x.x depending on specific OS.</p>
+<p>The user-vpn-Tor would have the vpn provider see that you are connecting to the Tor network. They would see the address of the entry guard or bridge, but that’s it. They do not know what you are doing in Tor network. Since you have to sign into the vpn service from host’s ip, they see the original connecting address.They know that a person at your host IP signed into their service at whatever time and that you are using the Tor network. Depending on your requirements this may be acceptable or not. How you paid for the vpn, if there is a paper trail from a credit card, paypal, etc will also be stored by the provider</p>
+<p>Visited websites from when you are using Whonix would only see the address of the exit node that connects to them, not the entry guard, not the vpn server ip, and not the host ip.</p>
+<p>To create a user-Tor-vpn, you connect to the vpn service from inside the workstation and there are some modifications made to the network too. See the wiki for a detailed explanation<br>
+hopefully this helps to answer your question</p>
+          <p><a href="http://forums.whonix.org/t/vpn-on-the-host-question/8197/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-on-the-host-question/8197/2</link>
+        <pubDate>Wed, 25 Sep 2019 02:46:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8197-2</guid>
+        <source url="http://forums.whonix.org/t/vpn-on-the-host-question/8197.rss">VPN (on the host) question</source>
+      </item>
+      <item>
+        <title>VPN (on the host) question</title>
+        <dc:creator><![CDATA[Aby1]]></dc:creator>
+        <description><![CDATA[
+            <p>I read the Whonix links about using Whonix with a VPN. After reading them, it seems as though adding a VPN to Whonix will worsen one’s anonymity, but I could be wrong.</p>
+<p>The question is this: If a VPN is used on the host device (such as Windows or a Mac), and Whonix is used within VirtualBox, what kind of configuration is that? Is that a “User → VPN → Tor → Internet” connection, or is that a “User → Tor → VPN → Internet” connection? With that configuration, is Tor traffic routed through the VPN, or is VPN traffic routed through Tor?</p>
+<p>Also, if that configuration is used (VPN on host machine while using Whonix in VirtualBox), what would the VPN provider see? Would they see the person’s real IP Address, or would they see the IP Address of a Tor node? Would visited websites see the VPN provider’s IP Address, or would they see a Tor node IP address?</p>
+<p>How would one create a “User → Tor → VPN → Internet” configuration?</p>
+          <p><a href="http://forums.whonix.org/t/vpn-on-the-host-question/8197/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-on-the-host-question/8197/1</link>
+        <pubDate>Wed, 25 Sep 2019 02:20:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8197-1</guid>
+        <source url="http://forums.whonix.org/t/vpn-on-the-host-question/8197.rss">VPN (on the host) question</source>
+      </item>
+  </channel>
+</rss>

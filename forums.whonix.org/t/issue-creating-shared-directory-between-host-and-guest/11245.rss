@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Issue creating shared directory between host and guest</title>
+    <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245</link>
+    <description>Issue: Issue creating shared directory between host and guest
+I was following the steps on how to create a shared directory between host and guest VM from this article(https://www.explorelinux.com/how-to-create-shared-directory-between-host-and-guest-in-kvm/)
+I didn&#39;t get very far.
+
+
+Initial condition:
+------------------
+shutdown whonix gateway and workstation
+
+In host OS:
+-----------
+    $ mkdir /home/(hostuser)/vmhost-share
+    $ sudo chown libvirt-qemu:libvirt-qemu /home/(hostuser)/vmhost-share
+
+    $ ls -ld vmhost-share
+    drwxrwxrwx 2 libvirt-qemu libvirt-qemu 4096 Mar  6 19:42 vmhost-share
+
+open virt-manager
+    select &quot;show vm hardware details&quot;
+    click &quot;add hardware&quot;
+    select &quot;file system&quot;
+        type=mount
+        driver=squash
+        sourcepath=/home/(hostuser)/vmhost-share
+        targetpath=/vmshare
+
+Start whonix gateway...ok
+start whonix workstation...failed
+
+whonix workstation console output...
+
+    $ sudo virsh start Whonix-Workstation
+    error: Failed to start domain Whonix-Workstation
+    error: internal error: qemu unexpectedly closed the monitor: 2021-03-08T15:31:51.184081Z qemu-system-x86_64: -device virtio-9p-pci,id=fs0,fsdev=fsdev-fs0,mount_tag=/vmshare,bus=pci.0,addr=0x8: cannot initialize fsdev &#39;fsdev-fs0&#39;: failed to open &#39;/home/(hostuser)/vmhost-share&#39;: Permission denied</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 15 Mar 2021 15:44:12 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[dev001]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve set permission of /home/samplehostuser/shared to 660. This creates a problem as I could not get into the directory as ‘samplehostuser’. So I set the permission to 760 (drwxrw----) and the Whonix-Workstation fails on startup.</p>
+<pre><code>$ sudo virsh start Whonix-Workstation
+error: Failed to start domain Whonix-Workstation
+error: internal error: process exited while connecting to monitor: 2021-03-15T15:23:12.203344Z qemu-system-x86_64: -device virtio-9p-pci,id=fs0,fsdev=fsdev-fs0,mount_tag=shared,bus=pci.0,addr=0x8: share path /home/samplehostuser/shared does not exist</code></pre>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/17</link>
+        <pubDate>Mon, 15 Mar 2021 15:44:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-17</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="15" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>The reason we add user to the libvirt group is because otherwise the user would have to input their user account password every time they open and interact with the VMM GUI</p>
+</blockquote>
+</aside>
+<p>Not applicable… Because… What the user suggested is the other way arround.</p>
+<aside class="quote no-group quote-modified" data-username="Patrick" data-post="14" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<aside class="quote no-group" data-username="dev001" data-post="13" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/d/848f3c/40.png" class="avatar"> dev001:</div>
+<blockquote>
+<p>add user ‘libvirt-qemu’ to group ‘samplehostuser’.</p>
+</blockquote>
+</aside>
+</blockquote>
+</aside>
+<p>is different from</p>
+<p>add user <code>user</code> to  gropu <code>libvirt-qemu</code></p>
+<p>I said:</p>
+<blockquote>
+<p>No need for user <code>libvirt-qemu</code> to have full access to whole home folder of <code>samplehostuser</code> .</p>
+</blockquote>
+<p>Clarification in other words:</p>
+<p>I did not say:</p>
+<blockquote>
+<p>No need for user <code>user</code> to have full access to <code>libvirt-qemu</code>.</p>
+</blockquote>
+<blockquote>
+<p>Do not add user <code>user</code> to group <code>libvirt-qemu</code>.</p>
+</blockquote>
+<aside class="quote no-group" data-username="HulaHoop" data-post="15" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>it could mess up permissions on a system level dir?</p>
+</blockquote>
+</aside>
+<p>The risk is minuscule. Linux folder permissions aren’t black magic.</p>
+<p>It’s possible to view all file system settings one way or another.</p>
+<pre><code>stat /mnt
+</code></pre>
+<p>And after making modifications, checking again, seeing that nothing actually changed.</p>
+<p>Since /mnt is and stays owned by user <code>root</code>, there should be no way for KVM to mess up that folder. It seems to respect folder permissions, otherwise there wouldn’t be this issue to begin with.</p>
+<p>Also this could be turned around. Risking to mess up /mnt (which probably one most users’s systems doesn’t contain anything nowadays) vs risking to mess up /home, which would effectively brick the system for most users (not knowing how to use recovery mode). If permissions in /home or /home/user are messed up, that could even break login and X.</p>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/16</link>
+        <pubDate>Mon, 15 Mar 2021 13:46:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-16</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="14" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>What’s the issue with <span class="hashtag">#2</span>?</p>
+</blockquote>
+</aside>
+<p>I hesitate because it could mess up permissions on a system level dir? Not sure of the consequences so I kept everything in home</p>
+<aside class="quote no-group" data-username="Patrick" data-post="14" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>That should also be avoided. No need for user <code>libvirt-qemu</code> to have full access to whole home folder of <code>samplehostuser</code>.</p>
+</blockquote>
+</aside>
+<p>The reason we add user to the libvirt group is because otherwise the user would have to input their user account password every time they open and interact with the VMM GUI</p>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/15</link>
+        <pubDate>Mon, 15 Mar 2021 13:33:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-15</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="dev001" data-post="11" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/d/848f3c/40.png" class="avatar"> dev001:</div>
+<blockquote>
+<h1>Scenario#1: This works</h1>
+<p>On the host os, if I create the shared directory in /mnt/shared and set permission to 777, then the guest vm would start ok and guest vm app can access the shared directory</p>
+</blockquote>
+</aside>
+<p>Insecure because then any limited linux user account can read that folder.</p>
+<aside class="quote no-group" data-username="dev001" data-post="11" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/d/848f3c/40.png" class="avatar"> dev001:</div>
+<blockquote>
+<h1>Scenario#2: This works</h1>
+<p>On the host os, if I create the shared directory in /mnt/shared and set permission to 770 and group=libvirt-qemu or group=kvm. The guest vm would start ok and guest vm app can access the shared directory. Setting the directory’s group to another other value would cause the guest vm startup to fail.</p>
+</blockquote>
+</aside>
+<p>Better.</p>
+<p><code>770</code> means <code>ug+rwx</code>. Owner and group having read, write, execute permission. The execute permission seems not needed.</p>
+<p>Could you try <code>660</code> please?</p>
+<p><code>660</code> means <code>ug+rw</code>. Owner and group having read, write permission.</p>
+<aside class="quote no-group" data-username="dev001" data-post="11" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/d/848f3c/40.png" class="avatar"> dev001:</div>
+<blockquote>
+<h1>Scenario#3: This works</h1>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-username="dev001" data-post="11" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/d/848f3c/40.png" class="avatar"> dev001:</div>
+<blockquote>
+<ul>
+<li>/home/samplehostuser permission is 777 or</li>
+</ul>
+</blockquote>
+</aside>
+<p>Even worse than <span class="hashtag">#1</span>.</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="12" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>I think all scenarios you listed are less ideal for different reasons which is why I can’t accept them.</p>
+</blockquote>
+</aside>
+<p>What’s the issue with <span class="hashtag">#2</span>?</p>
+<aside class="quote no-group" data-username="dev001" data-post="13" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/d/848f3c/40.png" class="avatar"> dev001:</div>
+<blockquote>
+<p>add user ‘libvirt-qemu’ to group ‘samplehostuser’.</p>
+</blockquote>
+</aside>
+<p>That should also be avoided. No need for user <code>libvirt-qemu</code> to have full access to whole home folder of <code>samplehostuser</code>.</p>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/14</link>
+        <pubDate>Mon, 15 Mar 2021 10:34:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-14</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[dev001]]></dc:creator>
+        <description><![CDATA[
+            <p>The documentation as written didn’t work for me. The issue was it was not detailed enough with the folder permissions. I was simply asking to update the documentation with more details</p>
+<p>In my case, my host user account permission is:<br>
+<code>/home/samplehostuser ... permission 770</code><br>
+and the shared folder permission is:<br>
+<code>/home/samplehostuser/shared ... permission 777</code></p>
+<p>This would cause the Whonix-Workstation to fail on startup.</p>
+<p>To fix this issue, I would need to set:<br>
+<code>/home/samplehostuser ... permission 777</code><br>
+or<br>
+add user ‘libvirt-qemu’ to group ‘samplehostuser’.</p>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/13</link>
+        <pubDate>Sun, 14 Mar 2021 22:47:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-13</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="dev001" data-post="11" data-topic="11245">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/d/848f3c/40.png" class="avatar"> dev001:</div>
+<blockquote>
+<h2>Request:</h2>
+<p>The documentation (<a href="https://www.whonix.org/wiki/KVM#Shared_Folders">https://www.whonix.org/wiki/KVM#Shared_Folders</a>) is not clear on this and needs to be updated with these details</p>
+</blockquote>
+</aside>
+<p>I still don;t know why the typical scenario documented already doesn’t work for you. I think all scenarios  you listed are less ideal for different reasons which is why I can’t accept them.</p>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/12</link>
+        <pubDate>Fri, 12 Mar 2021 15:21:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-12</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[dev001]]></dc:creator>
+        <description><![CDATA[
+            <p>I finally got it to work.</p>
+<h1>Scenario#1: This works</h1>
+<p>On the host os, if I create the shared directory in /mnt/shared and set permission to 777, then the guest vm would start ok and guest vm app can access the shared directory</p>
+<h1>Scenario#2: This works</h1>
+<p>On the host os, if I create the shared directory in /mnt/shared and set permission to 770 and group=libvirt-qemu or group=kvm. The guest vm would start ok and guest vm app can access the shared directory. Setting the directory’s group to another other value would cause the guest vm startup to fail.</p>
+<h1>Scenario#3: This works</h1>
+<p>If the shared directory is within the host os’s user account. i.e. /home/samplehostuser/shared.</p>
+<p>It is important to verify the following criteria:</p>
+<ol>
+<li>/home/samplehostuser permission is 777 or</li>
+<li>if /home/samplehostuser permission is 770, then libvirt-qemu must be a member of samplehostuser group</li>
+</ol>
+<p>Note: (1) could have security consequences.</p>
+<h2>Request:</h2>
+<p>The documentation (<a href="https://www.whonix.org/wiki/KVM#Shared_Folders" rel="noopener nofollow ugc">https://www.whonix.org/wiki/KVM#Shared_Folders</a>) is not clear on this and needs to be updated with these details</p>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/11</link>
+        <pubDate>Thu, 11 Mar 2021 23:15:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-11</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="442" data-topic="166">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/help-welcome-kvm-development-staying-the-course/166/442">[Help Welcome] KVM Development - staying the course</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/kvm/11"><span class="badge-category-bg" style="background-color: #9EB83B;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Everything specific to Whonix KVM. (devs)">KVM</span></a>
+  </div>
+  <blockquote>
+    <a href="https://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245" class="inline-onebox">Issue creating shared directory between host and guest</a> reminds me… chmod 777 /home/user/shared isn’t a great. Security issue and usability issue. 
+As per <a href="https://chmod-calculator.com/">https://chmod-calculator.com/</a> 777 allow public (i.e. any linux user account including those not having business there on the system) to read, write, execute files from that folder. 
+Is there some more canonical way to set up shared folders with KVM? 
+[1] Under which user is KVM attempting to write to shared folders? 
+[1] Under which group is KV…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/10</link>
+        <pubDate>Thu, 11 Mar 2021 16:15:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-10</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[dev001]]></dc:creator>
+        <description><![CDATA[
+            <pre><code>$ lsb_release -a
+No LSB modules are available.
+Distributor ID:	Ubuntu
+Description:	Ubuntu 20.04.2 LTS
+Release:	20.04
+Codename:	focal</code></pre>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/9</link>
+        <pubDate>Thu, 11 Mar 2021 16:02:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-9</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <ul>
+<li>Become a master of linux file permissions. Unrelated to Whonix.</li>
+<li>Remove Whonix from the equation as per <a href="https://www.whonix.org/wiki/Free_Support_Principle">https://www.whonix.org/wiki/Free_Support_Principle</a>
+</li>
+<li>Emulate what is supposed to happen.</li>
+</ul>
+<hr>
+<p>syntax:</p>
+<pre><code>sudo -u user-which-you-think-will-be-creating-files touch /path/to/folder/example-file
+sudo -u user-which-you-think-will-be-creating-files rm /path/to/folder/example-file
+</code></pre>
+<p>If the emulated test fails, so would any application such as KVM doing the same.<br>
+(Not sure KVM should be called an application but in this context it doesn’t make a difference.)</p>
+<hr>
+<ul>
+<li>Stay out of <code>/home</code>-anything.</li>
+</ul>
+<hr>
+<p>Running under user <code>user</code>:</p>
+<pre><code class="lang-auto">$ mkdir afolder
+$ sudo chown user2:user2 afolder
+$ sudo -u user2 touch /home/user/afolder/test
+</code></pre>
+<blockquote>
+<p>touch: cannot touch ‘/home/user/afolder/test’: Permission denied</p>
+</blockquote>
+<p><code>/home/user</code> owned by user <code>user</code> doesn’t easily mix with a sub folder accessible by another user. Since the parent folder <code>/home/user</code> is only accessible by user <code>user</code> the sub folder <code>/home/user/afolder</code> cannot easily be accessible by user <code>user2</code>.</p>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/8</link>
+        <pubDate>Thu, 11 Mar 2021 15:40:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-8</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>What host are you using? I’m guessing something other than Debian stable. I would file a bug report with them at his point.</p>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/7</link>
+        <pubDate>Thu, 11 Mar 2021 15:28:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-7</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[dev001]]></dc:creator>
+        <description><![CDATA[
+            <p>My host user is a member of the groups: kvm, libvirt, libvirt-qemu</p>
+<p>The “/home/samplehostuser/shared” folder at the host is as follows…</p>
+<pre><code>$ ls -l -d /home/samplehostuser/shared
+drwxrwxrwx 2 samplehostuser samplehostuser 4.0K Mar  8 11:43 /home/samplehostuser/shared/
+</code></pre>
+<p>I changed the group name of “/home/samplehostuser/shared” to kvm, libvirt and libvirt-qemu and still getting the permission error when starting up the Whonix-Workstation</p>
+<p>Any more suggestions?</p>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/6</link>
+        <pubDate>Thu, 11 Mar 2021 08:39:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-6</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Did you add your user to the libvirt and kvm groups? I also assume you’ve chowned the shared dir</p>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/5</link>
+        <pubDate>Tue, 09 Mar 2021 20:53:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-5</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[dev001]]></dc:creator>
+        <description><![CDATA[
+            <p>In the guest vm, I also tried to manually mount the “shared” directory and received an error.</p>
+<pre><code>user@host:~$ sudo mount -t 9p -o trans=virtio shared /mnt/shared
+mount: /mnt/shared: bad option; for several filesystems (e.g. nfs, cifs) you might need a /sbin/mount.&lt;type&gt; helper program.</code></pre>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/4</link>
+        <pubDate>Tue, 09 Mar 2021 06:14:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-4</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[dev001]]></dc:creator>
+        <description><![CDATA[
+            <p>I followed the instructions of the document you provided. It still doesn’t work.</p>
+<p>Here are the steps…</p>
+<h1>Initial condition:</h1>
+<p>Both whonix gateway and workstation are running</p>
+<h1>Configuration:</h1>
+<h2>open virt-manager</h2>
+<p>select whonix workstation<br>
+select “show vm hardware details”<br>
+click “add hardware”<br>
+select “file system”<br>
+type=mount<br>
+driver=default<br>
+mode=mapped<br>
+sourcepath=/home/samplehostuser/shared<br>
+targetpath=shared<br>
+click “apply” button</p>
+<blockquote>
+<p>Dialog pops up saying. “This device could not be attached to the running machine. Would you like to make the device available after the next guest shutdown”.<br>
+Detailed message says “Operation not supported: live attach of device ‘filesystem’ is not supported…”</p>
+</blockquote>
+<p>click “yes”.</p>
+<h1>Shutdown and start workstation</h1>
+<p>Shutdown whonix workstation<br>
+start whonix workstation…fails</p>
+<pre><code>$ sudo virsh start Whonix-Workstation
+error: Failed to start domain Whonix-Workstation
+error: internal error: process exited while connecting to monitor: 2021-03-08T19:10:13.527737Z qemu-system-x86_64: -device virtio-9p-pci,id=fs0,fsdev=fsdev-fs0,mount_tag=shared,bus=pci.0,addr=0x8: cannot initialize fsdev 'fsdev-fs0': failed to open '/home/samplehostuser/shared': Permission denied
+
+$ ls -l -d shared
+drwxrwxrwx 2 samplehostuser samplehostuser 4.0K Mar  8 11:43 shared/</code></pre>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/3</link>
+        <pubDate>Mon, 08 Mar 2021 19:22:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-3</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Please follow the instructions documented here instead of trying something on your own:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/KVM#Shared_Folders" target="_blank" rel="noopener" title="10:50PM - 21 February 2021">Whonix – 21 Feb 21</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/218;"><img src="https://www.whonix.org/w/images/b/be/234234234236kvm.png" class="thumbnail" width="690" height="218"></div>
+
+<h3><a href="https://www.whonix.org/wiki/KVM#Shared_Folders" target="_blank" rel="noopener">Whonix ™ for KVM</a></h3>
+
+<p>Using Whonix ™ with KVM (Kernel Virtual Machine)</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/2</link>
+        <pubDate>Mon, 08 Mar 2021 15:57:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-2</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+      <item>
+        <title>Issue creating shared directory between host and guest</title>
+        <dc:creator><![CDATA[dev001]]></dc:creator>
+        <description><![CDATA[
+            <p>Issue: Issue creating shared directory between host and guest<br>
+I was following the steps on how to create a shared directory between host and guest VM from this article(<a href="https://www.explorelinux.com/how-to-create-shared-directory-between-host-and-guest-in-kvm/" rel="noopener nofollow ugc">https://www.explorelinux.com/how-to-create-shared-directory-between-host-and-guest-in-kvm/</a>)<br>
+I didn’t get very far.</p>
+<h2>Initial condition:</h2>
+<p>shutdown whonix gateway and workstation</p>
+<h2>In host OS:</h2>
+<pre><code>$ mkdir /home/(hostuser)/vmhost-share
+$ sudo chown libvirt-qemu:libvirt-qemu /home/(hostuser)/vmhost-share
+
+$ ls -ld vmhost-share
+drwxrwxrwx 2 libvirt-qemu libvirt-qemu 4096 Mar  6 19:42 vmhost-share
+</code></pre>
+<p>open virt-manager<br>
+select “show vm hardware details”<br>
+click “add hardware”<br>
+select “file system”<br>
+type=mount<br>
+driver=squash<br>
+sourcepath=/home/(hostuser)/vmhost-share<br>
+targetpath=/vmshare</p>
+<p>Start whonix gateway…ok<br>
+start whonix workstation…failed</p>
+<p>whonix workstation console output…</p>
+<pre><code>$ sudo virsh start Whonix-Workstation
+error: Failed to start domain Whonix-Workstation
+error: internal error: qemu unexpectedly closed the monitor: 2021-03-08T15:31:51.184081Z qemu-system-x86_64: -device virtio-9p-pci,id=fs0,fsdev=fsdev-fs0,mount_tag=/vmshare,bus=pci.0,addr=0x8: cannot initialize fsdev 'fsdev-fs0': failed to open '/home/(hostuser)/vmhost-share': Permission denied</code></pre>
+          <p><a href="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245/1</link>
+        <pubDate>Mon, 08 Mar 2021 15:34:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11245-1</guid>
+        <source url="http://forums.whonix.org/t/issue-creating-shared-directory-between-host-and-guest/11245.rss">Issue creating shared directory between host and guest</source>
+      </item>
+  </channel>
+</rss>

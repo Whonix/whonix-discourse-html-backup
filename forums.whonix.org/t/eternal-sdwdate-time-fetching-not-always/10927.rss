@@ -1,0 +1,1608 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Eternal sdwdate time fetching (not always)</title>
+    <link>http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927</link>
+    <description>There is sometimes when Qubes-Whonix just fail to make the timing of the VM no matter how many times you restart sdwdate or change Tor paths, So went as the recommended of what to do in case this happen with whonixcheck debug (`whonixcheck --verbose --gui --cli`): 
+
+GUI:
+
+    INFO: Input Detection: INPUT_AUTO=false CLI=true GUI=true Manually set to --gui and --cli. 
+    INFO: Root Check Result: Ok, not running as root. 
+    INFO: Pin torproject.org certificate: disabled. 
+    INFO: Check sudo Result: OK 
+    INFO: whonix_build_version: 3:3.4-1 
+    INFO: whonix-gateway-packages-dependencies-cli: 20.3-1 
+    INFO: /etc/whonix_version: 15 
+    INFO: Spectre Meltdown Test: skipping since spectre_meltdown_check=false, ok. 
+    INFO: systemd journal check Result: 
+    warnings: 
+    ######################################## 
+
+    ######################################## 
+
+    failed: 
+    ######################################## 
+
+    ######################################## 
+
+    errors: 
+    ######################################## 
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 00, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 01, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 03, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 04, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 05, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 06, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 07, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: Error: Driver &#39;pcspkr&#39; is already registered, aborting... 
+    ######################################## 
+
+    denied: 
+    ######################################## 
+
+    ######################################## 
+
+    ordering cycle: 
+    ######################################## 
+
+    ######################################## 
+
+    To see this for yourself... 
+    1. Open a terminal. (dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; Terminal) 
+    2. Run. 
+    sudo journalctl | grep -i warn
+
+    3. Run. 
+    sudo journalctl | grep -i fail
+
+    4. Run. 
+    sudo journalctl | grep -i error
+
+    5. Run. 
+    sudo journalctl | grep -i denied
+
+    6. Run. 
+    sudo journalctl | grep -i &quot;ordering cycle&quot;
+    If you know what you are doing, feel free to disable this check. Create a file /etc/whonix.d/50_whonixcheck_user.conf and add: 
+    whonixcheck_skip_functions+=&quot; check_journal &quot; 
+    INFO: Whonix firewall systemd unit check Result: Ok. 
+    INFO: Qubes qubes-db Test Result: Connection to local qubes-db daemon succeeded, ok. 
+    INFO: Qubes Settings Test Result: Ok. (GATEWAY_IP: 127.0.0.1) 
+    INFO: Qubes Settings Test Result: Ok, qubes_vm_type is ProxyVM. 
+    INFO: Check Kernel Messages Test Result: Found nothing remarkable, ok. 
+    INFO: check network interfaces Result: Ok. 
+    INFO: Check whonixsetup Result: done, ok. 
+    INFO: Check Package Manager Running Result: None running, ok. 
+    INFO: Tor Check Result: &quot;DisableNetwork 1&quot; not active, ok. 
+    INFO: Tor Config Check Result: Tor config ok. 
+    INFO: Tor Pid Check Result: Pid 965 running., ok. 
+    INFO: Control Port Filter Proxy Test Result: OK 
+    INFO: check_anondate_do debugging information:
+
+    tor_consensus_status : verified
+    current_time_in_valid_range: true
+
+    current_time_torish : 2020-12-30 13:31:16
+    tor_consensus_valid_after : 2020-12-30 12:00:00
+    tor_consensus_valid_until : 2020-12-30 15:00:00
+    tor_consensus_middle_range : 2020-12-30 13:30:00
+
+    tor_cert_lifetime_output : 
+    tor_cert_lifetime_valid : true
+    tor_cert_valid_after : 
+
+    tor_consensus_user_permission : debian-tor
+    tor_consensus_group_permission: debian-tor
+
+    INFO: Tor SocksPort Reachability Test Result: Reachable. (curl exit code: 22 | curl status message: [22] - [HTTP page not retrieved. The requested url was not found or returned another error with the HTTP error code being 400 or above. This return code only appears if -f, --fail is used.]) 
+    ERROR: Time Synchronization Result: 
+    Whonixcheck gave up waiting. 
+
+    Time synchronization status: pending 
+    sdwdate reports: Initial time fetching in progress... 
+    whonix_firewall status: first run after boot 
+
+    Possible issues: 
+    - sdwdate will need a few more moments for fetching the time. 
+    - sdwdate time sources might be dysfunctional. 
+
+    Recommendations: 
+
+    A) Rerun whonixcheck: 
+    dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; Whonix Check
+    or in Terminal: whonixcheck 
+    or more verbose in Terminal: whonixcheck --verbose --gui --cli 
+
+    B) Restart sdwdate. 
+    dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; sdwdate-gui -&gt; right click on sdwdate-gui systray -&gt; Restart sdwdate
+    or in Terminal: sudo service sdwdate restart 
+
+    C) Manually set the time. 
+
+    As last resort... 
+
+    1. Open a terminal. (dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; Terminal) 
+    2. Use the manual clock setting tool. 
+    sudo --set-home clock-random-manual-gui
+    3. Simulate sdwdate success. 
+
+
+CLI:
+
+
+    root@host:~# whonixcheck --verbose --gui --cli
+    [INFO] [whonixcheck] whonix-ws | Whonix-Gateway | whonix-gw-15 TemplateBased ProxyVM | Wed 30 Dec 2020 01:31:13 PM UTC
+    [INFO] [whonixcheck] Input Detection: INPUT_AUTO=false CLI=true GUI=true
+    Manually set to --gui and --cli.
+    [INFO] [whonixcheck] Root Check Result: Ok, not running as root.
+    [INFO] [whonixcheck] Pin torproject.org certificate: disabled.
+    [INFO] [whonixcheck] Check sudo Result: OK
+    [INFO] [whonixcheck] whonix_build_version: 3:3.4-1
+    [INFO] [whonixcheck] whonix-gateway-packages-dependencies-cli: 20.3-1
+    [INFO] [whonixcheck] /etc/whonix_version: 15
+    [INFO] [whonixcheck] Spectre Meltdown Test: skipping since spectre_meltdown_check=false, ok.
+    [INFO] [whonixcheck] systemd journal check Result:
+    warnings:
+    ########################################
+
+    ########################################
+
+    failed:
+    ########################################
+
+    ########################################
+
+    errors:
+    ########################################
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 00, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 01, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 03, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 04, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 05, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 06, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 07, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: Error: Driver &#39;pcspkr&#39; is already registered, aborting...
+    ########################################
+
+    denied:
+    ########################################
+
+    ########################################
+
+    ordering cycle:
+    ########################################
+
+    ########################################
+
+    To see this for yourself...
+    1. Open a terminal. (dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws-&gt; Terminal)
+    2. Run. sudo journalctl | grep -i warn
+    3. Run. sudo journalctl | grep -i fail
+    4. Run. sudo journalctl | grep -i error
+    5. Run. sudo journalctl | grep -i denied
+    6. Run. sudo journalctl | grep -i &quot;ordering cycle&quot;
+
+    If you know what you are doing, feel free to disable this check.
+    Create a file /etc/whonix.d/50_whonixcheck_user.conf and add:
+    whonixcheck_skip_functions+=&quot; check_journal &quot;
+    [INFO] [whonixcheck] Whonix firewall systemd unit check Result: Ok.
+    [INFO] [whonixcheck] Qubes qubes-db Test Result: Connection to local qubes-db daemon succeeded, ok.
+    [INFO] [whonixcheck] Qubes Settings Test Result: Ok. (GATEWAY_IP: 127.0.0.1)
+    [INFO] [whonixcheck] Qubes Settings Test Result: Ok, qubes_vm_type is ProxyVM.
+    [INFO] [whonixcheck] Check Kernel Messages Test Result: Found nothing remarkable, ok.
+    [INFO] [whonixcheck] check network interfaces Result: Ok.
+    [INFO] [whonixcheck] Check whonixsetup Result: done, ok.
+    [INFO] [whonixcheck] Check Package Manager Running Result: None running, ok.
+    [INFO] [whonixcheck] Tor Check Result: &quot;DisableNetwork 1&quot; not active, ok.
+    [INFO] [whonixcheck] Tor Config Check Result: Tor config ok.
+    [INFO] [whonixcheck] Tor Pid Check Result: Pid 965 running., ok.
+    [INFO] [whonixcheck] Control Port Filter Proxy Test Result: OK
+    [INFO] [whonixcheck] check_anondate_do debugging information:
+
+    tor_consensus_status       : verified
+    current_time_in_valid_range: true
+
+    current_time_torish        : 2020-12-30 13:31:16
+    tor_consensus_valid_after  : 2020-12-30 12:00:00
+    tor_consensus_valid_until  : 2020-12-30 15:00:00
+    tor_consensus_middle_range : 2020-12-30 13:30:00
+
+    tor_cert_lifetime_output   : 
+    tor_cert_lifetime_valid    : true
+    tor_cert_valid_after       : 
+
+    tor_consensus_user_permission : debian-tor
+    tor_consensus_group_permission: debian-tor
+    [INFO] [whonixcheck] Tor SocksPort Reachability Test Result: Reachable. (curl exit code: 22 | curl status message: [22] - [HTTP page not retrieved. The requested url was not found or returned another error with the HTTP error code being 400 or above. This return code only appears if -f, --fail is used.])
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 0 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 2 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 4 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 6 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 8 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 10 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 12 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 14 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 16 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 18 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 20 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 22 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 24 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 26 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 28 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 30 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 32 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 34 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 36 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 38 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 40 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 42 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 44 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 46 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 48 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 50 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 52 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 54 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 56 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 58 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 60 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 62 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 64 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 66 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: General Timeout Error. Internet connection might be down. Sleeping for 0.2 minutes.
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 68 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: General Timeout Error. Internet connection might be down. Sleeping for 0.2 minutes.
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 70 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: General Timeout Error. Internet connection might be down. Sleeping for 0.2 minutes.
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 72 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: General Timeout Error. Internet connection might be down. Sleeping for 0.2 minutes.
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 74 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: General Timeout Error. Internet connection might be down. Sleeping for 0.2 minutes.
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 76 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 78 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 80 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 82 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 84 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 86 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 88 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 90 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 92 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 94 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 96 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 98 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 100 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 102 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 104 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 106 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 108 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 110 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 112 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 114 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 116 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 118 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 120 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 122 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 124 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 126 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 128 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 130 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 132 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 134 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 136 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 138 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 140 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 142 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 144 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 146 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [INFO] [whonixcheck] Tor Connection Result:
+    - Connecting for 148 seconds. | 100 % done. 
+    - Tor Circuit: established.
+    - Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY=&quot;Done&quot;
+    - Timesync status: not done.
+    - sdwdate reports: Initial time fetching in progress...
+    [ERROR] [whonixcheck] Time Synchronization Result:
+    Whonixcheck gave up waiting.
+
+    Time synchronization status: pending
+    sdwdate reports: Initial time fetching in progress...
+    whonix_firewall status: first run after boot
+
+    Possible issues:
+    - sdwdate will need a few more moments for fetching the time.
+    - sdwdate time sources might be dysfunctional.
+
+    Recommendations:
+
+    A) Rerun whonixcheck:
+    dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; Whonix Check
+    or in Terminal: whonixcheck
+    or more verbose in Terminal: whonixcheck --verbose --gui --cli
+
+    B) Restart sdwdate.
+    dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; sdwdate-gui -&gt; right click on sdwdate-gui systray -&gt; Restart sdwdate
+    or in Terminal: sudo service sdwdate restart
+
+    C) Manually set the time.
+
+    As last resort...
+
+    1. Open a terminal. (dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; Terminal)
+    2. Use the manual clock setting tool. sudo --set-home clock-random-manual-gui
+    3. Simulate sdwdate success. sudo touch /run/sdwdate/first_success
+    4. Rerun whonixcheck.
+
+sudo journalctl | grep -i error
+
+    root@host:~# sudo journalctl | grep -i error
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 00, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 01, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 03, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 04, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 05, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 06, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 07, disabling event (20190816/evgpe-841)
+    Dec 30 13:14:26 host kernel: RAS: Correctable Errors collector initialized.
+    Dec 30 13:14:26 host kernel: Error: Driver &#39;pcspkr&#39; is already registered, aborting...
+    Dec 30 13:14:30 host xl[741]: libxl: error: libxl_utils.c:818:libxl_cpu_bitmap_alloc: failed to retrieve the maximum number of cpus
+    Dec 30 13:14:30 host xl[741]: libxl: error: libxl_utils.c:818:libxl_cpu_bitmap_alloc: failed to retrieve the maximum number of cpus
+    Dec 30 13:17:33 host qubes.VMShell-dom0[1517]: (xfce4-terminal:1519): dbind-WARNING **: 13:17:33.154: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+    Dec 30 13:19:12 host sdwdate[982]: 2020-12-30 13:19:12 - sdwdate - INFO - retry_on_error_counter: 0
+    Dec 30 13:21:43 host sdwdate[982]: 2020-12-30 13:21:43 - sdwdate - INFO - retry_on_error_counter: 1
+    Dec 30 13:21:43 host sdwdate[982]: 2020-12-30 13:21:43 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.0 minutes.
+    Dec 30 13:22:05 host qubes.StartApp+xfce4-terminal-dom0[17019]: (xfce4-terminal:17029): dbind-WARNING **: 13:22:05.995: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+    Dec 30 13:22:15 host qubes.VMShell-dom0[17081]: (xfce4-terminal:17082): dbind-WARNING **: 13:22:15.433: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+    Dec 30 13:24:50 host sdwdate[17101]: 2020-12-30 13:24:50 - sdwdate - INFO - retry_on_error_counter: 0
+    Dec 30 13:24:50 host sdwdate[17101]: 2020-12-30 13:24:50 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.0 minutes.
+    Dec 30 13:27:20 host sdwdate[17101]: 2020-12-30 13:27:20 - sdwdate - INFO - retry_on_error_counter: 1
+    Dec 30 13:27:20 host sdwdate[17101]: 2020-12-30 13:27:20 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.0 minutes.
+    Dec 30 13:29:52 host sdwdate[17101]: 2020-12-30 13:29:52 - sdwdate - INFO - retry_on_error_counter: 2
+    Dec 30 13:29:52 host sdwdate[17101]: 2020-12-30 13:29:52 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.13333333333333333 minutes.
+    Dec 30 13:31:08 host qubes.VMShell-dom0[26945]: (xfce4-terminal:26946): dbind-WARNING **: 13:31:08.728: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+    Dec 30 13:32:31 host sdwdate[17101]: 2020-12-30 13:32:31 - sdwdate - INFO - retry_on_error_counter: 3
+    Dec 30 13:32:31 host sdwdate[17101]: 2020-12-30 13:32:31 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.2 minutes.
+    Dec 30 13:35:14 host sdwdate[17101]: 2020-12-30 13:35:14 - sdwdate - INFO - retry_on_error_counter: 4
+    Dec 30 13:35:14 host sdwdate[17101]: 2020-12-30 13:35:14 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.38333333333333336 minutes.
+    Dec 30 13:38:08 host sdwdate[17101]: 2020-12-30 13:38:08 - sdwdate - INFO - * value: b&#39;connect error: Socket error: 0x04: Host unreachable&#39;
+    Dec 30 13:38:08 host sdwdate[17101]: 2020-12-30 13:38:08 - sdwdate - INFO - retry_on_error_counter: 5
+    Dec 30 13:40:45 host sdwdate[17101]: 2020-12-30 13:40:45 - sdwdate - INFO - retry_on_error_counter: 6
+    Dec 30 13:40:45 host sdwdate[17101]: 2020-12-30 13:40:45 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.43333333333333335 minutes.
+    Dec 30 13:43:43 host sdwdate[17101]: 2020-12-30 13:43:43 - sdwdate - INFO - retry_on_error_counter: 7
+    Dec 30 13:43:43 host sdwdate[17101]: 2020-12-30 13:43:43 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.26666666666666666 minutes.
+
+What solves it only using the last solution mentioned in Whonixcheck:
+
+    C) Manually set the time.
+
+    As last resort...
+
+    1. Open a terminal. (dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; Terminal)
+    2. Use the manual clock setting tool. sudo --set-home clock-random-manual-gui
+    3. Simulate sdwdate success. sudo touch /run/sdwdate/first_success
+    4. Rerun whonixcheck.
+
+So wonder what is causing it to fail eternally sometimes.</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 12 Jan 2021 04:32:00 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Eternal sdwdate time fetching (not always)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="4" data-topic="10967">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/sdwdate-synchronisation-fails-sometimes-works/10967/4">sdwdate synchronisation fails, sometimes works</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/support/5"><span class="badge-category-bg" style="background-color: #8C6238;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="User support for the Whonix operating system. (devs)">Support</span></a>
+  </div>
+  <blockquote>
+    Could be because of the current developments: <a href="https://forums.whonix.org/t/most-onions-down-due-to-a-denial-of-service-attack-on-the-tor-network/10979" class="inline-onebox">Most Onions Down due to a Denial of Service Attack on the Tor Network</a>
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927/4</link>
+        <pubDate>Tue, 12 Jan 2021 04:32:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10927-4</guid>
+        <source url="http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927.rss">Eternal sdwdate time fetching (not always)</source>
+      </item>
+      <item>
+        <title>Eternal sdwdate time fetching (not always)</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="10927">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Connectivity otherwise functional, Tor Browser etc.?</p>
+</blockquote>
+</aside>
+<p>yeah everything working fine with the connection, just when running whonixcheck or sdwdate doesnt show time being fetched.</p>
+<p>Next time if it happens i will report the rest of the logs that you have mentioned.</p>
+          <p><a href="http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927/3</link>
+        <pubDate>Thu, 31 Dec 2020 16:00:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10927-3</guid>
+        <source url="http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927.rss">Eternal sdwdate time fetching (not always)</source>
+      </item>
+      <item>
+        <title>Eternal sdwdate time fetching (not always)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Connectivity otherwise functional, Tor Browser etc.?</p>
+<p>As connectivity test (useful in both Whonix-Gateway and Whonix-Workstation):</p>
+<pre><code>whonixcheck --leak-tests
+</code></pre>
+<p>(Output of it not required if it shows no errors / warnings.)</p>
+<hr>
+<p>Please also let’s see sdwdate’s log. Accessibly from sdwdate-gui.</p>
+<hr>
+<p>Also perhaps useful: <a href="https://www.whonix.org/wiki/Tor#Log_Analysis">Tor Log Analysis</a></p>
+<hr>
+<p>Related:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Sdwdate" target="_blank" rel="noopener" title="10:02AM - 26 December 2020">Whonix – 26 Dec 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/77;"><img src="https://www.whonix.org/w/images/7/7e/Sunset-1331088640.jpg" class="thumbnail" width="131" height="77"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Sdwdate" target="_blank" rel="noopener">sdwdate: Secure Distributed Web Date</a></h3>
+
+<p>sdwdate - Secure Distributed Web Date - Homepage</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Sdwdate-gui" target="_blank" rel="noopener" title="11:18AM - 06 October 2020">Whonix – 6 Oct 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/31;"><img src="https://phabricator.whonix.org/file/data/wzb4lyr3za3kq2ovbhla/PHID-FILE-7zwxlcakwy3g4dur62yo/8.png" class="thumbnail" width="131" height="31"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Sdwdate-gui" target="_blank" rel="noopener">sdwdate-gui: Secure Distributed Web Date Graphical User Interface</a></h3>
+
+<p>sdwdate - Secure Distributed Web Date - systray - graphical user interface (GUI) - Homepage</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927/2</link>
+        <pubDate>Wed, 30 Dec 2020 14:29:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10927-2</guid>
+        <source url="http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927.rss">Eternal sdwdate time fetching (not always)</source>
+      </item>
+      <item>
+        <title>Eternal sdwdate time fetching (not always)</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>There is sometimes when Qubes-Whonix just fail to make the timing of the VM no matter how many times you restart sdwdate or change Tor paths, So went as the recommended of what to do in case this happen with whonixcheck debug (<code>whonixcheck --verbose --gui --cli</code>):</p>
+<p>GUI:</p>
+<pre><code>INFO: Input Detection: INPUT_AUTO=false CLI=true GUI=true Manually set to --gui and --cli. 
+INFO: Root Check Result: Ok, not running as root. 
+INFO: Pin torproject.org certificate: disabled. 
+INFO: Check sudo Result: OK 
+INFO: whonix_build_version: 3:3.4-1 
+INFO: whonix-gateway-packages-dependencies-cli: 20.3-1 
+INFO: /etc/whonix_version: 15 
+INFO: Spectre Meltdown Test: skipping since spectre_meltdown_check=false, ok. 
+INFO: systemd journal check Result: 
+warnings: 
+######################################## 
+
+######################################## 
+
+failed: 
+######################################## 
+
+######################################## 
+
+errors: 
+######################################## 
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 00, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 01, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 03, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 04, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 05, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 06, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 07, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: Error: Driver 'pcspkr' is already registered, aborting... 
+######################################## 
+
+denied: 
+######################################## 
+
+######################################## 
+
+ordering cycle: 
+######################################## 
+
+######################################## 
+
+To see this for yourself... 
+1. Open a terminal. (dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; Terminal) 
+2. Run. 
+sudo journalctl | grep -i warn
+
+3. Run. 
+sudo journalctl | grep -i fail
+
+4. Run. 
+sudo journalctl | grep -i error
+
+5. Run. 
+sudo journalctl | grep -i denied
+
+6. Run. 
+sudo journalctl | grep -i "ordering cycle"
+If you know what you are doing, feel free to disable this check. Create a file /etc/whonix.d/50_whonixcheck_user.conf and add: 
+whonixcheck_skip_functions+=" check_journal " 
+INFO: Whonix firewall systemd unit check Result: Ok. 
+INFO: Qubes qubes-db Test Result: Connection to local qubes-db daemon succeeded, ok. 
+INFO: Qubes Settings Test Result: Ok. (GATEWAY_IP: 127.0.0.1) 
+INFO: Qubes Settings Test Result: Ok, qubes_vm_type is ProxyVM. 
+INFO: Check Kernel Messages Test Result: Found nothing remarkable, ok. 
+INFO: check network interfaces Result: Ok. 
+INFO: Check whonixsetup Result: done, ok. 
+INFO: Check Package Manager Running Result: None running, ok. 
+INFO: Tor Check Result: "DisableNetwork 1" not active, ok. 
+INFO: Tor Config Check Result: Tor config ok. 
+INFO: Tor Pid Check Result: Pid 965 running., ok. 
+INFO: Control Port Filter Proxy Test Result: OK 
+INFO: check_anondate_do debugging information:
+
+tor_consensus_status : verified
+current_time_in_valid_range: true
+
+current_time_torish : 2020-12-30 13:31:16
+tor_consensus_valid_after : 2020-12-30 12:00:00
+tor_consensus_valid_until : 2020-12-30 15:00:00
+tor_consensus_middle_range : 2020-12-30 13:30:00
+
+tor_cert_lifetime_output : 
+tor_cert_lifetime_valid : true
+tor_cert_valid_after : 
+
+tor_consensus_user_permission : debian-tor
+tor_consensus_group_permission: debian-tor
+
+INFO: Tor SocksPort Reachability Test Result: Reachable. (curl exit code: 22 | curl status message: [22] - [HTTP page not retrieved. The requested url was not found or returned another error with the HTTP error code being 400 or above. This return code only appears if -f, --fail is used.]) 
+ERROR: Time Synchronization Result: 
+Whonixcheck gave up waiting. 
+
+Time synchronization status: pending 
+sdwdate reports: Initial time fetching in progress... 
+whonix_firewall status: first run after boot 
+
+Possible issues: 
+- sdwdate will need a few more moments for fetching the time. 
+- sdwdate time sources might be dysfunctional. 
+
+Recommendations: 
+
+A) Rerun whonixcheck: 
+dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; Whonix Check
+or in Terminal: whonixcheck 
+or more verbose in Terminal: whonixcheck --verbose --gui --cli 
+
+B) Restart sdwdate. 
+dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; sdwdate-gui -&gt; right click on sdwdate-gui systray -&gt; Restart sdwdate
+or in Terminal: sudo service sdwdate restart 
+
+C) Manually set the time. 
+
+As last resort... 
+
+1. Open a terminal. (dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; Terminal) 
+2. Use the manual clock setting tool. 
+sudo --set-home clock-random-manual-gui
+3. Simulate sdwdate success. 
+</code></pre>
+<p>CLI:</p>
+<pre><code>root@host:~# whonixcheck --verbose --gui --cli
+[INFO] [whonixcheck] whonix-ws | Whonix-Gateway | whonix-gw-15 TemplateBased ProxyVM | Wed 30 Dec 2020 01:31:13 PM UTC
+[INFO] [whonixcheck] Input Detection: INPUT_AUTO=false CLI=true GUI=true
+Manually set to --gui and --cli.
+[INFO] [whonixcheck] Root Check Result: Ok, not running as root.
+[INFO] [whonixcheck] Pin torproject.org certificate: disabled.
+[INFO] [whonixcheck] Check sudo Result: OK
+[INFO] [whonixcheck] whonix_build_version: 3:3.4-1
+[INFO] [whonixcheck] whonix-gateway-packages-dependencies-cli: 20.3-1
+[INFO] [whonixcheck] /etc/whonix_version: 15
+[INFO] [whonixcheck] Spectre Meltdown Test: skipping since spectre_meltdown_check=false, ok.
+[INFO] [whonixcheck] systemd journal check Result:
+warnings:
+########################################
+
+########################################
+
+failed:
+########################################
+
+########################################
+
+errors:
+########################################
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 00, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 01, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 03, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 04, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 05, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 06, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 07, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: Error: Driver 'pcspkr' is already registered, aborting...
+########################################
+
+denied:
+########################################
+
+########################################
+
+ordering cycle:
+########################################
+
+########################################
+
+To see this for yourself...
+1. Open a terminal. (dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws-&gt; Terminal)
+2. Run. sudo journalctl | grep -i warn
+3. Run. sudo journalctl | grep -i fail
+4. Run. sudo journalctl | grep -i error
+5. Run. sudo journalctl | grep -i denied
+6. Run. sudo journalctl | grep -i "ordering cycle"
+
+If you know what you are doing, feel free to disable this check.
+Create a file /etc/whonix.d/50_whonixcheck_user.conf and add:
+whonixcheck_skip_functions+=" check_journal "
+[INFO] [whonixcheck] Whonix firewall systemd unit check Result: Ok.
+[INFO] [whonixcheck] Qubes qubes-db Test Result: Connection to local qubes-db daemon succeeded, ok.
+[INFO] [whonixcheck] Qubes Settings Test Result: Ok. (GATEWAY_IP: 127.0.0.1)
+[INFO] [whonixcheck] Qubes Settings Test Result: Ok, qubes_vm_type is ProxyVM.
+[INFO] [whonixcheck] Check Kernel Messages Test Result: Found nothing remarkable, ok.
+[INFO] [whonixcheck] check network interfaces Result: Ok.
+[INFO] [whonixcheck] Check whonixsetup Result: done, ok.
+[INFO] [whonixcheck] Check Package Manager Running Result: None running, ok.
+[INFO] [whonixcheck] Tor Check Result: "DisableNetwork 1" not active, ok.
+[INFO] [whonixcheck] Tor Config Check Result: Tor config ok.
+[INFO] [whonixcheck] Tor Pid Check Result: Pid 965 running., ok.
+[INFO] [whonixcheck] Control Port Filter Proxy Test Result: OK
+[INFO] [whonixcheck] check_anondate_do debugging information:
+
+tor_consensus_status       : verified
+current_time_in_valid_range: true
+
+current_time_torish        : 2020-12-30 13:31:16
+tor_consensus_valid_after  : 2020-12-30 12:00:00
+tor_consensus_valid_until  : 2020-12-30 15:00:00
+tor_consensus_middle_range : 2020-12-30 13:30:00
+
+tor_cert_lifetime_output   : 
+tor_cert_lifetime_valid    : true
+tor_cert_valid_after       : 
+
+tor_consensus_user_permission : debian-tor
+tor_consensus_group_permission: debian-tor
+[INFO] [whonixcheck] Tor SocksPort Reachability Test Result: Reachable. (curl exit code: 22 | curl status message: [22] - [HTTP page not retrieved. The requested url was not found or returned another error with the HTTP error code being 400 or above. This return code only appears if -f, --fail is used.])
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 0 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 2 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 4 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 6 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 8 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 10 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 12 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 14 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 16 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 18 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 20 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 22 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 24 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 26 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 28 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 30 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 32 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 34 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 36 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 38 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 40 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 42 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 44 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 46 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 48 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 50 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 52 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 54 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 56 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 58 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 60 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 62 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 64 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 66 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: General Timeout Error. Internet connection might be down. Sleeping for 0.2 minutes.
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 68 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: General Timeout Error. Internet connection might be down. Sleeping for 0.2 minutes.
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 70 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: General Timeout Error. Internet connection might be down. Sleeping for 0.2 minutes.
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 72 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: General Timeout Error. Internet connection might be down. Sleeping for 0.2 minutes.
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 74 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: General Timeout Error. Internet connection might be down. Sleeping for 0.2 minutes.
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 76 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 78 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 80 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 82 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 84 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 86 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 88 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 90 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 92 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 94 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 96 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 98 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 100 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 102 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 104 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 106 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 108 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 110 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 112 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 114 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 116 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 118 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 120 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 122 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 124 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 126 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 128 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 130 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 132 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 134 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 136 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 138 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 140 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 142 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 144 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 146 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[INFO] [whonixcheck] Tor Connection Result:
+- Connecting for 148 seconds. | 100 % done. 
+- Tor Circuit: established.
+- Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+- Timesync status: not done.
+- sdwdate reports: Initial time fetching in progress...
+[ERROR] [whonixcheck] Time Synchronization Result:
+Whonixcheck gave up waiting.
+
+Time synchronization status: pending
+sdwdate reports: Initial time fetching in progress...
+whonix_firewall status: first run after boot
+
+Possible issues:
+- sdwdate will need a few more moments for fetching the time.
+- sdwdate time sources might be dysfunctional.
+
+Recommendations:
+
+A) Rerun whonixcheck:
+dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; Whonix Check
+or in Terminal: whonixcheck
+or more verbose in Terminal: whonixcheck --verbose --gui --cli
+
+B) Restart sdwdate.
+dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; sdwdate-gui -&gt; right click on sdwdate-gui systray -&gt; Restart sdwdate
+or in Terminal: sudo service sdwdate restart
+
+C) Manually set the time.
+
+As last resort...
+
+1. Open a terminal. (dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; Terminal)
+2. Use the manual clock setting tool. sudo --set-home clock-random-manual-gui
+3. Simulate sdwdate success. sudo touch /run/sdwdate/first_success
+4. Rerun whonixcheck.
+</code></pre>
+<p>sudo journalctl | grep -i error</p>
+<pre><code>root@host:~# sudo journalctl | grep -i error
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 00, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 01, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 03, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 04, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 05, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 06, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: ACPI Error: No handler or method for GPE 07, disabling event (20190816/evgpe-841)
+Dec 30 13:14:26 host kernel: RAS: Correctable Errors collector initialized.
+Dec 30 13:14:26 host kernel: Error: Driver 'pcspkr' is already registered, aborting...
+Dec 30 13:14:30 host xl[741]: libxl: error: libxl_utils.c:818:libxl_cpu_bitmap_alloc: failed to retrieve the maximum number of cpus
+Dec 30 13:14:30 host xl[741]: libxl: error: libxl_utils.c:818:libxl_cpu_bitmap_alloc: failed to retrieve the maximum number of cpus
+Dec 30 13:17:33 host qubes.VMShell-dom0[1517]: (xfce4-terminal:1519): dbind-WARNING **: 13:17:33.154: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+Dec 30 13:19:12 host sdwdate[982]: 2020-12-30 13:19:12 - sdwdate - INFO - retry_on_error_counter: 0
+Dec 30 13:21:43 host sdwdate[982]: 2020-12-30 13:21:43 - sdwdate - INFO - retry_on_error_counter: 1
+Dec 30 13:21:43 host sdwdate[982]: 2020-12-30 13:21:43 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.0 minutes.
+Dec 30 13:22:05 host qubes.StartApp+xfce4-terminal-dom0[17019]: (xfce4-terminal:17029): dbind-WARNING **: 13:22:05.995: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+Dec 30 13:22:15 host qubes.VMShell-dom0[17081]: (xfce4-terminal:17082): dbind-WARNING **: 13:22:15.433: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+Dec 30 13:24:50 host sdwdate[17101]: 2020-12-30 13:24:50 - sdwdate - INFO - retry_on_error_counter: 0
+Dec 30 13:24:50 host sdwdate[17101]: 2020-12-30 13:24:50 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.0 minutes.
+Dec 30 13:27:20 host sdwdate[17101]: 2020-12-30 13:27:20 - sdwdate - INFO - retry_on_error_counter: 1
+Dec 30 13:27:20 host sdwdate[17101]: 2020-12-30 13:27:20 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.0 minutes.
+Dec 30 13:29:52 host sdwdate[17101]: 2020-12-30 13:29:52 - sdwdate - INFO - retry_on_error_counter: 2
+Dec 30 13:29:52 host sdwdate[17101]: 2020-12-30 13:29:52 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.13333333333333333 minutes.
+Dec 30 13:31:08 host qubes.VMShell-dom0[26945]: (xfce4-terminal:26946): dbind-WARNING **: 13:31:08.728: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files
+Dec 30 13:32:31 host sdwdate[17101]: 2020-12-30 13:32:31 - sdwdate - INFO - retry_on_error_counter: 3
+Dec 30 13:32:31 host sdwdate[17101]: 2020-12-30 13:32:31 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.2 minutes.
+Dec 30 13:35:14 host sdwdate[17101]: 2020-12-30 13:35:14 - sdwdate - INFO - retry_on_error_counter: 4
+Dec 30 13:35:14 host sdwdate[17101]: 2020-12-30 13:35:14 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.38333333333333336 minutes.
+Dec 30 13:38:08 host sdwdate[17101]: 2020-12-30 13:38:08 - sdwdate - INFO - * value: b'connect error: Socket error: 0x04: Host unreachable'
+Dec 30 13:38:08 host sdwdate[17101]: 2020-12-30 13:38:08 - sdwdate - INFO - retry_on_error_counter: 5
+Dec 30 13:40:45 host sdwdate[17101]: 2020-12-30 13:40:45 - sdwdate - INFO - retry_on_error_counter: 6
+Dec 30 13:40:45 host sdwdate[17101]: 2020-12-30 13:40:45 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.43333333333333335 minutes.
+Dec 30 13:43:43 host sdwdate[17101]: 2020-12-30 13:43:43 - sdwdate - INFO - retry_on_error_counter: 7
+Dec 30 13:43:43 host sdwdate[17101]: 2020-12-30 13:43:43 - sdwdate - INFO - General Timeout Error. Internet connection might be down. Sleeping for 0.26666666666666666 minutes.
+</code></pre>
+<p>What solves it only using the last solution mentioned in Whonixcheck:</p>
+<pre><code>C) Manually set the time.
+
+As last resort...
+
+1. Open a terminal. (dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-ws -&gt; Terminal)
+2. Use the manual clock setting tool. sudo --set-home clock-random-manual-gui
+3. Simulate sdwdate success. sudo touch /run/sdwdate/first_success
+4. Rerun whonixcheck.
+</code></pre>
+<p>So wonder what is causing it to fail eternally sometimes.</p>
+          <p><a href="http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927/1</link>
+        <pubDate>Wed, 30 Dec 2020 13:47:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10927-1</guid>
+        <source url="http://forums.whonix.org/t/eternal-sdwdate-time-fetching-not-always/10927.rss">Eternal sdwdate time fetching (not always)</source>
+      </item>
+  </channel>
+</rss>

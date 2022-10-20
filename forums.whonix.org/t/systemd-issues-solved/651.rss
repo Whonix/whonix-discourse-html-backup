@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Systemd issues [SOLVED]</title>
+    <link>http://forums.whonix.org/t/systemd-issues-solved/651</link>
+    <description>There are some difficult issues with the needed port to systemd for Debian jessie.
+
+[hr]
+
+https://github.com/Whonix/whonix-initializer is supposed to only be started when the system boots up. No issue with redistributable images here. It does first run initialization on first boot and then won&#39;t ever start again, because a done file will be created. For other kinds of future install methods this is not so nice. Because when it was installed by apt-get, the service would run in background and then suddenly force restart the system, which would be very surprising and not very nice. Therefore with sysvinit it was simple. /usr/lib/first_run_initializer_gui checked if the DPKG_MAINTSCRIPT_PACKAGE environment variable was set and exits if yes. The problem here is, that systemd does not preserve the environment. (Environment= or EnvironmentFile= are not help here.)
+
+Asked on stackexchange if env vars can be preserved:
+https://unix.stackexchange.com/questions/166450/preserve-environment-variables-using-systemd
+
+Other implementation option... Can systemd tell somehow the script if it was called as part system boot up or other case?
+
+[hr]
+
+Systemd does not support custom actions?
+
+That would be a bit troublesome. Would require some refactoring in sdwdate then. No idea how to deal with that yet. I&#39;ll explain what custom action it supports at the moment.
+
+/etc/init.d/sdwdate restartnd - the &quot;nd&quot; stands for &quot;no dispatch&quot;. It passes options to not dispatch gui notifications when running for the first iteration. This is useful for timesync. Because timesync restarts sdwdate using restartnd, because timesync works as a monitor that starts its own gui.
+
+/etc/init.d/sdwdate force-reload - it deletes the first success file. Sdwdate acts differently depending on if it started up for the very first time. Then it does clock jumps using date. But if it globally succeeded at least once, it gradually adjusts the clock using sclockadj. For enforcing clock jumps (what it does when run by timesync) the force-reload option is used.
+
+/etc/init.d/sdwdate restartndclean - a combination of both.
+
+[hr]
+
+https://github.com/Whonix/Whonix/issues/292 - probably not that hard, but help welcome.
+
+[hr]
+
+Related to above. When using [i]StandardInput=tty[/i] then [i]sudo systemctl restart servicename[/i] no longer works. This is a problem, because dpkg maintainer scripts automatically run a similar command ([i]invoke-rc.d[/i]) and it would hang forever during upgrades. (When aborting, ending up with fixable package system.) So this also needs some conditional case ignoring the restart action then.
+
+[hr]
+
+Porting Whonix&#39;s sysvinit files to systemd. Probably not that hard either, but also help welcome.</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 23 May 2015 16:35:35 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/systemd-issues-solved/651.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>All solved / implemented.</p>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/13</link>
+        <pubDate>Sat, 23 May 2015 16:35:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-13</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>ticket:<br>
+<a href="https://phabricator.whonix.org/T106" class="onebox" target="_blank">https://phabricator.whonix.org/T106</a></p>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/12</link>
+        <pubDate>Thu, 22 Jan 2015 22:25:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-12</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>How to implement policy conform systemd custom actions on Debian?<br>
+</p><aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://unix.stackexchange.com/questions/169286/how-to-implement-policy-conform-systemd-custom-actions-on-debian" target="_blank">unix.stackexchange.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://unix.stackexchange.com/users/49297/adrelanos" target="_blank">
+    <img alt="adrelanos" src="https://www.gravatar.com/avatar/83f6805262f0dcc117814487c5b2d1c4?s=128&amp;d=identicon&amp;r=PG" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://unix.stackexchange.com/questions/169286/how-to-implement-policy-conform-systemd-custom-actions-on-debian" target="_blank">How to implement policy conform systemd custom actions on Debian?</a>
+</h4>
+
+<div class="tags">
+  <strong>debian, systemd, deb</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://unix.stackexchange.com/users/49297/adrelanos" target="_blank">
+    adrelanos
+  </a>
+  on <a href="https://unix.stackexchange.com/questions/169286/how-to-implement-policy-conform-systemd-custom-actions-on-debian" target="_blank">06:10PM - 21 Nov 14 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/11</link>
+        <pubDate>Fri, 21 Nov 2014 18:10:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-11</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:9, topic:651”][quote author=nrgaway link=topic=707.msg5311#msg5311 date=1415328914]</p>
+<aside class="quote">
+<blockquote>
+<p>Interesting idea about multiple unit files for sdwdate! I don’t know if that would be Debian policy conform, though. (At some point getting it into official Debian repo would be nice.)</p>
+</blockquote>
+</aside>
+<p>It looks like many package are doing that; guess you better look into it though.<br>
+[/quote]<br>
+Know any examples that would be close to this use case?</p>
+<p><a href="https://packages.debian.org/search?searchon=contents&amp;keywords=.service&amp;mode=path&amp;suite=testing&amp;arch=any%5B/quote%5D" class="onebox" target="_blank" rel="nofollow noopener">https://packages.debian.org/search?searchon=contents&amp;keywords=.service&amp;mode=path&amp;suite=testing&amp;arch=any[/quote]</a></p>
+<p>The one that comes to mind is lirc.  They seems to use 2 systemd service files on Fedora.  Looks like not many packages have been converted over to Debian yet, so maybe look at some fedora examples.  Here is the rpm spec file for lirc <a href="http://pkgs.fedoraproject.org/cgit/lirc.git/tree/lirc.spec#n230" data-bbcode="true" rel="nofollow noopener">http://pkgs.fedoraproject.org/cgit/lirc.git/tree/lirc.spec#n230</a>.  Looks like they still using sysvinit on Debian.</p>
+<p>Looks like environments are also supported.<br>
+<a href="http://www.freedesktop.org/software/systemd/man/systemd.service.html" data-bbcode="true" rel="nofollow noopener">http://www.freedesktop.org/software/systemd/man/systemd.service.html</a><br>
+<a href="http://www.freedesktop.org/software/systemd/man/systemd.unit.html" data-bbcode="true" rel="nofollow noopener">http://www.freedesktop.org/software/systemd/man/systemd.unit.html</a></p>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/10</link>
+        <pubDate>Fri, 07 Nov 2014 09:33:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-10</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“nrgaway, post:6, topic:651”][quote author=Patrick link=topic=707.msg5302#msg5302 date=1415303866]<br>
+Interesting idea about multiple unit files for sdwdate! I don’t know if that would be Debian policy conform, though. (At some point getting it into official Debian repo would be nice.)<br>
+[/quote]</p>
+<p>It looks like many package are doing that; guess you better look into it though.[/quote]<br>
+Know any examples that would be close to this use case?</p>
+<p><a href="https://packages.debian.org/search?searchon=contents&amp;keywords=.service&amp;mode=path&amp;suite=testing&amp;arch=any" class="onebox" target="_blank">https://packages.debian.org/search?searchon=contents&amp;keywords=.service&amp;mode=path&amp;suite=testing&amp;arch=any</a></p>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/9</link>
+        <pubDate>Fri, 07 Nov 2014 08:39:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-9</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:7, topic:651”][quote author=nrgaway link=topic=707.msg5310#msg5310 date=1415328418]<br>
+Why not just go the other way around then… When you do the initial installation place a file somewhere and when initialization is complete, delete it.  I like this better anyway since less littering of file system and for my purposes in Qubes, one less file to link <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"><br>
+[/quote]<br>
+Yeah, good idea. The cleanup chroot script can create that todo file. Thereby making run of whonix-initializer opt-in rather than opt-out. A much cleaner approach generally. Will work on that.[/quote]<br>
+Implemented:<br>
+</p><aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonix-initializer/commit/63f7921eab2a367fa6da0e8105dc124de4d177bb" target="_blank">github.com/Whonix/whonix-initializer</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/whonix-initializer/commit/63f7921eab2a367fa6da0e8105dc124de4d177bb" target="_blank">Refactored implementation for later systemd support. The run of Whonix First Run Initializer (not the verifiable builds option yet) is now opt-in rather than opt-out. Unless the verifiable builds option is disabled when using the build script, a todo file will be created during the cleanup chroot script. When Whonix First Run Initializer later runs, it only proceeds if the todo file  exists. Thanks to nrgaway for the suggestion ( https://www.whonix.org/forum/index.php/topic,707.msg5310.html#msg5310 ).</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2014-11-07" data-time="08:16:06" data-timezone="UTC">08:16AM - 07 Nov 14 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 2 files with 21 additions and 1 deletions">
+        <a href="https://github.com/Whonix/whonix-initializer/commit/63f7921eab2a367fa6da0e8105dc124de4d177bb" target="_blank">
+          <span class="added">+21</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+Not yet tested.<p></p>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/8</link>
+        <pubDate>Fri, 07 Nov 2014 08:20:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-8</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="5" data-topic="651">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"> nrgaway:</div>
+<blockquote>
+<p>Why not just go the other way around then… When you do the initial installation place a file somewhere and when initialization is complete, delete it.  I like this better anyway since less littering of file system and for my purposes in Qubes, one less file to link <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+</blockquote>
+</aside>
+<p>Yeah, good idea. The cleanup chroot script can create that todo file. Thereby making run of whonix-initializer opt-in rather than opt-out. A much cleaner approach generally. Will work on that.</p>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/7</link>
+        <pubDate>Fri, 07 Nov 2014 07:58:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-7</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="4" data-topic="651">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Interesting idea about multiple unit files for sdwdate! I don’t know if that would be Debian policy conform, though. (At some point getting it into official Debian repo would be nice.)</p>
+</blockquote>
+</aside>
+<p>It looks like many package are doing that; guess you better look into it though.</p>
+<p>I just split my setup script that was being called by udev into 3 separate systemd units since one of the qubes modules was enabling ip  forwarding.</p>
+<p>I am able to make sure it runs after that service now so I can disable it. Now the 3 units are:</p>
+<p>[ul][li]network setup (add the actual eth1 interface)[/li]<br>
+[li]housekeeping including search and replace IP’s[/li]<br>
+[li]bring firewall up[/li][/ul]</p>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/6</link>
+        <pubDate>Fri, 07 Nov 2014 02:55:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-6</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="4" data-topic="651">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>About Whonix Initializer, image someone runs “sudo apt-get install whonix-workstation”. As part of it, also whonix-initializer gets installed. /root/.whonix/first_run_initializer.done does not exist at that time. So systemd would run it. But at the end of whonix-initializer, whonix-initializer would restart the system, which is unwanted. So whonix-initializer needs some way to know if it was run by apt-get/dpkg or during system startup (where reboot would be appropriate).</p>
+</blockquote>
+</aside>
+<p>Why not just go the other way around then… When you do the initial installation place a file somewhere and when initialization is complete, delete it.  I like this better anyway since less littering of file system and for my purposes in Qubes, one less file to link <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/5</link>
+        <pubDate>Fri, 07 Nov 2014 02:46:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-5</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Interesting idea about multiple unit files for sdwdate! I don’t know if that would be Debian policy conform, though. (At some point getting it into official Debian repo would be nice.)</p>
+<p>[hr]</p>
+<p>About Whonix Initializer, image someone runs “sudo apt-get install whonix-workstation”. As part of it, also whonix-initializer gets installed. /root/.whonix/first_run_initializer.done does not exist at that time. So systemd would run it. But at the end of whonix-initializer, whonix-initializer would restart the system, which is unwanted. So whonix-initializer needs some way to know if it was run by apt-get/dpkg or during system startup (where reboot would be appropriate).</p>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/4</link>
+        <pubDate>Thu, 06 Nov 2014 19:57:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-4</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:1, topic:651”]Systemd does not support custom actions?</p>
+<p>That would be a bit troublesome. Would require some refactoring in sdwdate then. No idea how to deal with that yet. I’ll explain what custom action it supports at the moment.</p>
+<p>/etc/init.d/sdwdate restartnd - the “nd” stands for “no dispatch”. It passes options to not dispatch gui notifications when running for the first iteration. This is useful for timesync. Because timesync restarts sdwdate using restartnd, because timesync works as a monitor that starts its own gui.</p>
+<p>/etc/init.d/sdwdate force-reload - it deletes the first success file. Sdwdate acts differently depending on if it started up for the very first time. Then it does clock jumps using date. But if it globally succeeded at least once, it gradually adjusts the clock using sclockadj. For enforcing clock jumps (what it does when run by timesync) the force-reload option is used.</p>
+<p>/etc/init.d/sdwdate restartndclean - a combination of both.[/quote]</p>
+<p>Sorry, I have to make this real quick since I need to leave in 5 minutes <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<p>You can break the sdwdate unit into multiple units; no need to just pile everything in one unit.  I will look at it further later.  I need to understand better how sdwdate works and I only had time to glance at this quickly</p>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/3</link>
+        <pubDate>Thu, 06 Nov 2014 19:46:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-3</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:1, topic:651”]There are some difficult issues with the needed port to systemd for Debian jessie.</p>
+<p>[hr]</p>
+<p><a href="https://github.com/Whonix/whonix-initializer" rel="nofollow noopener">https://github.com/Whonix/whonix-initializer</a> is supposed to only be started when the system boots up. No issue with redistributable images here. It does first run initialization on first boot and then won’t ever start again, because a done file will be created. For other kinds of future install methods this is not so nice. Because when it was installed by apt-get, the service would run in background and then suddenly force restart the system, which would be very surprising and not very nice. Therefore with sysvinit it was simple. /usr/lib/first_run_initializer_gui checked if the DPKG_MAINTSCRIPT_PACKAGE environment variable was set and exits if yes. The problem here is, that systemd does not preserve the environment. (Environment= or EnvironmentFile= are not help here.)[/quote]</p>
+<p>I listed an example below how to accomplish this.  Just check for the file that is created after it is run for the first time.  If the file does not exist, it is not run.  You could have another script run before this that will place a file in /var/run/whonix/initializer.done or just read from file system?  The oneshot means it runs, and then its done until next time system restarted.</p>
+<pre><code class="lang-auto">[Unit]
+Description=Whonix Initializer
+!ConditionPathExists=|/var/root/.whonix/initialization.done
+After=xxx.service
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/lib/whonix/pre-initializer
+ExecStartPre=/usr/lib/whonix/pre-initializer2
+ExecStart=/usr/lib/whonix/whonix-initializer
+StandardOutput=syslog
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/2</link>
+        <pubDate>Thu, 06 Nov 2014 19:42:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-2</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+      <item>
+        <title>Systemd issues [SOLVED]</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>There are some difficult issues with the needed port to systemd for Debian jessie.</p>
+<p>[hr]</p>
+<p><a href="https://github.com/Whonix/whonix-initializer">https://github.com/Whonix/whonix-initializer</a> is supposed to only be started when the system boots up. No issue with redistributable images here. It does first run initialization on first boot and then won’t ever start again, because a done file will be created. For other kinds of future install methods this is not so nice. Because when it was installed by apt-get, the service would run in background and then suddenly force restart the system, which would be very surprising and not very nice. Therefore with sysvinit it was simple. /usr/lib/first_run_initializer_gui checked if the DPKG_MAINTSCRIPT_PACKAGE environment variable was set and exits if yes. The problem here is, that systemd does not preserve the environment. (Environment= or EnvironmentFile= are not help here.)</p>
+<p>Asked on stackexchange if env vars can be preserved:<br>
+</p><aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://unix.stackexchange.com/questions/166450/preserve-environment-variables-using-systemd" target="_blank">unix.stackexchange.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://unix.stackexchange.com/users/49297/adrelanos" target="_blank">
+    <img alt="adrelanos" src="https://www.gravatar.com/avatar/83f6805262f0dcc117814487c5b2d1c4?s=128&amp;d=identicon&amp;r=PG" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://unix.stackexchange.com/questions/166450/preserve-environment-variables-using-systemd" target="_blank">Preserve environment variables using systemd?</a>
+</h4>
+
+<div class="tags">
+  <strong>environment-variables, systemd</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://unix.stackexchange.com/users/49297/adrelanos" target="_blank">
+    adrelanos
+  </a>
+  on <a href="https://unix.stackexchange.com/questions/166450/preserve-environment-variables-using-systemd" target="_blank">06:13PM - 06 Nov 14 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Other implementation option… Can systemd tell somehow the script if it was called as part system boot up or other case?</p>
+<p>[hr]</p>
+<p>Systemd does not support custom actions?</p>
+<p>That would be a bit troublesome. Would require some refactoring in sdwdate then. No idea how to deal with that yet. I’ll explain what custom action it supports at the moment.</p>
+<p>/etc/init.d/sdwdate restartnd - the “nd” stands for “no dispatch”. It passes options to not dispatch gui notifications when running for the first iteration. This is useful for timesync. Because timesync restarts sdwdate using restartnd, because timesync works as a monitor that starts its own gui.</p>
+<p>/etc/init.d/sdwdate force-reload - it deletes the first success file. Sdwdate acts differently depending on if it started up for the very first time. Then it does clock jumps using date. But if it globally succeeded at least once, it gradually adjusts the clock using sclockadj. For enforcing clock jumps (what it does when run by timesync) the force-reload option is used.</p>
+<p>/etc/init.d/sdwdate restartndclean - a combination of both.</p>
+<p>[hr]</p>
+<p><a href="https://github.com/Whonix/Whonix/issues/292">https://github.com/Whonix/Whonix/issues/292</a> - probably not that hard, but help welcome.</p>
+<p>[hr]</p>
+<p>Related to above. When using <span class="bbcode-i">StandardInput=tty</span> then <span class="bbcode-i">sudo systemctl restart servicename</span> no longer works. This is a problem, because dpkg maintainer scripts automatically run a similar command (<span class="bbcode-i">invoke-rc.d</span>) and it would hang forever during upgrades. (When aborting, ending up with fixable package system.) So this also needs some conditional case ignoring the restart action then.</p>
+<p>[hr]</p>
+<p>Porting Whonix’s sysvinit files to systemd. Probably not that hard either, but also help welcome.</p>
+          <p><a href="http://forums.whonix.org/t/systemd-issues-solved/651/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-issues-solved/651/1</link>
+        <pubDate>Thu, 06 Nov 2014 18:43:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-651-1</guid>
+        <source url="http://forums.whonix.org/t/systemd-issues-solved/651.rss">Systemd issues [SOLVED]</source>
+      </item>
+  </channel>
+</rss>

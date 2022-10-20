@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>VPN Before Tor on Whonix Gateway</title>
+    <link>http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216</link>
+    <description>Hi, i try setting on whonix gateway
+User -&gt; VPN -&gt; Tor -&gt; Internet
+Use this manual 
+https://www.whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor
+
+When i try connect to vpn, write:
+
+Sat Mar 12 16:16:16 2016 UDPv4 link remote: [AF_INET]116.16.166.16:53
+Sat Mar 12 16:16:16 2016 TLS Error: TLS key negotiation failed to occur within 60 seconds (check your network connectivity)
+Sat Mar 12 16:16:16 2016 TLS Error: TLS handshake failed
+
+ping with 116.16.166.16 okey.
+
+What is problem?</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 14 Mar 2016 00:45:08 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>VPN Before Tor on Whonix Gateway</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>I don’t think using Port 53 is an issue with Gateway.<br>
+Other commands for checking network in Gateway:<br>
+<code>sudo ifconfig</code><br>
+<code>sudo route -n</code><br>
+OpenVPN won’t alter iptables.</p>
+          <p><a href="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/7</link>
+        <pubDate>Mon, 14 Mar 2016 00:45:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2216-7</guid>
+        <source url="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216.rss">VPN Before Tor on Whonix Gateway</source>
+      </item>
+      <item>
+        <title>VPN Before Tor on Whonix Gateway</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="2216">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/l/8edcca/40.png" class="avatar"> lezibam:</div>
+<blockquote>
+<p>Sat Mar 12 16:16:16 2016 TLS Error: TLS key negotiation failed to occur within 60 seconds (check your network connectivity)</p>
+</blockquote>
+</aside>
+<p>This error (as it says) is usually a connectivity issue and not a problem with TLS configuration.</p>
+<p>I would be inclined to think that you configured the server yourself and perhaps didn’t allow for proper incoming traffic. But we can rule that out since you said that the VPN works successfully from your host. (You tested it just now I hope?)</p>
+<p>The config files look ok.</p>
+<p>(IIUC You should uncomment at least<br>
+<code>LOCAL_NET="\ 127.0.0.0-127.0.0.255 \ 10.152.152.0-10.152.152.255 \ "</code><br>
+This shouldn’t prevent you from connecting to VPN though.)</p>
+<p>The only thing I can think of now is to test network connectivity from your Gateway. <code>curl.anondist-orig</code> will bypass Tor so it’s safe to use even if you’re trying to hide Tor usage. <strong>This command returns your real IP - don’t post.</strong></p>
+<p>In a Gateway Terminal:<br>
+<code>curl.anondist-orig checkip.dyndns.org</code><br>
+(or if it’s safe to connect to <a href="http://torproject.org">torproject.org</a>, you can use:<br>
+<code>curl.anondist-orig -H 'Host: check.torproject.org' -k https://38.229.72.22 | grep IP</code>)</p>
+<p>(Since you edited 50_user, have you rebooted the Gateway or Reload Firewall?)</p>
+          <p><a href="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/6</link>
+        <pubDate>Mon, 14 Mar 2016 00:40:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2216-6</guid>
+        <source url="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216.rss">VPN Before Tor on Whonix Gateway</source>
+      </item>
+      <item>
+        <title>VPN Before Tor on Whonix Gateway</title>
+        <dc:creator><![CDATA[lezibam]]></dc:creator>
+        <description><![CDATA[
+            <ol>
+<li>yes use on virtualbox, clean whonix after import</li>
+<li>this vpn work on host machine with openvpn</li>
+<li>/etc/whonix_firewall.d/50_user:</li>
+</ol>
+<blockquote>
+<pre><code>## Make sure Tor always connects through the VPN.
+## Enable: 1
+## Disable: 0
+## DISABELD BY DEFAULT, because it requires a VPN provider.
+VPN_FIREWALL=1
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>## IP address of the VPN server.
+## Get the IP using: nslookup vpn-example-server.org
+## Example: seattle.vpn.riseup.net
+## Some providers provide multiple VPN servers.
+## You can enter multiple IP addresses, separated by spaces.
+VPN_SERVERS="116.16.166.16"
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>## For OpenVPN.
+VPN_INTERFACE=tun0
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>## Destinations you don not want routed through the VPN.
+## 10.0.2.2-10.0.2.24: VirtualBox DHCP
+# LOCAL_NET="\
+# 127.0.0.0-127.0.0.24 \
+# 192.168.0.0-192.168.0.24 \
+# 192.168.1.0-192.168.1.24 \
+# 10.152.152.0-10.1188.42.224.8652.152.24 \
+# 10.0.2.2-10.0.2.24 \
+# "
+</code></pre>
+</blockquote>
+<ol start="4">
+<li>vpn config :</li>
+</ol>
+<blockquote>
+<p>dev tun<br>
+proto udp<br>
+remote 116.16.166.16 53<br>
+cipher AES-128-CBC<br>
+auth SHA1<br>
+resolv-retry infinite<br>
+nobind<br>
+persist-key<br>
+persist-tun<br>
+client<br>
+verb 3<br>
+auth-user-pass</p>
+</blockquote>
+<pre><code> &lt;ca&gt;
+ -----BEGIN CERTIFICATE-----
+ MANYLATTERS
+ -----END CERTIFICATE-----
+ &lt;/ca&gt;</code></pre>
+          <p><a href="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/5</link>
+        <pubDate>Sun, 13 Mar 2016 08:12:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2216-5</guid>
+        <source url="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216.rss">VPN Before Tor on Whonix Gateway</source>
+      </item>
+      <item>
+        <title>VPN Before Tor on Whonix Gateway</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>In that situation, I believe you can also use <code>--verify-x509-name</code> to pass the authorized server name. Not sure how that compares in terms of security though. (I’ve used before with a lazy/lax provider.)</p>
+          <p><a href="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/4</link>
+        <pubDate>Sun, 13 Mar 2016 03:50:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2216-4</guid>
+        <source url="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216.rss">VPN Before Tor on Whonix Gateway</source>
+      </item>
+      <item>
+        <title>VPN Before Tor on Whonix Gateway</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Maybe ssl verification fails because it works with hostnames, not IPs. In that case - if supported by the provider - try using openvpn certificates rather than ssl verification.</p>
+          <p><a href="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/3</link>
+        <pubDate>Sat, 12 Mar 2016 23:47:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2216-3</guid>
+        <source url="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216.rss">VPN Before Tor on Whonix Gateway</source>
+      </item>
+      <item>
+        <title>VPN Before Tor on Whonix Gateway</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>Assuming VirtualBox platform, clean Whonix images, OpenVPN.</p>
+<p>3 possibilities come to mind:</p>
+<ol>
+<li>VPN is not configured correctly.</li>
+<li>Whonix Firewall (in Gateway) is not configured correctly.</li>
+<li>VPN IP or protocol is blocked by your ISP.</li>
+</ol>
+<p>To rule out <span class="hashtag">#1</span> &amp; <span class="hashtag">#3:</span> Have you used a VPN before (outside of Whonix)? Do you know how to configure OpenVPN .conf files? You can set it up in your host to test (without firewall, without Whonix).</p>
+<p>To rule out <span class="hashtag">#2:</span> Copy/paste contents of your <code>/etc/whonix_firewall.d/50_user</code> file. Redact anything private (shouldn’t be any).</p>
+<p>IP in your log geolocates to HK which is great (in terms of internet freedom) but it’s registered to China Telecom which is highly yucky. Probably safe to say that PRC is tapped in to every line in/out of HK but still, no better choices? (Is everything forced through a mainland provider?)</p>
+          <p><a href="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/2</link>
+        <pubDate>Sat, 12 Mar 2016 23:33:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2216-2</guid>
+        <source url="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216.rss">VPN Before Tor on Whonix Gateway</source>
+      </item>
+      <item>
+        <title>VPN Before Tor on Whonix Gateway</title>
+        <dc:creator><![CDATA[lezibam]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi, i try setting on whonix gateway<br>
+User -&gt; VPN -&gt; Tor -&gt; Internet<br>
+Use this manual<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/b/bb/City-427640640.jpg" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor" target="_blank" rel="nofollow noopener">Tunnels/Connecting to a VPN before Tor</a></h3>
+
+<p>Instructions on how to connect to a VPN before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet)</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>When i try connect to vpn, write:</p>
+<p>Sat Mar 12 16:16:16 2016 UDPv4 link remote: [AF_INET]116.16.166.16:53<br>
+Sat Mar 12 16:16:16 2016 TLS Error: TLS key negotiation failed to occur within 60 seconds (check your network connectivity)<br>
+Sat Mar 12 16:16:16 2016 TLS Error: TLS handshake failed</p>
+<p>ping with 116.16.166.16 okey.</p>
+<p>What is problem?</p>
+          <p><a href="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216/1</link>
+        <pubDate>Sat, 12 Mar 2016 18:23:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2216-1</guid>
+        <source url="http://forums.whonix.org/t/vpn-before-tor-on-whonix-gateway/2216.rss">VPN Before Tor on Whonix Gateway</source>
+      </item>
+  </channel>
+</rss>

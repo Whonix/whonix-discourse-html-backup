@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix Gateway Networking - How does it work?</title>
+    <link>http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555</link>
+    <description>I would like to better understand how the Whonix Gateway manages the networking. I could not find answers in the Wiki documentation or elsewhere. 
+
+So far, this is my understanding of the Gateway&#39;s network organisation (please corrrect me if I am wrong):
+
+The Gateway has two virtual network interfaces: eth0 and eth1.
+
+* eth0 &quot;gets&quot; the internet from the host machine via the default virtualbox virtual NAT adapter, therefore sudo ifconfig returns 10.0.2.15  as its IP address (default VirtualBox NAT settings)
+
+* eth1 is another virtualized interface running on the Gateway whose traffic is completly torrified and to which the Workstation (or any other VM) connects, hence the Workstation doesn&#39;t &quot;know&quot; the clearnet address of the Gateway. This network is known as an Internal Network named &quot;Whonix&quot; in the VirtualBox network settings.
+
+What I don&#39;t understand, is how exactly is this configured in the Gateway? The  /etc/network/interfaces.d/30_non-qubes-whonix file return a fairly simple configuration, with eth0 being inet dhcp (default Virtualbox setting), and the eth1 showing only  
+&gt;     iface eth1 inet static
+&gt;            address 10.152.152.10
+&gt;            netmask 255.255.192.0
+
+How does the Gateway act as a router? Does it run a dhcp server? How is the internal network configured? 
+
+I am asking to have a depper understanding of how Whonix work and also to be able to reproduce a similar setting as I like the idea of having a virtualized router for other VMs, even for clearnet activities.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 31 Dec 2017 01:11:44 +0000</lastBuildDate>
+    <category>VirtualBox</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix Gateway Networking - How does it work?</title>
+        <dc:creator><![CDATA[onion_knight]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for your answer. It makes more sense now.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/10</link>
+        <pubDate>Sun, 31 Dec 2017 01:11:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4555-10</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555.rss">Whonix Gateway Networking - How does it work?</source>
+      </item>
+      <item>
+        <title>Whonix Gateway Networking - How does it work?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>For socksified connections, you don’t need iptables rules at all.</p>
+<aside class="quote" data-post="8" data-topic="4555">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/o/f6c823/40.png" class="avatar"> onion_knight:</div>
+<blockquote>
+<p>How does the Whonix Gateway achieves this withouth IP forwarding? Is it Tor related?</p>
+</blockquote>
+</aside>
+<p>Tor related. Fortunately Tor can be configured to open a <code>DnsPort</code> and a <code>TransPort</code> listening port. Then you can use iptables to redirect traffic to these ports.</p>
+<p>See this short very chapter <code>Anonymizing Middlebox</code>:<br>
+<a href="https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#AnonymizingMiddlebox" class="onebox" target="_blank">https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#AnonymizingMiddlebox</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/9</link>
+        <pubDate>Tue, 26 Dec 2017 15:47:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4555-9</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555.rss">Whonix Gateway Networking - How does it work?</source>
+      </item>
+      <item>
+        <title>Whonix Gateway Networking - How does it work?</title>
+        <dc:creator><![CDATA[onion_knight]]></dc:creator>
+        <description><![CDATA[
+            <p>Merry Christmas!</p>
+<p>I know that this is a bit off-topic, but I think that it can be of interest for Whonix users. Feel free to close the topic if you think otherwise.</p>
+<p>So I have been playing around with iptables and VM networking and I was able to forward traffic from a proxy/gateway VM to another VM with this kind of rules:</p>
+<pre><code>sudo iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE
+sudo iptables -A FORWARD -i enp0s3 -o enp0s8 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i enp0s8 -o enp0s3 -j ACCEPT
+</code></pre>
+<p>For VPN configuration, I just replace “enp0s3” by “tun0”:</p>
+<pre><code>iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+iptables -A FORWARD -i tun0 -o enp0s8 -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i enp0s8 -o tun0 -j ACCEPT
+</code></pre>
+<p>However, this setting requires IP forwarding in order to work:</p>
+<p><code>echo 1 &gt; /proc/sys/net/ipv4/ip_forward</code></p>
+<p>How does the Whonix Gateway achieves this withouth IP forwarding? Is it Tor related? Or is there something else that I am missing?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/8</link>
+        <pubDate>Mon, 25 Dec 2017 22:58:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4555-8</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555.rss">Whonix Gateway Networking - How does it work?</source>
+      </item>
+      <item>
+        <title>Whonix Gateway Networking - How does it work?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>onion_knight:</p>
+<blockquote>
+<p>Thanks for the link, now I know how to link VMs through internal network and ping/ssh each other, but I still can’t figure out how to use iptables to forward the traffic from VM-Workstation (with only internal network attached) to VM-Gateway (with NAT and internal network attached). I guess it is more a general question about VMs and iptables forwarding, but I don’t see how exactly it is achieved in Whonix either.</p>
+</blockquote>
+<p>It’s all here.</p>
+<p><a href="https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy">https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy</a></p>
+<p><a href="https://github.com/Whonix/whonix-gw-firewall/blob/master/usr/bin/whonix_firewall">https://github.com/Whonix/whonix-gw-firewall/blob/master/usr/bin/whonix_firewall</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/7</link>
+        <pubDate>Sat, 25 Nov 2017 12:41:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4555-7</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555.rss">Whonix Gateway Networking - How does it work?</source>
+      </item>
+      <item>
+        <title>Whonix Gateway Networking - How does it work?</title>
+        <dc:creator><![CDATA[onion_knight]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for the link, now I know how to link VMs through internal network and ping/ssh each other, but I still can’t figure out how to use iptables to forward the traffic from VM-Workstation (with only internal network attached) to VM-Gateway (with NAT and internal network attached). I guess it is more a general question about VMs and iptables forwarding, but I don’t see how exactly it is achieved in Whonix either.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/6</link>
+        <pubDate>Sat, 25 Nov 2017 12:38:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4555-6</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555.rss">Whonix Gateway Networking - How does it work?</source>
+      </item>
+      <item>
+        <title>Whonix Gateway Networking - How does it work?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>onion_knight:</p>
+<blockquote>
+<p>Thanks for your answers, really appreciated. You’re right I need to learn more about Linux networking and iptables, but I’d also like to understand how on the  software side the two VMs connect to each other, where are the configuration files they look at to establish the connection on the Whonix internal network?</p>
+</blockquote>
+<p>Settings files: VirtualBox settings files.</p>
+<p>These are auto generated from command line during Whonix build:</p>
+<p><a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm">https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/5</link>
+        <pubDate>Sat, 25 Nov 2017 11:38:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4555-5</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555.rss">Whonix Gateway Networking - How does it work?</source>
+      </item>
+      <item>
+        <title>Whonix Gateway Networking - How does it work?</title>
+        <dc:creator><![CDATA[onion_knight]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for your answers, really appreciated. You’re right I need to learn more about Linux networking and iptables, but I’d also like to understand how on the  software side the two VMs connect to each other, where are the configuration files they look at to establish the connection on the Whonix internal network? How the Gateway and the Workstation “know” that eth1/eth0 correspond to the Whonix internal network?</p>
+<p>EDIT: I think I have figured it out. When creating an internal network, VMs automatically see it as a second eth network (enp0s8 in debian 9). I am now looking for information on Whonix iptables rulesests, but so far without much success…</p>
+<p>EDIT2: after a few hours of (very interesting read), I could not find a satisfying answer to my question: how do I reliably reproduce the WG/WW networking system and more generally speaking how to reliably forward traffic from one VM to another VM using iptables…</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/4</link>
+        <pubDate>Sat, 25 Nov 2017 08:06:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4555-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555.rss">Whonix Gateway Networking - How does it work?</source>
+      </item>
+      <item>
+        <title>Whonix Gateway Networking - How does it work?</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="4555">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/o/f6c823/40.png" class="avatar"> onion_knight:</div>
+<blockquote>
+<p>I am asking to have a depper understanding of how Whonix work and also to be able to reproduce a similar setting as I like the idea of having a virtualized router for other VMs, even for clearnet activities.</p>
+</blockquote>
+</aside>
+<p>Before you can understand how Whonix networking works, you need to have a basic understanding of Linux networking in general. Your first step should be to find a few basic tutorials on iptables and routes.</p>
+<p>Your goal is to understand the output (on Whonix-Gateway) of:</p>
+<pre><code class="lang-auto">sudo route -n
+sudo iptables -nvL -t nat
+sudo iptables -nvL
+</code></pre>
+<p>Then you’ll see that Whonix uses iptables redirection and not forwarding.</p>
+<p>Qubes OS is a great sandbox for testing virtual routers. You can also look at specialized distributions: <a href="https://en.wikipedia.org/wiki/List_of_router_and_firewall_distributions">https://en.wikipedia.org/wiki/List_of_router_and_firewall_distributions</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/3</link>
+        <pubDate>Fri, 24 Nov 2017 22:19:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4555-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555.rss">Whonix Gateway Networking - How does it work?</source>
+      </item>
+      <item>
+        <title>Whonix Gateway Networking - How does it work?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="4555">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/o/f6c823/40.png" class="avatar"> onion_knight:</div>
+<blockquote>
+<p>How does the Gateway act as a router?</p>
+</blockquote>
+</aside>
+<p>There is no IP forwarding.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://assets-cdn.github.com/favicon.ico" class="site-icon" width="32" height="32">
+      <a href="https://github.com/Whonix/ipv4-forward-disable" target="_blank" rel="nofollow noopener">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars3.githubusercontent.com/u/4500165?s=400&amp;v=4" class="thumbnail onebox-avatar" width="400" height="400">
+
+<h3><a href="https://github.com/Whonix/ipv4-forward-disable" target="_blank" rel="nofollow noopener">Whonix/ipv4-forward-disable</a></h3>
+
+<p>ipv4-forward-disable - Deactivates IPv4 forwarding using /etc/sysctl.d/ - As defense in depth to prevent leaks.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Tor is running on the gateway. It opens ports. The workstation can talk to these directly. (socksified)</p>
+<p>System default traffic from the workstation (non-socksified), called transparent proxying, is redirected by <code>whonix-gw-firewall</code> to Tor’s <code>DnsPort</code> and Tor’s <code>TransPort</code>.</p>
+<p>Whonix (previously called TorBOX) was based on <a href="https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#LocalRedirectionandAnonymizingMiddlebox">https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#LocalRedirectionandAnonymizingMiddlebox</a>. That’s how it all started.</p>
+<aside class="quote" data-post="1" data-topic="4555">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/o/f6c823/40.png" class="avatar"> onion_knight:</div>
+<blockquote>
+<p>Does it run a dhcp server</p>
+</blockquote>
+</aside>
+<p>No, static networking.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/2</link>
+        <pubDate>Fri, 24 Nov 2017 18:50:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4555-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555.rss">Whonix Gateway Networking - How does it work?</source>
+      </item>
+      <item>
+        <title>Whonix Gateway Networking - How does it work?</title>
+        <dc:creator><![CDATA[onion_knight]]></dc:creator>
+        <description><![CDATA[
+            <p>I would like to better understand how the Whonix Gateway manages the networking. I could not find answers in the Wiki documentation or elsewhere.</p>
+<p>So far, this is my understanding of the Gateway’s network organisation (please corrrect me if I am wrong):</p>
+<p>The Gateway has two virtual network interfaces: eth0 and eth1.</p>
+<ul>
+<li>
+<p>eth0 “gets” the internet from the host machine via the default virtualbox virtual NAT adapter, therefore sudo ifconfig returns 10.0.2.15  as its IP address (default VirtualBox NAT settings)</p>
+</li>
+<li>
+<p>eth1 is another virtualized interface running on the Gateway whose traffic is completly torrified and to which the Workstation (or any other VM) connects, hence the Workstation doesn’t “know” the clearnet address of the Gateway. This network is known as an Internal Network named “Whonix” in the VirtualBox network settings.</p>
+</li>
+</ul>
+<p>What I don’t understand, is how exactly is this configured in the Gateway? The  /etc/network/interfaces.d/30_non-qubes-whonix file return a fairly simple configuration, with eth0 being inet dhcp (default Virtualbox setting), and the eth1 showing only</p>
+<blockquote>
+<pre><code>iface eth1 inet static
+       address 10.152.152.10
+       netmask 255.255.192.0
+</code></pre>
+</blockquote>
+<p>How does the Gateway act as a router? Does it run a dhcp server? How is the internal network configured?</p>
+<p>I am asking to have a depper understanding of how Whonix work and also to be able to reproduce a similar setting as I like the idea of having a virtualized router for other VMs, even for clearnet activities.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555/1</link>
+        <pubDate>Fri, 24 Nov 2017 18:23:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4555-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-networking-how-does-it-work/4555.rss">Whonix Gateway Networking - How does it work?</source>
+      </item>
+  </channel>
+</rss>

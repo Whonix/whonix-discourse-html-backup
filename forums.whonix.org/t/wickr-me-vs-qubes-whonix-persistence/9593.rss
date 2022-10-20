@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Wickr Me vs Qubes-Whonix Persistence</title>
+    <link>http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593</link>
+    <description>Re: Wickr Me
+
+Instructions are fine for non-Qubes-Whonix. Not practical (correct) for Qubes-Whonix:
+
+1. snapd must be installed in (separate) whonix-ws-15 templateVM
+2. wickrme can&#39;t be installed in the templateVM with &quot;snap install wickrme&quot; (due to whatever restrictions Qubes puts on installations i.e. only from official repos or whatever). So, they have to run this in the AppVM, but that of course is not persistent.
+
+Not feasible for Qubes-Whonix user to install this in the AppVM everytime they want to run it. Not sure what is the best solution - maybe we just note it is &quot;non-Qubes-Whonix&quot; users only at the minute?</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 14 Jun 2020 16:34:45 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Wickr Me vs Qubes-Whonix Persistence</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Would be interesting to have snapd functional and documented independent from wickrme as snapd is getting increasingly popular. Related: <a href="https://forums.whonix.org/t/snap-store-snaps-snapd-snapcraft-io-a-new-software-source/7631" class="inline-onebox">Snap Store / snaps / snapd / snapcraft.io - a new software source?</a></p>
+<aside class="quote no-group" data-username="torjunkie" data-post="6" data-topic="9593">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<p>With option B, tried:</p>
+</blockquote>
+</aside>
+<p>These instructions are sound. bind-dirs is functional for the “simple” use case. (Manually leaving any files in folder /snap or /arbitrary-folder-name.)</p>
+<p>Problem might be snap itself uses <code>mount</code>. Also <code>bind-dirs</code> is based on <code>mount</code>.</p>
+<pre><code>mount | grep snap
+</code></pre>
+<p>This mount is by bind-dirs.</p>
+<blockquote>
+<p>/dev/xvdb on /snap type ext4 (rw,relatime,discard)</p>
+</blockquote>
+<p>This mount is by <code>snapd</code>:</p>
+<blockquote>
+<p>/var/lib/snapd/snaps/core18_1754.snap on /snap/core18/1754 type squashfs (ro,nodev,relatime,x-gdu.hide)</p>
+</blockquote>
+<p>Also <code>/var/lib/snapd</code> would need added to bind-dirs configuration.</p>
+<p>I’ve tested that but now running into another issue.</p>
+<blockquote>
+<p>internal error, please report: running “wickrme” failed: cannot find installed snap “wickrme” at revision 352: missing file /snap/wickrme/352/meta/snap.yaml</p>
+</blockquote>
+<p>It’s probably because snapd did not set up its mount because something Qubes TempalteBasedVMs / bind-dirs is doing is interfering. Didn’t investigate further due to lack of time. Could be reported as a Qubes bug to Qubes.</p>
+          <p><a href="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/7</link>
+        <pubDate>Sun, 14 Jun 2020 16:34:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9593-7</guid>
+        <source url="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593.rss">Wickr Me vs Qubes-Whonix Persistence</source>
+      </item>
+      <item>
+        <title>Wickr Me vs Qubes-Whonix Persistence</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>FYI - Option C doesn’t work:</p>
+<blockquote>
+<p>error: cannot install “wickrme”: Post<br>
+<a href="https://api.snapcraft.io/v2/snaps/refresh:">https://api.snapcraft.io/v2/snaps/refresh:</a> dial tcp: lookup<br>
+<a href="http://api.snapcraft.io">api.snapcraft.io</a> on 10.152.152.10:53: dial udp 10.152.152.10:53:<br>
+connect: network is unreachable</p>
+</blockquote>
+<p>With option B, tried:</p>
+<ol>
+<li>Clone whonix-ws-15 to whonix-ws-15-wickr</li>
+<li>In TemplateVM, install snapd - sudo apt install snapd</li>
+<li>Check there is a root snap folder (/snap) - there is</li>
+<li>Shutdown the whonix-ws-15-wickr TemplateVM</li>
+<li>Clone the anon-whonix AppVM to anon-whonix-wickr</li>
+<li>Set the TemplateVM for that AppVM to whonix-ws-15-wickr</li>
+<li>In the new AppVM, ensure folder /rw/config/qubes-bind-dirs.d exists - sudo mkdir -p /rw/config/qubes-bind-dirs.d</li>
+<li>In the AppVM, create a user.conf file with root rights - sudoedit /rw/config/qubes-bind-dirs.d/50_user.conf</li>
+<li>Append the necessary Wickr Me folder name to the binds variable. Add - binds+=( ‘/snap’ ) and save the file.</li>
+<li>Reboot the anon-whonix-wickr AppVM since then technically any sub-folders and files within /snap should persist across reboots.</li>
+<li>Install Wickr Me in the AppVM terminal - snap install wickrme</li>
+<li>Launch Wickr Me in the AppVM terminal - /snap/bin/wickrme - works</li>
+<li>Restart the Wickr Me AppVM and pray the thing still exists and will relaunch with the same terminal command.</li>
+</ol>
+<p>And… it doesn’t work. Only the README file exists in the /snap folder. (I note that when Wickr Me is installed it has files &amp; folders everywhere e.g. /sbin etc. But this is a proof of concept that bind-dirs won’t keep that root folder even, so something is up with the existing documentation.)</p>
+<p>Easy solution -&gt; I’ll note this as “Non-Qubes-Whonix” on the relevant wiki page <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"> Besides, Qubes-Whonix users have far more secure options available, so they need to develop good habits instead of relying on security theater like Wickr Me.</p>
+          <p><a href="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/6</link>
+        <pubDate>Sun, 14 Jun 2020 04:46:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9593-6</guid>
+        <source url="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593.rss">Wickr Me vs Qubes-Whonix Persistence</source>
+      </item>
+      <item>
+        <title>Wickr Me vs Qubes-Whonix Persistence</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="torjunkie" data-post="4" data-topic="9593">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<p>I thought this would work, but it doesn’t keep the root folder <code>/snap</code> persistent. So something is wrong with bind-dirs in Qubes presently, or their documentation is simply wrong.</p>
+</blockquote>
+</aside>
+<p>More likely documentation issue. bind-dirs is working. It’s what makes /var/lib/tor persistent in TemplateBased sys-whonix.</p>
+<p>The folder /snap might have to exist inside TemplateVM to be able to use bind-dirs. Dunno. Try?</p>
+<pre><code>sudo mkdir /snap
+</code></pre>
+<p>Shutdown TemplateVM. Restart TemplateBasedVM.</p>
+<p>Using bind-dirs might require existence of the folder in TempalteVM. Possibly a bug in bind-dirs.</p>
+<aside class="quote no-group" data-username="torjunkie" data-post="4" data-topic="9593">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<p>Hard to know what it necessary to bind i.e. would you have to add many multiples of sub-folders?</p>
+</blockquote>
+</aside>
+<p>No. Root folder (example here: <code>/snap</code>) alone will be enough. Works well for onion services inside /var/lib/tor when following Whonix /wiki/Onion_Services documentation which are stored in a sub folder under /var/lib/tor.</p>
+          <p><a href="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/5</link>
+        <pubDate>Sat, 13 Jun 2020 13:23:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9593-5</guid>
+        <source url="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593.rss">Wickr Me vs Qubes-Whonix Persistence</source>
+      </item>
+      <item>
+        <title>Wickr Me vs Qubes-Whonix Persistence</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>I thought this would work, but it doesn’t keep the root folder <code>/snap</code> persistent. So something is wrong with bind-dirs in Qubes presently, or their documentation is simply wrong.</p>
+<p>FYI - the root <code>/snap</code> folder has inside of it <code>/bin</code>, <code>/core18</code>, <code>/gtk-common-themes</code>, <code>/wickrme</code> and README, with a bunch of those having sub-folders.</p>
+<p>Hard to know what it necessary to bind i.e. would you have to add many multiples of sub-folders? (If so, a useless functionality.) Of if just having the bind-dirs for the root folder /snap is enough to cover off all files and sub-folders within it?</p>
+<p>See: <a href="https://github.com/QubesOS/qubes-issues/issues/5862">https://github.com/QubesOS/qubes-issues/issues/5862</a> here also. Any ideas? If not, your option C might be the only viable one.</p>
+<p>{{Box|text=<br>
+‘’‘1.’’’ Clone the <code>anon-whonix</code> AppVM.</p>
+<p>Create a standalone <code>anon-whonix-wickr</code> AppVM with Qubes Manager.</p>
+<p>‘’‘2.’’’ Create a Qubes [<a href="https://www.qubes-os.org/doc/bind-dirs/">https://www.qubes-os.org/doc/bind-dirs/</a> bind-dirs] folder for the Wickr Me application.</p>
+<p>In the new AppVM, ensure folder <code>/rw/config/qubes-bind-dirs.d</code> exists.</p>
+<p>{{CodeSelect|code=<br>
+sudo mkdir -p /rw/config/qubes-bind-dirs.d<br>
+}}</p>
+<p>‘’‘3.’’’ Create a <code>user.conf</code> file with root rights.</p>
+<p>{{CodeSelect|code=<br>
+sudoedit /rw/config/qubes-bind-dirs.d/50_user.conf<br>
+}}</p>
+<p>‘’‘4.’’’ Append the necessary Wickr Me folder name to the binds variable.</p>
+<p>Add.</p>
+<p>{{CodeSelect|code=<br>
+binds+=( ‘/snap’ )<br>
+}}</p>
+<p>‘’‘5.’’’ Save the file and reboot the <code>anon-whonix-wickr</code> AppVM.</p>
+<p>From now on any sub-folders and files within the folders above will persist across reboots.</p>
+<p>Note: It is possible to make make many files or folders persist, simply by making multiple entries in the <code>50_user.conf file</code>, each on a separate line. For example, if you added the file /etc/tor/torrc to the binds variable, any modifications to that file will persist across reboots.</p>
+<p>‘’‘6.’’’ Open a terminal.</p>
+<p>{{Open_a _product_ws_terminal}}</p>
+<p>‘’‘7.’’’ Install dependencies.</p>
+<p>{{Update}}</p>
+<p>{{CodeSelect|code=<br>
+sudo apt-get update<br>
+}}</p>
+<p>Install dependencies.</p>
+<p>{{CodeSelect|code=<br>
+sudo apt install snapd<br>
+}}</p>
+<p>‘’‘8.’’’ Reboot.</p>
+<p>A reboot is required so snap can add itself to the <code>PATH</code> environment variable. Otherwise, following installation it can be launched from the absolute path:</p>
+<p>{{CodeSelect|code=<br>
+/snap/bin/wickrme<br>
+}}<br>
+</p>
+<p>‘’‘9.’’’ Install Wickr Me.</p>
+<p>{{CodeSelect|code=<br>
+snap install wickrme<br>
+}}</p>
+<p>The installation process is now complete.<br>
+}}</p>
+          <p><a href="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/4</link>
+        <pubDate>Sat, 13 Jun 2020 05:38:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9593-4</guid>
+        <source url="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593.rss">Wickr Me vs Qubes-Whonix Persistence</source>
+      </item>
+      <item>
+        <title>Wickr Me vs Qubes-Whonix Persistence</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>Those bind-dir instructions over on Qubes don’t look too difficult? (famous last words <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"> )</p>
+          <p><a href="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/3</link>
+        <pubDate>Wed, 27 May 2020 11:38:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9593-3</guid>
+        <source url="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593.rss">Wickr Me vs Qubes-Whonix Persistence</source>
+      </item>
+      <item>
+        <title>Wickr Me vs Qubes-Whonix Persistence</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I see three options.</p>
+<p>A) <a href="https://www.whonix.org/wiki/Install_Software#Install_Software_in_a_TemplateBasedVM">Install Software in a TemplateBasedVM</a> is one way.</p>
+<p>B) Another way would be adding folder <code>/snap</code> to <a href="https://www.qubes-os.org/doc/bind-dirs/">bind-dirs</a>.</p>
+<p>C) Make use of snap proxy settings. Use snap to install Wickr Me in Qubes TemplateVM by setting the Qubes updates proxy. (Least secure - unless using a dedicated, separate TemplateVM.)</p>
+<pre><code>http_proxy=http://127.0.0.1:8082 snap install wickrme
+</code></pre>
+<p>A and B are untested but I speculate it has a good chance that would work.</p>
+<p>Anyone feel free to test this. As for wiki, perhaps just add a comment and link to this forum thread.</p>
+<hr>
+<p>This is known to work in Qubes:</p>
+<pre><code>curl --proxy http://127.0.0.1:8082/ --tlsv1.2 --proto =https --max-time 180 --output ~/patrick.asc https://www.whonix.org/patrick.asc</code></pre>
+          <p><a href="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/2</link>
+        <pubDate>Sun, 24 May 2020 10:27:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9593-2</guid>
+        <source url="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593.rss">Wickr Me vs Qubes-Whonix Persistence</source>
+      </item>
+      <item>
+        <title>Wickr Me vs Qubes-Whonix Persistence</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>Re: Wickr Me</p>
+<p>Instructions are fine for non-Qubes-Whonix. Not practical (correct) for Qubes-Whonix:</p>
+<ol>
+<li>snapd must be installed in (separate) whonix-ws-15 templateVM</li>
+<li>wickrme can’t be installed in the templateVM with “snap install wickrme” (due to whatever restrictions Qubes puts on installations i.e. only from official repos or whatever). So, they have to run this in the AppVM, but that of course is not persistent.</li>
+</ol>
+<p>Not feasible for Qubes-Whonix user to install this in the AppVM everytime they want to run it. Not sure what is the best solution - maybe we just note it is “non-Qubes-Whonix” users only at the minute?</p>
+          <p><a href="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593/1</link>
+        <pubDate>Sun, 24 May 2020 02:31:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9593-1</guid>
+        <source url="http://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593.rss">Wickr Me vs Qubes-Whonix Persistence</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Cooperating Multi-Tor Implementation to avoid Guard Duplication</title>
+    <link>http://forums.whonix.org/t/cooperating-multi-tor-implementation-to-avoid-guard-duplication/6126</link>
+    <description>**Why?**
+
+Summary: It&#39;s safer to partition activities under different Guard nodes than sticking everything under one guard for a long time in case it&#39;s malicious. More details on the wiki incoming.
+
+
+**Tor inter-VM communication**
+
+Implementation outline:
+
+Each Tor runs in it&#39;s own VM and is knwledgeable about the state of the other and avoids using the same guards.
+
+For KVM: Add ivshmem-doorbell device to all gateways. Disable apparmor for gateways VMs to allow communication. Mount and access devices under /dev/. Symlink Tor config on shmem device. Use inotify to copy over new Tor state file when it detects that it&#39;s modified. Taking into account other copies of state files there - a diff operation is run, removing dupe guard entries from either state file which is then detected by inotify and written back to the Tor of one of the VMs.
+
+
+PROS:
+
+*Straightforward multi-Tor setup with easy isolation.
+
+
+CONS:
+
+*KVM specific though can have analogue config in Xen. VBox probably not supported.
+
+*Needs fiddling around on host to disable Apparmor isolated between GWs.
+
+*Complex and uses more resources.
+
+*Race condition would need to be resolved for when dupe entries are detected.
+
+
+Links:
+
+https://libvirt.org/formatdomain.html#elementsShmem
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg03365.html
+
+https://stackoverflow.com/questions/38799366/using-ivshmem-with-libvirt-virt-manager
+
+https://unix.stackexchange.com/questions/188536/how-to-make-a-temporary-file-in-ram
+
+
+***
+
+**One Gateway - Multiple Tors**
+
+Implementation outline:
+Possible with and without namespaces. Spawning different Tors (under different users that are bound to separate NICs) so each instance can use identical port numbers. Internal networks would be different and use one of its own NICs created on the GW.
+
+A simpler variant of Rusty Bird&#39;s Corridor can then be implemented - Modified to monitor and block duplicate Guard connections as opposed to non Tor connections. Additionally it can trigger a corrective action that resets the state of one of the Tors in question.
+
+PROS:
+*Implementation much simpler especially how to resolve dupe guard conflicts. Already based on familiar concepts we use.
+
+*Virtualization platform independent since everything we need is self contained.
+
+*More resource efficient than spawning more VMs.
+
+
+CONS:
+*Theoretically each Tor is not as isolated as the multi-VM approach, but it&#39;s not a deal-breaker if instances are spawned properly and their network resources are partitioned. Also since the GW is part of the TCB it shouldn&#39;t be concerning. Setting CPU/RAM/Entropy limits per process should take care of any potential DDoS attack on other Tors because of a hyperactive malicious workstation that is exhausting Gateway resources.
+
+
+
+Links:
+
+Modifying this script can help with creating many Tor instances on the fly:
+https://tor.stackexchange.com/questions/327/how-may-i-run-multiple-tor-relay-instances-in-a-single-linux-machine
+
+
+How to bind each instance to its own NIC:
+https://unix.stackexchange.com/questions/210982/bind-unix-program-to-specific-network-interface
+
+
+Corridor can provide code that can be repurposed to filter Guards:
+https://github.com/rustybird/corridor</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 10 Oct 2018 14:45:32 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/cooperating-multi-tor-implementation-to-avoid-guard-duplication/6126.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Cooperating Multi-Tor Implementation to avoid Guard Duplication</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>I was just thinking about that, we need to isolates WS usage according to Tors existed in the GW.</p>
+<p>e.g:-</p>
+<ul>
+<li>Distro repo update/upgrade will use Tor 0</li>
+<li>Browsing will use Tor 1 e.g: TBB</li>
+<li>Applications will use Tor 2 e.g: Hexchat…etc</li>
+</ul>
+<p>Related:-</p>
+<aside class="quote quote-modified" data-post="1" data-topic="6089">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/tnt_bom_bom/40/1793_1.png" class="avatar">
+    <a href="https://forums.whonix.org/t/stream-isolation-with-tor-the-danger-beneath/6089">Stream Isolation with Tor - The Danger Beneath</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/general-tor-and-anonymity-talk"><span class="badge-category-bg" style="background-color: #92278F;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="General topics about Tor and Anonymity that can be discussed independently from Whonix.">General Tor and Anonymity Talk</span></a>
+  </div>
+  <blockquote>
+    we always hear about torrifying things in the the distro, but i had question on Tor Design: 
+Lets say im living in US , and i want to use whonix,tails…etc: 
+
+
+* = Tor relays
+a,b,c = tor nodes as guardian,middle,exit
+zz,zgl = connection fingerprint 
+so me using Tor Browser to visit Signal website:
+
+zzUS -&gt; a*Canada -&gt; b*France -&gt; c*Austria -&gt; <a href="http://signal.org" rel="nofollow noopener">signal.org</a> (located in US) tagged as zz (lets say zz is the tag for tor browser) 
+on the same time i have downloaded/using signal: 
+(since we are using the …
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/cooperating-multi-tor-implementation-to-avoid-guard-duplication/6126/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cooperating-multi-tor-implementation-to-avoid-guard-duplication/6126/2</link>
+        <pubDate>Wed, 10 Oct 2018 14:45:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6126-2</guid>
+        <source url="http://forums.whonix.org/t/cooperating-multi-tor-implementation-to-avoid-guard-duplication/6126.rss">Cooperating Multi-Tor Implementation to avoid Guard Duplication</source>
+      </item>
+      <item>
+        <title>Cooperating Multi-Tor Implementation to avoid Guard Duplication</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><strong>Why?</strong></p>
+<p>Summary: It’s safer to partition activities under different Guard nodes than sticking everything under one guard for a long time in case it’s malicious. More details on the wiki incoming.</p>
+<p><strong>Tor inter-VM communication</strong></p>
+<p>Implementation outline:</p>
+<p>Each Tor runs in it’s own VM and is knwledgeable about the state of the other and avoids using the same guards.</p>
+<p>For KVM: Add ivshmem-doorbell device to all gateways. Disable apparmor for gateways VMs to allow communication. Mount and access devices under /dev/. Symlink Tor config on shmem device. Use inotify to copy over new Tor state file when it detects that it’s modified. Taking into account other copies of state files there - a diff operation is run, removing dupe guard entries from either state file which is then detected by inotify and written back to the Tor of one of the VMs.</p>
+<p>PROS:</p>
+<p>*Straightforward multi-Tor setup with easy isolation.</p>
+<p>CONS:</p>
+<p>*KVM specific though can have analogue config in Xen. VBox probably not supported.</p>
+<p>*Needs fiddling around on host to disable Apparmor isolated between GWs.</p>
+<p>*Complex and uses more resources.</p>
+<p>*Race condition would need to be resolved for when dupe entries are detected.</p>
+<p>Links:</p>
+<p><a href="https://libvirt.org/formatdomain.html#elementsShmem" class="onebox" target="_blank">https://libvirt.org/formatdomain.html#elementsShmem</a></p>
+<p><a href="https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg03365.html" class="onebox" target="_blank">https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg03365.html</a></p>
+<aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://stackoverflow.com/questions/38799366/using-ivshmem-with-libvirt-virt-manager" target="_blank">stackoverflow.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://stackoverflow.com/users/981766/sahil-singh" target="_blank">
+    <img alt="Sahil Singh" src="https://i.stack.imgur.com/NPHId.jpg?s=128&amp;g=1" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://stackoverflow.com/questions/38799366/using-ivshmem-with-libvirt-virt-manager" target="_blank">Using IVSHMEM with libvirt virt-manager</a>
+</h4>
+
+<div class="tags">
+  <strong>shared-memory, virtualization, qemu, libvirt</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://stackoverflow.com/users/981766/sahil-singh" target="_blank">
+    Sahil Singh
+  </a>
+  on <a href="https://stackoverflow.com/questions/38799366/using-ivshmem-with-libvirt-virt-manager" target="_blank">12:19AM - 06 Aug 16</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://unix.stackexchange.com/questions/188536/how-to-make-a-temporary-file-in-ram" target="_blank">unix.stackexchange.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://unix.stackexchange.com/users/38537/user208145" target="_blank">
+    <img alt="user208145" src="https://i.stack.imgur.com/bhrpH.png?s=128&amp;g=1" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://unix.stackexchange.com/questions/188536/how-to-make-a-temporary-file-in-ram" target="_blank">How to make a temporary file in RAM?</a>
+</h4>
+
+<div class="tags">
+  <strong>shell-script, files, filesystems, scripting</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://unix.stackexchange.com/users/38537/user208145" target="_blank">
+    user208145
+  </a>
+  on <a href="https://unix.stackexchange.com/questions/188536/how-to-make-a-temporary-file-in-ram" target="_blank">05:59AM - 06 Mar 15</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p><strong>One Gateway - Multiple Tors</strong></p>
+<p>Implementation outline:<br>
+Possible with and without namespaces. Spawning different Tors (under different users that are bound to separate NICs) so each instance can use identical port numbers. Internal networks would be different and use one of its own NICs created on the GW.</p>
+<p>A simpler variant of Rusty Bird’s Corridor can then be implemented - Modified to monitor and block duplicate Guard connections as opposed to non Tor connections. Additionally it can trigger a corrective action that resets the state of one of the Tors in question.</p>
+<p>PROS:<br>
+*Implementation much simpler especially how to resolve dupe guard conflicts. Already based on familiar concepts we use.</p>
+<p>*Virtualization platform independent since everything we need is self contained.</p>
+<p>*More resource efficient than spawning more VMs.</p>
+<p>CONS:<br>
+*Theoretically each Tor is not as isolated as the multi-VM approach, but it’s not a deal-breaker if instances are spawned properly and their network resources are partitioned. Also since the GW is part of the TCB it shouldn’t be concerning. Setting CPU/RAM/Entropy limits per process should take care of any potential DDoS attack on other Tors because of a hyperactive malicious workstation that is exhausting Gateway resources.</p>
+<p>Links:</p>
+<p>Modifying this script can help with creating many Tor instances on the fly:<br>
+</p><aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://tor.stackexchange.com/questions/327/how-may-i-run-multiple-tor-relay-instances-in-a-single-linux-machine" target="_blank">tor.stackexchange.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://tor.stackexchange.com/users/64/alaf" target="_blank">
+    <img alt="alaf" src="https://i.stack.imgur.com/kDXql.png?s=128&amp;g=1" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://tor.stackexchange.com/questions/327/how-may-i-run-multiple-tor-relay-instances-in-a-single-linux-machine" target="_blank">How may I run multiple Tor relay instances in a single Linux machine?</a>
+</h4>
+
+<div class="tags">
+  <strong>relays, linux</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://tor.stackexchange.com/users/64/alaf" target="_blank">
+    alaf
+  </a>
+  on <a href="https://tor.stackexchange.com/questions/327/how-may-i-run-multiple-tor-relay-instances-in-a-single-linux-machine" target="_blank">12:38PM - 04 Oct 13</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>How to bind each instance to its own NIC:<br>
+</p><aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://unix.stackexchange.com/questions/210982/bind-unix-program-to-specific-network-interface" target="_blank">unix.stackexchange.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://unix.stackexchange.com/users/108221/skeen" target="_blank">
+    <img alt="Skeen" src="https://i.stack.imgur.com/0xhN0.jpg?s=128&amp;g=1" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://unix.stackexchange.com/questions/210982/bind-unix-program-to-specific-network-interface" target="_blank">Bind unix program to specific network interface</a>
+</h4>
+
+<div class="tags">
+  <strong>routing, network-interface</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://unix.stackexchange.com/users/108221/skeen" target="_blank">
+    Skeen
+  </a>
+  on <a href="https://unix.stackexchange.com/questions/210982/bind-unix-program-to-specific-network-interface" target="_blank">11:22AM - 20 Jun 15</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Corridor can provide code that can be repurposed to filter Guards:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://assets-cdn.github.com/favicon.ico" class="site-icon" width="32" height="32">
+      <a href="https://github.com/rustybird/corridor" target="_blank">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars2.githubusercontent.com/u/6682340?s=400&amp;v=4" class="thumbnail onebox-avatar" width="1" height="1">
+
+<h3><a href="https://github.com/rustybird/corridor" target="_blank">rustybird/corridor</a></h3>
+
+<p>Tor traffic whitelisting gateway. Contribute to rustybird/corridor development by creating an account on GitHub.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/cooperating-multi-tor-implementation-to-avoid-guard-duplication/6126/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cooperating-multi-tor-implementation-to-avoid-guard-duplication/6126/1</link>
+        <pubDate>Tue, 09 Oct 2018 16:47:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6126-1</guid>
+        <source url="http://forums.whonix.org/t/cooperating-multi-tor-implementation-to-avoid-guard-duplication/6126.rss">Cooperating Multi-Tor Implementation to avoid Guard Duplication</source>
+      </item>
+  </channel>
+</rss>

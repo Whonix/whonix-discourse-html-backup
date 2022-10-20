@@ -1,0 +1,1088 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+    <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671</link>
+    <description>This time-based error within a fully updated Gateway 11 running under VBox 5.  This error causes whonixcheck to fail, and continues to drive me nuts!
+
+Facts:
+
+My 64-Bit VBox 5 Host is/always has been set to UTC.
+
+Running &#39;date&#39; in a fully updated Gateway, correctly shows:
+
+Tue Nov 24 07:49:03 UTC 2015
+
+Yet following every Gateway boot, I see this error DESPITE the Gateway&#39;s Tor working correctly:
+
+ERROR: PVClock Test Result: 
+Unwanted PVClock kvm-clock tsc acpi_pm detected! This is unsupported by Whonix developers! Whonixcheck aborted! 
+Using PVClock together with Whonix is recommended against, because PVClock conflicts with Whonix&#39;s TimeSync design [1]. 
+You probably did not follow Whonix&#39;s KVM instructions. [2] 
+This might endanger your anonymity. Do not proceed unless you know what you are doing. 
+If you wish to ignore this warning and to continue whonixcheck anyway, you can set 
+WHONIXCHECK_NO_EXIT_ON_PVCLOCK_DETECTION=&quot;1&quot;
+in /etc/whonix.d/30_whonixcheck_default. 
+Recommended action: 
+- Shut down. 
+- Read Whonix documentation. [3] 
+- Follow Whonix&#39;s KVM instructions. [2] 
+- Or use Whonix a supported virtualizer. 
+- Or use Whonix with Physical Isolation. [4] 
+[1] https://www.whonix.org/wiki/Dev/TimeSync 
+[2] https://www.whonix.org/wiki/KVM 
+[3] https://www.whonix.org 
+[4] https://www.whonix.org/wiki/Physical_Isolation 
+
+Do I need to mention again this is a Gateway 11 error when run under VirtualBox 5, and is UNRELATED to KVM?
+
+Also note that I run many different OSes under VBox 5, and I have never seen another time-based error with any other VBox Guest OS.
+
+You should also be aware, this error does NOT occur immediately following a clean install/reinstall of the Gateway-11.ova file.
+
+The error occurs, and then persists, only following several apt-get updates.  Therefore, the solution to this bug, imo, lies in figuring out what changed to impact the time/clocks, and why, during those updates.
+
+Setting and using time should be drop dead simple in linux.  What was the original time goal, and why does it appear to have become so complex?  Why all the pain/PITA with Whonix&#39;s version of time?  
+
+What in the world are you actually delivering in terms of safety by using these flawed time checks?  Time is time, all users should be using UTC, period.
+
+Let me know,
+
+CCP
+
++++++++++++++++++++++++++++++++++++
+
+Is  /usr/lib/whonixcheck/check_pvclock the script that is driving the error?
+
+Here is the current content of that script.
+
+$ cat /usr/lib/whonixcheck/check_pvclock 
+#!/bin/bash
+
+## This file is part of Whonix.
+## Copyright (C) 2012 - 2014 Patrick Schleizer &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+pvclock_unwanted_detected() {
+   if [ &quot;$WHONIXCHECK_NO_EXIT_ON_PVCLOCK_DETECTION&quot; = &quot;1&quot; ]; then
+      local MSG=&quot;&lt;p&gt;PVClock Test Result: Unwanted PVClock detected, but &lt;code&gt;WHONIXCHECK_NO_EXIT_ON_PVCLOCK_DETECTION&lt;/code&gt; is set, continuing.&lt;/p&gt;&quot;
+      if [ &quot;$verbose&quot; -ge &quot;1&quot; ]; then
+         $output_x ${output_opts[@]} --messagex --typex &quot;info&quot; --message &quot;$MSG&quot;
+         $output_cli ${output_opts[@]} --messagecli --typecli &quot;info&quot; --message &quot;$MSG&quot;
+      fi
+      return 0
+   fi
+                                                                                                                                                                                                
+   local MSG=&quot;&lt;p&gt;PVClock Test Result:                                                                                                                                                           
+                                                                                                                                                                                                
+&lt;br&gt;&lt;/br&gt;&lt;b&gt;Unwanted PVClock &lt;code&gt;$available_clocksource&lt;/code&gt; detected! This is unsupported by Whonix developers! Whonixcheck aborted!&lt;/b&gt;                                                   
+                                                                                                                                                                                                
+&lt;p&gt;Using PVClock together with Whonix is recommended against, because PVClock conflicts with Whonix&#39;s TimeSync design [1].&lt;/p&gt;                                                                  
+                                                                                                                                                                                                
+&lt;p&gt;You probably did not follow Whonix&#39;s KVM instructions. [2]&lt;/p&gt;
+
+&lt;p&gt;This might endanger your anonymity. Do not proceed unless you know what you are doing.&lt;/p&gt;
+
+&lt;p&gt;If you wish to ignore this warning and to continue whonixcheck anyway, you can set
+&lt;code&gt;&lt;blockquote&gt;WHONIXCHECK_NO_EXIT_ON_PVCLOCK_DETECTION=\&quot;1\&quot;&lt;/blockquote&gt;&lt;/code&gt;
+in &lt;code&gt;/etc/whonix.d/30_whonixcheck_default&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Recommended action:
+&lt;br&gt;&lt;/br&gt;- Shut down.
+&lt;br&gt;&lt;/br&gt;- Read Whonix documentation. [3]
+&lt;br&gt;&lt;/br&gt;- Follow Whonix&#39;s KVM instructions. [2]
+&lt;br&gt;&lt;/br&gt;- Or use Whonix a supported virtualizer.
+&lt;br&gt;&lt;/br&gt;- Or use Whonix with Physical Isolation. [4]&lt;/p&gt;
+
+&lt;p&gt;[1] &lt;a href=https://www.whonix.org/wiki/Dev/TimeSync&gt;https://www.whonix.org/wiki/Dev/TimeSync&lt;/a&gt;
+&lt;br&gt;&lt;/br&gt;[2] &lt;a href=https://www.whonix.org/wiki/KVM&gt;https://www.whonix.org/wiki/KVM&lt;/a&gt;
+&lt;br&gt;&lt;/br&gt;[3] &lt;a href=https://www.whonix.org&gt;https://www.whonix.org&lt;/a&gt;
+&lt;br&gt;&lt;/br&gt;[4] &lt;a href=https://www.whonix.org/wiki/Physical_Isolation&gt;https://www.whonix.org/wiki/Physical_Isolation&lt;/a&gt;
+&lt;/p&gt;
+&lt;/p&gt;&quot;
+
+   $output_x ${output_opts[@]} --messagex --typex &quot;error&quot; --message &quot;$MSG&quot;
+   $output_cli ${output_opts[@]} --messagecli --typecli &quot;error&quot; --message &quot;$MSG&quot;
+   EXIT_CODE=&quot;1&quot;
+   cleanup &quot;1&quot;
+   return 0
+}
+
+check_pvclock() {
+   if [ -f &quot;/var/run/qubes-whonix/qubes.SetDateTime&quot; ]; then
+      qubes_set_date_time_content=&quot;$(cat &quot;/var/run/qubes-whonix/qubes.SetDateTime&quot;)&quot; || true
+      local MSG=&quot;&lt;p&gt;\
+PVClock Result: dom0 is telling us the time. \
+File &lt;code&gt;/var/run/qubes-whonix/qubes.SetDateTime&lt;/code&gt; exists. \
+Its content is &lt;code&gt;$qubes_set_date_time_content&lt;/code&gt;. \
+This is non-ideal. A known issue. Contributions happily considered. Read more: &lt;a href=https://phabricator.whonix.org/T397&gt;https://phabricator.whonix.org/T397&lt;/a&gt;&lt;/p&gt;&quot;
+      if [ &quot;$verbose&quot; -ge &quot;1&quot; ]; then
+         $output_x ${output_opts[@]} --messagex --typex &quot;info&quot; --message &quot;$MSG&quot;
+         $output_cli ${output_opts[@]} --messagecli --typecli &quot;info&quot; --message &quot;$MSG&quot;
+      fi
+   fi
+
+   if [ ! -f &quot;/sys/devices/system/clocksource/clocksource0/current_clocksource&quot; ]; then
+      local MSG=&quot;&lt;p&gt;PVClock Result: &lt;code&gt;/sys/devices/system/clocksource/clocksource0/current_clocksource&lt;/code&gt; does not exist, ok.&lt;/p&gt;&quot;
+      if [ &quot;$verbose&quot; -ge &quot;1&quot; ]; then
+         $output_x ${output_opts[@]} --messagex --typex &quot;info&quot; --message &quot;$MSG&quot;
+         $output_cli ${output_opts[@]} --messagecli --typecli &quot;info&quot; --message &quot;$MSG&quot;
+      fi
+      return 0
+   fi
+
+   local current_clocksource available_clocksource
+   current_clocksource=&quot;$(cat &quot;/sys/devices/system/clocksource/clocksource0/current_clocksource&quot;)&quot; || true
+   available_clocksource=&quot;$(cat &quot;/sys/devices/system/clocksource/clocksource0/available_clocksource&quot;)&quot; || true
+
+   if [ &quot;$current_clocksource&quot; = &quot;xen&quot; ]; then
+      local MSG=&quot;&lt;p&gt;PVClock Result: &lt;code&gt;/sys/devices/system/clocksource/clocksource0/current_clocksource&lt;/code&gt; exist, is &lt;code&gt;$current_clocksource&lt;/code&gt;. \
+This is non-ideal. A known issue. Contributions happily considered. Read more: &lt;a href=https://phabricator.whonix.org/T389&gt;https://phabricator.whonix.org/T389&lt;/a&gt;&lt;/p&gt;&quot;
+      if [ &quot;$verbose&quot; -ge &quot;1&quot; ]; then
+         $output_x ${output_opts[@]} --messagex --typex &quot;info&quot; --message &quot;$MSG&quot;
+         $output_cli ${output_opts[@]} --messagecli --typecli &quot;info&quot; --message &quot;$MSG&quot;
+      fi
+      return 0
+   fi
+
+   if [ &quot;$current_clocksource&quot; = &quot;kvm-clock&quot; ]; then
+      pvclock_unwanted_detected
+      return 0
+   fi
+
+   local MSG=&quot;&lt;p&gt;PVClock Result: &lt;code&gt;/sys/devices/system/clocksource/clocksource0/current_clocksource&lt;/code&gt; exist, is &lt;code&gt;$current_clocksource&lt;/code&gt;.&lt;/p&gt;&quot;
+   if [ &quot;$verbose&quot; -ge &quot;1&quot; ]; then
+      $output_x ${output_opts[@]} --messagex --typex &quot;info&quot; --message &quot;$MSG&quot;
+      $output_cli ${output_opts[@]} --messagecli --typecli &quot;info&quot; --message &quot;$MSG&quot;
+   fi
+   return 0
+}</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 02 Dec 2015 05:54:54 +0000</lastBuildDate>
+    <category>VirtualBox</category>
+    <atom:link href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>3 posts were merged into an existing topic: <a href="http://forums.whonix.org/t/whonix-virtualbox-paravirtualization-which-acceleration-mode-is-optimal-help-wanted/1703">Whonix VirtualBox Paravirtualization - Which Acceleration Mode is Optimal? Help Wanted!</a></p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/22</link>
+        <pubDate>Wed, 02 Dec 2015 16:04:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-22</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>A post was merged into an existing topic: <a href="http://forums.whonix.org/t/whonix-virtualbox-paravirtualization-which-acceleration-mode-is-optimal-help-wanted/1703">Whonix VirtualBox Paravirtualization - Which Acceleration Mode is Optimal? Help Wanted!</a></p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/26">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/26</link>
+        <pubDate>Wed, 02 Dec 2015 16:02:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-26</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <a href="https://www.whonix.org/blog/virtualbox-acceleration-mode" target="_blank" title="06:06PM - 01 December 2015" rel="nofollow noopener">Whonix – 1 Dec 15</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/362;"><img src="https://www.whonix.org/blog/wp-content/uploads/2016/06/Whonix_Facebook-Social-Share.png" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/blog/virtualbox-acceleration-mode" target="_blank" rel="nofollow noopener">Whonix VirtualBox Paravirtualization - Which Acceleration Mode is Optimal? Help...</a></h3>
+
+<p>What will be the optimal paravirtualization setting for Whonix? none explicitly turns off exposing any paravirtualization interface sounds good security wise but could be really slow. Please test and leave feedback. minimal sounds like a worthwhile...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote" data-post="1" data-topic="1703">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar">
+    <a href="https://forums.whonix.org/t/whonix-virtualbox-paravirtualization-which-acceleration-mode-is-optimal-help-wanted/1703">Whonix VirtualBox Paravirtualization - Which Acceleration Mode is Optimal? Help Wanted!</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/virtualbox"><span class="badge-category-bg" style="background-color: #283890;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Everything specific to Whonix VirtualBox. (devs)">VirtualBox</span></a>
+  </div>
+  <blockquote>
+    Originally published at: <a href="https://www.whonix.org/blog/virtualbox-acceleration-mode">https://www.whonix.org/blog/virtualbox-acceleration-mode</a> What will be the optimal paravirtualization setting for Whonix? 
+
+	
+none explicitly turns off exposing any paravirtualization interface sounds good security wise but could be really slow. Please test and leave feedback.
+	
+minimal sounds like a worthwhile alternative if `none` is too slow. But what technology is `minimal` actually using? VirtualBox legacy or kvm? However, documentation says, it lets the VM read the …
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/25">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/25</link>
+        <pubDate>Tue, 01 Dec 2015 18:07:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-25</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi Patrick,</p>
+<p>Yes, I did note the new Security tab.  I do realize you face limited time and resources, yet it is unfortunate Whonix does not have a dedicated VBox maintainer.  I say this because the VBox user base is likely much larger than the combined number of KVM and Qubes users, by a significant factor.  I also doubt this VBox user base disparity is likely to change any time soon.</p>
+<p>I am pretty sure a new VBox topic such as ‘Whonix VBox Paravirtualization - Which Acceleration Mode is Optimal?  Help Us Test!’ is warranted at this point.</p>
+<p>I do not want to presume which testing information would prove the most useful for you to make a VBox determination.</p>
+<p>However, I imagine you would want VBox users to report:</p>
+<ol>
+<li>Host OS name:  Win 10, Gentoo, etc.</li>
+<li>Host OS architecture:  64 or 32 Bit</li>
+<li>Gateway Version - only 11, or better.</li>
+<li>VBox Acceleration Mode Used</li>
+<li>Notable Observations - errors, warnings. slowness, failures, etc.</li>
+<li>Any other ‘things’ you deem important.</li>
+</ol>
+<p>It is probably best to create a short form that users can fill out with the requested information so you don’t have to hunt through long text ‘essays.’</p>
+<p>Once the Gateway performance is understood across a range of systems, then you could open testing up for the Workstation, if desired.</p>
+<p>To close, another loop, I am now running Gateway 11 under Acceleration = None.</p>
+<p>No errors, no warnings, and apt-get works.  However, just after the apt-get scan began, the Gateway reported:</p>
+<p>hrtimer:  interrupt took xxx ns</p>
+<p>I don’t know if that is significant, or not.</p>
+<p>In any event, the Gateway is operating correctly under  Acceleration = None, and if any ‘slowness’ is in fact occurring, it is imperceptible.  Perhaps there is some kind of relevant speed test?</p>
+<p>Food for thought.</p>
+<p>CCP</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/21</link>
+        <pubDate>Tue, 01 Dec 2015 03:39:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-21</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>The remaining question is, which setting the best VirtualBox paravirtualization setting for Whonix is.</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/20</link>
+        <pubDate>Mon, 30 Nov 2015 21:47:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-20</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi Patrick,</p>
+<p>Yes - I’ve got Gateway 12 updated and running.  I can confirm the entire PVClock issue on VBox stems from the paravirtualization choice.  I knew this before I even saw your latest, because I noticed you had Legacy selected as the default VBox Acceleration on 12.</p>
+<p>I ran whonixcheck both ways:  Legacy and Default.</p>
+<p>With Legacy, no PVClock [WARNING] and apt-get scan completes.</p>
+<p>With Default, the PVClock [WARNING] is present and apt-get scan completes.</p>
+<p>And yes, it does appear that VBox ‘auto-selects’ KVM paravirtualization for Linux Guests running on Linux Hosts when Acceleration = Default is selected.</p>
+<p>I think we’ve beaten this issue to death, but at least we understand what is driving it.  It certainly is not an issue worth losing sleep over, as the Gateway continues to operate correctly in either acceleration mode.</p>
+<p>Thanks for all your support Patrick,</p>
+<p>CCP - an almost normally-adjusted, non-breath-holder  <img src="//forums.whonix.org/images/emoji/twitter/triumph.png?v=5" title=":triumph:" class="emoji" alt=":triumph:"></p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/19</link>
+        <pubDate>Mon, 30 Nov 2015 18:38:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-19</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>The user support answer would be:<br>
+Good enough for now. Might be fixed in Whonix 13. Don’t hold your breath for it.</p>
+<hr>
+<p>Since you seem to be interested in the technical backgrounds, this will be the development discussion answer:<br>
+I keep it in the same topic, since otherwise this does not get attention anyhow, and I wouldn’t know who else would look into Whonix VirtualBox development.</p>
+<p>Your Whonix KVM [real KVM on LInux, I suppose] results seems fine.</p>
+<p>The terminology now gets difficult since VirtualBox 5 now also supports KVM as paravirtualization provider. ( <a href="https://forums.whonix.org/t/unsupported-virtualbox-now-supports-kvm-and-hyper-v-as-paravirtualization-providers/1318">[unsupported] VirtualBox now supports KVM and Hyper-V as paravirtualization providers</a>)</p>
+<p>Your Whonix VirtualBox results are not ideal development wise yet. The problem now is, that systemd-detect-virt detects kvm, even though you are running in VirtualBox.</p>
+<p>I am wondering why you are the only one reporting this. Did you change System, Acceleration, Paravirtualization interface?</p>
+<p>FYI, it’s related to:</p>
+<ul>
+<li>
+<a href="https://www.virtualbox.org/manual/ch08.html">https://www.virtualbox.org/manual/ch08.html</a> read this one very parameter description <code>--paravirtprovider none|default|legacy|minimal|hyperv|kvm</code>
+</li>
+<li>read this one very chapter <a href="https://www.virtualbox.org/manual/ch10.html#gimproviders">https://www.virtualbox.org/manual/ch10.html#gimproviders</a>
+</li>
+</ul>
+<p>If you set it to Paravirtualization interface to <code>legacy</code>, that whonixcheck error should varnish. Also the output of <code>cat /sys/devices/system/clocksource/clocksource0/available_clocksource</code> should change then.</p>
+<p>I wonder what the optimal paravirtualization for Whonix 13 will be.</p>
+<ul>
+<li>
+<p><code>default</code> is problematic, since as in your case, it does autodetection, then used VirtualBox KVM</p>
+</li>
+<li>
+<p><code>none</code> explicitly turns off exposing any paravirtualization interface sounds good security wise but could be really slow. Please test and leave feedback.</p>
+</li>
+<li>
+<p><code>minimal</code> sounds like a worthwhile alternative if <code>none</code> is too slow. But what technology is <code>minimal</code> actually using? VirtualBox legacy or kvm? However, documentation says, it lets the VM read the APIC frequency. To be researched how bad this would be.</p>
+</li>
+<li>
+<p><code>legacy</code> is good enough for now. That’s like VirtualBox 4.x. But since they now call it legacy, that code will rot, and probably should be avoided in long run.</p>
+</li>
+<li>
+<p><code>kvm</code> (VirtualBox) is problematic, since it provides unwanted pvclock kvm-clock. (Which allows a clock correlation attacks once VM is compromised.</p>
+</li>
+<li>
+<p>Does not seem like pvclocks can be configured in VirtualBox. (With linux libvirt kvm it’s possible.)</p>
+</li>
+<li>
+<p><a href="https://www.whonix.org/wiki/Dev/TimeSync#Clock_Correlation_Attack">https://www.whonix.org/wiki/Dev/TimeSync#Clock_Correlation_Attack</a></p>
+</li>
+<li>
+<p>However, this presupposes that users did read and apply <a href="https://www.whonix.org/wiki/Advanced_Security_Guide#Spoof_the_Initial_Virtual_Hardware_Clock_Offset">https://www.whonix.org/wiki/Advanced_Security_Guide#Spoof_the_Initial_Virtual_Hardware_Clock_Offset</a> beforehand, which probably few do.</p>
+</li>
+<li>
+<p>Therefore probably not a big issues.</p>
+</li>
+<li>
+<p><code>hyperv</code> The microsoft thingy. No idea about that one. May or may not be great for Linux guests (Whonix).</p>
+</li>
+</ul>
+<p>Each virtualization platform should be reviewed for performance, security, pvclock interfaces and hardware identifiers readable by the vm ( <a href="https://www.whonix.org/wiki/Protocol-Leak-Protection_and_Fingerprinting-Protection">https://www.whonix.org/wiki/Protocol-Leak-Protection_and_Fingerprinting-Protection</a> ).</p>
+<p>Not sure you noticed the new Download table yet:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Download" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/362;"><img src="https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Download" target="_blank" rel="nofollow noopener">Download</a></h3>
+
+<p>Download Whonix. Privacy Protection. Anonymity Online.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+The point is, it introduces a security column. For your information:<br>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/VirtualBox#Security_and_Support_Status" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/d/d5/Virtualbox_logo.png" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://www.whonix.org/wiki/VirtualBox#Security_and_Support_Status" target="_blank" rel="nofollow noopener">VirtualBox</a></h3>
+
+<p>Whonix in VirtualBox - Stable Version</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/18</link>
+        <pubDate>Mon, 30 Nov 2015 16:18:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-18</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>Patrick,</p>
+<p>This is the Gateway output while it is running under VBox:</p>
+<p>sudo virt-what<br>
+virtualbox<br>
+kvm</p>
+<p>sudo systemd-detect-virt<br>
+kvm</p>
+<p>As I mentioned earlier, Acceleration is set to Default for my Gateway in VBox.</p>
+<p>CCP</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/17</link>
+        <pubDate>Mon, 30 Nov 2015 03:02:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-17</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>Patrick,</p>
+<p>I’m running KVM atm, so I’ll need to reboot a couple of things to return to VBox.</p>
+<p>However, while I here, on an updated Gateway 11 running under KVM, please note this output of whonixcheck, most notably the absence of the PVClock [WARNING].</p>
+<p>whonixcheck<br>
+[INFO] [whonixcheck] Connected to Tor.<br>
+[INFO] [whonixcheck] Whonix is produced independently of, with no guarantee from, The Tor Project. Whonix is experimental software. Do not rely on it for strong anonymity. <a href="https://www.whonix.org" rel="nofollow noopener">https://www.whonix.org</a><br>
+[INFO] [whonixcheck] SocksPort Test: Testing Tor’s SocksPort…<br>
+[INFO] [whonixcheck] SocksPort Test Result: Connected to Tor. IP: xx.xx.xx.xx<br>
+[INFO] [whonixcheck] Whonix News Download: Checking for Whonix news and updates…<br>
+[INFO] [whonixcheck] Whonix News Result:<br>
+√ Up to date: whonix-gateway-packages-dependencies 2.9-1<br>
+√ Up to date: Whonix Build Version: 11.0.0.3.0<br>
+[INFO] [whonixcheck] Debian Package Update Check: Checking for software updates via apt-get… ( Documentation: <a href="https://www.whonix.org/wiki/Update" rel="nofollow noopener">https://www.whonix.org/wiki/Update</a> )<br>
+[INFO] [whonixcheck] Debian Package Update Check Result: No updates found via apt-get.<br>
+[INFO] [whonixcheck] Whonix APT Repository: Enabled.<br>
+When the Whonix team releases TESTERS updates,<br>
+they will be AUTOMATICALLY installed (when you run apt-get dist-upgrade)<br>
+along with updated packages from the Debian team. Please<br>
+read <a href="https://www.whonix.org/wiki/Trust" rel="nofollow noopener">https://www.whonix.org/wiki/Trust</a> to understand the risk.<br>
+If you want to change this, use:<br>
+sudo whonix_repository</p>
+<p>Also, while I’m running KVM, here is the Gateway 11 output you requested:</p>
+<p>sudo virt-what<br>
+kvm</p>
+<p>sudo systemd-detect-virt<br>
+kvm</p>
+<p>I’ll post the Gateway output from within VBox in a few minutes.</p>
+<p>CCP</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/16</link>
+        <pubDate>Mon, 30 Nov 2015 02:40:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-16</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>You got the upgrade. But that test doesn’t totally work as expected. It<br>
+shouldn’t show that.</p>
+<p>Could you please post the output of the following two commands?</p>
+<p><code>sudo virt-what</code></p>
+<p><code>sudo systemd-detect-virt</code></p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/15</link>
+        <pubDate>Sun, 29 Nov 2015 14:59:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-15</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>Patrick,</p>
+<p>Yes - my use of the word ‘error’ was in error. <img src="//forums.whonix.org/images/emoji/twitter/triumph.png?v=5" title=":triumph:" class="emoji" alt=":triumph:"></p>
+<p>As you can see below, a [WARNING] is generated, and the updates scan is working.</p>
+<p>I am running 3:3.8.2-1.  The entire run looks like this:</p>
+<p>whonixcheck<br>
+[INFO] [whonixcheck] Connected to Tor.<br>
+[WARNING] [whonixcheck] PVClock Test Result:</p>
+<p>Unwanted PVClock kvm-clock tsc acpi_pm  detected! Using this PVClock together with Whonix is recommended against, because it conflicts with Whonix’s TimeSync design [1].</p>
+<p>If you know what you are doing, feel free to disable this check.<br>
+Create a file /etc/whonix.d/50_whonixcheck_user and add:<br>
+whonixcheck_skip_functions+=" pvclock_unwanted_detected "</p>
+<p>Recommended action:</p>
+<ul>
+<li>If you are using KVM, you probably did not follow Whonix’s KVM instructions. [2]</li>
+<li>Or use a different supported Whonix platform. [3]</li>
+</ul>
+<p>[1] <a href="https://www.whonix.org/wiki/Dev/TimeSync" rel="nofollow noopener">https://www.whonix.org/wiki/Dev/TimeSync</a><br>
+[2] <a href="https://www.whonix.org/wiki/KVM" rel="nofollow noopener">https://www.whonix.org/wiki/KVM</a><br>
+[3] <a href="https://www.whonix.org/wiki/Supported_Platforms" rel="nofollow noopener">https://www.whonix.org/wiki/Supported_Platforms</a><br>
+[INFO] [whonixcheck] Whonix is produced independently of, with no guarantee from, The Tor Project. Whonix is experimental software. Do not rely on it for strong anonymity. <a href="https://www.whonix.org" rel="nofollow noopener">https://www.whonix.org</a><br>
+[INFO] [whonixcheck] SocksPort Test: Testing Tor’s SocksPort…<br>
+[INFO] [whonixcheck] SocksPort Test Result: Connected to Tor. IP: XX.XX.XX.XX<br>
+[INFO] [whonixcheck] Whonix News Download: Checking for Whonix news and updates…<br>
+[INFO] [whonixcheck] Whonix News Result:<br>
+√ Up to date: whonix-gateway-packages-dependencies 2.9-1<br>
+√ Up to date: Whonix Build Version: 11.0.0.3.0<br>
+[INFO] [whonixcheck] Debian Package Update Check: Checking for software updates via apt-get… ( Documentation: <a href="https://www.whonix.org/wiki/Update" rel="nofollow noopener">https://www.whonix.org/wiki/Update</a> )<br>
+[INFO] [whonixcheck] Debian Package Update Check Result: No updates found via apt-get.<br>
+[INFO] [whonixcheck] Whonix APT Repository: Enabled.<br>
+When the Whonix team releases TESTERS updates,<br>
+they will be AUTOMATICALLY installed (when you run apt-get dist-upgrade)<br>
+along with updated packages from the Debian team. Please<br>
+read <a href="https://www.whonix.org/wiki/Trust" rel="nofollow noopener">https://www.whonix.org/wiki/Trust</a> to understand the risk.<br>
+If you want to change this, use:<br>
+sudo whonix_repository</p>
+<p>++++++++++++++++++++++++++++++++++++</p>
+<p>Thanks for your input on ‘automating’ the update download and installation process from within whonixcheck.  I understand.</p>
+<p>CCP</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/14</link>
+        <pubDate>Sun, 29 Nov 2015 08:18:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-14</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Corrupt_Correct_Pig:</p>
+<blockquote>
+<p>I grabbed the update, and whonixcheck is now working correctly on<br>
+VBox<br>
+following boot, despite the now understood to be trivial PVClock 'error’<br>
+continuing to be reported.</p>
+</blockquote>
+<p>Reported as error or warning?</p>
+<ul>
+<li>Warning -&gt; better, that’s the update</li>
+<li>Error -&gt; update did not work</li>
+</ul>
+<p>Does whonixcheck still stop?</p>
+<ul>
+<li>stop -&gt; update did not work</li>
+<li>continue -&gt; better, but it should not show a warning anymore</li>
+</ul>
+<p>Please post the output of the pvclock this check.</p>
+<p>What whonixcheck version you have now installed?</p>
+<p><code>dpkg -l | grep whonixcheck</code></p>
+<p>Should be <code>3:3.8.2-1</code>.</p>
+<blockquote>
+<p>Concerning the whonixcheck process, has the possibility been<br>
+discussed of having whonixcheck not merely do an apt-get package<br>
+update check, but to have whonixcheck directly offer to download and<br>
+install a listed group of upgradeable packages?</p>
+</blockquote>
+<p>Yes. But it’s too difficult to implement this on the Whonix side. It’s a<br>
+Debian [and derivatives] issue. More info:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/Automatic_Updates" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/362;"><img src="https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Dev/Automatic_Updates" target="_blank" rel="nofollow noopener">Dev/Automatic Updates</a></h3>
+
+<p>Why does Whonix (not) use Automatic Updates? Why does Whonix (not) use a GUI Update Notifier or GUI Updater?</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Upgrading with best security there is left a manual process. Documented<br>
+here:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Update" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/426;"><img src="https://www.whonix.org/w/images/1/19/Padlock-597495-640.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Update" target="_blank" rel="nofollow noopener">Security Guide</a></h3>
+
+<p>Computer Security Guide for Whonix Linux for Users, Whonix Hardening</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<blockquote>
+<p>I don’t just want whonixcheck to scan the repos</p>
+</blockquote>
+<p>Every check in whonixcheck can be selectively disabled. For disabling<br>
+the operating system updates check, see:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Advanced_Security_Guide#Prevent_running_apt-get" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/426;"><img src="https://www.whonix.org/w/images/4/4e/Padlocks337569640.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Advanced_Security_Guide#Prevent_running_apt-get" target="_blank" rel="nofollow noopener">Advanced Security Guide</a></h3>
+
+<p>Computer Security Guide for Whonix Linux for Advanced Users, Whonix Hardening</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/13</link>
+        <pubDate>Sat, 28 Nov 2015 15:40:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-13</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi Patrick,</p>
+<p>Thank you.  I grabbed the update, and whonixcheck is now working correctly on VBox following boot, despite the now understood to be trivial PVClock ‘error’ continuing to be reported.</p>
+<p>I think we are making good progress here.</p>
+<p>I’ll wait for HulaHoop’s testing/input on the KVM side of the house.</p>
+<p>Concerning the whonixcheck process, has the possibility been discussed of having whonixcheck not merely do an apt-get package update check, but to have whonixcheck directly offer to download and install a listed group of upgradeable packages?</p>
+<p>This is not a whonixcheck bug, just a potential feature request.  In other words, I don’t just want whonixcheck to scan the repos and tell me 24 packages can be upgraded, leaving me to need to apt-get scan the reops again myself, and then download and install the packages.  It seems like a waste of time and resources to scan the repos twice for the exact same information.</p>
+<p>I think a better/more efficient solution would include:</p>
+<ol>
+<li>whonixcheck scans the repos, identifies, and lists all upgradeable packages.</li>
+<li>A time test since the last package update check can be used.  If a sufficient amount of time has passed since the previous update check, the repo scan should run at every boot.</li>
+<li>whonixcheck asks if the user wants to download and install that group of packages (Y/n) from its scan.</li>
+</ol>
+<p>Let me know if this functionality has been considered previously, and if it would be difficult, or unwise, to implement.</p>
+<p>Cheers,</p>
+<p>CCP</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/12</link>
+        <pubDate>Sat, 28 Nov 2015 09:00:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-12</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Upgrades in testers repository coming soon. (Less than 1 hour expected.)</p>
+<aside class="quote" data-post="1" data-topic="1584">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar">
+    <a href="https://forums.whonix.org/t/whonix-12-testers-repository-notes/1584">Whonix 12 testers repository - Notes</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    It's ready... 
+
+mirror.whonix.org always lags behind. Either wait ~1 hour. Or use this... 
+
+In summary... 
+
+ sudo whonix_repository --baseuri http://sourceforge.net/projects/whonixdevelopermetafiles/files/internal/ --repository testers --enable &amp;&amp; \
+sudo apt-get update &amp;&amp; \
+sudo apt-get --yes dist-upgrade &amp;&amp; \
+sudo apt-get --yes autoremove
+
+Some notes... 
+
+[hr] 
+
+Tor Browser will no be started from the old location... 
+
+ /home/user/tor-browser_en-US
+
+or this old location... 
+
+ /home/user/.tb/tor…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/11</link>
+        <pubDate>Wed, 25 Nov 2015 19:51:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-11</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>The git commit.<br>
+</p><aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonixcheck/commit/cb5f82e20b60b0c70ae73a5e36d53811f17573e9" target="_blank" rel="nofollow noopener">github.com/Whonix/whonixcheck</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">
+    <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="https://github.com/Whonix/whonixcheck/commit/cb5f82e20b60b0c70ae73a5e36d53811f17573e9" target="_blank" rel="nofollow noopener">whonixcheck pvclock test fixes</a>
+</h4>
+
+  <pre class="message" style="white-space: pre-wrap;">- no longer exit whonixcheck if unsupported pv clock was detected
+- make unsupported pv clock detection only a warning as opposed...</pre>
+
+<div class="date">
+  by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+  on <a href="https://github.com/Whonix/whonixcheck/commit/cb5f82e20b60b0c70ae73a5e36d53811f17573e9" target="_blank" rel="nofollow noopener">06:53PM - 25 Nov 15</a>
+</div>
+
+<div class="github-commit-stats">
+  changed <strong>4 files</strong>
+  with <strong>39 additions</strong>
+  and <strong>50 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+<a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a> please consider testing if kvm-clock detection would still work in KVM.<p></p>
+<p>Still have to produce an upgraded package.</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/10</link>
+        <pubDate>Wed, 25 Nov 2015 18:57:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-10</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>Patrick,</p>
+<p>Since this whonixcheck ‘error’ does not impact the Gateway’s Tor functionality, it’s not really a significant problem.</p>
+<p>I will continue to manually update the Gateway, and wait for a fix.</p>
+<p>KUDOS:  More generally, you’ve done a great job with Gateway 11!  The Gateway runs on my end with excellent stability even with only 128 Mb of allocated DRAM, and even when the Gateway needs to provide an isolated network for several OSes running behind it, concurrently.  Furthermore, I see that same Gateway 11 stabilty whether running VBox, or KVM, on my Host.</p>
+<p>Just for the record:</p>
+<p>From my 64-bit Linux Host:<br>
+’# cat /sys/devices/system/clocksource/clocksource0/current_clocksource’<br>
+tsc</p>
+<p>From the VBoxxed Gateway 11:<br>
+’# cat /sys/devices/system/clocksource/clocksource0/current_clocksource’<br>
+kvm-clock</p>
+<p>Thanks for helping me to understand to what is occuring here Patrick.</p>
+<p>CCP</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/9</link>
+        <pubDate>Wed, 25 Nov 2015 03:13:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-9</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Corrupt_Correct_Pig:</p>
+<blockquote>
+<p>Let me know if you think this is worth the effort.</p>
+</blockquote>
+<p>No. Wait for the updated whonixcheck repository. No more diagnosis required.</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/8</link>
+        <pubDate>Tue, 24 Nov 2015 14:59:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-8</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>OK Patrick - I’m learning more about this issue as we progress, and I’m glad you’ll work to resolve it in 12.</p>
+<p>And, unsurprisingly, the issue of a real fix had crossed my mind.  <img src="//forums.whonix.org/images/emoji/twitter/triumph.png?v=5" title=":triumph:" class="emoji" alt=":triumph:"></p>
+<p>Your UTC explanations make sense in the larger user context.</p>
+<p>If it’s important enough to try to isolate the update/group of updates which are triggering this error, I can start with a clean Gateway 11.ova reinstall and a from known set of initial VBox paramaters, and then start running updates/rebooting after each set, and finding out when/where it breaks.</p>
+<p>Let me know if you think this is worth the effort.</p>
+<p>CCP</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/7</link>
+        <pubDate>Tue, 24 Nov 2015 14:56:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-7</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Corrupt_Correct_Pig:</p>
+<blockquote>
+<p>Are we still using these two time related options for the default build? I found them at:</p>
+<p><a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm">https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm</a></p>
+<ol>
+<li>sudo -u “$user_name” VBoxManage modifyvm “$VMNAME” --rtcuseutc on</li>
+<li>sudo -u “$user_name” VBoxManage setextradata “$VMNAME” “VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled” “1”</li>
+</ol>
+</blockquote>
+<p>Still in use. But those are unrelated here. This is not about UTC at<br>
+all. This is only related to pvclock.</p>
+<p>/sys/devices/system/clocksource/clocksource0/available_clocksource</p>
+<p>/sys/devices/system/clocksource/clocksource0/current_clocksource</p>
+<p>The stopgap will be a Whonix 12 update to disable this test in VirtualBox.</p>
+<p>And if you are wondering about the real fix… The real solution would<br>
+be <a href="https://phabricator.whonix.org/T437">https://phabricator.whonix.org/T437</a> but unfortunately, it’s very<br>
+unlikely to happen. Even fixing this for better supported virtualizers<br>
+seems very hard.</p>
+<blockquote>
+<p>Neither of the explanations accompanying either option seems necessary if the host is already set to UTC.</p>
+</blockquote>
+<p>We don’t expect the host to be set to UTC. Also don’t recommend that<br>
+anywhere. (Would result in a strange browser fingerprint for<br>
+non-torified browsing on the host.) Also would not be great to require<br>
+this from users. Luckily UTC here is a non-issue.</p>
+<blockquote>
+<p>As for the VBox Gateway, under System, Motherboard, users can/should have ‘Hardware Clock in UTC Time’ Checked/Enabled - and also for any other OSes they run where revealing timezones can potentially harm them.</p>
+</blockquote>
+<p>This is already advised here:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Other_Operating_Systems" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/9/99/Board-832155640.jpg" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://www.whonix.org/wiki/Other_Operating_Systems" target="_blank" rel="nofollow noopener">Other Operating Systems</a></h3>
+
+<p>Anonymize any Operating System! Your operating system tunneled through the Tor Anonymity Network! Create your Custom-Whonix-Workstation!</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/6</link>
+        <pubDate>Tue, 24 Nov 2015 14:15:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-6</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Corrupt_Correct_Pig:</p>
+<blockquote>
+<p>Are you suggesting changing the setting from Default to None?</p>
+</blockquote>
+<p>No.</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/5</link>
+        <pubDate>Tue, 24 Nov 2015 14:01:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-5</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>Are we still using these two time related options for the default build? I found them at:</p>
+<p>‘<a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm" rel="nofollow noopener">https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm</a>’</p>
+<ol>
+<li>sudo -u “$user_name” VBoxManage modifyvm “$VMNAME” --rtcuseutc on</li>
+<li>sudo -u “$user_name” VBoxManage setextradata “$VMNAME” “VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled” “1”</li>
+</ol>
+<p>Neither of the explanations accompanying either option makes either option seem necessary if the host is already set to UTC.</p>
+<p>As for the VBox Gateway, under System, Motherboard, users can/should have ‘Hardware Clock in UTC Time’ Checked/Enabled - and also for any other OSes they run where revealing timezones can potentially harm them.</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/4</link>
+        <pubDate>Tue, 24 Nov 2015 13:53:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-4</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi Patrick,</p>
+<p>Thanks for your follow-up.</p>
+<p>Yes, I always get my updates from the Testers repo.</p>
+<p>On Gateway 11 - under System, Acceleration, Paravirtualization interface = Default.</p>
+<p>Note, I also have both of these options ENABLED:</p>
+<p>Enable VT-x/AMD-v<br>
+Enable Nested Paging</p>
+<p>I also have 1 CPU allocated with PAE/NX ENABLED</p>
+<p>Patrick, also note that even though Paravirtualization interface = Default, the main VBox GUI still reports:  KVM Paravirtualization for the Gateway, as it also shows for every linux OS VBox Guest on my system.    Are you suggesting changing the setting from Default to None?</p>
+<p>Let me know if you can already see the settings choices that are causing this error.</p>
+<p>Thanks,</p>
+<p>CCP</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/3</link>
+        <pubDate>Tue, 24 Nov 2015 13:03:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-3</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>That error doesn’t directly break Tor. It derivatives from the recommend/expected virtualizer configuration.</p>
+<p>This is unrelated to UTC. It is about the pvclock setting. If you want more background on it, search the forum for kvmclock. See also <a href="https://www.whonix.org/wiki/Dev/KVM#How_to_disable_KVMClock.3F">https://www.whonix.org/wiki/Dev/KVM#How_to_disable_KVMClock.3F</a>. It allows an attack similar to the one described here <a href="https://www.whonix.org/wiki/Dev/TimeSync#Clock_Correlation_Attack">https://www.whonix.org/wiki/Dev/TimeSync#Clock_Correlation_Attack</a>.</p>
+<p>Did you change any settings in VirtualBox? The paravirtualization providers? Don’t.</p>
+<p>This is unsupported, discouraged.<br>
+( <a href="https://forums.whonix.org/t/unsupported-virtualbox-now-supports-kvm-and-hyper-v-as-paravirtualization-providers/1318">[unsupported] VirtualBox now supports KVM and Hyper-V as paravirtualization providers</a> )</p>
+<p>Whonix 11 didn’t get any updates related to that recently. Did you update from the testers repository?</p>
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/2</link>
+        <pubDate>Tue, 24 Nov 2015 08:46:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-2</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+      <item>
+        <title>Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>This time-based error within a fully updated Gateway 11 running under VBox 5.  This error causes whonixcheck to fail, and continues to drive me nuts!</p>
+<p>Facts:</p>
+<p>My 64-Bit VBox 5 Host is/always has been set to UTC.</p>
+<p>Running ‘date’ in a fully updated Gateway, correctly shows:</p>
+<p>Tue Nov 24 07:49:03 UTC 2015</p>
+<p>Yet following every Gateway boot, I see this error DESPITE the Gateway’s Tor working correctly:</p>
+<p>ERROR: PVClock Test Result:<br>
+Unwanted PVClock kvm-clock tsc acpi_pm detected! This is unsupported by Whonix developers! Whonixcheck aborted!<br>
+Using PVClock together with Whonix is recommended against, because PVClock conflicts with Whonix’s TimeSync design [1].<br>
+You probably did not follow Whonix’s KVM instructions. [2]<br>
+This might endanger your anonymity. Do not proceed unless you know what you are doing.<br>
+If you wish to ignore this warning and to continue whonixcheck anyway, you can set<br>
+WHONIXCHECK_NO_EXIT_ON_PVCLOCK_DETECTION="1"<br>
+in /etc/whonix.d/30_whonixcheck_default.<br>
+Recommended action:</p>
+<ul>
+<li>Shut down.</li>
+<li>Read Whonix documentation. [3]</li>
+<li>Follow Whonix’s KVM instructions. [2]</li>
+<li>Or use Whonix a supported virtualizer.</li>
+<li>Or use Whonix with Physical Isolation. [4]<br>
+[1] <a href="https://www.whonix.org/wiki/Dev/TimeSync" rel="nofollow noopener">https://www.whonix.org/wiki/Dev/TimeSync</a><br>
+[2] <a href="https://www.whonix.org/wiki/KVM" rel="nofollow noopener">https://www.whonix.org/wiki/KVM</a><br>
+[3] <a href="https://www.whonix.org" rel="nofollow noopener">https://www.whonix.org</a><br>
+[4] <a href="https://www.whonix.org/wiki/Physical_Isolation" rel="nofollow noopener">https://www.whonix.org/wiki/Physical_Isolation</a>
+</li>
+</ul>
+<p>Do I need to mention again this is a Gateway 11 error when run under VirtualBox 5, and is UNRELATED to KVM?</p>
+<p>Also note that I run many different OSes under VBox 5, and I have never seen another time-based error with any other VBox Guest OS.</p>
+<p>You should also be aware, this error does NOT occur immediately following a clean install/reinstall of the Gateway-11.ova file.</p>
+<p>The error occurs, and then persists, only following several apt-get updates.  Therefore, the solution to this bug, imo, lies in figuring out what changed to impact the time/clocks, and why, during those updates.</p>
+<p>Setting and using time should be drop dead simple in linux.  What was the original time goal, and why does it appear to have become so complex?  Why all the pain/PITA with Whonix’s version of time?</p>
+<p>What in the world are you actually delivering in terms of safety by using these flawed time checks?  Time is time, all users should be using UTC, period.</p>
+<p>Let me know,</p>
+<p>CCP</p>
+<p>+++++++++++++++++++++++++++++++++++</p>
+<p>Is  /usr/lib/whonixcheck/check_pvclock the script that is driving the error?</p>
+<p>Here is the current content of that script.</p>
+<p>$ cat /usr/lib/whonixcheck/check_pvclock<br>
+#!/bin/bash</p>
+<h2>This file is part of Whonix.</h2>
+<h2>Copyright © 2012 - 2014 Patrick Schleizer <a href="mailto:adrelanos@riseup.net">adrelanos@riseup.net</a>
+</h2>
+<h2>See the file COPYING for copying conditions.</h2>
+<p>pvclock_unwanted_detected() {<br>
+if [ “$WHONIXCHECK_NO_EXIT_ON_PVCLOCK_DETECTION” = “1” ]; then<br>
+local MSG="</p><p>PVClock Test Result: Unwanted PVClock detected, but <code>WHONIXCHECK_NO_EXIT_ON_PVCLOCK_DETECTION</code> is set, continuing.</p>"<br>
+if [ “$verbose” -ge “1” ]; then<br>
+$output_x ${output_opts[@]} --messagex --typex “info” --message “$MSG”<br>
+$output_cli ${output_opts[@]} --messagecli --typecli “info” --message "$MSG"<br>
+fi<br>
+return 0<br>
+fi
+<p>local MSG="</p><p>PVClock Test Result:</p>
+<p><br><b>Unwanted PVClock <code>$available_clocksource</code> detected! This is unsupported by Whonix developers! Whonixcheck aborted!</b></p>
+<p>Using PVClock together with Whonix is recommended against, because PVClock conflicts with Whonix's TimeSync design [1].</p>                                                                  
+<p>You probably did not follow Whonix's KVM instructions. [2]</p>
+<p>This might endanger your anonymity. Do not proceed unless you know what you are doing.</p>
+<p>If you wish to ignore this warning and to continue whonixcheck anyway, you can set
+<code></code></p><blockquote><code>WHONIXCHECK_NO_EXIT_ON_PVCLOCK_DETECTION=\"1\"</code></blockquote>
+in <code>/etc/whonix.d/30_whonixcheck_default</code>.<p></p>
+<p>Recommended action:
+<br>- Shut down.
+<br>- Read Whonix documentation. [3]
+<br>- Follow Whonix's KVM instructions. [2]
+<br>- Or use Whonix a supported virtualizer.
+<br>- Or use Whonix with Physical Isolation. [4]</p>
+<p>[1] <a href="https://www.whonix.org/wiki/Dev/TimeSync" rel="nofollow noopener">https://www.whonix.org/wiki/Dev/TimeSync</a>
+<br>[2] <a href="https://www.whonix.org/wiki/KVM" rel="nofollow noopener">https://www.whonix.org/wiki/KVM</a>
+<br>[3] <a href="https://www.whonix.org" rel="nofollow noopener">https://www.whonix.org</a>
+<br>[4] <a href="https://www.whonix.org/wiki/Physical_Isolation" rel="nofollow noopener">https://www.whonix.org/wiki/Physical_Isolation</a>
+</p>
+"
+<p>$output_x ${output_opts[@]} --messagex --typex “error” --message “$MSG”<br>
+$output_cli ${output_opts[@]} --messagecli --typecli “error” --message "$MSG"<br>
+EXIT_CODE="1"<br>
+cleanup "1"<br>
+return 0<br>
+}</p>
+<p>check_pvclock() {<br>
+if [ -f “/var/run/qubes-whonix/qubes.SetDateTime” ]; then<br>
+qubes_set_date_time_content="$(cat “/var/run/qubes-whonix/qubes.SetDateTime”)" || true<br>
+local MSG="</p><p><br>
+PVClock Result: dom0 is telling us the time. <br>
+File <code>/var/run/qubes-whonix/qubes.SetDateTime</code> exists. <br>
+Its content is <code>$qubes_set_date_time_content</code>. <br>
+This is non-ideal. A known issue. Contributions happily considered. Read more: <a href="https://phabricator.whonix.org/T397" rel="nofollow noopener">https://phabricator.whonix.org/T397</a></p>"<br>
+if [ “$verbose” -ge “1” ]; then<br>
+$output_x ${output_opts[@]} --messagex --typex “info” --message “$MSG”<br>
+$output_cli ${output_opts[@]} --messagecli --typecli “info” --message "$MSG"<br>
+fi<br>
+fi
+<p>if [ ! -f “/sys/devices/system/clocksource/clocksource0/current_clocksource” ]; then<br>
+local MSG="</p><p>PVClock Result: <code>/sys/devices/system/clocksource/clocksource0/current_clocksource</code> does not exist, ok.</p>"<br>
+if [ “$verbose” -ge “1” ]; then<br>
+$output_x ${output_opts[@]} --messagex --typex “info” --message “$MSG”<br>
+$output_cli ${output_opts[@]} --messagecli --typecli “info” --message "$MSG"<br>
+fi<br>
+return 0<br>
+fi
+<p>local current_clocksource available_clocksource<br>
+current_clocksource="$(cat “/sys/devices/system/clocksource/clocksource0/current_clocksource”)" || true<br>
+available_clocksource="$(cat “/sys/devices/system/clocksource/clocksource0/available_clocksource”)" || true</p>
+<p>if [ “$current_clocksource” = “xen” ]; then<br>
+local MSG="</p><p>PVClock Result: <code>/sys/devices/system/clocksource/clocksource0/current_clocksource</code> exist, is <code>$current_clocksource</code>. <br>
+This is non-ideal. A known issue. Contributions happily considered. Read more: <a href="https://phabricator.whonix.org/T389" rel="nofollow noopener">https://phabricator.whonix.org/T389</a></p>"<br>
+if [ “$verbose” -ge “1” ]; then<br>
+$output_x ${output_opts[@]} --messagex --typex “info” --message “$MSG”<br>
+$output_cli ${output_opts[@]} --messagecli --typecli “info” --message "$MSG"<br>
+fi<br>
+return 0<br>
+fi
+<p>if [ “$current_clocksource” = “kvm-clock” ]; then<br>
+pvclock_unwanted_detected<br>
+return 0<br>
+fi</p>
+<p>local MSG="</p><p>PVClock Result: <code>/sys/devices/system/clocksource/clocksource0/current_clocksource</code> exist, is <code>$current_clocksource</code>.</p>"<br>
+if [ “$verbose” -ge “1” ]; then<br>
+$output_x ${output_opts[@]} --messagex --typex “info” --message “$MSG”<br>
+$output_cli ${output_opts[@]} --messagecli --typecli “info” --message "$MSG"<br>
+fi<br>
+return 0<br>
+}
+          <p><a href="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671/1</link>
+        <pubDate>Tue, 24 Nov 2015 08:11:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1671-1</guid>
+        <source url="http://forums.whonix.org/t/recurring-time-error-within-gateway-11-under-virtualbox-5-error-unwanted-pvclock-kvm-clock-tsc-acpi-pm-detected/1671.rss">Recurring Time Error within Gateway 11 under VirtualBox 5 - ERROR: Unwanted PVClock kvm-clock tsc acpi_pm detected!</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,667 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+    <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875</link>
+    <description>Edit: added more testing
+Edit: replace old versions with new ones
+
+Has anyone else observed this?
+
+An idle torbrowser 8.0 with no addons and just the home page open, running in whonix-ws-14, eventually uses 50%-150% cpu. This occurs after torbrowser is running for a while. Often occurs after resuming from suspend, but suspending is not necessary.
+
+* TorBrowser 8.0.3/8.5a2: **affected**
+* TorBrowser 8.0.1 with extensions.torbutton.versioncheck_enabled := false: **affected**
+* TorBrowser 8.0 manually downloaded from torproject.org running in a debian-9 VM: **not affected**
+* firefox-60.2.0esr on whonix-14: **not affected**
+
+strace excerpt:
+    
+    strace: Process 1236 attached
+    strace: [ Process PID=1236 runs in x32 mode. ]
+    strace: [ Process PID=1236 runs in 64 bit mode. ]
+    write(21, &quot;M&quot;, 1)                       = 1
+    futex(0x77eec4968b08, FUTEX_WAKE_PRIVATE, 1) = 1
+    gettimeofday({tv_sec=1536281272, tv_usec=371176}, NULL) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=747749190}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=747800286}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=747856121}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=747912515}) = 0
+    recvmsg(4, {msg_namelen=0}, 0)          = -1 EAGAIN (Resource temporarily unavailable)
+    poll([{fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=29, events=POLLIN}, {fd=33, events=POLLIN}, {fd=53, events=POLLIN}, {fd=71, events=POLLIN}], 6, 0) = 1 ([{fd=33, revents=POLLIN}])
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748119767}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748175956}) = 0
+    read(33, &quot;\372&quot;, 1)                     = 1
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748289733}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748345557}) = 0
+    recvmsg(4, {msg_namelen=0}, 0)          = -1 EAGAIN (Resource temporarily unavailable)
+    poll([{fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=29, events=POLLIN}, {fd=33, events=POLLIN}, {fd=53, events=POLLIN}, {fd=71, events=POLLIN}], 6, 0) = 0 (Timeout)
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748523610}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748579429}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748636882}) = 0
+    gettimeofday({tv_sec=1536281272, tv_usec=372185}, NULL) = 0
+    ioctl(60, FIONREAD, [0])                = 0
+    ioctl(60, FIONREAD, [0])                = 0
+    recvfrom(60, &quot;&quot;, 0, 0, NULL, NULL)      = 0
+    write(21, &quot;M&quot;, 1)                       = 1
+    futex(0x77eec4968b08, FUTEX_WAKE_PRIVATE, 1) = 1
+    gettimeofday({tv_sec=1536281272, tv_usec=372585}, NULL) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749156071}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749212254}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749268018}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749324779}) = 0
+    recvmsg(4, {msg_namelen=0}, 0)          = -1 EAGAIN (Resource temporarily unavailable)
+    poll([{fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=29, events=POLLIN}, {fd=33, events=POLLIN}, {fd=53, events=POLLIN}, {fd=71, events=POLLIN}], 6, 0) = 1 ([{fd=33, revents=POLLIN}])
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749516152}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749573911}) = 0
+    read(33, &quot;\372&quot;, 1)                     = 1
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749691617}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749748225}) = 0
+    recvmsg(4, {msg_namelen=0}, 0)          = -1 EAGAIN (Resource temporarily unavailable)
+    poll([{fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=29, events=POLLIN}, {fd=33, events=POLLIN}, {fd=53, events=POLLIN}, {fd=71, events=POLLIN}], 6, 0) = 0 (Timeout)
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749928040}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749984307}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=750062799}) = 0
+    gettimeofday({tv_sec=1536281272, tv_usec=373612}, NULL) = 0
+    ioctl(60, FIONREAD, [0])                = 0
+    ioctl(60, FIONREAD, [0])                = 0
+    recvfrom(60, &quot;&quot;, 0, 0, NULL, NULL)      = 0
+    write(21, &quot;M&quot;, 1)                       = 1
+    futex(0x77eec4968b08, FUTEX_WAKE_PRIVATE, 1) = 1
+    gettimeofday({tv_sec=1536281272, tv_usec=374010}, NULL) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=750580684}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=750636687}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=750692549}) = 0
+    clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=750749224}) = 0
+    recvmsg(4, {msg_namelen=0}, 0)          = -1 EAGAIN (Resource temporarily unavailable)
+    poll([{fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=29, events=POLLIN}, {fd=33, events=POLLIN}, {fd=53, events=POLLIN}, {fd=71, events=POLLIN}], 6, 0) = 1 ([{fd=33, revents=POLLIN}])
+
+strace -c after about 5 seconds:
+
+    user@host:~$ ps -A | grep firefox
+     1236 ?        03:58:59 firefox.real
+    user@host:~$ sudo strace -cp 1236
+    strace: Process 1236 attached
+    ^Cstrace: Process 1236 detached
+    % time     seconds  usecs/call     calls    errors syscall
+    ------ ----------- ----------- --------- --------- ----------------
+      0.00    0.000000           0      2285           read
+      0.00    0.000000           0      2281           write
+      0.00    0.000000           0      4567           poll
+      0.00    0.000000           0      4536           ioctl
+      0.00    0.000000           0      2268           recvfrom
+      0.00    0.000000           0      4568      4567 recvmsg
+      0.00    0.000000           0      4578           gettimeofday
+      0.00    0.000000           0      2296           futex
+      0.00    0.000000           0     25513           clock_gettime
+    ------ ----------- ----------- --------- --------- ----------------
+    100.00    0.000000                 52892      4567 total</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 31 Aug 2020 13:23:09 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Duplicate of <a href="https://forums.whonix.org/t/bug-restart-of-sdwdate-in-whonix-gateway-causes-100-cpu-use-of-tor-browser-in-whonix-workstation/9541" class="inline-onebox">bug: restart of sdwdate in Whonix-Gateway causes 100% CPU use of Tor Browser in Whonix-Workstation</a>?</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/23</link>
+        <pubDate>Mon, 31 Aug 2020 13:23:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-23</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[ldwkcj]]></dc:creator>
+        <description><![CDATA[
+            <p>This issue is also being discussed in the recently launched Qubes OS discourse:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://aws1.discourse-cdn.com/free1/uploads/qubes_os/optimized/1X/b259e67730c5ce8bb587274123e00f6337b88b0f_2_32x32.png" class="site-icon" width="16" height="16">
+      <a href="https://qubes-os.discourse.group/t/tor-browser-high-cpu-usage-while-idle-in-whonix-ws/134" target="_blank" rel="nofollow noopener" title="05:29PM - 21 August 2020">Qubes OS Community Forum – 21 Aug 20</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://aws1.discourse-cdn.com/free1/uploads/qubes_os/original/1X/b259e67730c5ce8bb587274123e00f6337b88b0f.png" class="thumbnail onebox-avatar" width="128" height="128">
+
+<h3><a href="https://qubes-os.discourse.group/t/tor-browser-high-cpu-usage-while-idle-in-whonix-ws/134" target="_blank" rel="nofollow noopener">Tor Browser high CPU usage while idle, in Whonix-ws</a></h3>
+
+<p>Yes there’s some Tor Browser bug with Whonix that causes CPU usage to spike for no reason. Hopefully it will get fixed with the new Tor Browser alpha.  See the Whonix thread:...</p>
+
+  <p><span class="label1">Reading time: 1 mins 🕑</span>
+    <span class="label2">Likes: 3 ❤</span></p>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Apparently it’s still a problem even with the latest Tor Browser alpha based on ESR78.</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/22</link>
+        <pubDate>Fri, 28 Aug 2020 22:16:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-22</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Also a recent report of high cpu for a Windows TBB user.</p>
+<p><a href="https://trac.torproject.org/projects/tor/ticket/8560#comment:20" class="onebox" target="_blank" rel="nofollow noopener">https://trac.torproject.org/projects/tor/ticket/8560#comment:20</a></p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/21</link>
+        <pubDate>Fri, 18 Oct 2019 00:52:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-21</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[tatertot]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="15" data-topic="5875">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/0/ec9cab/40.png" class="avatar"> 0brand:</div>
+<blockquote>
+<p>Disabling both <code>qubes-update-check</code> (in sys-whonix) and torbutton.versioncheck (in anon-whonix) is required to prevent high cup in Tor Browser.</p>
+</blockquote>
+</aside>
+<p>I’ve tested disabling both and the issue still occurs.</p>
+<aside class="quote no-group" data-post="18" data-topic="5875">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/0/ec9cab/40.png" class="avatar"> 0brand:</div>
+<blockquote>
+<p>Could anyone that experienced this problem please confirm that they use corridor in their setup. Then try testing without <code>sys-corridor</code> as <code>Netvm</code> for <code>sys-whonix</code></p>
+</blockquote>
+</aside>
+<p>Never used corridor.</p>
+<aside class="quote no-group" data-post="17" data-topic="5875">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/0/ec9cab/40.png" class="avatar"> 0brand:</div>
+<blockquote>
+<p>Killing <code>firefox.real</code> in the <code>anon-whonix</code> VM, then restarting Tor Browser can be used as a workaround for that particular session</p>
+</blockquote>
+</aside>
+<p>Quitting and relaunching torbrowser also temporarily fixes it.</p>
+<p>Speaking about the issue in general, I think this issue is under-reported because:</p>
+<ol>
+<li>torbrowser remains responsive (not a hard freeze)</li>
+<li>per-VM CPU usage is not displayed in qubes manager in Qubes 4.0</li>
+</ol>
+<p>Unless you have per-VM CPU monitoring (e.g. <code>xentop</code>), it is not immediately obvious you are suffering from this issue.</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/20</link>
+        <pubDate>Sat, 06 Apr 2019 17:54:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-20</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[awokd]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>I <em><code>might</code></em> have found what is triggering this in Qubes-Whonix. During testing I started trying to isolate the issue and I come across something interesting. I no longer have problems with high cpu when I remove <code>sys-corridor</code> from my setup. This means that even with both <code>qubes-update-check</code> enabled and <code>extensions.torbutton.versioncheck_enabled</code> = true I had no high cup issues.</p>
+</blockquote>
+<p>I’m not using sys-corridor but have experienced that high CPU often.<br>
+Might be one of those other causes, like you said.</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/19</link>
+        <pubDate>Sun, 31 Mar 2019 17:45:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-19</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>I <em><code>might</code></em> have found what is triggering this in Qubes-Whonix. During testing I started trying to isolate the issue and I come across something interesting. I no longer have problems with high cpu when I remove <code>sys-corridor</code> from my setup. This means that even with both <code>qubes-update-check</code> enabled and <code>extensions.torbutton.versioncheck_enabled</code> = true I had no high cup issues.</p>
+<p>If you recall corridor was not functional for a time in Debian 9. These problems did not start until right after corridor was fixed.</p>
+<p>Corridor was fixed by rustybird for Debian 9 in the beginning of December 2019 (<a href="https://github.com/rustybird/corridor" rel="nofollow noopener">https://github.com/rustybird/corridor</a>). This correlates with the time users started having issues with high cpu. (if I go by the time this problem was reported by tatertot)</p>
+<p>Could anyone that experienced this problem please confirm that they use corridor in their setup. Then try testing without <code>sys-corridor</code> as <code>Netvm</code> for <code>sys-whonix</code></p>
+<p>Note: This problem is caused by an underlying issue with Tor Browser. Its possible there could be multiple triggers that can cause this high CPU issues.</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/18</link>
+        <pubDate>Sun, 31 Mar 2019 17:29:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-18</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group quote-modified" data-post="16" data-topic="5875">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<blockquote>
+<p>When <code>firfox.real</code> CPU starts to spike I switch NetVM to a <strong>non</strong> - <code>sys-whonix</code> Tor Version VM and the problem is gone. It may have nothing to do with the NetVM that is used. Problem may subside <em>just</em> because NetVM is changed. Or maybe just by coincident.</p>
+</blockquote>
+<p>Good thought. Perhaps try change from one sys-whonix to another sys-whonix2?</p>
+</blockquote>
+</aside>
+<p>I might have found something easier. Killing <code>firefox.real</code>  in the <code>anon-whonix</code> VM, then restarting Tor Browser can be used as a workaround for that particular session. When this is done the <code>%cpu</code> and <code>%mem</code> are normilized. If using a DispVM users can (1) start a konsole (2) start Tor Browser from the konsole (3)) kill <code>firefox.real</code> (4) start Tor Browser from the konsole. This would allow for killing the process without shutting down the DispVM.</p>
+<p>Note: I would suspect killing Tor Browser in the konsole (press Ctrl + C ) would work instead of killing <code>firefox.real</code>. I will find out when I start testing again.</p>
+<aside class="quote no-group" data-post="16" data-topic="5875">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>This is a very difficult case.</p>
+<p>Since “Disable <code>qubes-update-check</code> in <code>sys-whonix</code> .” is part of the workaround, it could be a Qubes specific issue. But something <code>qubes-update-check</code> does could just be the trigger and it could be a bug in Tor Browser or Firefox.</p>
+</blockquote>
+</aside>
+<p>Its odd that changes in both <code>sys-whonix</code> and <code>anon-whonix</code> are needed for a persistent <em>workaround</em>. I wouldn’t be surprised if there was something else that was responsible for this behavior (Tor Browser related)</p>
+<aside class="quote no-group" data-post="16" data-topic="5875">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Commented on <a href="https://trac.torproject.org/projects/tor/ticket/8560" rel="nofollow noopener">https://trac.torproject.org/projects/tor/ticket/8560 </a>. Please join if useful.</p>
+</blockquote>
+</aside>
+<p>I haven’t been able  to reproduce this in Debian Tor Browser but myabe the right conditions need to be set. I’ll keep going with this and maybe I"ll get lucky. Otherwise it might be best that i not comment on this issue since I might unintentionally say something to get this labeled a Qubes-Whonix bug.</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/17</link>
+        <pubDate>Tue, 12 Mar 2019 22:00:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-17</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="10" data-topic="5875">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/0/ec9cab/40.png" class="avatar"> 0brand:</div>
+<blockquote>
+<p>When <code>firfox.real</code> CPU starts to spike I switch NetVM to a <strong>non</strong> - <code>sys-whonix</code> Tor Version VM and the problem is gone. It may have nothing to do with the NetVM that is used. Problem may subside <em>just</em> because NetVM is changed. Or maybe just by coincident.</p>
+</blockquote>
+</aside>
+<p>Good thought. Perhaps try change from one sys-whonix to another sys-whonix2?</p>
+<aside class="quote no-group" data-post="15" data-topic="5875">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/0/ec9cab/40.png" class="avatar"> 0brand:</div>
+<blockquote>
+<p>Where to submit a bug report?</p>
+</blockquote>
+</aside>
+<p>Good question, next question. <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=6" title=":wink:" class="emoji" alt=":wink:"></p>
+<aside class="quote no-group" data-post="15" data-topic="5875">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/0/ec9cab/40.png" class="avatar"> 0brand:</div>
+<blockquote>
+<p>Would this be a Qubes specific issue?</p>
+</blockquote>
+</aside>
+<p>This is a very difficult case.</p>
+<p>Since “Disable <code>qubes-update-check</code> in <code>sys-whonix</code> .” is part of the workaround, it could be a Qubes specific issue. But something <code>qubes-update-check</code> does could just be the trigger and it could be a bug in Tor Browser or Firefox.</p>
+<hr>
+<p>Commented on <a href="https://trac.torproject.org/projects/tor/ticket/8560" rel="nofollow noopener">https://trac.torproject.org/projects/tor/ticket/8560</a>. Please join if useful.</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/16</link>
+        <pubDate>Tue, 12 Mar 2019 06:15:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-16</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>I believe I found the reason that setting <code>extensions.torbutton.versioncheck_enabled</code> to <code>false</code> works for me and no one else. I use a custom script to update my VMs so I always disable <code>qubes-update-check</code> in my VMs since it is not needed. Disabling both <code>qubes-update-check</code> (in sys-whonix) and torbutton.versioncheck (in anon-whonix) is required to prevent high cup in Tor Browser.  I’ve tested this quite extensively with newly created <code>sys-whonix</code> and <code>anon-whonix</code> VMs.</p>
+<p>Where to submit a bug report? Would this be a Qubes specific issue?</p>
+<p>To fix this issue:</p>
+<ol>
+<li>
+<p>Disable <code>qubes-update-check</code> in <code>sys-whonix</code>.</p>
+<p>In a dom0 terminal, run.</p>
+<p><code>qvm-service -d sys-whonix qubes-update-check</code></p>
+</li>
+<li>
+<p>Disble <code>torbutton.versioncheck</code> in <code>anon-whonix</code> Tor Browser.</p>
+<p>In dom0 terminal, run Tor Browser.</p>
+<p><code>qvm-run anon-whonix torbrowser</code></p>
+<p>Next, type <code>about:config</code> in Tor Browser address bar.</p>
+<p>Then type <code>extensions.torbutton.versioncheck_enabled</code> in the search bar and “toggle” to <code>false</code>.</p>
+</li>
+</ol>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/15</link>
+        <pubDate>Mon, 11 Mar 2019 23:45:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-15</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Having the same issue with different hardware. Running <code>top</code> shows CPU and MEM spike about 20-30 seconds after Tor Browser is started. The spike would be consistent with what I might expect to see when first browsing to a new web page, CPU 90-120% and MEM 30-35%. Like my previous post I was able to fix the issue by typing <code>about:config</code> in the address bar then toggle <code>extensions.torbutton.versioncheck_enabled</code> to false.</p>
+<p>It takes about 45 minutes before my laptop starts getting to hot and my fans kick in before I would even know there is an issue so it would not surprise me if more users are having this issue but are not aware of it.</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/14</link>
+        <pubDate>Fri, 08 Mar 2019 23:04:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-14</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[unmkwa]]></dc:creator>
+        <description><![CDATA[
+            <p>Same problem to me after update. 70-80% CPU usage.<br>
+<code>extensions.torbutton.versioncheck_enabled</code> to false don’t help</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/13</link>
+        <pubDate>Thu, 25 Oct 2018 12:33:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-13</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[tatertot]]></dc:creator>
+        <description><![CDATA[
+            <p>Unfortunately it didn’t work for me : (.</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/12</link>
+        <pubDate>Sun, 23 Sep 2018 17:36:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-12</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Was searching though Tor trac for High CPU bug reports and came across this older one which was solved by using <code>about:config</code> to toggle <code>extensions.torbutton.versioncheck_enabled</code> to false. Although its a different bug, the solution works for me.</p>
+<p><a href="https://trac.torproject.org/projects/tor/ticket/8560">https://trac.torproject.org/projects/tor/ticket/8560</a></p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/11</link>
+        <pubDate>Fri, 21 Sep 2018 20:57:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-11</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>This bug seems to only affect my <code>disp-anon-whonix</code> VMs that use a <code>sys-whonix</code> (based on Template <a href="http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Tor_Versioning">Tor Versioning</a>) as netvm?</p>
+<p>When <code>firfox.real</code> CPU starts to spike I switch NetVM to a <strong>non</strong>-<code>sys-whonix</code> Tor Version VM and the problem is gone. It may have nothing to do with the NetVM that is used. Problem may subside <em>just</em> because NetVM is changed. Or maybe just by coincident.</p>
+<p><strong>Note:</strong> No problems with any <code>anon-whonix</code> VM that use default <code>sys-whonix</code> VMs  as NetVM.</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/10</link>
+        <pubDate>Thu, 20 Sep 2018 10:12:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-10</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Having problems with the same bug on my system. Have this issue when <code>clockadj</code> is running <em>and</em> when it is not. This bug was triggered at VM start so not sure of the reason why this would start all of a sudden</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/9</link>
+        <pubDate>Wed, 19 Sep 2018 23:28:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-9</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This one?</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://bugzilla.mozilla.org/show_bug.cgi/extensions/BMO/web/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=508427" target="_blank">bugzilla.mozilla.org</a>
+  </header>
+  <article class="onebox-body">
+    
+
+<h3><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=508427" target="_blank">508427 - High CPU on Linux even when in the background, possibly due to frequent...</a></h3>
+
+<p>NEW (nobody) in Core - XPCOM. Last updated 2017-07-31.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>A nine years unresolved old bug in Firefox but that doesn’t explain why it gets triggered in Whonix only.</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/8</link>
+        <pubDate>Sat, 08 Sep 2018 17:41:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-8</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[tatertot]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes. Actually, I’ve never seen sclockadj appear in ps, even though it is installed at /usr/lib/sdwdate/sclockadj</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/7</link>
+        <pubDate>Sat, 08 Sep 2018 17:18:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-7</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Can you reproduce this issue while sclockadj does not appear in ps?</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/6</link>
+        <pubDate>Sat, 08 Sep 2018 09:10:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-6</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[tatertot]]></dc:creator>
+        <description><![CDATA[
+            <p>sclockadj (installed at /usr/lib/sdwdate/sclockadj) doesn’t appear in ps.</p>
+<p>whonix-installed torbrowser-8.0 on whonix-ws-14 - <strong>affected</strong><br>
+manually-installed torbrowser-8.0 on debian stretch - <strong>can’t reproduce</strong><br>
+firefox-60.2.0esr on whonix-ws-14 - <strong>can’t reproduce</strong></p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/5</link>
+        <pubDate>Sat, 08 Sep 2018 06:05:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-5</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>tatertot:</p>
+<blockquote>
+<aside class="quote no-group" data-post="2" data-topic="5875" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Could you try please if you can reproduce this without Tor Browser being involved at all?</p>
+</blockquote>
+</aside>
+<p>Meaning, try to reproduce using Firefox 60.2.0esr on whonix-ws-14?</p>
+</blockquote>
+<p>Can do.</p>
+<p>But I meant just suspend without anything. Could be sclockadj issue.<br>
+That’s why.</p>
+<p>To check if sclockadj is running.</p>
+<pre><code>ps aux | grep sclockadj</code></pre>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/4</link>
+        <pubDate>Fri, 07 Sep 2018 15:20:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-4</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[tatertot]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="2" data-topic="5875" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Could you try please if you can reproduce this without Tor Browser being involved at all?</p>
+</blockquote>
+</aside>
+<p>Meaning, try to reproduce using Firefox 60.2.0esr on whonix-ws-14?</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/3</link>
+        <pubDate>Fri, 07 Sep 2018 06:33:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-3</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Could you try please if you can reproduce this without Tor Browser being involved at all?</p>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/2</link>
+        <pubDate>Fri, 07 Sep 2018 05:09:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-2</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+      <item>
+        <title>TorBrowser 8.0 high cpu usage while idle, in whonix</title>
+        <dc:creator><![CDATA[tatertot]]></dc:creator>
+        <description><![CDATA[
+            <p>Edit: added more testing<br>
+Edit: replace old versions with new ones</p>
+<p>Has anyone else observed this?</p>
+<p>An idle torbrowser 8.0 with no addons and just the home page open, running in whonix-ws-14, eventually uses 50%-150% cpu. This occurs after torbrowser is running for a while. Often occurs after resuming from suspend, but suspending is not necessary.</p>
+<ul>
+<li>TorBrowser 8.0.3/8.5a2: <strong>affected</strong>
+</li>
+<li>TorBrowser 8.0.1 with extensions.torbutton.versioncheck_enabled := false: <strong>affected</strong>
+</li>
+<li>TorBrowser 8.0 manually downloaded from <a href="http://torproject.org" rel="nofollow noopener">torproject.org</a> running in a debian-9 VM: <strong>not affected</strong>
+</li>
+<li>firefox-60.2.0esr on whonix-14: <strong>not affected</strong>
+</li>
+</ul>
+<p>strace excerpt:</p>
+<pre><code>strace: Process 1236 attached
+strace: [ Process PID=1236 runs in x32 mode. ]
+strace: [ Process PID=1236 runs in 64 bit mode. ]
+write(21, "M", 1)                       = 1
+futex(0x77eec4968b08, FUTEX_WAKE_PRIVATE, 1) = 1
+gettimeofday({tv_sec=1536281272, tv_usec=371176}, NULL) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=747749190}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=747800286}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=747856121}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=747912515}) = 0
+recvmsg(4, {msg_namelen=0}, 0)          = -1 EAGAIN (Resource temporarily unavailable)
+poll([{fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=29, events=POLLIN}, {fd=33, events=POLLIN}, {fd=53, events=POLLIN}, {fd=71, events=POLLIN}], 6, 0) = 1 ([{fd=33, revents=POLLIN}])
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748119767}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748175956}) = 0
+read(33, "\372", 1)                     = 1
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748289733}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748345557}) = 0
+recvmsg(4, {msg_namelen=0}, 0)          = -1 EAGAIN (Resource temporarily unavailable)
+poll([{fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=29, events=POLLIN}, {fd=33, events=POLLIN}, {fd=53, events=POLLIN}, {fd=71, events=POLLIN}], 6, 0) = 0 (Timeout)
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748523610}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748579429}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=748636882}) = 0
+gettimeofday({tv_sec=1536281272, tv_usec=372185}, NULL) = 0
+ioctl(60, FIONREAD, [0])                = 0
+ioctl(60, FIONREAD, [0])                = 0
+recvfrom(60, "", 0, 0, NULL, NULL)      = 0
+write(21, "M", 1)                       = 1
+futex(0x77eec4968b08, FUTEX_WAKE_PRIVATE, 1) = 1
+gettimeofday({tv_sec=1536281272, tv_usec=372585}, NULL) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749156071}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749212254}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749268018}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749324779}) = 0
+recvmsg(4, {msg_namelen=0}, 0)          = -1 EAGAIN (Resource temporarily unavailable)
+poll([{fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=29, events=POLLIN}, {fd=33, events=POLLIN}, {fd=53, events=POLLIN}, {fd=71, events=POLLIN}], 6, 0) = 1 ([{fd=33, revents=POLLIN}])
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749516152}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749573911}) = 0
+read(33, "\372", 1)                     = 1
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749691617}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749748225}) = 0
+recvmsg(4, {msg_namelen=0}, 0)          = -1 EAGAIN (Resource temporarily unavailable)
+poll([{fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=29, events=POLLIN}, {fd=33, events=POLLIN}, {fd=53, events=POLLIN}, {fd=71, events=POLLIN}], 6, 0) = 0 (Timeout)
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749928040}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=749984307}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=750062799}) = 0
+gettimeofday({tv_sec=1536281272, tv_usec=373612}, NULL) = 0
+ioctl(60, FIONREAD, [0])                = 0
+ioctl(60, FIONREAD, [0])                = 0
+recvfrom(60, "", 0, 0, NULL, NULL)      = 0
+write(21, "M", 1)                       = 1
+futex(0x77eec4968b08, FUTEX_WAKE_PRIVATE, 1) = 1
+gettimeofday({tv_sec=1536281272, tv_usec=374010}, NULL) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=750580684}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=750636687}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=750692549}) = 0
+clock_gettime(CLOCK_MONOTONIC, {tv_sec=9668, tv_nsec=750749224}) = 0
+recvmsg(4, {msg_namelen=0}, 0)          = -1 EAGAIN (Resource temporarily unavailable)
+poll([{fd=4, events=POLLIN}, {fd=5, events=POLLIN}, {fd=29, events=POLLIN}, {fd=33, events=POLLIN}, {fd=53, events=POLLIN}, {fd=71, events=POLLIN}], 6, 0) = 1 ([{fd=33, revents=POLLIN}])
+</code></pre>
+<p>strace -c after about 5 seconds:</p>
+<pre><code>user@host:~$ ps -A | grep firefox
+ 1236 ?        03:58:59 firefox.real
+user@host:~$ sudo strace -cp 1236
+strace: Process 1236 attached
+^Cstrace: Process 1236 detached
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+  0.00    0.000000           0      2285           read
+  0.00    0.000000           0      2281           write
+  0.00    0.000000           0      4567           poll
+  0.00    0.000000           0      4536           ioctl
+  0.00    0.000000           0      2268           recvfrom
+  0.00    0.000000           0      4568      4567 recvmsg
+  0.00    0.000000           0      4578           gettimeofday
+  0.00    0.000000           0      2296           futex
+  0.00    0.000000           0     25513           clock_gettime
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000000                 52892      4567 total</code></pre>
+          <p><a href="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875/1</link>
+        <pubDate>Fri, 07 Sep 2018 02:17:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5875-1</guid>
+        <source url="http://forums.whonix.org/t/torbrowser-8-0-high-cpu-usage-while-idle-in-whonix/5875.rss">TorBrowser 8.0 high cpu usage while idle, in whonix</source>
+      </item>
+  </channel>
+</rss>

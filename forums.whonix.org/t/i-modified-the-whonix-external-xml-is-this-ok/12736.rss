@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>I modified the Whonix-External.xml - Is this OK?</title>
+    <link>http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736</link>
+    <description>Hello,
+
+This is the default Whonix-External.xml
+
+    &lt;network&gt;
+      &lt;name&gt;Whonix-External&lt;/name&gt;
+      &lt;forward mode=&#39;nat&#39;/&gt;
+      &lt;bridge name=&#39;virbr1&#39; stp=&#39;on&#39; delay=&#39;0&#39;/&gt;
+      &lt;ip address=&#39;10.0.2.2&#39; netmask=&#39;255.255.255.0&#39;/&gt;
+    &lt;/network&gt;
+
+Would this be an acceptable modification to ensure all traffic passes through tun0 and won&#39;t leak if it the VPN disconnects?
+
+    &lt;network&gt;
+      &lt;name&gt;Whonix-External&lt;/name&gt;
+      &lt;forward dev=&#39;tun0&#39; mode=&#39;nat&#39;&gt;
+        &lt;interface dev=&#39;tun0&#39;/&gt;
+      &lt;/forward&gt;
+      &lt;bridge name=&#39;virbr1&#39; stp=&#39;on&#39; delay=&#39;0&#39;/&gt;
+      &lt;ip address=&#39;10.0.2.2&#39; netmask=&#39;255.255.255.0&#39;&gt;
+      &lt;/ip&gt;
+    &lt;/network&gt;</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 12 Aug 2022 12:14:25 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>I modified the Whonix-External.xml - Is this OK?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="1" data-topic="14449">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img loading="lazy" alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/96bed5/40.png" class="avatar">
+    <a href="https://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449">Guide: Easy Fix for Whonix Firewall Kill Switch</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/kvm/11"><span class="badge-category-bg" style="background-color: #9EB83B;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Everything specific to Whonix KVM. (devs)">KVM</span></a>
+  </div>
+  <blockquote>
+    Hi devs, you’re all doing an incredible job and I’ve donated twice already. Thank you!. <img width="20" height="20" src="//forums.whonix.org/images/emoji/twitter/upside_down_face.png?v=12" title="upside_down_face" alt="upside_down_face" class="emoji"> (I’m alex_tanner but forgot my pw) 
+There has been a lot of debate about a fail-closed mechanism or a kill switch for VPN users on Whonix. (Cutting off all traffic to TOR if the VPN drops). 
+This recommended script VPN-Firewall by adrelanos on Github is fine, but there is a much quicker, safer and more efficient way to achieve this. 
+This guide is for VPN that are set up on the host. 
+Liter…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736/4</link>
+        <pubDate>Fri, 12 Aug 2022 12:14:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12736-4</guid>
+        <source url="http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736.rss">I modified the Whonix-External.xml - Is this OK?</source>
+      </item>
+      <item>
+        <title>I modified the Whonix-External.xml - Is this OK?</title>
+        <dc:creator><![CDATA[alex_tanner]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve been wondering the exact same thing and figured it out.</p>
+<p>Adding the following to the Whonix-External.xml is <strong>all</strong> you need to achieve fail-closed.</p>
+<pre><code class="lang-auto">  &lt;forward dev='tun0' mode='nat'&gt;
+</code></pre>
+<p>Once you start the Exernal Network, libvirt automatically generates iptable rules to facilitate traffic between virbr1 (Whonix-External) and the interface tun0.</p>
+<p>Among other rules, these are added to the FORWARD chain to set up connectivity between WS, GW and tun0.</p>
+<p>Incoming (only for established):<br>
+<code>-A FORWARD -m conntrack --ctstate ESTABLISHED -j ACCEPT</code><br>
+Outgoing:<br>
+<code>-A FORWARD -s 10.0.2.0/24 -i virbr1 -o tun0 -j ACCEPT</code></p>
+<p>10.0.2.0/24 is the IP range of the Internal Network adapter virbr2, that is used by the WS. It is automatically assigned by libvirt because the IP of virbr1 that is linked to it is 10.0.2.2</p>
+<p>Finally, you change your default FOWARD policy to drop.</p>
+<p><code>/sbin/iptables -P FORWARD DROP</code></p>
+<p>That’s it.</p>
+<p>If your VPN cuts out or openvpn exits, virbr1 won’t have any matching rules to send or receive packets through any other interface and the FOWARD default drop policy will take effect.</p>
+          <p><a href="http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736/3</link>
+        <pubDate>Wed, 10 Aug 2022 20:20:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12736-3</guid>
+        <source url="http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736.rss">I modified the Whonix-External.xml - Is this OK?</source>
+      </item>
+      <item>
+        <title>I modified the Whonix-External.xml - Is this OK?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Interesting use case! Try simulating this situation by terminating the VPN connection randomly and see if the GW can still communicate with the outside world. If you want to avoid leaving network fingerprints while testing then try running a VPN server listening on the localhost and assign it tun0 instead. Wireshark may be of use.</p>
+          <p><a href="http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736/2</link>
+        <pubDate>Sun, 07 Nov 2021 18:11:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12736-2</guid>
+        <source url="http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736.rss">I modified the Whonix-External.xml - Is this OK?</source>
+      </item>
+      <item>
+        <title>I modified the Whonix-External.xml - Is this OK?</title>
+        <dc:creator><![CDATA[Erich_Wettel]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello,</p>
+<p>This is the default Whonix-External.xml</p>
+<pre><code>&lt;network&gt;
+  &lt;name&gt;Whonix-External&lt;/name&gt;
+  &lt;forward mode='nat'/&gt;
+  &lt;bridge name='virbr1' stp='on' delay='0'/&gt;
+  &lt;ip address='10.0.2.2' netmask='255.255.255.0'/&gt;
+&lt;/network&gt;
+</code></pre>
+<p>Would this be an acceptable modification to ensure all traffic passes through tun0 and won’t leak if it the VPN disconnects?</p>
+<pre><code>&lt;network&gt;
+  &lt;name&gt;Whonix-External&lt;/name&gt;
+  &lt;forward dev='tun0' mode='nat'&gt;
+    &lt;interface dev='tun0'/&gt;
+  &lt;/forward&gt;
+  &lt;bridge name='virbr1' stp='on' delay='0'/&gt;
+  &lt;ip address='10.0.2.2' netmask='255.255.255.0'&gt;
+  &lt;/ip&gt;
+&lt;/network&gt;</code></pre>
+          <p><a href="http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736/1</link>
+        <pubDate>Thu, 04 Nov 2021 20:12:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12736-1</guid>
+        <source url="http://forums.whonix.org/t/i-modified-the-whonix-external-xml-is-this-ok/12736.rss">I modified the Whonix-External.xml - Is this OK?</source>
+      </item>
+  </channel>
+</rss>

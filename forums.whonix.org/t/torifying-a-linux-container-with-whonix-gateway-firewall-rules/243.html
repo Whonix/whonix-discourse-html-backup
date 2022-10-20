@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>Torifying a Linux Container with Whonix Gateway Firewall Rules - General Tor and Anonymity Talk - Whonix Forum</title>
+    <meta name="description" content="I want to isolate my hidden service application in an unprivileged LXC, which is available in the latest Ubuntu 14.04. I don&amp;#39;t know much about iptables, so I looked at the Whonix Gateway iptables rules, changing eth1 to &amp;hellip;">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="243.html" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../c/news/21.html">NEWS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;Torifying a Linux Container with Whonix Gateway Firewall Rules&#39;" href="243.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/torifying-a-linux-container-with-whonix-gateway-firewall-rules/243" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/torifying-a-linux-container-with-whonix-gateway-firewall-rules/243" />
+<meta property="og:title" content="Torifying a Linux Container with Whonix Gateway Firewall Rules" />
+<meta name="twitter:title" content="Torifying a Linux Container with Whonix Gateway Firewall Rules" />
+<meta property="og:description" content="I want to isolate my hidden service application in an unprivileged LXC, which is available in the latest Ubuntu 14.04. I don’t know much about iptables, so I looked at the Whonix Gateway iptables rules, changing eth1 to lxcbr0. I think it’s still too restrictive. I don’t need the host OS to be a Whonix Gateway per se. I don’t need host OS connections to be torified. My intention is that an attacker inside the LXC can’t determine the IP address by curl’ing, wget’ing or phoning home to his server...." />
+<meta name="twitter:description" content="I want to isolate my hidden service application in an unprivileged LXC, which is available in the latest Ubuntu 14.04. I don’t know much about iptables, so I looked at the Whonix Gateway iptables rules, changing eth1 to lxcbr0. I think it’s still too restrictive. I don’t need the host OS to be a Whonix Gateway per se. I don’t need host OS connections to be torified. My intention is that an attacker inside the LXC can’t determine the IP address by curl’ing, wget’ing or phoning home to his server...." />
+<meta property="article:published_time" content="2014-04-24T02:36:09+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../index.html">
+          <img src="../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="243.html">Torifying a Linux Container with Whonix Gateway Firewall Rules</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../c/general-tor-and-anonymity-talk/10.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #92278F'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>General Tor and Anonymity Talk</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/malcolm'><span itemprop='name'>malcolm</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="243.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-04-24T02:36:09Z' class='post-time'>
+                April 24, 2014,  2:36am
+              </time>
+              <meta itemprop='dateModified' content='2014-04-24T02:36:09Z'>
+          <span itemprop='position'>#1</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I want to isolate my hidden service application in an unprivileged LXC, which is available in the latest Ubuntu 14.04. I don’t know much about iptables, so I looked at the Whonix Gateway iptables rules, changing eth1 to lxcbr0. I think it’s still too restrictive. I don’t need the host OS to be a Whonix Gateway per se. I don’t need host OS connections to be torified. My intention is that an attacker inside the LXC can’t determine the IP address by curl’ing, wget’ing or phoning home to his server. If he “breaks out” of the LXC then there are many ways to obtain the IP address and torification of the host OS is useless. Could someone help me refine these iptables rules to allow the host OS to run normally but torify all connections coming from lxcbr0 (the LXC virtual bridge adapter)? Here’s what I have so far. Thanks in advance.</p>
+<h2>External interface</h2>
+<p>EXT_IF=“eth0”</p>
+<h2>Internal interface</h2>
+<p>INT_IF=“lxcbr0”</p>
+<h2>Internal “tunnel” interface, usually the same as</h2>
+<h2>the Internal interface unless using vpn tunnels</h2>
+<h2>between workstations and gateway</h2>
+<p>INT_TIF=“lxcbr0”</p>
+<h2>Destinations you don not want routed through Tor</h2>
+<p>NON_TOR_WHONIXG=“192.168.1.0/24 192.168.0.0/24 127.0.0.0/8”</p>
+<h2>Transparent Proxy Port</h2>
+<p>TRANS_PORT_WHONIXW=“9040”</p>
+<h2>DNSPort</h2>
+<p>DNS_PORT_WHONIXW=“53”</p>
+<p>###########################</p>
+<h2>IPv4 DEFAULTS</h2>
+<p>###########################</p>
+<h2>Set secure defaults.</h2>
+<p>iptables -P INPUT DROP   #####  This rule kills my ssh connection too.</p>
+<h2>FORWARD rules does not actually do anything if forwarding is disabled. Better be safe just in case.</h2>
+<p>iptables -P FORWARD DROP</p>
+<h2>Only the Tor process is allowed to establish outgoing connections.</h2>
+<p>iptables -P OUTPUT DROP</p>
+<p>###########################</p>
+<h2>IPv4 PREPARATIONS</h2>
+<p>###########################</p>
+<h2>Flush old rules.</h2>
+<p>iptables -F<br>
+iptables -X<br>
+iptables -t nat -F<br>
+iptables -t nat -X<br>
+iptables -t mangle -F<br>
+iptables -t mangle -X</p>
+<p>############################</p>
+<h2>IPv4 DROP INVALID PACKAGES</h2>
+<p>############################</p>
+<h2>DROP INVALID</h2>
+<p>iptables -A INPUT -m state --state INVALID -j DROP</p>
+<h2>DROP INVALID SYN PACKETS</h2>
+<p>iptables -A INPUT -p tcp --tcp-flags ALL ACK,RST,SYN,FIN -j DROP<br>
+iptables -A INPUT -p tcp --tcp-flags SYN,FIN SYN,FIN -j DROP<br>
+iptables -A INPUT -p tcp --tcp-flags SYN,RST SYN,RST -j DROP</p>
+<h2>DROP PACKETS WITH INCOMING FRAGMENTS. THIS ATTACK ONCE RESULTED IN KERNEL PANICS</h2>
+<p>iptables -A INPUT -f -j DROP</p>
+<h2>DROP INCOMING MALFORMED XMAS PACKETS</h2>
+<p>iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP</p>
+<h2>DROP INCOMING MALFORMED NULL PACKETS</h2>
+<p>iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP</p>
+<p>###########################</p>
+<h2>IPv4 INPUT</h2>
+<p>###########################</p>
+<h2>Traffic on the loopback interface is accepted.</h2>
+<p>iptables -A INPUT -i lo -j ACCEPT</p>
+<h2>Established incoming connections are accepted.</h2>
+<p>iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT</p>
+<h2>Allow incoming SSH connections on the external interface.</h2>
+<p>iptables -A INPUT -i “$EXT_IF” -p tcp --dport 22 -j ACCEPT</p>
+<h2>Allow DNS traffic to DNSPort.</h2>
+<p>iptables -A INPUT -i “$INT_TIF” -p udp --dport 53 -j ACCEPT</p>
+<h2>Allow TCP traffic TransPort.</h2>
+<p>iptables -A INPUT -i “$INT_IF” -p tcp --dport “$TRANS_PORT_WHONIXW” -j ACCEPT</p>
+<h2>Redirect remaining DNS traffic to DNSPORT.</h2>
+<p>iptables -t nat -A PREROUTING -i “$INT_IF” -p udp --dport 53 -j REDIRECT --to-ports “$DNS_PORT_WHONIXW”</p>
+<h2>Catch all remaining TCP and redirect to TransPort.</h2>
+<p>iptables -t nat -A PREROUTING -i “$INT_IF” -p tcp --syn -j REDIRECT --to-ports “$TRANS_PORT_WHONIXW”</p>
+<h2>Reject anything not explicitly allowed above.</h2>
+<p>iptables -A INPUT -j DROP</p>
+<p>###########################</p>
+<h2>IPv4 FORWARD</h2>
+<p>###########################</p>
+<h2>Reject everything.</h2>
+<p>iptables -A FORWARD -j REJECT --reject-with icmp-admin-prohibited</p>
+<p>###########################</p>
+<h2>IPv6</h2>
+<p>###########################</p>
+<h2>Policy DROP for all traffic as fallback.</h2>
+<p>ip6tables -P INPUT DROP<br>
+ip6tables -P OUTPUT DROP<br>
+ip6tables -P FORWARD DROP</p>
+<h2>Flush old rules.</h2>
+<p>ip6tables -F<br>
+ip6tables -X<br>
+ip6tables -t mangle -F<br>
+ip6tables -t mangle -X</p>
+<h2>Allow unlimited access on loopback.</h2>
+<h2>Not activated, since we do not need it.</h2>
+<p><span class="hashtag">#ip6tables</span> -A INPUT -i lo -j ACCEPT<br>
+<span class="hashtag">#ip6tables</span> -A OUTPUT -o lo -j ACCEPT</p>
+<h2>Drop/reject all other traffic.</h2>
+<p>ip6tables -A INPUT -j DROP</p>
+<h2>–reject-with icmp-admin-prohibited not supported by ip6tables</h2>
+<p>ip6tables -A OUTPUT -j REJECT</p>
+<h2>–reject-with icmp-admin-prohibited not supported by ip6tables</h2>
+<p>ip6tables -A FORWARD -j REJECT</p>
+<p>###########################</p>
+<h2>End</h2>
+<p>###########################</p>
+        </div>
+
+        <meta itemprop='headline' content='Torifying a Linux Container with Whonix Gateway Firewall Rules'>
+          <meta itemprop='keywords' content=''>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/malcolm'><span itemprop='name'>malcolm</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="243.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-04-24T02:37:12Z' class='post-time'>
+                April 24, 2014,  2:37am
+              </time>
+              <meta itemprop='dateModified' content='2014-04-24T02:37:12Z'>
+          <span itemprop='position'>#2</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I should add that my torrc running on the host OS is configured like this.</p>
+<p>VirtualAddrNetworkIPv4 10.192.0.0/10<br>
+AutoMapHostsOnResolve 1<br>
+TransPort 9040<br>
+DNSPort 53</p>
+        </div>
+
+        <meta itemprop='headline' content='Torifying a Linux Container with Whonix Gateway Firewall Rules'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/malcolm'><span itemprop='name'>malcolm</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="243.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-04-24T02:41:30Z' class='post-time'>
+                April 24, 2014,  2:41am
+              </time>
+              <meta itemprop='dateModified' content='2014-04-24T02:41:30Z'>
+          <span itemprop='position'>#3</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Also, the lxcbr0 gateway is 10.0.3.1 and all Linux containers are given IP addresses in the 10.0.3.0/24 space.</p>
+        </div>
+
+        <meta itemprop='headline' content='Torifying a Linux Container with Whonix Gateway Firewall Rules'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/malcolm'><span itemprop='name'>malcolm</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="243.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-04-24T04:31:23Z' class='post-time'>
+                April 24, 2014,  4:31am
+              </time>
+              <meta itemprop='dateModified' content='2014-04-24T04:31:23Z'>
+          <span itemprop='position'>#4</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I was told that this might work but haven’t tried it yet.</p>
+<p>#!/bin/sh<br>
+NON_TOR=“192.168.1.0/24 10.0.2.0/24 10.0.3.0/24”  # First and second range should be changed based on actual external network<br>
+TOR_UID="x"<br>
+TRANS_PORT="9040"<br>
+INT_IF="lxcbr0"<br>
+iptables -F<br>
+iptables -t nat -F<br>
+iptables -t nat -A OUTPUT -o lo -j RETURN<br>
+iptables -t nat -A OUTPUT -m owner --uid-owner $TOR_UID -j RETURN<br>
+iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 53<br>
+for NET in $NON_TOR; do<br>
+iptables -t nat -A OUTPUT -d $NET -j RETURN<br>
+iptables -t nat -A PREROUTING -i $INT_IF -d $NET -j RETURN<br>
+done<br>
+iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports $TRANS_PORT<br>
+iptables -t nat -A PREROUTING -i $INT_IF -p udp --dport 53 -j REDIRECT --to-ports 53<br>
+iptables -t nat -A PREROUTING -i $INT_IF -p tcp --syn -j REDIRECT --to-ports $TRANS_PORT<br>
+iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT<br>
+for NET in $NON_TOR 127.0.0.0/8; do<br>
+iptables -A OUTPUT -d $NET -j ACCEPT<br>
+done<br>
+iptables -A OUTPUT -m owner --uid-owner $TOR_UID -j ACCEPT<br>
+iptables -A OUTPUT -j REJECT</p>
+        </div>
+
+        <meta itemprop='headline' content='Torifying a Linux Container with Whonix Gateway Firewall Rules'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="243.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-04-24T10:04:54Z' class='post-time'>
+                April 24, 2014, 10:04am
+              </time>
+              <meta itemprop='dateModified' content='2014-04-24T10:04:54Z'>
+          <span itemprop='position'>#5</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>This question is as difficult as “can you port Whonix to KVM?” Big effort.</p>
+<p>Unfortunately our old leak testing thread for Whonix/KVM was lost together with our old AWCforum, would have given an idea how much is involved.</p>
+<p>Some comments:</p>
+<ul>
+<li>When you got a functional, for leak testing, see: <a href="../../../external.html?link=https://www.whonix.org/wiki/Dev/Leak_Tests">https://www.whonix.org/wiki/Dev/Leak_Tests</a>
+</li>
+<li>Everything through Tor at once isn’t a good idea. see: <a href="../../../external.html?link=https://www.whonix.org/wiki/Stream_Isolation">https://www.whonix.org/wiki/Stream_Isolation</a>
+</li>
+<li>Eventually also interesting, hardware ids, see: <a href="../../../external.html?link=https://www.whonix.org/wiki/Whonix%27s_Protocol-Leak-Protection_and_Fingerprinting-Protection">https://www.whonix.org/wiki/Whonix's_Protocol-Leak-Protection_and_Fingerprinting-Protection</a>
+</li>
+</ul>
+<p>Eventually someone on the tor-talk mailing list will have something to contribute.</p>
+<p>Looks to me, this one will require someone to do the hard work, to doing original research.</p>
+        </div>
+
+        <meta itemprop='headline' content='Torifying a Linux Container with Whonix Gateway Firewall Rules'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

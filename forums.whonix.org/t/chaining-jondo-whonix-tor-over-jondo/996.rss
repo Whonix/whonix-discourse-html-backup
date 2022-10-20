@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Chaining JonDo + Whonix (TOR over JonDo)</title>
+    <link>http://forums.whonix.org/t/chaining-jondo-whonix-tor-over-jondo/996</link>
+    <description>Hi everyone!
+
+I would like to build a chain consisting of a VPN, TOR and JonDo looking like this:
+
+user --&gt; VPN --&gt; Jondo --&gt; TOR --&gt; remote server
+
+I am using Whonix and I installed the VPN on the host. Like this:
+
+user (Whonix Workstation) --&gt; TOR (Whonix Gateway) --&gt; VPN (on the host) --&gt; remote server
+
+As a note: I began learning Linux (as well as Whonix) some month ago, have been reading into this a lot for weeks now, and while I indeed managed to get some deeper knowledge of what this is all about, I still feel like a total noob when it comes to setting up and configuring advanced setups like this one.
+
+Alright, so here comes the problem: The JonDo part!
+
+I tried to set up a JonDoBox with help of the instructions here http://anonymous-proxy-servers.net/en/help/transocks.html --&gt; failed (this is beyond my skills)
+
+What I did next worked out fine, however I am not aware of how this effects security of Whonix itself.
+
+I installed the JonDo client on the Whonix Gateway. I then modified the torrc file, adding &quot;HTTPSProxy 127.0.0.1:4001&quot; to it. Finally I configured Whonix Gateway&#39;s firewall to allow non-TOR connections for the user &quot;user&quot; (ALLOW_GATEWAY_USER_USER=1), resulting in TOR connecting over JonDo first.
+
+I guess this is a dangerous way of setting this whole thing up, isn&#39;t it? On the other hand, the documentation states that torifying the gateway would not be mandatory which makes me assume that this maybe be safe though. I think the unsafe part is granting free access to the user, right? I would really appreciate if anyone could comment on this.
+
+I also tried to start JonDo client as user &quot;clearnet&quot; which resulted in some error (user clearnet not allowed to start JonDo process).
+
+Please can anyone help me setting up this properly? Not much information about it on the net. 
+
+Thank you very much!
+
+Greetz,
+idontknow</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 22 May 2015 14:02:23 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/chaining-jondo-whonix-tor-over-jondo/996.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Chaining JonDo + Whonix (TOR over JonDo)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Congratulations.</p>
+<p>arm doesn’t connect to the Tor network. Tor does. arm is a Tor Controller. It provides an interface to Tor. No interaction with the Tor network.</p>
+<p>Under your assumptions (explicit, 1) trustworthiness of JonDo) (and implicit, 2) JonDo improving anonymity), it should be safe.</p>
+<p>This is what I think that will happen:<br>
+user -&gt; Tor (listening on usual ports) on the gateway -&gt; Tor will connect over JonDonym</p>
+<p>Traffic flow:<br>
+user -&gt; JonDonym -&gt; Tor -&gt; destination</p>
+<p>Doing ‘user -&gt; Tor -&gt; JonDonym -&gt; destination’ however is not something I would recommend for other purposes than occasionally circumvention Tor bans, in long run. It’s just an opinion, but I think you’re better off using Tor exits, because there are much more of them used by much more people, so it’s easier to blend in. Apart from that opinion, I don’t see any other reasons against that.</p>
+<p>(Related btw):</p>
+<ul>
+<li>( <a href="https://www.whonix.org/wiki/Dev/Inspiration#JonDonym_as_Tor_replacement_.28JonDoBOX.29">https://www.whonix.org/wiki/Dev/Inspiration#JonDonym_as_Tor_replacement_.28JonDoBOX.29</a> )</li>
+<li>( <a href="https://www.whonix.org/wiki/JonDonym">https://www.whonix.org/wiki/JonDonym</a> )</li>
+</ul>
+<p>Is JonDo worth it? Or already dead? Release date…<br>
+<a href="https://anonymous-proxy-servers.net/en/software_linux.html" class="onebox" target="_blank">https://anonymous-proxy-servers.net/en/software_linux.html</a></p>
+<blockquote>DOWNLOAD (version 00.19.001, release date: 2013-08-29)</blockquote>
+<p>Edit by Patrick:<br>
+Fixed typo “low” -&gt; “flow”</p>
+          <p><a href="http://forums.whonix.org/t/chaining-jondo-whonix-tor-over-jondo/996/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/chaining-jondo-whonix-tor-over-jondo/996/3</link>
+        <pubDate>Fri, 22 May 2015 14:02:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-996-3</guid>
+        <source url="http://forums.whonix.org/t/chaining-jondo-whonix-tor-over-jondo/996.rss">Chaining JonDo + Whonix (TOR over JonDo)</source>
+      </item>
+      <item>
+        <title>Chaining JonDo + Whonix (TOR over JonDo)</title>
+        <dc:creator><![CDATA[idontknow]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi again!</p>
+<p>A couple of weeks have passed since my previous post, unfortunately I haven’t got any feedback yet. I am still looking for a proper way chaining TOR over JonDonym. I have been further reading up on this topic and I started over with the following:</p>
+<ul>
+<li>
+<p>imported and installed Whonix Gateway</p>
+</li>
+<li>
+<p>added JonDo repository and signing key (in order to being able to update and install Jondo in a secure manner)</p>
+</li>
+<li>
+<p>installed packages jondo and jondoconsole (only using either of the two)</p>
+</li>
+<li>
+<p>added user  with  command “sudo adduser --system --password-disabled --group debian-jondo”</p>
+</li>
+<li>
+<p>added “HTTPSProxy 127.0.0.1:4001” (for free service only) to torrc user config file</p>
+</li>
+<li>
+<p>modified file /usr/bin/whonix_firewall:</p>
+<pre><code>"iptables -t nat -A OUTPUT -m owner --uid-owner debian-jondo -j RETURN"
+"iptables -A OUTPUT -m owner --uid-owner debian-jondo -j ACCEPT"
+</code></pre>
+<p>to the IPv4 OUTPUT part. I do not want to use a VPN on the Whonix Gateway so these two rules<br>
+should be enough to add</p>
+</li>
+<li>
+<p>after booting up the VM I start Jondo with “kdesudo -u debian-jondo jondo” (or jondoconsole)<br>
+This could be executed automatically at boot. (TODO)</p>
+</li>
+</ul>
+<p>=&gt; Finished! When Jondo has connected to a mix cascade, arm is able to connect to the tor network! I eventually have JonDonym and TOR chained succesfully (JonDonym over TOR)!</p>
+<p>I haven’t done any leak tests yet.</p>
+<p>The debian-jondo user basically has the same rights and behaves the same way as user debian-tor. It also has the same iptables rules. Debian-tor runs the TOR process, debian-jondo the Jondo process. Both connect to the clearnet. So this should be ok, shouldn’t it? JonDonym manual states that for connecting TOR over JonDonym it’s safe to enter TOR as the proxy in the Jondo settings, thus I assume it might be equally safe the other way around. Is this correct? Of course I weaken security by installing Jondo on the gateway, but I act on the assumption that it can be trusted.</p>
+<p>Please, can anyone comment on this? Patrick, do you think this is a safe setup?</p>
+<p>Thank you very much. Greets!</p>
+          <p><a href="http://forums.whonix.org/t/chaining-jondo-whonix-tor-over-jondo/996/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/chaining-jondo-whonix-tor-over-jondo/996/2</link>
+        <pubDate>Thu, 21 May 2015 20:36:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-996-2</guid>
+        <source url="http://forums.whonix.org/t/chaining-jondo-whonix-tor-over-jondo/996.rss">Chaining JonDo + Whonix (TOR over JonDo)</source>
+      </item>
+      <item>
+        <title>Chaining JonDo + Whonix (TOR over JonDo)</title>
+        <dc:creator><![CDATA[idontknow]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi everyone!</p>
+<p>I would like to build a chain consisting of a VPN, TOR and JonDo looking like this:</p>
+<p>user --&gt; VPN --&gt; Jondo --&gt; TOR --&gt; remote server</p>
+<p>I am using Whonix and I installed the VPN on the host. Like this:</p>
+<p>user (Whonix Workstation) --&gt; TOR (Whonix Gateway) --&gt; VPN (on the host) --&gt; remote server</p>
+<p>As a note: I began learning Linux (as well as Whonix) some month ago, have been reading into this a lot for weeks now, and while I indeed managed to get some deeper knowledge of what this is all about, I still feel like a total noob when it comes to setting up and configuring advanced setups like this one.</p>
+<p>Alright, so here comes the problem: The JonDo part!</p>
+<p>I tried to set up a JonDoBox with help of the instructions here <a href="http://anonymous-proxy-servers.net/en/help/transocks.html" rel="nofollow noopener">http://anonymous-proxy-servers.net/en/help/transocks.html</a> --&gt; failed (this is beyond my skills)</p>
+<p>What I did next worked out fine, however I am not aware of how this effects security of Whonix itself.</p>
+<p>I installed the JonDo client on the Whonix Gateway. I then modified the torrc file, adding “HTTPSProxy 127.0.0.1:4001” to it. Finally I configured Whonix Gateway’s firewall to allow non-TOR connections for the user “user” (ALLOW_GATEWAY_USER_USER=1), resulting in TOR connecting over JonDo first.</p>
+<p>I guess this is a dangerous way of setting this whole thing up, isn’t it? On the other hand, the documentation states that torifying the gateway would not be mandatory which makes me assume that this maybe be safe though. I think the unsafe part is granting free access to the user, right? I would really appreciate if anyone could comment on this.</p>
+<p>I also tried to start JonDo client as user “clearnet” which resulted in some error (user clearnet not allowed to start JonDo process).</p>
+<p>Please can anyone help me setting up this properly? Not much information about it on the net.</p>
+<p>Thank you very much!</p>
+<p>Greetz,<br>
+idontknow</p>
+          <p><a href="http://forums.whonix.org/t/chaining-jondo-whonix-tor-over-jondo/996/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/chaining-jondo-whonix-tor-over-jondo/996/1</link>
+        <pubDate>Mon, 06 Apr 2015 14:41:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-996-1</guid>
+        <source url="http://forums.whonix.org/t/chaining-jondo-whonix-tor-over-jondo/996.rss">Chaining JonDo + Whonix (TOR over JonDo)</source>
+      </item>
+  </channel>
+</rss>

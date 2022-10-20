@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Hidden service binding Nginx to localhost</title>
+    <link>http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615</link>
+    <description>Hi. 
+
+If i set up a hidden service on a regular Linux system I would normally add
+
+listen 127.0.0.1:80; 
+
+In order to bind the web server to localhost, using nginx and whonix if you bind the server to 127.0.0.1 the hidden service will not load when trying to access it via an onion address.
+
+It does load using an onion address with either of these lines instead.
+
+Listen 80;
+or 
+Listen 10.152.152.11:80;
+
+Is using Listen 80; safe? as whonix is forcing all traffic through tor or should I bind it to 10.152.152.11 and will this cause any issues?
+
+My concern is shodan or an equivalent finding information.
+
+Thanks in advance.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 17 Dec 2017 04:58:51 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Hidden service binding Nginx to localhost</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="7" data-topic="4615">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/w/e36b37/40.png" class="avatar"> WhonixUser3425:</div>
+<blockquote>
+<p>Still not working</p>
+</blockquote>
+</aside>
+<p>Oops, that’s backwards. Listen on eth0, stream to localhost:</p>
+<pre><code class="lang-nohighlight">sudo socat TCP-LISTEN:80,fork,reuseaddr,bind=10.152.152.11 TCP:127.0.0.1:80
+</code></pre>
+<p>But don’t have to use unix sockets, or even socat for that matter. (Disregard that riseup link. Not relevant.)</p>
+<p>Plain iptables redirection will work. Same as what Whonix Gateway does - in reverse.</p>
+<pre><code class="lang-nohighlight">sudo sysctl -w net.ipv4.conf.all.route_localnet=1
+sudo iptables -t nat -I PREROUTING -i eth0 -d 10.152.152.11 -p tcp --dport 80 -j DNAT --to 127.0.0.1:80
+</code></pre>
+<hr>
+<p>Personally, I would rather not use localhost at all. You never know when some poorly behaved extension will decide to broadcast everything on a localhost page. Plus <code>route_localnet=0</code> by default for a reason. (If you’re ashamed to be using Whonix :), you can change 10.152.152.11 to something like 192.168.0.2. I’m sure there’s at least a couple hidden services that use reverse-proxies.)</p>
+<hr>
+<p>PSA: TPO just released first release candidate for 0.3.2 - meaning stable version is around the corner. Need to reserve my 56 char url before someone takes it.</p>
+          <p><a href="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/9</link>
+        <pubDate>Sun, 17 Dec 2017 04:58:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4615-9</guid>
+        <source url="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615.rss">Hidden service binding Nginx to localhost</source>
+      </item>
+      <item>
+        <title>Hidden service binding Nginx to localhost</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>entr0py:</p>
+<blockquote>
+<p>(Also, there’s nothing special about port 80.)</p>
+</blockquote>
+<p>There might be - all ports below 1024 require root to be opened, unless<br>
+(???).</p>
+          <p><a href="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/8</link>
+        <pubDate>Sat, 16 Dec 2017 09:35:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4615-8</guid>
+        <source url="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615.rss">Hidden service binding Nginx to localhost</source>
+      </item>
+      <item>
+        <title>Hidden service binding Nginx to localhost</title>
+        <dc:creator><![CDATA[WhonixUser3425]]></dc:creator>
+        <description><![CDATA[
+            <p>Still not working with the new socat command, I’ve never used this before so I have no idea what to try next.</p>
+<p>When browsing the other thread I noticed that whonix 14 will make this a lot easier, I’m looking forward to that release day <img src="//forums.whonix.org/images/emoji/twitter/smiley.png?v=5" title=":smiley:" class="emoji" alt=":smiley:"></p>
+          <p><a href="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/7</link>
+        <pubDate>Fri, 15 Dec 2017 22:22:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4615-7</guid>
+        <source url="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615.rss">Hidden service binding Nginx to localhost</source>
+      </item>
+      <item>
+        <title>Hidden service binding Nginx to localhost</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>don’t have much experience with socat. you can try:</p>
+<p><code>socat TCP-LISTEN:80,fork,reuseaddr,bind=127.0.0.1 TCP:10.152.152.10:80</code></p>
+<p>(Also, there’s nothing special about port 80.)</p>
+          <p><a href="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/6</link>
+        <pubDate>Fri, 15 Dec 2017 21:59:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4615-6</guid>
+        <source url="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615.rss">Hidden service binding Nginx to localhost</source>
+      </item>
+      <item>
+        <title>Hidden service binding Nginx to localhost</title>
+        <dc:creator><![CDATA[WhonixUser3425]]></dc:creator>
+        <description><![CDATA[
+            <p>Regarding socat.</p>
+<p>I added this to my nginx conf:</p>
+<p>Listen 127.0.0.1:80</p>
+<p>I then run socat as follows:</p>
+<p>socat TCP-LISTEN:80,fork TCP:10.152.152.10:80</p>
+<p>it gives an error saying address is already in use, I tried stopping nginx and running the socat command first, this time nginx won’t running saying unable to bind to port it’s already in use.</p>
+<p>Have I done something incorrect?</p>
+<p>Thanks in advance.</p>
+          <p><a href="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/5</link>
+        <pubDate>Fri, 15 Dec 2017 18:27:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4615-5</guid>
+        <source url="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615.rss">Hidden service binding Nginx to localhost</source>
+      </item>
+      <item>
+        <title>Hidden service binding Nginx to localhost</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>That’s like asking “How can someone hack into my computer?” Depends on software, configuration, skill of attacker, skill of admin, etc. You’ll get better advice on a pentesting forum.</p>
+          <p><a href="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/4</link>
+        <pubDate>Thu, 14 Dec 2017 16:16:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4615-4</guid>
+        <source url="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615.rss">Hidden service binding Nginx to localhost</source>
+      </item>
+      <item>
+        <title>Hidden service binding Nginx to localhost</title>
+        <dc:creator><![CDATA[WhonixUser3425]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for the replies if I set it up to use 10.152.152.11, what ways could someone use to find out this information?</p>
+<p>I’ve configured my forum and removed any ips that show when posting and in user profiles.</p>
+          <p><a href="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/3</link>
+        <pubDate>Thu, 14 Dec 2017 12:35:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4615-3</guid>
+        <source url="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615.rss">Hidden service binding Nginx to localhost</source>
+      </item>
+      <item>
+        <title>Hidden service binding Nginx to localhost</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>You have a couple options:</p>
+<ul>
+<li>
+<p>Webserver listens on 127.0.0.1. Then you need some way to redirect web traffic between whonix-gateway and localhost on the workstation (ie socat). This opens up localhost bypass attacks since all connections will appear to the web server to be coming from localhost. (Some web services assume localhost is safe to expose because they don’t take Tor usage into consideration.)</p>
+</li>
+<li>
+<p>Use a non-localhost address like 10.152.152.11. This will reveal that you are using Whonix.</p>
+</li>
+<li>
+<p><span class="bbcode-s">The most robust option is probably to redirect Unix sockets using socat, similarly to the way that Tor Browser is doing currently. This will also reveal that you are special (non-localhost).</span></p>
+</li>
+</ul>
+<p>See:</p>
+<ul>
+<li><a href="https://forums.whonix.org/t/hidden-service-apache-and-whonix-wiki-related-questions/2735/11">Hidden service, Apache and Whonix wiki related questions.</a></li>
+<li><span class="bbcode-s"><a href="https://riseup.net/en/security/network-security/tor/onionservices-best-practices/#be-careful-of-localhost-bypasses">https://riseup.net/en/security/network-security/tor/onionservices-best-practices/#be-careful-of-localhost-bypasses</a></span></li>
+</ul>
+<aside class="quote" data-post="1" data-topic="4615">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/w/e36b37/40.png" class="avatar"> WhonixUser3425:</div>
+<blockquote>
+<p>My concern is shodan or an equivalent finding information.</p>
+</blockquote>
+</aside>
+<p>Don’t know. In general, anything an (unauthenticated) user can see, so can a web crawler. IIUC it’s rather trivial to enumerate v2 onions by running HSDirs. v3 is supposed to help by making the onion address itself a key to unlock the descriptors. To keep onion completely hidden, use <a href="http://kkkkkkkkkk63ava6.onion/wiki/Hidden_Services#Hidden_Service_Authentication">hidden service authentication</a>.</p>
+          <p><a href="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/2</link>
+        <pubDate>Thu, 14 Dec 2017 04:12:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4615-2</guid>
+        <source url="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615.rss">Hidden service binding Nginx to localhost</source>
+      </item>
+      <item>
+        <title>Hidden service binding Nginx to localhost</title>
+        <dc:creator><![CDATA[WhonixUser3425]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi.</p>
+<p>If i set up a hidden service on a regular Linux system I would normally add</p>
+<p>listen 127.0.0.1:80;</p>
+<p>In order to bind the web server to localhost, using nginx and whonix if you bind the server to 127.0.0.1 the hidden service will not load when trying to access it via an onion address.</p>
+<p>It does load using an onion address with either of these lines instead.</p>
+<p>Listen 80;<br>
+or<br>
+Listen 10.152.152.11:80;</p>
+<p>Is using Listen 80; safe? as whonix is forcing all traffic through tor or should I bind it to 10.152.152.11 and will this cause any issues?</p>
+<p>My concern is shodan or an equivalent finding information.</p>
+<p>Thanks in advance.</p>
+          <p><a href="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615/1</link>
+        <pubDate>Thu, 14 Dec 2017 01:27:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4615-1</guid>
+        <source url="http://forums.whonix.org/t/hidden-service-binding-nginx-to-localhost/4615.rss">Hidden service binding Nginx to localhost</source>
+      </item>
+  </channel>
+</rss>

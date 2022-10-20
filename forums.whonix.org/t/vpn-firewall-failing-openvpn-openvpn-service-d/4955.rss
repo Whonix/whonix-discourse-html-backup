@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>VPN-Firewall failing [openvpn@openvpn.service.d]</title>
+    <link>http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955</link>
+    <description>Hello,
+
+I am setting up VPN-Firewall on HOST machine. Instalation goes without any problems, however, openvpn does not start as it suppose to. Operating system: Debian 8. I am attaching neccessary logs and information.
+
+**Netfilter Status seems not to complain.**
+
+    user@host:~$ sudo service netfilter-persistent status
+    ● netfilter-persistent.service - netfilter persistent configuration
+       Loaded: loaded (/lib/systemd/system/netfilter-persistent.service; enabled)
+      Drop-In: /lib/systemd/system/netfilter-persistent.service.d
+               └─20_vpn-firewall.conf
+       Active: active (exited) since 2018-03-09 14:56:44 CET; 2min 6s ago
+     Main PID: 1557 (code=exited, status=0/SUCCESS)
+       CGroup: /system.slice/netfilter-persistent.service
+
+    mar 09 14:56:44 host netfilter-persistent[1557]: run-parts: executing /usr/share/netfilter-per...art
+    mar 09 14:56:44 host netfilter-persistent[1557]: OK: IPv6 suppot not avalaible on system
+    mar 09 14:56:44 host netfilter-persistent[1557]: OK: The firewall should not show any messages,
+    mar 09 14:56:44 host netfilter-persistent[1557]: OK: besides output beginning with prefix OK:...
+    mar 09 14:56:44 host netfilter-persistent[1557]: OK: FORWARDING: false
+    mar 09 14:56:44 host netfilter-persistent[1557]: OK: VPN firewall loaded.
+    mar 09 14:56:44 host systemd[1]: Started netfilter persistent configuration.
+    Hint: Some lines were ellipsized, use -l to show in full.
+
+
+**However openvpn service already has some problems.**
+
+    user@host:~$ sudo service openvpn@openvpn status
+    ● openvpn@openvpn.service - OpenVPN connection to openvpn
+       Loaded: loaded (/lib/systemd/system/openvpn@openvpn.service; enabled)
+      Drop-In: /lib/systemd/system/openvpn@openvpn.service.d
+               └─50-unpriv.conf
+       Active: failed (Result: exit-code) since pią 2018-03-09 14:58:06 CET; 10s ago
+      Process: 1791 ExecStart=/usr/sbin/openvpn --daemon ovpn-%i --status /run/openvpn/%i.status 10 --cd /etc/openvpn --config /etc/openvpn/%i.conf (code=exited, status=0/SUCCESS)
+     Main PID: 1792 (code=exited, status=1/FAILURE)
+
+    mar 09 14:58:05 host ovpn-openvpn[1792]: OPTIONS IMPORT: explicit notify parm(s) modified
+    mar 09 14:58:05 host ovpn-openvpn[1792]: OPTIONS IMPORT: --ifconfig/up options modified
+    mar 09 14:58:05 host ovpn-openvpn[1792]: OPTIONS IMPORT: route options modified
+    mar 09 14:58:05 host ovpn-openvpn[1792]: OPTIONS IMPORT: route-related options modified
+    mar 09 14:58:05 host ovpn-openvpn[1792]: OPTIONS IMPORT: --ip-win32 and/or --dhcp-option optio...ied
+    mar 09 14:58:05 host ovpn-openvpn[1792]: ROUTE_GATEWAY 10.64.64.64
+    mar 09 14:58:05 host ovpn-openvpn[1792]: ERROR: Cannot ioctl TUNSETIFF tun0: Operation not per...=1)
+    mar 09 14:58:05 host ovpn-openvpn[1792]: Exiting due to fatal error
+    mar 09 14:58:06 host systemd[1]: openvpn@openvpn.service: main process exited, code=exited, s...LURE
+    mar 09 14:58:06 host systemd[1]: Unit openvpn@openvpn.service entered failed state.
+
+**Openvpn .conf file - dev is set to tun0.**
+
+    user@host:/etc/openvpn$ cat openvpn.conf
+    client
+    dev tun0
+    proto udp
+    remote &lt;ip&gt; &lt;port&gt;
+    auth-user-pass /etc/openvpn/auth.txt
+
+    resolv-retry infinite
+    nobind
+    persist-tun
+    persist-key
+    persist-remote-ip
+
+    cipher AES-256-CBC
+    tls-cipher TLS-DHE-RSA-WITH-AES-256-CBC-SHA:TLS-DHE-DSS-WITH-AES-256-CBC-SHA:TLS-RSA-WITH-AES-256-CBC-SHA
+    ns-cert-type server
+    verify-x509-name de name-prefix
+    key-direction 1
+    comp-lzo
+    verb 3
+
+    ;ca ca.crt
+    &lt;ca&gt;
+    ###KEY HERE###
+    &lt;/ca&gt;
+    &lt;tls-auth&gt;
+    ###KEY HERE###
+    &lt;/tls-auth&gt;
+
+    #############################
+    ## VPN-Firewall specific settings ##
+    #############################
+    client
+    dev tun0
+    persist-tun
+    persist-key
+
+    script-security 2
+    up &quot;/etc/openvpn/update-resolv-conf script_type=up dev=tun0&quot;
+    down &quot;/etc/openvpn/update-resolv-conf script_type=down dev=tun0&quot;
+
+    user tunnel
+    iproute /usr/bin/ip-unpriv
+
+**Upon checking dmesg output right after reboot. I can grab some specific errors.** Well, error seems self explainatory, however i have no clue how to fix it in vpn-firewall script.
+
+    [   29.929328] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:13] Failed to parse protect system value, ignoring: strict
+    [   29.929412] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:15] Unknown lvalue &#39;ProtectControlGroups&#39; in section &#39;Service&#39;
+    [   29.929418] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:16] Unknown lvalue &#39;RestrictRealtime&#39; in section &#39;Service&#39;
+    [   29.929424] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:17] Unknown lvalue &#39;ProtectKernelModules&#39; in section &#39;Service&#39;
+    [   29.929434] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:20] Unknown lvalue &#39;ReadWritePaths&#39; in section &#39;Service&#39;
+    [   29.929440] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:21] Unknown lvalue &#39;ProtectKernelTunables&#39; in section &#39;Service&#39;
+    [   29.929451] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:26] Unknown lvalue &#39;MemoryDenyWriteExecute&#39; in section &#39;Service&#39;
+    [   29.929457] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:27] Unknown lvalue &#39;AmbientCapabilities&#39; in section &#39;Service&#39;
+
+**Onwership and permissions on neccessary files.**
+
+    user@host:ls -al /run/resolvconf
+    drwxrwxr-x  3 root tunnel 100 mar  9 10:24 .
+    drwxr-xr-x 26 root root   900 mar  9 10:22 ..
+    -rw-r--r--  1 root root     0 mar  9 10:24 enable-updates
+    drwxrwxr-x  2 root tunnel  40 mar  9 10:22 interface
+    -rw-r--r--  1 root root   151 mar  9 10:22 resolv.conf
+    user@host:sudo chown --recursive root:tunnel /run/resolvconf #This sets ownership only temporary, after reboot it reverses
+    user@host:ls -al /run/resolvconf
+    drwxrwxr-x  3 root tunnel 100 mar  9 10:24 .
+    drwxr-xr-x 26 root root   900 mar  9 10:22 ..
+    -rw-r--r--  1 root tunnel   0 mar  9 10:24 enable-updates
+    drwxrwxr-x  2 root tunnel  40 mar  9 10:22 interface
+    -rw-r--r--  1 root tunnel 151 mar  9 10:22 resolv.conf
+    user@host:sudo chmod --recursive 775 /run/resolvconf
+    user@host:ls -al /run/resolvconf
+    drwxrwxr-x  3 root tunnel 100 mar  9 10:24 .
+    drwxr-xr-x 26 root root   900 mar  9 10:22 ..
+    -rwxrwxr-x  1 root tunnel   0 mar  9 10:24 enable-updates
+    drwxrwxr-x  2 root tunnel  40 mar  9 10:22 interface
+    -rwxrwxr-x  1 root tunnel 151 mar  9 10:22 resolv.conf
+
+    user@host: ls -la /etc/openvpn
+    drwxr-xr-x   2 tunnel tunnel  4096 mar  8 14:56 .
+    drwxr-xr-x 129 root   root   12288 mar  8 16:45 ..
+    -rwxr-xr-x   1 tunnel tunnel    29 mar  8 14:59 auth.txt
+    -rwxr-xr-x   1 tunnel tunnel  3090 mar  9 10:38 openvpn.conf
+    -rwxr-xr-x   1 tunnel tunnel  1301 jun 26  2017 update-resolv-conf
+
+I am hitting my head against a wall here for few days already. Last time i was setting VPN-Firewall installation went without any problems.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 11 Mar 2018 13:31:25 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>VPN-Firewall failing [openvpn@openvpn.service.d]</title>
+        <dc:creator><![CDATA[cs88]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello,</p>
+<p>I will post output of openvpn later. I will try to recreate this error on virtual machine, because:</p>
+<p>Currently i used old version of VPN-Firewall (previous). I noticed that Patrick updated whole script from the last time i used it. Old version WORKS without any problems after first install. The difference is in file which dmesg complains about. Weird. So for me problem is somehow solved.</p>
+<p>My understanding is that selinux is somehow limiting vpn-firewall from accessing openvpn service. But that is just a wild guess. If that would be the case, why error was not reported by anyone earlier? I doubt that my system is unique from others. Some relevant links</p>
+<aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://serverfault.com/questions/807956/openvpn-post-up-script-fails-with-operation-not-permitted-if-and-only-if-openv" target="_blank" rel="nofollow noopener">serverfault.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://serverfault.com/users/128232/valentin-lorentz" target="_blank" rel="nofollow noopener">
+    <img alt="Valentin Lorentz" src="//forums.whonix.org/uploads/default/original/2X/f/f376f2267139e500ef96764d2b885ece9dc553ab.jpg" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://serverfault.com/questions/807956/openvpn-post-up-script-fails-with-operation-not-permitted-if-and-only-if-openv" target="_blank" rel="nofollow noopener">openvpn post-up script fails with “Operation not permitted” if and only if openvpn is run by systemd</a>
+</h4>
+
+<div class="tags">
+  <strong>debian, openvpn, systemd, init.d</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://serverfault.com/users/128232/valentin-lorentz" target="_blank" rel="nofollow noopener">
+    Valentin Lorentz
+  </a>
+  on <a href="https://serverfault.com/questions/807956/openvpn-post-up-script-fails-with-operation-not-permitted-if-and-only-if-openv" target="_blank" rel="nofollow noopener">09:33AM - 09 Oct 16 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Semicolon before ca is what was provided in offical configuration file by VPN provider. Older version of vpn-firewall does not complain about it, it just treats it as comment.</p>
+          <p><a href="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955/6</link>
+        <pubDate>Sun, 11 Mar 2018 13:31:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4955-6</guid>
+        <source url="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955.rss">VPN-Firewall failing [openvpn@openvpn.service.d]</source>
+      </item>
+      <item>
+        <title>VPN-Firewall failing [openvpn@openvpn.service.d]</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <code>cs88</code></p>
+<p>Could you run this command:</p>
+<p><code>sudo service openvpn@openvpn stop</code></p>
+<p>And post the output of these commands: (may need to redact sensitive info)</p>
+<p><code>sudo service openvpn@openvpn start -l</code><br>
+<code>sudo service openvpn@openvpn status -l</code></p>
+<p>Also wanted to ask is the semi-colon ( ; ) a typo or intentional.The one before <strong>ca</strong> in openvpn.conf</p>
+<p><strong>;ca</strong> ca.crt</p>
+          <p><a href="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955/5</link>
+        <pubDate>Sat, 10 Mar 2018 22:02:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4955-5</guid>
+        <source url="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955.rss">VPN-Firewall failing [openvpn@openvpn.service.d]</source>
+      </item>
+      <item>
+        <title>VPN-Firewall failing [openvpn@openvpn.service.d]</title>
+        <dc:creator><![CDATA[cs88]]></dc:creator>
+        <description><![CDATA[
+            <p>A little additional info. I am still stuck, however i decided to inspect and edit mentioned in dmesg file</p>
+<pre><code>[   29.929328] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:13] Failed to parse protect system value, ignoring: strict
+</code></pre>
+<p>I get this</p>
+<pre><code>## This file is part of Whonix.
+## Copyright (C) 2012 - 2015 Patrick Schleizer &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+[Unit]
+ConditionPathExists=!/var/run/qubes-service/whonix-template
+
+[Service]
+
+User=tunnel
+Group=tunnel
+
+ProtectSystem=strict
+ProtectHome=true
+ProtectControlGroups=true
+RestrictRealtime=true
+ProtectKernelModules=true
+CapabilityBoundingSet=
+CapabilityBoundingSet=CAP_NET_ADMIN
+ReadWritePaths=/etc/resolv.conf /run/openvpn /run/resolvconf
+ProtectKernelTunables=true
+NoNewPrivileges=true
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6
+SystemCallFilter=~@clock @cpu-emulation @debug @keyring @module @mount @obsolete @raw-io
+SystemCallArchitectures=native
+</code></pre>
+<p>Which is somehow different from my previous setup, which is this</p>
+<pre><code>[Unit]
+ConditionPathExists=!/var/run/qubes-service/whonix-template
+
+[Service]
+
+User=tunnel
+
+ExecStartPre=/usr/bin/sudo /usr/sbin/openvpn --rmtun --dev tun0
+ExecStartPre=/usr/bin/sudo /usr/sbin/openvpn --mktun --dev tun0 --dev-type tun --user tunnel --group tunnel
+
+ExecStopPost=/usr/bin/sudo /usr/sbin/openvpn --rmtun --dev tun0
+</code></pre>
+<p>Changing this file to above output does not help, error still persists. Commenting out value CapabilityBoundingSet=CAP_NET_ADMIN per openvpn bugtrack reccomendation also does not change anything. As i understand there is some problem between vpnfirewall and selinux package.</p>
+<p>I also tried adding user tunnel to sudoers, without any result.</p>
+<p>I am honestly clueless. Any help appriciated.</p>
+          <p><a href="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955/4</link>
+        <pubDate>Sat, 10 Mar 2018 20:19:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4955-4</guid>
+        <source url="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955.rss">VPN-Firewall failing [openvpn@openvpn.service.d]</source>
+      </item>
+      <item>
+        <title>VPN-Firewall failing [openvpn@openvpn.service.d]</title>
+        <dc:creator><![CDATA[cs88]]></dc:creator>
+        <description><![CDATA[
+            <p>No, different system, Debian 8. Installed fresh and fully updated. Previous system was also based on Debian 8.</p>
+<p>I tried reinstalling whole script few times, without any effect. Of course, i issued commands to remove old installation first.</p>
+<p>I am using same VPN provider as on previous system, .conf was copied using sudo cp. I adjusted neccessary paths, in this case it was only path to auth file.</p>
+<p>Errors from dmesg also happen already during boot screen. I just posted whole output from dmesg. It seems that there is something missing somewhere. While installing for the first time on fresh system i used standard make install command in place of make deb-icup, maybe that is a reason? However please note that from that time i already tried to reinstall whole script few times, deleteing previous configuration using</p>
+<pre><code>sudo update-rc.d vpnfirewall remove
+sudo update-rc.d vpn-firewall remove
+sudo rm /usr/local/bin/vpnfirewall
+sudo rm /usr/bin/vpnfirewall
+sudo rm /usr/bin/vpn-firewall
+sudo rm /etc/init.d/vpnfirewall
+sudo rm /etc/init.d/vpn-firewall</code></pre>
+          <p><a href="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955/3</link>
+        <pubDate>Sat, 10 Mar 2018 11:56:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4955-3</guid>
+        <source url="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955.rss">VPN-Firewall failing [openvpn@openvpn.service.d]</source>
+      </item>
+      <item>
+        <title>VPN-Firewall failing [openvpn@openvpn.service.d]</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <code>cs88</code></p>
+<aside class="quote" data-post="1" data-topic="4955">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/c/d07c76/40.png" class="avatar"> cs88:</div>
+<blockquote>
+<p>Last time i was setting VPN-Firewall installation went without any problems.</p>
+</blockquote>
+</aside>
+<p>On the same system?  Did you remove the old version of VPN-Firewall?</p>
+<p>You may have an error in your <code>openvpn.conf</code>. Are you using the same VPN service provider?</p>
+          <p><a href="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955/2</link>
+        <pubDate>Sat, 10 Mar 2018 11:20:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4955-2</guid>
+        <source url="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955.rss">VPN-Firewall failing [openvpn@openvpn.service.d]</source>
+      </item>
+      <item>
+        <title>VPN-Firewall failing [openvpn@openvpn.service.d]</title>
+        <dc:creator><![CDATA[cs88]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello,</p>
+<p>I am setting up VPN-Firewall on HOST machine. Instalation goes without any problems, however, openvpn does not start as it suppose to. Operating system: Debian 8. I am attaching neccessary logs and information.</p>
+<p><strong>Netfilter Status seems not to complain.</strong></p>
+<pre><code>user@host:~$ sudo service netfilter-persistent status
+● netfilter-persistent.service - netfilter persistent configuration
+   Loaded: loaded (/lib/systemd/system/netfilter-persistent.service; enabled)
+  Drop-In: /lib/systemd/system/netfilter-persistent.service.d
+           └─20_vpn-firewall.conf
+   Active: active (exited) since 2018-03-09 14:56:44 CET; 2min 6s ago
+ Main PID: 1557 (code=exited, status=0/SUCCESS)
+   CGroup: /system.slice/netfilter-persistent.service
+
+mar 09 14:56:44 host netfilter-persistent[1557]: run-parts: executing /usr/share/netfilter-per...art
+mar 09 14:56:44 host netfilter-persistent[1557]: OK: IPv6 suppot not avalaible on system
+mar 09 14:56:44 host netfilter-persistent[1557]: OK: The firewall should not show any messages,
+mar 09 14:56:44 host netfilter-persistent[1557]: OK: besides output beginning with prefix OK:...
+mar 09 14:56:44 host netfilter-persistent[1557]: OK: FORWARDING: false
+mar 09 14:56:44 host netfilter-persistent[1557]: OK: VPN firewall loaded.
+mar 09 14:56:44 host systemd[1]: Started netfilter persistent configuration.
+Hint: Some lines were ellipsized, use -l to show in full.
+</code></pre>
+<p><strong>However openvpn service already has some problems.</strong></p>
+<pre><code>user@host:~$ sudo service openvpn@openvpn status
+● openvpn@openvpn.service - OpenVPN connection to openvpn
+   Loaded: loaded (/lib/systemd/system/openvpn@openvpn.service; enabled)
+  Drop-In: /lib/systemd/system/openvpn@openvpn.service.d
+           └─50-unpriv.conf
+   Active: failed (Result: exit-code) since pią 2018-03-09 14:58:06 CET; 10s ago
+  Process: 1791 ExecStart=/usr/sbin/openvpn --daemon ovpn-%i --status /run/openvpn/%i.status 10 --cd /etc/openvpn --config /etc/openvpn/%i.conf (code=exited, status=0/SUCCESS)
+ Main PID: 1792 (code=exited, status=1/FAILURE)
+
+mar 09 14:58:05 host ovpn-openvpn[1792]: OPTIONS IMPORT: explicit notify parm(s) modified
+mar 09 14:58:05 host ovpn-openvpn[1792]: OPTIONS IMPORT: --ifconfig/up options modified
+mar 09 14:58:05 host ovpn-openvpn[1792]: OPTIONS IMPORT: route options modified
+mar 09 14:58:05 host ovpn-openvpn[1792]: OPTIONS IMPORT: route-related options modified
+mar 09 14:58:05 host ovpn-openvpn[1792]: OPTIONS IMPORT: --ip-win32 and/or --dhcp-option optio...ied
+mar 09 14:58:05 host ovpn-openvpn[1792]: ROUTE_GATEWAY 10.64.64.64
+mar 09 14:58:05 host ovpn-openvpn[1792]: ERROR: Cannot ioctl TUNSETIFF tun0: Operation not per...=1)
+mar 09 14:58:05 host ovpn-openvpn[1792]: Exiting due to fatal error
+mar 09 14:58:06 host systemd[1]: openvpn@openvpn.service: main process exited, code=exited, s...LURE
+mar 09 14:58:06 host systemd[1]: Unit openvpn@openvpn.service entered failed state.
+</code></pre>
+<p><strong>Openvpn .conf file - dev is set to tun0.</strong></p>
+<pre><code>user@host:/etc/openvpn$ cat openvpn.conf
+client
+dev tun0
+proto udp
+remote &lt;ip&gt; &lt;port&gt;
+auth-user-pass /etc/openvpn/auth.txt
+
+resolv-retry infinite
+nobind
+persist-tun
+persist-key
+persist-remote-ip
+
+cipher AES-256-CBC
+tls-cipher TLS-DHE-RSA-WITH-AES-256-CBC-SHA:TLS-DHE-DSS-WITH-AES-256-CBC-SHA:TLS-RSA-WITH-AES-256-CBC-SHA
+ns-cert-type server
+verify-x509-name de name-prefix
+key-direction 1
+comp-lzo
+verb 3
+
+;ca ca.crt
+&lt;ca&gt;
+###KEY HERE###
+&lt;/ca&gt;
+&lt;tls-auth&gt;
+###KEY HERE###
+&lt;/tls-auth&gt;
+
+#############################
+## VPN-Firewall specific settings ##
+#############################
+client
+dev tun0
+persist-tun
+persist-key
+
+script-security 2
+up "/etc/openvpn/update-resolv-conf script_type=up dev=tun0"
+down "/etc/openvpn/update-resolv-conf script_type=down dev=tun0"
+
+user tunnel
+iproute /usr/bin/ip-unpriv
+</code></pre>
+<p><strong>Upon checking dmesg output right after reboot. I can grab some specific errors.</strong> Well, error seems self explainatory, however i have no clue how to fix it in vpn-firewall script.</p>
+<pre><code>[   29.929328] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:13] Failed to parse protect system value, ignoring: strict
+[   29.929412] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:15] Unknown lvalue 'ProtectControlGroups' in section 'Service'
+[   29.929418] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:16] Unknown lvalue 'RestrictRealtime' in section 'Service'
+[   29.929424] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:17] Unknown lvalue 'ProtectKernelModules' in section 'Service'
+[   29.929434] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:20] Unknown lvalue 'ReadWritePaths' in section 'Service'
+[   29.929440] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:21] Unknown lvalue 'ProtectKernelTunables' in section 'Service'
+[   29.929451] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:26] Unknown lvalue 'MemoryDenyWriteExecute' in section 'Service'
+[   29.929457] systemd[1]: [/lib/systemd/system/openvpn@openvpn.service.d/50-unpriv.conf:27] Unknown lvalue 'AmbientCapabilities' in section 'Service'
+</code></pre>
+<p><strong>Onwership and permissions on neccessary files.</strong></p>
+<pre><code>user@host:ls -al /run/resolvconf
+drwxrwxr-x  3 root tunnel 100 mar  9 10:24 .
+drwxr-xr-x 26 root root   900 mar  9 10:22 ..
+-rw-r--r--  1 root root     0 mar  9 10:24 enable-updates
+drwxrwxr-x  2 root tunnel  40 mar  9 10:22 interface
+-rw-r--r--  1 root root   151 mar  9 10:22 resolv.conf
+user@host:sudo chown --recursive root:tunnel /run/resolvconf #This sets ownership only temporary, after reboot it reverses
+user@host:ls -al /run/resolvconf
+drwxrwxr-x  3 root tunnel 100 mar  9 10:24 .
+drwxr-xr-x 26 root root   900 mar  9 10:22 ..
+-rw-r--r--  1 root tunnel   0 mar  9 10:24 enable-updates
+drwxrwxr-x  2 root tunnel  40 mar  9 10:22 interface
+-rw-r--r--  1 root tunnel 151 mar  9 10:22 resolv.conf
+user@host:sudo chmod --recursive 775 /run/resolvconf
+user@host:ls -al /run/resolvconf
+drwxrwxr-x  3 root tunnel 100 mar  9 10:24 .
+drwxr-xr-x 26 root root   900 mar  9 10:22 ..
+-rwxrwxr-x  1 root tunnel   0 mar  9 10:24 enable-updates
+drwxrwxr-x  2 root tunnel  40 mar  9 10:22 interface
+-rwxrwxr-x  1 root tunnel 151 mar  9 10:22 resolv.conf
+
+user@host: ls -la /etc/openvpn
+drwxr-xr-x   2 tunnel tunnel  4096 mar  8 14:56 .
+drwxr-xr-x 129 root   root   12288 mar  8 16:45 ..
+-rwxr-xr-x   1 tunnel tunnel    29 mar  8 14:59 auth.txt
+-rwxr-xr-x   1 tunnel tunnel  3090 mar  9 10:38 openvpn.conf
+-rwxr-xr-x   1 tunnel tunnel  1301 jun 26  2017 update-resolv-conf
+</code></pre>
+<p>I am hitting my head against a wall here for few days already. Last time i was setting VPN-Firewall installation went without any problems.</p>
+          <p><a href="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955/1</link>
+        <pubDate>Fri, 09 Mar 2018 13:29:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4955-1</guid>
+        <source url="http://forums.whonix.org/t/vpn-firewall-failing-openvpn-openvpn-service-d/4955.rss">VPN-Firewall failing [openvpn@openvpn.service.d]</source>
+      </item>
+  </channel>
+</rss>

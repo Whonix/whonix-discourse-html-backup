@@ -1,0 +1,936 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>I am building a laptop with physical isolation and hardware kill switches</title>
+    <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273</link>
+    <description>-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+I am building a laptop with physical isolation and hardware kill switches
+
+Hi everyone, I am building a laptop with physical isolation (via a dedicated single-board computer ([SBC][1]) ) and hardware kill switches, I just finished the first prototype and it&#39;s usable!
+
+Now I want to share my ideas with you and possibly get some feedback from the Whonix community.
+
+- -----
+
+This thing is based on a Asus C201PA ([Gentoo Wiki][2], [Debian Wiki][3]) , which is a Rockchip RK3288-C ([Wikipedia][4], [Rockchip Wiki][5]) based Chromebook. It&#39;s [Libreboot compatible][6] and does not require any non-free blob to operate.
+
+#### Kernel / Drivers
+
+Most of it&#39;s features, including LCD and HDMI video framebuffer, eMMC, microSD, battery, and USB is available in mainline linux since v4.8-rc2.
+
+It&#39;s [Mali T764][7] GPU comes with non-free driver, but `xserver-xorg-video-fbdev` works just fine. 
+
+It also has a soldered on M.2 Type 1216 WLAN + BT card that requires non-free blob to operate, but we don&#39;t need it and can be (easily) removed by using a SMT rework station.
+
+#### SBC[1]
+
+The SBC I use to perform physical isolation is a [PocketBeagle][8], it&#39;s small enough to be put inside C201&#39;s case, and can be powered directly by C201&#39;s motherboard.
+
+The PocketBeagle is a [open source][14] SBC based around a OSD335x-SM System-in-Package (SiP) ([Specs][9], [PDF Datasheet][10]), according to [eLinux Wiki][11], it&#39;s mainlined as well, although I haven&#39;t confirm it yet.
+
+- -----
+
+Internal Diagram:
+
+```
+ --------
+ |      |    |-----|--[ * SBC ]------------------------[ USB hub ]
+ | C201 |----| USB |                                |       |
+ |      |    | hub |                                |       |
+ |------|    |-----|--[ * USB to serial adapter ]-----------|
+                                                            |
+                              [ * USB Port ]----------------|
+                              [ * WLAN Adapter ]------------|
+                                               
+
+- - The parts labeled with * can be controlled individually by kill switches
+- - Once the power of the serial adapter is turned of, it should be impossible to reveal user&#39;s real IP address even when the C201&#39;s OS is fully compromised
+```
+- -----
+
+Connection Diagram:
+
+```
+Wired:     [ Internet ] ---- [ Ethernet Adapter ] ---- [ SBC ] ---- [ C201 ]
+Wireless:  [ Internet ] ---- [ Wireless Adapter ] ---- [ SBC ] ---- [ C201 ]
+```
+- -----
+
+Features: 
+
+- - Physical isolation via dedicated SBC
+- - Multiple hardwired kill switches with LED indicators for controlling SBC, serial adapter, WLAN and SBC&#39;s USB port
+- - Open firmware, zero non-free blob required
+- - C201 itself can be stateless by booting from a microSD Card, which can be easily physically destoryed within 5 sec.
+- - Low overall power consumption
+- - Lightweight, about 1.03kg after mod
+- - Low cost, should be under 200$  (C201: 100$ + SBC: 40$ + Serial: 5$ + Hub: 5$ x 2 + Switches/LEDs: 5$)
+
+What&#39;s next:
+
+- - Port TBB (Should be possible, someone has done that on C201 before)
+- - Port Alpine Linux and use it as the base system?
+- - Make some kind of sandbox / container layer (Maybe LXC?) for risky applications (e.g. Firefox)
+- - Port as many Whonix security feature to it as possible &lt;- Maybe just ports Whonix itself to it?
+
+Please let me know what do you think about this! All feedback are welcomed!
+
+This is posted from my prototype system, with Tor running on SBC :)
+
+P.S.: Sorry for the long inline signature, I can&#39;t get a secure email address when using Tor, so I have to use a temp. address to register. The following key should be online on pgp.mit.edu soon.
+
+pub   rsa3072 2020-04-07 [SC] [expires: 2022-04-07]
+      AAACDA2D2E49CF6DA72AB8D97DB140229CC5EED3
+uid           [ultimate] Yoshidako &lt;yoshidako@example.com&gt;
+sub   rsa3072 2020-04-07 [E] [expires: 2022-04-07]
+
+
+#### Quick Specs
+
+##### PocketBeagle
+
+* RAM: 512MB DDR3
+* CPU: 1-GHz ARM Cortex-A8 (armhf)
+* Based on Octavo Systems OSD3358-SM 21mm x 21mm system-in-package
+* ARM Cortex-M3 + 3D accelerator (Not sure what Cortex-M3 is, the CPU is Cortex A8)
+* 2 x 2-bit 200-MHz programmable real-time units (PRUs)
+* Power / battery management
+* EEPROM (Not sure what is it for...)
+* 72 expansion pin headers
+* 8 analog inputs
+* 44 digital I/Os
+* High-speed microUSB host/client and microSD connectors
+* [System Reference Manual][12]
+* [OSD335x-SM Detailed Block Diagram][13]
+
+##### Asus C201
+
+* SoC: Rockchip RK3288-C
+* CPU: 4 x ARM Cortax-A17 @ 1.8 GHz (armhf)
+* RAM: 2 or 4 GB DDR3 
+* GPU: Mali T764
+* Audio processor: Rockchip I2S
+* Screen size: 11.6&quot;
+* Resolution: 1366x768
+* Touchpad: Elan I2C 
+* Board: Veyron-Speedy 
+* Battery: 7.6V 38Wh
+
+#### Useful Links
+
+Installing Gentoo: https://wiki.gentoo.org/wiki/Asus_Chromebook_C201/Installing_Gentoo
+Installing Debian: https://wiki.debian.org/InstallingDebianOn/Asus/C201
+
+[1]: https://en.wikipedia.org/wiki/Single-board_computer
+[2]: https://wiki.gentoo.org/wiki/Asus_Chromebook_C201
+[3]: https://wiki.debian.org/InstallingDebianOn/Asus/C201
+[4]: https://en.wikipedia.org/wiki/Rockchip_RK3288
+[5]: https://web.archive.org/web/20200213004323/http://opensource.rock-chips.com/wiki_RK3288
+[6]: https://libreboot.org/docs/hardware/c201.html
+[7]: https://developer.arm.com/ip-products/graphics-and-multimedia/mali-gpus/mali-t760-gpu
+[8]: https://beagleboard.org/pocket
+[9]: https://octavosystems.com/octavo_products/osd335x-sm/
+[10]: https://octavosystems.com/docs/osd335x-sm-datasheet/
+[11]: https://elinux.org/Beagleboard:BeagleBoneBlack_Debian#Kernel_Option
+[12]: https://github.com/beagleboard/pocketbeagle/wiki/System-Reference-Manuals
+[13]: https://octavosystems.com/octavosystems.com/wp-content/uploads/2017/05/OSD335x-SM-Detailed-Block.png
+[14]: https://github.com/beagleboard/pocketbeagle
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBCgAdFiEEqqzaLS5Jz22nKrjZfbFAIpzF7tMFAl6MrjcACgkQfbFAIpzF
+7tPrxwwAkhgWLrKJcvyJdWpTGZebau75HwN4attCeT0kHVztt6jvia5V5eoLf5ky
+6dUYoRbsjizx+cQCt4QfEc7bQUHQmcN0L1fO1Alx0/PlJ12kyqTT3hDhw3VbXp2m
+AgvA/5/ic4OLDHhKho1jcz9d+9nt9+LBubZ/jfg8FHussVKK8jrWlsL7OU9ecOtB
+JUSYSZPXdyobmspBgFRTG4EmK670Vuy/r6B5R46ctOzW/qQQd3rkV8SlgI6u9Uuh
+EK3Svag/FnuBsvq1SA+NRP6XLqudLg14mHkFnjVIQINc6yZhfyE8LTVfcuAuaYid
+3HUZ0mKsUTeXNG3nsD2Fim2iGcCmFMm936gxl6k+pxNkzDBjZa9snJ4QKjSyLqXj
+t1b/3+sv61mk1wQLT19osa6zhWEEJtIItI2qnjh7IU/oqnB762Il+1+IgMxXrvlD
+emUd2h2hBfMSryiMyMLpt5+v1KCq0rLxS29fWe8mAzMwl7oVeocGcglprq3/gzQ4
+5D2V6PzM
+=Om/E
+-----END PGP SIGNATURE-----</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 18 Apr 2020 15:56:32 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[FantasyCookie17]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="yoshidako" data-post="27" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/54ee81/40.png" class="avatar"> yoshidako:</div>
+<blockquote>
+<p>As for the virtualization, I don’t know how useful it’s gonna to be on boards with limited RAM and CPU resources. AFAIK, even high-end boards (e.g. RPi 4, PineBook Pro) have only 4GB of RAM, minus at least ~500MB required by a Gateway VM and a host system, the amount of RAM left might not be enough for user to do the actual work.</p>
+</blockquote>
+</aside>
+<p>Well, it might be just enough for some basic work. 500 MB isn’t that much. Now, let’s say it’s 1GB. That would mean there would be 3GB RAM left. This should still be enough for usecases were you don’t have lots of tabs/programs running at the same time. Yes, most ARM SoCs, while being capable of 64-bit calculations, only have 32-bit memory addressing, which means there’s a limit of 4GB most of the time, thus that’s the most one would typically see soldered to such a board. There are ARM boards (not actual SBCs though) that support more, such as the HoneyComb LX2K by SolidRun, however this won’t really be usable in a laptop. Same goes for other alternative architectures, for example, there are the Talos II and Blackbird mainboards by Raptor Systems, which use POWER9 CPUs. While certainly supporting enough RAM, and also an interesting platform for something like Whonix, they’re not usable as a laptop.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/28">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/28</link>
+        <pubDate>Sat, 18 Apr 2020 15:56:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-28</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[yoshidako]]></dc:creator>
+        <description><![CDATA[
+            <p>Well, I probably underestimated the complexity of this project…</p>
+<p>If I can start again I will probably use something more future-proof such as <a href="https://www.pine64.org/pinebook-pro/" rel="nofollow noopener">PineBook Pro</a>.</p>
+<p>As for the virtualization, I don’t know how useful it’s gonna to be on boards with limited RAM and CPU resources. AFAIK, even high-end boards (e.g. RPi 4, PineBook Pro) have only 4GB of RAM, minus at least ~500MB required by a Gateway VM and a host system, the amount of RAM left might not be enough for user to do the actual work.</p>
+<p>That’s also why I prefer to use some kind of lightweight container rather than virtualization.</p>
+<p>However, I believe it’s possible to run KVM on C201, but I might have to hack the firmware to start the kernel in HYP mode.</p>
+<p>Some useful links:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://lwn.net/images/favicon.png" class="site-icon" width="16" height="16">
+      <a href="https://lwn.net/Articles/557132/" target="_blank" rel="nofollow noopener">lwn.net</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="16" height="16">
+
+<h3><a href="https://lwn.net/Articles/557132/" target="_blank" rel="nofollow noopener">Supporting KVM on the ARM architecture [LWN.net]</a></h3>
+
+<p>One of the new features in the 3.9 kernel is KVM/ARM: KVM support for the ARM
+architecture.  While KVM is already supported on i386 and x86/64, PowerPC, and
+s390, ARM support required more than just reimplementing the features and
+styles of the other...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+<a href="https://systems.cs.columbia.edu/projects/kvm-arm/" class="onebox" target="_blank" rel="nofollow noopener">https://systems.cs.columbia.edu/projects/kvm-arm/</a><p></p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/27">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/27</link>
+        <pubDate>Sat, 18 Apr 2020 13:16:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-27</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>I see. You do what you see reasonable, but if I were planning such a project I’d go for a arm64 board to make it more future proof. Think virtualization, hardware security extensions, 2038 clock bug, UEFI support.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/26">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/26</link>
+        <pubDate>Thu, 16 Apr 2020 13:12:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-26</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[yoshidako]]></dc:creator>
+        <description><![CDATA[
+            <p>I believe this board isn’t arm64, because uname shows it’s a <code>armv7l</code>, and the first arm64 processor is based on <code>ARMv8-A</code>.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/25">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/25</link>
+        <pubDate>Wed, 15 Apr 2020 23:48:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-25</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Right. OP’s board is arm64 I believe.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/24">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/24</link>
+        <pubDate>Wed, 15 Apr 2020 20:08:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-24</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="22" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Please try to get it maintained by anthraxx upstream.</p>
+</blockquote>
+</aside>
+<p>linux-hardened was only ever meant to support x86_64 and arm64. Other architectures are out-of-scope.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/23</link>
+        <pubDate>Wed, 15 Apr 2020 18:01:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-23</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="yoshidako" data-post="20" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/54ee81/40.png" class="avatar"> yoshidako:</div>
+<blockquote>
+<p>I am now porting anthraxx/linux-hardened to armhf, though not sure how hard it’s gonna to be.</p>
+</blockquote>
+</aside>
+<p>Awesome. Please try to get it maintained by anthraxx upstream.</p>
+<aside class="quote no-group" data-username="yoshidako" data-post="20" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/54ee81/40.png" class="avatar"> yoshidako:</div>
+<blockquote>
+<p>The major problem for me is, while the rootfs works perfectly, many critical parts of KickSecure are not available for armhf, including:</p>
+</blockquote>
+</aside>
+<p>Yeah some of the stuff in KSPP is for arm though because of Google’s interests. The fact most projects are x86 centric is caused by legacy baggage and networking effect. However it is very valuable having a viable alternative platform until development catches up.</p>
+<p>There was interest to port Tor Browser to arm by namecoin lead dev on Tor mailing lists. They may renew interest if they see privacy projects targeting the hardware. Even without TBB for Linux, a private arm laptop is still more valuable than not existing.</p>
+<p>Does the board support virtualization? Have you tried KVM on it?</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/22</link>
+        <pubDate>Wed, 15 Apr 2020 15:43:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-22</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[yoshidako]]></dc:creator>
+        <description><![CDATA[
+            <p>Just read <a href="https://www.whonix.org/wiki/Verified_Boot" rel="nofollow noopener">Whonix/Verified_Boot</a>, and I think I should be able to implement verified boot on C201 using Depthcharge.</p>
+<aside class="onebox pdf">
+  <header class="source">
+      <a href="https://link.springer.com/content/pdf/10.1007/978-1-4842-0070-4_5.pdf" target="_blank" rel="nofollow noopener">link.springer.com</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://link.springer.com/content/pdf/10.1007/978-1-4842-0070-4_5.pdf" target="_blank" rel="nofollow noopener"><span class="pdf-onebox-logo"></span></a>
+<h3><a href="https://link.springer.com/content/pdf/10.1007/978-1-4842-0070-4_5.pdf" target="_blank" rel="nofollow noopener">978-1-4842-0070-4_5.pdf</a></h3>
+
+<p class="filesize">374.31 KB</p>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>I really hope I got more time to put into this project.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/21</link>
+        <pubDate>Wed, 15 Apr 2020 12:19:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-21</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[yoshidako]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a><br>
+<a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a></p>
+<p>Thanks for the link!</p>
+<p>I don’t think this will affect me since I am doing distro-morphing on top of a clean debootstrap-ed buster rootfs.</p>
+<p>The major problem for me is, while the rootfs works perfectly, many critical parts of KickSecure are not available for armhf, including:</p>
+<ul>
+<li>
+<p>Everything related to kernel (anthraxx/linux-hardened only supports arm64 / x86)</p>
+</li>
+<li>
+<ul>
+<li>LKRG</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>KSPP</li>
+</ul>
+</li>
+<li>
+<ul>
+<li><a href="https://github.com/Whonix/tirdad" rel="nofollow noopener">TCP ISN CPU Information Leak Protection</a></li>
+</ul>
+</li>
+<li>
+<p>SecBrowser is also not supported since it’s based on TBB.</p>
+</li>
+</ul>
+<p>I am now porting anthraxx/linux-hardened to armhf, though not sure how hard it’s gonna to be.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/20</link>
+        <pubDate>Wed, 15 Apr 2020 10:23:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-20</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>As for distro-morphing there’s some bad and some good news. Updated its dedicated forum thread just now to elaborate on that. See:</p>
+<p><a href="https://forums.whonix.org/t/sudo-apt-get-install-whonix-part-i-distro-morphing/2346/6" class="inline-onebox">'sudo apt-get install whonix' Part I / Distro-Morphing</a></p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/19</link>
+        <pubDate>Tue, 14 Apr 2020 18:57:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-19</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Nice. Just FYI distro-morphing is experiencing bitrot because it has been deprecated (contributions welcome if you or anyone is interested). Complexity make its maintenance very impractical.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/18</link>
+        <pubDate>Tue, 14 Apr 2020 18:30:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-18</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[yoshidako]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a></p>
+<p>I just confirmed that both C201 and PocketBeagle are mainlined.</p>
+<p>Now the latest ti-linux-kernel-dev for PocketBeagle is 5.4.20-ti-r6.</p>
+<p>I also ported stock Debian and Alpine Linux to PocketBeagle, everything seems to be working <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<pre><code class="lang-auto">
+Welcome to Alpine Linux 3.11
+Kernel 5.4.20-ti-r6 on an armv7l (/dev/ttyS0)
+
+alpine login: 
+</code></pre>
+<p>Next step: try to run whonix-gateway-cli using <code>distro-morphing</code> .</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/17</link>
+        <pubDate>Mon, 13 Apr 2020 16:42:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-17</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="yoshidako" data-post="14" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/54ee81/40.png" class="avatar"> yoshidako:</div>
+<blockquote>
+<p>do you know how can I confirm that?</p>
+</blockquote>
+</aside>
+<p>No, I wouldn’t know how.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/16</link>
+        <pubDate>Sun, 12 Apr 2020 16:20:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-16</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[yoshidako]]></dc:creator>
+        <description><![CDATA[
+            <p>Everything seems to be working!<br>
+WLAN is a bit buggy, but usable.<br>
+Not sure if that’s due to software or hardware.</p>
+<p>I think I can start dogfooding now <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/15</link>
+        <pubDate>Sat, 11 Apr 2020 12:41:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-15</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[yoshidako]]></dc:creator>
+        <description><![CDATA[
+            <p>Now I am running a kernel with</p>
+<p><code>CONFIG_MUSB_PIO_ONLY=y</code></p>
+<p>… which disables all the DMA USB controllers:</p>
+<pre><code class="lang-auto">#ifdef CONFIG_MUSB_PIO_ONLY
+static inline struct dma_controller *
+musb_dma_controller_create(struct musb *m, void __iomem *io)
+{
+        return NULL;
+}
+
+static inline void musb_dma_controller_destroy(struct dma_controller *d) { }
+
+#else
+
+</code></pre>
+<p>So I assume that DMA via USB is now disabled, but I still can’t confirm that, do you know how can I confirm  that?</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/14</link>
+        <pubDate>Fri, 10 Apr 2020 14:51:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-14</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="yoshidako" data-post="5" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/54ee81/40.png" class="avatar"> yoshidako:</div>
+<blockquote>
+<p>As for the schematics, I am not sure if it’s public because Asus C201 is not an open hardware. Could you show me why is this important?</p>
+</blockquote>
+</aside>
+<p>As open as possible. Meaning you publish how you made your laptop so others can assemble the parts and create something like it.</p>
+<p>Why? For freedom.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/13</link>
+        <pubDate>Fri, 10 Apr 2020 14:15:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-13</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[yoshidako]]></dc:creator>
+        <description><![CDATA[
+            <p>I think I should be able to disable DMA by forcing PIO mode using <a href="https://web.archive.org/web/20181229002913/http://processors.wiki.ti.com/index.php/MUSB_Linux_Driver_Configuration" rel="nofollow noopener">AM335x’s <code>CONFIG_MUSB_PIO_ONLY</code> kernel option</a>, so I don’t have to touch SMMU.</p>
+<p>This is expected to dramatically reduce the usable USB bandwidth, but I still don’t know how much. I will test it and see if that’s still usable.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/12</link>
+        <pubDate>Thu, 09 Apr 2020 11:23:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-12</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="yoshidako" data-post="10" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/54ee81/40.png" class="avatar"> yoshidako:</div>
+<blockquote>
+<p>I believe the exploit chain you described is: (Correct me if I’m wrong.)</p>
+<ol>
+<li>Malicious USB devices connected to the SBC can compromise SBC’s USB host controller</li>
+<li>Since host controller can do DMA, the SBC itself can be compromised (or for whatever reasons SBC itself was compromised)</li>
+<li>As long as the SBC itself is compromised, it can be turn into a malicious device that compromises C201’s host controller and eventually compromises C201 itself.</li>
+</ol>
+</blockquote>
+</aside>
+<p>Yes.</p>
+<aside class="quote no-group" data-username="yoshidako" data-post="10" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/54ee81/40.png" class="avatar"> yoshidako:</div>
+<blockquote>
+<p>And TBH, I have no idea about how can I use this, Linux kernel’s documents for ARM <a href="https://www.kernel.org/doc/html/v5.5-rc1/arm/arm.html">2</a> don’t have a section about SMMU.</p>
+</blockquote>
+</aside>
+<p>There seems to be some documentation here <a href="https://www.kernel.org/doc/Documentation/devicetree/bindings/iommu/">https://www.kernel.org/doc/Documentation/devicetree/bindings/iommu/</a> and the source code is <a href="https://github.com/torvalds/linux/blob/master/drivers/iommu/arm-smmu.c">https://github.com/torvalds/linux/blob/master/drivers/iommu/arm-smmu.c</a> if that helps.</p>
+<p>I don’t have any idea on how to use SMMU either though.</p>
+<aside class="quote no-group" data-username="yoshidako" data-post="10" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/54ee81/40.png" class="avatar"> yoshidako:</div>
+<blockquote>
+<p>If I understand the problem correctly, this is a hardware problem and softwares such as USBguard can do nothing to fix it, right?</p>
+</blockquote>
+</aside>
+<p>Yes, USBGuard just denies access to certain USB devices. It doesn’t setup any isolation.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/11</link>
+        <pubDate>Wed, 08 Apr 2020 14:58:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-11</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[yoshidako]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>By <code>physical isolation</code>, do you mean isolation between hardware devices?</p>
+</blockquote>
+<p>Yes</p>
+<blockquote>
+<p>USB is complex and has plenty of vulnerabilities.</p>
+</blockquote>
+<p>Thanks! I never thought about that.</p>
+<p>I believe the exploit chain you described is: (Correct me if I’m wrong.)</p>
+<ol>
+<li>Malicious USB devices connected to the SBC can compromise SBC’s USB host controller</li>
+<li>Since host controller can do DMA, the SBC itself can be compromised (or for whatever reasons SBC itself was compromised)</li>
+<li>As long as the SBC itself is compromised, it can be turn into a malicious device that compromises C201’s host controller and eventually compromises C201 itself.</li>
+</ol>
+<blockquote>
+<p>An IOMMU would be far more effective.</p>
+</blockquote>
+<p>I am sure Cortex-A17 has support for SMMU (ARM’s IOMMU) <a href="https://community.arm.com/developer/ip-products/processors/f/cortex-a-forum/5155/arm-full-virtualisation-software" rel="nofollow noopener">1</a>, therefore RK3288 should also supports that, but I haven’t confirm it yet.</p>
+<p>And TBH, I have no idea about how can I use this, Linux kernel’s documents for ARM <a href="https://www.kernel.org/doc/html/v5.5-rc1/arm/arm.html" rel="nofollow noopener">2</a> don’t have a section about SMMU.</p>
+<p>If I understand the problem correctly, this is a hardware problem and softwares such as USBguard can do nothing to fix it, right?</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/10</link>
+        <pubDate>Wed, 08 Apr 2020 02:41:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-10</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>By “physical isolation”, do you mean isolation between hardware devices?</p>
+<p>It seems you’re doing this via USB which isn’t a good idea. USB is complex and has plenty of vulnerabilities. An IOMMU would be far more effective.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/9</link>
+        <pubDate>Tue, 07 Apr 2020 22:35:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-9</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[yoshidako]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes, I believe it’s mainlined ever since v4.8-rc2.</p>
+<p>As for the schematics, I am not sure if it’s public because Asus C201 is not an open hardware. Could you show me why is this important?</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/5</link>
+        <pubDate>Tue, 07 Apr 2020 16:12:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-5</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[yoshidako]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for your feedback!</p>
+<blockquote>
+<p>What’s your goal? Personal machine or development? something re-usable by others?</p>
+</blockquote>
+<p>Both? I will try to use this as my daily driver so I can find and solve problems rapidly.</p>
+<p>It will be great if others will be able to reuse this design in future.<br>
+But for now, I hope this will inspires some people <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<blockquote>
+<p>What Debian platform is that? arm64, armel, armhf or something?</p>
+</blockquote>
+<p>It’s 32bit, running Debian armhf.</p>
+<p>Debian actually has a page for C201 here: <a href="https://wiki.debian.org/InstallingDebianOn/Asus/C201" rel="nofollow noopener">https://wiki.debian.org/InstallingDebianOn/Asus/C201</a></p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/4</link>
+        <pubDate>Tue, 07 Apr 2020 16:09:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-4</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Internet says it has <a href="https://en.wikipedia.org/wiki/Rockchip_RK3288">https://en.wikipedia.org/wiki/Rockchip_RK3288</a> which is</p>
+</blockquote>
+</aside>
+<p><a class="mention" href="http://forums.whonix.org/u/yoshidako">@yoshidako</a> have this board’s drivers been mainlined? It was WIP last time I checked. Publish the schematics on github if you hope to build a community around it.</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/3</link>
+        <pubDate>Tue, 07 Apr 2020 13:22:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-3</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>What’s your goal? Personal machine or development, something re-usable by others?</p>
+<aside class="quote no-group" data-username="yoshidako" data-post="1" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/54ee81/40.png" class="avatar"> yoshidako:</div>
+<blockquote>
+<p>SBC</p>
+</blockquote>
+</aside>
+<p>Would be useful to explain at first use what that means or link to some definition.</p>
+<aside class="quote no-group" data-username="yoshidako" data-post="1" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/54ee81/40.png" class="avatar"> yoshidako:</div>
+<blockquote>
+<p>Asus C201PA, which is a Rockchip based laptop</p>
+</blockquote>
+</aside>
+<p>Internet says it has <a href="https://en.wikipedia.org/wiki/Rockchip_RK3288">https://en.wikipedia.org/wiki/Rockchip_RK3288</a> which is</p>
+<blockquote>
+<p>an ARM architecture System on Chip (SoC) from Rockchip</p>
+</blockquote>
+<p>What Debian platform is that? arm64, armel, armhf or something?</p>
+<p>Sounds interesting.</p>
+<p>You’re in good luck since only recently arm64 builds were fixed. See: <a href="https://forums.whonix.org/t/whonix-development-news/9251" class="inline-onebox">Whonix Development News</a></p>
+<aside class="quote no-group" data-username="Patrick" data-post="1" data-topic="9251">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"><a href="//forums.whonix.org/t/whonix-development-news/9251/1">Whonix Development News</a>
+</div>
+<blockquote>
+<p>Note: only the build was fixed. I didn’t try to boot the image let alone try it on real hardware. You could help the development if you could create instructions how to boot that image using virtualization such as libvirt configuration files and/or qemu command line to boot the image from a amd64 host.</p>
+</blockquote>
+</aside>
+<p>Therefore seems feasible that Whonix could also be ported to a lot / most / all platforms that are supported by Debian.</p>
+<p>search maybe:</p>
+<pre><code>site:debian.org ARM Cortex-A17
+</code></pre>
+<aside class="quote no-group" data-username="yoshidako" data-post="1" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/54ee81/40.png" class="avatar"> yoshidako:</div>
+<blockquote>
+<p>Port Alpine Linux and use it as the base system?</p>
+</blockquote>
+</aside>
+<p>I am not convinced that this would be any useful. See:</p>
+<p><a href="https://www.whonix.org/wiki/Dev/Operating_System#Alpine_Linux">https://www.whonix.org/wiki/Dev/Operating_System#Alpine_Linux</a></p>
+<aside class="quote no-group" data-username="yoshidako" data-post="1" data-topic="9273">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/54ee81/40.png" class="avatar"> yoshidako:</div>
+<blockquote>
+<p>Make some kind of sandbox / container layer (Maybe LXC?) for risky applications (e.g. Firefox)</p>
+</blockquote>
+</aside>
+<p>Join:</p>
+<aside class="quote quote-modified" data-post="2" data-topic="9008">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/system-wide-sandboxing-framework/9008/2">System-wide sandboxing framework</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    Sounds really good in theory. 
+Would apparmor profiles and other default hardening by packages if any be added “on top”? 
+
+Could you please scratch Whonix from the name / folder names? I guess this could be generic. Could be part of apparmor-profile-everything? 
+
+main_app_dir="/usr/share/whonix-apps" 
+
+Possibly better in user’s /home folder? 
+How would an application by started by default using the sandbox wrapper without needing to prepend on command line? The good old problem of non-existence …
+  </blockquote>
+</aside>
+
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="16" height="16">
+      <a href="https://github.com/Whonix/sandbox-app-launcher" target="_blank">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars3.githubusercontent.com/u/4500165?s=400&amp;v=4" class="thumbnail" width="" height="">
+
+<h3><a href="https://github.com/Whonix/sandbox-app-launcher" target="_blank">Whonix/sandbox-app-launcher</a></h3>
+
+<p>An app launcher to start apps in a restrictive sandbox - Whonix/sandbox-app-launcher</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/2</link>
+        <pubDate>Tue, 07 Apr 2020 12:39:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-2</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+      <item>
+        <title>I am building a laptop with physical isolation and hardware kill switches</title>
+        <dc:creator><![CDATA[yoshidako]]></dc:creator>
+        <description><![CDATA[
+            <p>-----BEGIN PGP SIGNED MESSAGE-----<br>
+Hash: SHA512</p>
+<p>I am building a laptop with physical isolation and hardware kill switches</p>
+<p>Hi everyone, I am building a laptop with physical isolation (via a dedicated single-board computer (<a href="https://en.wikipedia.org/wiki/Single-board_computer" rel="nofollow noopener">SBC</a>) ) and hardware kill switches, I just finished the first prototype and it’s usable!</p>
+<p>Now I want to share my ideas with you and possibly get some feedback from the Whonix community.</p>
+<hr>
+<p>This thing is based on a Asus C201PA (<a href="https://wiki.gentoo.org/wiki/Asus_Chromebook_C201" rel="nofollow noopener">Gentoo Wiki</a>, <a href="https://wiki.debian.org/InstallingDebianOn/Asus/C201" rel="nofollow noopener">Debian Wiki</a>) , which is a Rockchip RK3288-C (<a href="https://en.wikipedia.org/wiki/Rockchip_RK3288" rel="nofollow noopener">Wikipedia</a>, <a href="https://web.archive.org/web/20200213004323/http://opensource.rock-chips.com/wiki_RK3288" rel="nofollow noopener">Rockchip Wiki</a>) based Chromebook. It’s <a href="https://libreboot.org/docs/hardware/c201.html" rel="nofollow noopener">Libreboot compatible</a> and does not require any non-free blob to operate.</p>
+<h4>Kernel / Drivers</h4>
+<p>Most of it’s features, including LCD and HDMI video framebuffer, eMMC, microSD, battery, and USB is available in mainline linux since v4.8-rc2.</p>
+<p>It’s <a href="https://developer.arm.com/ip-products/graphics-and-multimedia/mali-gpus/mali-t760-gpu" rel="nofollow noopener">Mali T764</a> GPU comes with non-free driver, but <code>xserver-xorg-video-fbdev</code> works just fine.</p>
+<p>It also has a soldered on M.2 Type 1216 WLAN + BT card that requires non-free blob to operate, but we don’t need it and can be (easily) removed by using a SMT rework station.</p>
+<h4>SBC<a href="https://en.wikipedia.org/wiki/Single-board_computer" rel="nofollow noopener">1</a>
+</h4>
+<p>The SBC I use to perform physical isolation is a <a href="https://beagleboard.org/pocket" rel="nofollow noopener">PocketBeagle</a>, it’s small enough to be put inside C201’s case, and can be powered directly by C201’s motherboard.</p>
+<p>The PocketBeagle is a <a href="https://github.com/beagleboard/pocketbeagle" rel="nofollow noopener">open source</a> SBC based around a OSD335x-SM System-in-Package (SiP) (<a href="https://octavosystems.com/octavo_products/osd335x-sm/" rel="nofollow noopener">Specs</a>, <a href="https://octavosystems.com/docs/osd335x-sm-datasheet/" rel="nofollow noopener">PDF Datasheet</a>), according to <a href="https://elinux.org/Beagleboard:BeagleBoneBlack_Debian#Kernel_Option" rel="nofollow noopener">eLinux Wiki</a>, it’s mainlined as well, although I haven’t confirm it yet.</p>
+<hr>
+<p>Internal Diagram:</p>
+<pre><code class="lang-auto"> --------
+ |      |    |-----|--[ * SBC ]------------------------[ USB hub ]
+ | C201 |----| USB |                                |       |
+ |      |    | hub |                                |       |
+ |------|    |-----|--[ * USB to serial adapter ]-----------|
+                                                            |
+                              [ * USB Port ]----------------|
+                              [ * WLAN Adapter ]------------|
+                                               
+
+- - The parts labeled with * can be controlled individually by kill switches
+- - Once the power of the serial adapter is turned of, it should be impossible to reveal user's real IP address even when the C201's OS is fully compromised
+</code></pre>
+<hr>
+<p>Connection Diagram:</p>
+<pre><code class="lang-auto">Wired:     [ Internet ] ---- [ Ethernet Adapter ] ---- [ SBC ] ---- [ C201 ]
+Wireless:  [ Internet ] ---- [ Wireless Adapter ] ---- [ SBC ] ---- [ C201 ]
+</code></pre>
+<hr>
+<p>Features:</p>
+<ul>
+<li>
+<ul>
+<li>Physical isolation via dedicated SBC</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Multiple hardwired kill switches with LED indicators for controlling SBC, serial adapter, WLAN and SBC’s USB port</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Open firmware, zero non-free blob required</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>C201 itself can be stateless by booting from a microSD Card, which can be easily physically destoryed within 5 sec.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Low overall power consumption</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Lightweight, about 1.03kg after mod</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Low cost, should be under 200$  (C201: 100$ + SBC: 40$ + Serial: 5$ + Hub: 5$ x 2 + Switches/LEDs: 5$)</li>
+</ul>
+</li>
+</ul>
+<p>What’s next:</p>
+<ul>
+<li>
+<ul>
+<li>Port TBB (Should be possible, someone has done that on C201 before)</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Port Alpine Linux and use it as the base system?</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Make some kind of sandbox / container layer (Maybe LXC?) for risky applications (e.g. Firefox)</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Port as many Whonix security feature to it as possible &lt;- Maybe just ports Whonix itself to it?</li>
+</ul>
+</li>
+</ul>
+<p>Please let me know what do you think about this! All feedback are welcomed!</p>
+<p>This is posted from my prototype system, with Tor running on SBC <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<p>P.S.: Sorry for the long inline signature, I can’t get a secure email address when using Tor, so I have to use a temp. address to register. The following key should be online on pgp.mit.edu soon.</p>
+<p>pub   rsa3072 2020-04-07 [SC] [expires: 2022-04-07]<br>
+AAACDA2D2E49CF6DA72AB8D97DB140229CC5EED3<br>
+uid           [ultimate] Yoshidako <a href="mailto:yoshidako@example.com">yoshidako@example.com</a><br>
+sub   rsa3072 2020-04-07 [E] [expires: 2022-04-07]</p>
+<h4>Quick Specs</h4>
+<h5>PocketBeagle</h5>
+<ul>
+<li>RAM: 512MB DDR3</li>
+<li>CPU: 1-GHz ARM Cortex-A8 (armhf)</li>
+<li>Based on Octavo Systems OSD3358-SM 21mm x 21mm system-in-package</li>
+<li>ARM Cortex-M3 + 3D accelerator (Not sure what Cortex-M3 is, the CPU is Cortex A8)</li>
+<li>2 x 2-bit 200-MHz programmable real-time units (PRUs)</li>
+<li>Power / battery management</li>
+<li>EEPROM (Not sure what is it for…)</li>
+<li>72 expansion pin headers</li>
+<li>8 analog inputs</li>
+<li>44 digital I/Os</li>
+<li>High-speed microUSB host/client and microSD connectors</li>
+<li><a href="https://github.com/beagleboard/pocketbeagle/wiki/System-Reference-Manuals" rel="nofollow noopener">System Reference Manual</a></li>
+<li><a href="https://octavosystems.com/octavosystems.com/wp-content/uploads/2017/05/OSD335x-SM-Detailed-Block.png" rel="nofollow noopener">OSD335x-SM Detailed Block Diagram</a></li>
+</ul>
+<h5>Asus C201</h5>
+<ul>
+<li>SoC: Rockchip RK3288-C</li>
+<li>CPU: 4 x ARM Cortax-A17 @ 1.8 GHz (armhf)</li>
+<li>RAM: 2 or 4 GB DDR3</li>
+<li>GPU: Mali T764</li>
+<li>Audio processor: Rockchip I2S</li>
+<li>Screen size: 11.6"</li>
+<li>Resolution: 1366x768</li>
+<li>Touchpad: Elan I2C</li>
+<li>Board: Veyron-Speedy</li>
+<li>Battery: 7.6V 38Wh</li>
+</ul>
+<h4>Useful Links</h4>
+<p>Installing Gentoo: <a href="https://wiki.gentoo.org/wiki/Asus_Chromebook_C201/Installing_Gentoo" rel="nofollow noopener">https://wiki.gentoo.org/wiki/Asus_Chromebook_C201/Installing_Gentoo</a><br>
+Installing Debian: <a href="https://wiki.debian.org/InstallingDebianOn/Asus/C201" rel="nofollow noopener">https://wiki.debian.org/InstallingDebianOn/Asus/C201</a></p>
+<p>-----BEGIN PGP SIGNATURE-----</p>
+<p>iQGzBAEBCgAdFiEEqqzaLS5Jz22nKrjZfbFAIpzF7tMFAl6MrjcACgkQfbFAIpzF<br>
+7tPrxwwAkhgWLrKJcvyJdWpTGZebau75HwN4attCeT0kHVztt6jvia5V5eoLf5ky<br>
+6dUYoRbsjizx+cQCt4QfEc7bQUHQmcN0L1fO1Alx0/PlJ12kyqTT3hDhw3VbXp2m<br>
+AgvA/5/ic4OLDHhKho1jcz9d+9nt9+LBubZ/jfg8FHussVKK8jrWlsL7OU9ecOtB<br>
+JUSYSZPXdyobmspBgFRTG4EmK670Vuy/r6B5R46ctOzW/qQQd3rkV8SlgI6u9Uuh<br>
+EK3Svag/FnuBsvq1SA+NRP6XLqudLg14mHkFnjVIQINc6yZhfyE8LTVfcuAuaYid<br>
+3HUZ0mKsUTeXNG3nsD2Fim2iGcCmFMm936gxl6k+pxNkzDBjZa9snJ4QKjSyLqXj<br>
+t1b/3+sv61mk1wQLT19osa6zhWEEJtIItI2qnjh7IU/oqnB762Il+1+IgMxXrvlD<br>
+emUd2h2hBfMSryiMyMLpt5+v1KCq0rLxS29fWe8mAzMwl7oVeocGcglprq3/gzQ4<br>
+5D2V6PzM<br>
+=Om/E<br>
+-----END PGP SIGNATURE-----</p>
+          <p><a href="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273/1</link>
+        <pubDate>Tue, 07 Apr 2020 12:24:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9273-1</guid>
+        <source url="http://forums.whonix.org/t/i-am-building-a-laptop-with-physical-isolation-and-hardware-kill-switches/9273.rss">I am building a laptop with physical isolation and hardware kill switches</source>
+      </item>
+  </channel>
+</rss>

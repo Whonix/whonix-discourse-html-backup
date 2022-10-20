@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Qubes-Whonix CORRIDOR: where to insert the bridges?</title>
+    <link>http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124</link>
+    <description>Hey, I hope u&#39;re all doing good.
+
+@Patrick @HulaHoop  I know u&#39;re busy guys so here&#39;s the short story:
+
+Following the guide at kkkkkkkkkk63ava6.onion/wiki/Corridor
+at the step to install corridor (&quot;sudo apt-get install corridor&quot;) I get errors at the end, which I wont even post since I think it&#39;s obvious why I get them:
+I use obfs4 bridges, and using the guide the biggest part of the bridges set-up is missing: where to store the bridge lines???? 
+
+at etc/tor/torrc the config is completely different than the normal torrc whonix-gateway config, I looked everywhere (corridor github, whonix blog, this forum) and still have no clue about where to insert the bridge lines.</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 13 Jul 2017 14:02:11 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Qubes-Whonix CORRIDOR: where to insert the bridges?</title>
+        <dc:creator><![CDATA[qubeswhonixalltheway]]></dc:creator>
+        <description><![CDATA[
+            <p>Alright, deep apologies to <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a>  . Thank you.<br>
+Thank you <a class="mention" href="http://forums.whonix.org/u/rustybird">@rustybird</a> for your answer, though it completely failed <img src="//forums.whonix.org/images/emoji/twitter/sweat_smile.png?v=5" title=":sweat_smile:" class="emoji" alt=":sweat_smile:"> though It gave me the right clue, I guess, on how to do it.<br>
+I managed to make it work on my own!! almost can’t believe it!!!<br>
+<em>Also the way to store the bridges you said is not correct</em>, in fact if you issue the command “grep -Ei ‘^[[:space:]]*Bridge[[:space:]]’ /etc/tor/torrc” you’ll see it only returns 2 bridges out of the 3 you usually insert (to make the command work the bridges must be in /etc/tor/torrc, it’s all explained in the guide I wrote below). To fix that I modified your code (if u want u can see in the little guide I posted below).</p>
+<p><em><strong>You may want to add this thread to kkkkkkkkkk63ava6.onion/wiki/Corridor I suppose, to help next users.</strong></em></p>
+<p>Here are the outputs of sys-corridor once it was working (no errors; 2nd and last output had the green point, the rest black):</p>
+<p>heresmyuser@sys-corridor:~$ sudo systemctl status corridor-data<br>
+● corridor-data.service - corridor’s relay list<br>
+Loaded: loaded (/lib/systemd/system/corridor-data.service; enabled)<br>
+Drop-In: /lib/systemd/system/corridor-data.service.d<br>
+└─qubes-service.conf, qubes.conf<br>
+Active: inactive (dead) since Thu 2017-07-13 11:23:58 EDT; 13s ago<br>
+Process: 672 ExecStart=/usr/sbin/corridor-data (code=exited, status=0/SUCCESS)<br>
+Main PID: 672 (code=exited, status=0/SUCCESS)</p>
+<p>Jul 13 11:23:58 sys-corridor systemd[1]: Starting corridor’s relay list…<br>
+Jul 13 11:23:58 sys-corridor systemd[1]: Started corridor’s relay list.<br>
+Jul 13 11:23:58 sys-corridor corridor-data[672]: corridor_relays updated.<br>
+heresmyuser@sys-corridor:~$ sudo systemctl status corridor-init-forwarding<br>
+● corridor-init-forwarding.service - corridor’s forwarding<br>
+Loaded: loaded (/lib/systemd/system/corridor-init-forwarding.service; enabled)<br>
+Drop-In: /lib/systemd/system/corridor-init-forwarding.service.d<br>
+└─qubes-service.conf, qubes.conf<br>
+Active: active (exited) since Thu 2017-07-13 11:23:55 EDT; 27s ago<br>
+Process: 407 ExecStart=/bin/rm -f /var/run/qubes-service/qubes-firewall (code=exited, status=0/SUCCESS)<br>
+Process: 337 ExecStart=/usr/sbin/corridor-init-forwarding (code=exited, status=0/SUCCESS)<br>
+Main PID: 407 (code=exited, status=0/SUCCESS)<br>
+CGroup: /system.slice/corridor-init-forwarding.service</p>
+<p>Jul 13 11:23:54 localhost systemd[1]: Starting corridor’s forwarding…<br>
+Jul 13 11:23:55 localhost corridor-init-forwarding[337]: net.ipv4.ip_forward = 1<br>
+Jul 13 11:23:55 localhost corridor-init-forwarding[337]: net.ipv6.conf.all.fo…<br>
+Jul 13 11:23:55 localhost systemd[1]: Started corridor’s forwarding.<br>
+Hint: Some lines were ellipsized, use -l to show in full.<br>
+heresmyuser@sys-corridor:~$ sudo systemctl status corridor-init-logged<br>
+● corridor-init-logged.service - corridor’s logging<br>
+Loaded: loaded (/lib/systemd/system/corridor-init-logged.service; enabled)<br>
+Drop-In: /lib/systemd/system/corridor-init-logged.service.d<br>
+└─qubes-service.conf, qubes.conf<br>
+Active: inactive (dead) since Thu 2017-07-13 11:23:58 EDT; 32s ago<br>
+Process: 697 ExecStart=/usr/sbin/corridor-init-logged (code=exited, status=0/SUCCESS)<br>
+Main PID: 697 (code=exited, status=0/SUCCESS)</p>
+<p>Jul 13 11:23:58 sys-corridor corridor-init-logged[697]: corridor_logged updated.<br>
+Jul 13 11:23:58 sys-corridor systemd[1]: Started corridor’s logging.<br>
+Hint: Some lines were ellipsized, use -l to show in full.<br>
+heresmyuser@sys-corridor:~$ sudo systemctl status corridor-init-snat<br>
+● corridor-init-snat.service - corridor’s source NAT<br>
+Loaded: loaded (/lib/systemd/system/corridor-init-snat.service; enabled)<br>
+Drop-In: /lib/systemd/system/corridor-init-snat.service.d<br>
+└─qubes-service.conf, qubes.conf<br>
+Active: active (exited) since Thu 2017-07-13 11:23:58 EDT; 1min 9s ago<br>
+Process: 722 ExecStart=/usr/sbin/corridor-init-snat (code=exited, status=0/SUCCESS)<br>
+Main PID: 722 (code=exited, status=0/SUCCESS)<br>
+CGroup: /system.slice/corridor-init-snat.service</p>
+<p>Jul 13 11:23:58 sys-corridor systemd[1]: Started corridor’s source NAT.<br>
+heresmyuser@sys-corridor:~$</p>
+<hr>
+<p><strong>I wrote a small but quite detailed guide for the next users who are stuck at the same problem, HERE IT GOES:</strong></p>
+<hr>
+<p>create the sys-corridor as shown in the steps of the whonix guide<br>
+once you turn it on, before you do anything execute ‘sudo nano /etc/apt/sources.list.d/qubes-r3.list’ or just issue ‘sudo nano <em>herethequbeslist</em>’ to whatever qubes list is at /etc/apt/sources.list.d and make sure you’re using the clearnet repositories.<br>
+sudo apt-get update<br>
+sudo apt-get upgrade<br>
+(this is to update your debian sys-corridor in case your debian template was not updated, btw you should update it)<br>
+cd /etc<br>
+sudo mkdir corridor.d<br>
+cd corridor.d</p>
+<p>Now following the guide at kkkkkkkkkk63ava6.onion/wiki/Corridor from the step where it says to edit ‘sudo nano /etc/corridor.d/21-bridges-user.conf’ and insert the code it says to insert.<br>
+NOW DOWNLOAD THE Whonix Signing Key: NOTE: if your sys-corridor is using sys-firewall as the NetVM than you must know that you are going to get the whonix key over the clear, which means your ISP will know you are probably gonna use whonix after that. If you wish this to not happen you could theoretically change your netVM to sys-whonix, BUT since after you downloaded the key, add the key, you’re gonna have to download the corridor whonix package from the whonix repo, and you’re still going to use sys-whonix in the meantime, the problem is that when installing the corridor package, it is automatically run, thus you’re gonna end up with bridges over guards (tor over tor) (bridges in case your sys-whonix is set up to use bridges), THUS BE CAREFUL. after that you still could replace sys-whonix with sys-firewall netVM of your sys-corridor, and it should get back to work normally as it should. This has not been tested, so if you want to test be careful and keep in mind that it might fail, or even worse bug something, so make sure if u wanna follow this path to make the proper backups, and do not do this if it’s a big risk for you in case it bugs and exposes  you, or I don’t know what else, you should ask someone that knows more than me about this.</p>
+<p>So now download, add the key, add the whonix apt repository, update your packages again, and install corridor as described at the whonix guide.<br>
+(don’t worry if during corridor’s installation you get errors like : ‘corridor-init-logged.service failed’)<br>
+Once you have installed corridor, wait before moving forward, you don’t need to make the check with sudo systemctl right now (in case you did relax, you didn’t break anything).</p>
+<p><strong>it’s time to add the bridges in the right way:</strong><br>
+sudo nano /etc/tor/torrc<br>
+scroll to the bottom of the file<br>
+at the very end after the very last comment INSERT THIS CODE IN THIS EXACT SYNTAXT (replacing only your bridge lines of course)<br>
+(so basically just leave untouched the 1st and last line of this code):</p>
+<p>BRIDGES="<br>
+Bridge obfs4 ip:port… bla bla bla…<br>
+Bridge obfs4 ip:port… bla bla bla…<br>
+Bridge obfs4 ip:port… bla bla bla…<br>
+"<br>
+then as before press ‘ctrl’+‘x’, type ‘Y’, and press enter.</p>
+<p>TO MAKE SURE THE SYNTAX IS CORRECT YOU CAN ISSUE this command in your terminal:<br>
+grep -Ei ‘^[[:space:]]*Bridge[[:space:]]’ /etc/tor/torrc</p>
+<p>If it corretly returns your bridge lines then you did good. In case it doesn’t then try again.</p>
+<p>now issue the command:<br>
+sudo nano /etc/corridor.d/20-bridges-auto.conf<br>
+and remove the character ‘#’ at the first line (to uncomment that code line) (btw the file contains only 1 line don’t worry)<br>
+then as before press ‘ctrl’+‘x’, type ‘Y’, and press enter.</p>
+<p>now issue the command:<br>
+sudo rm /etc/corridor.d/21-bridges-user.conf</p>
+<p>now issue the command:<br>
+sudo reboot</p>
+<p>once sys-corridor is shutted down, you can start it again from the qubes VM Manager<br>
+once it’s loaded open a terminal (in sys-corridor of course)<br>
+at this point you can move forward in the whonix guide, the systemctl commands should turn the following outputs:<br>
+the 1st one (corridor-data) should be ‘Loaded’ but with the black big dot<br>
+the 2nd one (corridor-init-forwarding) should be ‘Active’ with the green big dot<br>
+the 3d one (corridor-init-logged) should be should be ‘Loaded’ but with the black big dot<br>
+the 4th one (corridor-init-snat) should be should be ‘Active’ with the green big dot</p>
+<p>At least those were the outputs for me. More important is that it doesn’t show any errors.<br>
+Now if you want you can keep following the whonix guide, with steps such as ‘test corridor’ and/or ‘test logging’, ‘interpreting the results’, ‘configure sys-whonix’.</p>
+<p>I personally tested with both the tor browser bundle, and then opening firefox to see if it could got clearnet access. It all worked as expected from there, e.g. no clearnet access, only tor access through bridges. In fact issuing ‘sudo ipset list corridor_relays’ inside sys-corridor terminal showed that the only ips were the bridge ones, with their relative ports, and allowing only TCP protocol.</p>
+<p>I also tested on sys-whonix, it works.<br>
+I also tested to disable the bridges in sys-whonix, It successfully failed to connect to tor as expected!</p>
+<hr>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124/5</link>
+        <pubDate>Thu, 13 Jul 2017 13:42:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4124-5</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124.rss">Qubes-Whonix CORRIDOR: where to insert the bridges?</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix CORRIDOR: where to insert the bridges?</title>
+        <dc:creator><![CDATA[rustybird]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="3" data-topic="4124">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/q/ecae2f/40.png" class="avatar"> qubeswhonixalltheway:</div>
+<blockquote>
+<p>Last time ‘rustybird’ logged in was March 3 2017 at 5:56 PM.<br>
+So he’s obviously not able to answer.</p>
+</blockquote>
+</aside>
+<p>I beg to differ ;). Patrick’s CC appeared as an e-mail notification.</p>
+<aside class="quote" data-post="1" data-topic="4124">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/q/ecae2f/40.png" class="avatar"> qubeswhonixalltheway:</div>
+<blockquote>
+<p>I use obfs4 bridges, and using the guide the biggest part of the bridges set-up is missing: where to store the bridge lines???</p>
+</blockquote>
+</aside>
+<p>You can copy your <code>torrc</code> bridge lines into a new <code>.conf</code> file in sys-corridor’s <code>/etc/corridor.d/</code>, in the following format:</p>
+<pre><code>BRIDGES="Bridge obfs4 ...
+Bridge obfs4 ...
+Bridge obfs4 ..."</code></pre>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124/4</link>
+        <pubDate>Wed, 12 Jul 2017 18:40:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4124-4</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124.rss">Qubes-Whonix CORRIDOR: where to insert the bridges?</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix CORRIDOR: where to insert the bridges?</title>
+        <dc:creator><![CDATA[qubeswhonixalltheway]]></dc:creator>
+        <description><![CDATA[
+            <p>???<br>
+Last time ‘rustybird’ logged in was March 3 2017 at 5:56 PM.<br>
+So he’s obviously not able to answer.<br>
+You <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> and <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a> are the ones that were working at this project, not rustybird (by project I mean the qubes-whonix-corridor/whonix-corridor project, not the corridor project alone).</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124/3</link>
+        <pubDate>Wed, 12 Jul 2017 15:29:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4124-3</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124.rss">Qubes-Whonix CORRIDOR: where to insert the bridges?</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix CORRIDOR: where to insert the bridges?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>//cc <a class="mention" href="http://forums.whonix.org/u/rustybird">@rustybird</a></p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124/2</link>
+        <pubDate>Wed, 12 Jul 2017 14:04:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4124-2</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124.rss">Qubes-Whonix CORRIDOR: where to insert the bridges?</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix CORRIDOR: where to insert the bridges?</title>
+        <dc:creator><![CDATA[qubeswhonixalltheway]]></dc:creator>
+        <description><![CDATA[
+            <p>Hey, I hope u’re all doing good.</p>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a>  I know u’re busy guys so here’s the short story:</p>
+<p>Following the guide at kkkkkkkkkk63ava6.onion/wiki/Corridor<br>
+at the step to install corridor (“sudo apt-get install corridor”) I get errors at the end, which I wont even post since I think it’s obvious why I get them:<br>
+I use obfs4 bridges, and using the guide the biggest part of the bridges set-up is missing: where to store the bridge lines???</p>
+<p>at etc/tor/torrc the config is completely different than the normal torrc whonix-gateway config, I looked everywhere (corridor github, whonix blog, this forum) and still have no clue about where to insert the bridge lines.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124/1</link>
+        <pubDate>Wed, 12 Jul 2017 10:51:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4124-1</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-corridor-where-to-insert-the-bridges/4124.rss">Qubes-Whonix CORRIDOR: where to insert the bridges?</source>
+      </item>
+  </channel>
+</rss>

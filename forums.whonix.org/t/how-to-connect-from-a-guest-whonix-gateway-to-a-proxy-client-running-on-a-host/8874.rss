@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>How to connect from a guest (Whonix Gateway) to a proxy client running on a host. </title>
+    <link>http://forums.whonix.org/t/how-to-connect-from-a-guest-whonix-gateway-to-a-proxy-client-running-on-a-host/8874</link>
+    <description>How to connect from a guest (Whonix Gateway) to a proxy client running on a host. The proxy listens for 127.0.0.1:1080 on the host.
+I am trying to connect through a gateway to
+12.0.2.2:1080 (using the Anon connection wizard socks5) - this IP address is assigned the default gateway (0.0.0.0) on the host.
+
+This is unsuccessful.
+Need port forwarding?
+Need your help.</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 31 Jan 2020 20:31:01 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/how-to-connect-from-a-guest-whonix-gateway-to-a-proxy-client-running-on-a-host/8874.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>How to connect from a guest (Whonix Gateway) to a proxy client running on a host. </title>
+        <dc:creator><![CDATA[kelman]]></dc:creator>
+        <description><![CDATA[
+            <p>My problem is resolved.</p>
+<p>History of the decision.<br>
+My host is fedora 31, firewalld is enabled by default.<br>
+I turned off the firewall and the connection through the proxy worked, but not as it should. For unknown reasons, only obfs4 traffic worked through my proxy, and when I disconnected the connection through the proxy, Tor did not want to connect either through obfs4 or through a simple watchdog node - some kind of error. But now I know in which direction, it seems to me, I should go - since the problem is in the firewall. I turned on the firewall again and after searching on Google I found an article on the official Libvirt website which says that when installing KVM/libvirt it creates its own zone called libvirt. My solution was to add advanced firewall rules.</p>
+<p>Here are my steps:</p>
+<ol>
+<li>Setting the proxy for listening - <strong>10.0.2.2:1080</strong>
+</li>
+</ol>
+<ul>
+<li>
+<strong>10.0.2.2</strong> - ip of the Whonix Gateway virtual interface.</li>
+<li>
+<strong>1080</strong> - is the port that the proxy listens on.</li>
+</ul>
+<ol start="2">
+<li>Add advanced firewall rules. Allow the connection from the specified ip and port.</li>
+</ol>
+<blockquote>
+<p>firewall-cmd --permanent --zone = libvirt --add-rich-rule = ‘rule family = “ipv4” source address = “10.0.2.15” port protocol = “tcp” port = “1080” accept’</p>
+</blockquote>
+<ul>
+<li>
+<strong>10.0.2.15</strong> - ip of the Whonix Gateway virtual machine</li>
+<li>
+<strong>1080</strong> - the port specified for listening in the proxy client.</li>
+</ul>
+<ol start="3">
+<li>Connected using the anon connection wizard to my socks5 client through the ip gateway and port -</li>
+</ol>
+<ul>
+<li><strong>10.0.2.2:1080</strong></li>
+</ul>
+<p>That is actually all. Now everything works.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-connect-from-a-guest-whonix-gateway-to-a-proxy-client-running-on-a-host/8874/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-connect-from-a-guest-whonix-gateway-to-a-proxy-client-running-on-a-host/8874/3</link>
+        <pubDate>Fri, 31 Jan 2020 20:10:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8874-3</guid>
+        <source url="http://forums.whonix.org/t/how-to-connect-from-a-guest-whonix-gateway-to-a-proxy-client-running-on-a-host/8874.rss">How to connect from a guest (Whonix Gateway) to a proxy client running on a host. </source>
+      </item>
+      <item>
+        <title>How to connect from a guest (Whonix Gateway) to a proxy client running on a host. </title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This is probably possible but undocumented.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Undocumented" target="_blank" title="09:29AM - 01 December 2017">whonix.org – 1 Dec 17</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:101/67;"><img src="https://www.whonix.org/w/images/0/0a/Unsupported.jpg" class="thumbnail" width="101" height="67"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Undocumented" target="_blank">Unsupported - Whonix</a></h3>
+
+<p>What do you mean by unsupported?</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>The following documentation might introduce the proper terminology, connection schemes, to avoid talking past reach other and might fully discourage from whatever you’re trying anyhow.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Tunnels/Introduction" target="_blank" title="05:33PM - 03 November 2019">whonix.org – 3 Nov 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:101/71;"><img src="https://www.whonix.org/w/images/8/86/Beyond-1087922640.jpg" class="thumbnail" width="101" height="71"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Tunnels/Introduction" target="_blank">Combining Tunnels with Tor - Whonix</a></h3>
+
+<p>Instructions on how to combine tunnels (VPN, SSH, proxy) with Tor. (User → Tor → proxy/VPN/SSH → Internet) (User → proxy/VPN/SSH → Tor → Internet)</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Since it says.</p>
+<blockquote>
+<p>These configurations are difficult to set up and should only be attempted by advanced users. For the vast majority of Whonix ™ users, using Tor in isolation – without a VPN or proxy – is the correct choice.</p>
+</blockquote>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_a_proxy_before_Tor#Location_of_the_Running_Proxy" target="_blank" title="03:23AM - 18 June 2019">whonix.org – 18 Jun 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:101/61;"><img src="https://www.whonix.org/w/images/2/2c/Lightning-199651640.jpg" class="thumbnail" width="101" height="61"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_a_proxy_before_Tor#Location_of_the_Running_Proxy" target="_blank">Connecting to a Proxy before Tor - Whonix</a></h3>
+
+<p>Instructions on how to connect to a proxy before Tor (User → proxy → Tor → Internet)</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-username="kelman" data-post="1" data-topic="8874">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/k/3ec8ea/40.png" class="avatar"> kelman:</div>
+<blockquote>
+<p>Need port forwarding?</p>
+</blockquote>
+</aside>
+<p>Probably not. For explanation on port forwarding:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Ports" target="_blank" title="12:56AM - 01 May 2019">whonix.org – 1 May 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:101/67;"><img src="https://www.whonix.org/w/images/8/88/Buttons-1688111640.jpg" class="thumbnail" width="101" height="67"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Ports" target="_blank">Ports - Whonix</a></h3>
+
+<p>How to open a port in Whonix ™ / port forwarding / opening ports</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>This might be solvable as per <a href="https://www.whonix.org/wiki/Free_Support_Principle">https://www.whonix.org/wiki/Free_Support_Principle</a> by researching how to make any server running on the host available to VirtualBox VMs. I recommend to exercise this first with a Debian VM before trying this with Whonix-Gateway. Please post an update here if you figure it out. Might be interesting in future for others too.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-connect-from-a-guest-whonix-gateway-to-a-proxy-client-running-on-a-host/8874/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-connect-from-a-guest-whonix-gateway-to-a-proxy-client-running-on-a-host/8874/2</link>
+        <pubDate>Fri, 31 Jan 2020 10:34:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8874-2</guid>
+        <source url="http://forums.whonix.org/t/how-to-connect-from-a-guest-whonix-gateway-to-a-proxy-client-running-on-a-host/8874.rss">How to connect from a guest (Whonix Gateway) to a proxy client running on a host. </source>
+      </item>
+      <item>
+        <title>How to connect from a guest (Whonix Gateway) to a proxy client running on a host. </title>
+        <dc:creator><![CDATA[kelman]]></dc:creator>
+        <description><![CDATA[
+            <p>How to connect from a guest (Whonix Gateway) to a proxy client running on a host. The proxy listens for 127.0.0.1:1080 on the host.<br>
+I am trying to connect through a gateway to<br>
+12.0.2.2:1080 (using the Anon connection wizard socks5) - this IP address is assigned the default gateway (0.0.0.0) on the host.</p>
+<p>This is unsuccessful.<br>
+Need port forwarding?<br>
+Need your help.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-connect-from-a-guest-whonix-gateway-to-a-proxy-client-running-on-a-host/8874/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-connect-from-a-guest-whonix-gateway-to-a-proxy-client-running-on-a-host/8874/1</link>
+        <pubDate>Fri, 31 Jan 2020 09:36:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8874-1</guid>
+        <source url="http://forums.whonix.org/t/how-to-connect-from-a-guest-whonix-gateway-to-a-proxy-client-running-on-a-host/8874.rss">How to connect from a guest (Whonix Gateway) to a proxy client running on a host. </source>
+      </item>
+  </channel>
+</rss>

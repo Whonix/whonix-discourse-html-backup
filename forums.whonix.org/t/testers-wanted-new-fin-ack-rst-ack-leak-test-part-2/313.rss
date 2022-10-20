@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Testers wanted! New FIN ACK / RST ACK Leak Test - Part 2</title>
+    <link>http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313</link>
+    <description>Here&#39;s what I believe is going on. By using tcpdump with paramter: any host, it gives me a view of every packet  generated anywhere on my machine that is headed to google, even those that are traversing the inner isolated network. Even those that are not necessarily travelling from my real host nic across the clearnet. I figured this out by using netstat -natp , more details below.
+
+So this instruction in the leaktest would be wrong for KVM testing IMHO:
+
+&lt;blockquote&gt;On the host.
+
+Check, that you [b]can not see any connections[/b] to 74.125.28.104 in tcpdump.&lt;/blockquote&gt;
+
+As for the TCP flags and such in the tcpdump logs, I think  that there is a mistake with the way I am interpreting the results of this test. I want to post logs, sanitized ones though, that will let us both get to the end of this.
+
+Transproxy enabled default config:
+
+When relying on netstat -natp on the host, I haven&#39;t seen any packet heading towards google or showing a connection between my host ip directly to google. 
+Here;s what I see instead, Just the Gateway listening on eth0 and a bunch of python connections from localhost 127.0.0.1 headed to a second column of localhost destination 127.0.0.1.
+Again, I will post these logs if you need to know more
+
+On workstation netstat -natp output before shutting down Tor and interrupting connection:
+&lt;blockquote&gt;Active Internet connections (servers and established)                                                                                          
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name                                               
+tcp        0      0 127.0.0.1:9050          0.0.0.0:*               LISTEN      -                                                              
+tcp        0      0 127.0.0.1:9051          0.0.0.0:*               LISTEN      -                                                              
+tcp        0      0 127.0.0.1:9150          0.0.0.0:*               LISTEN      -                                                              
+tcp        0      0 127.0.0.1:9151          0.0.0.0:*               LISTEN      -                                                              
+tcp        0      0 127.0.0.1:11109         0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33412         TIME_WAIT   -               
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33414         TIME_WAIT   -               
+tcp        1      0 192.168.0.11:35406      74.125.28.104:80        CLOSE_WAIT  6767/python     
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33406         TIME_WAIT   -               
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33408         TIME_WAIT   -               
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33410         TIME_WAIT   -               
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33416         TIME_WAIT   -               
+tcp        0      0 192.168.0.11:40537      192.168.0.10:9108       ESTABLISHED 8343/curl.whonix-or
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33402         TIME_WAIT   -               
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33404         TIME_WAIT   -             &lt;/blockquote&gt;
+
+After restarting Tor and doing s close:
+
+&lt;blockquote&gt;Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 127.0.0.1:9050          0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:9051          0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:9150          0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:9151          0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:11109         0.0.0.0:*               LISTEN      -               
+tcp        1      1 192.168.0.11:35406      74.125.28.104:80        LAST_ACK    -             &lt;/blockquote&gt;</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 07 Jun 2014 10:30:50 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Testers wanted! New FIN ACK / RST ACK Leak Test - Part 2</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Great finding! Seems like VirtualBox implements the virtual interfaces other than KVM.</p>
+<p>I guess to be even more certain, we should run our traffic through physically isolated Gateway (non-Whonix!) and run tcpdump there on all interfaces.</p>
+          <p><a href="http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313/4</link>
+        <pubDate>Sat, 07 Jun 2014 10:30:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-313-4</guid>
+        <source url="http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313.rss">Testers wanted! New FIN ACK / RST ACK Leak Test - Part 2</source>
+      </item>
+      <item>
+        <title>Testers wanted! New FIN ACK / RST ACK Leak Test - Part 2</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Did a follow up test this time tcpdump ran on gateway and sniffed for packets on eth0. Nothing came up in logs both with and without the firewall fix. default settings of Transproxy enabled of course.  <img src="//forums.whonix.org/images/emoji/twitter/smiley.png?v=5" title=":smiley:" class="emoji" alt=":smiley:"></p>
+<p>Case closed</p>
+          <p><a href="http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313/3</link>
+        <pubDate>Sat, 07 Jun 2014 05:27:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-313-3</guid>
+        <source url="http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313.rss">Testers wanted! New FIN ACK / RST ACK Leak Test - Part 2</source>
+      </item>
+      <item>
+        <title>Testers wanted! New FIN ACK / RST ACK Leak Test - Part 2</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Patrick I read the Tor mailinglist more carefully. I wish done so ages ago and saved myself a lot of effort. The instructions you posted for the leaktest are problematic and caused this confusion, because they look for packets from all network interfaces on the host, even the virtual ones. So no matter what, there was always going to be packet showing up in the tcpdump log ,because tcpdump was told to look for them.  Simple as that.</p>
+<p>So instead I ran tcpdump with the parameters recommended by Mike as such that it only looked for packets from the hosts physical wifi device:</p>
+<blockquote>sudo tcpdump -n -i wlan0 host 74.125.28.104 and tcp port 80</blockquote>
+<p>and nothing showed up in tcpdump at all. Nada nothing. This means that with the default settings with transproxy on and without the proposed fixes in the experimental repo, nothing leaks to expose users. I am confident and I know what I did this time. Whether you wish to add the new settings to the firewall just in case its up to you. You might as well since you wrote it now.</p>
+<p>Sorry for the hassle, I should have been more careful and read the original thread with more attention.</p>
+<p>So what remains are two things, to change the leaktest settings to this command above instead, as to not baffle any one else in the future and to cross this off the blocker bug list. Should I cross post this in the original FIN ACK thread?</p>
+<p>EDIT:<br>
+I corrected the wiki for the leak test and posted the instructions straight out of the mailinglist message.<br>
+<a href="https://lists.torproject.org/pipermail/tor-talk/2014-March/032503.html" class="onebox" target="_blank">https://lists.torproject.org/pipermail/tor-talk/2014-March/032503.html</a></p>
+<blockquote>Replace '-i wlan0' with your network interface. If you use '-i any', you
+will also see transproxied packets (which are not normally leaked).</blockquote>
+          <p><a href="http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313/2</link>
+        <pubDate>Sat, 07 Jun 2014 04:03:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-313-2</guid>
+        <source url="http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313.rss">Testers wanted! New FIN ACK / RST ACK Leak Test - Part 2</source>
+      </item>
+      <item>
+        <title>Testers wanted! New FIN ACK / RST ACK Leak Test - Part 2</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Here’s what I believe is going on. By using tcpdump with paramter: any host, it gives me a view of every packet  generated anywhere on my machine that is headed to google, even those that are traversing the inner isolated network. Even those that are not necessarily travelling from my real host nic across the clearnet. I figured this out by using netstat -natp , more details below.</p>
+<p>So this instruction in the leaktest would be wrong for KVM testing IMHO:</p>
+<blockquote>On the host.
+<p>Check, that you <span class="bbcode-b">can not see any connections</span> to 74.125.28.104 in tcpdump.</p>
+</blockquote>
+<p>As for the TCP flags and such in the tcpdump logs, I think  that there is a mistake with the way I am interpreting the results of this test. I want to post logs, sanitized ones though, that will let us both get to the end of this.</p>
+<p>Transproxy enabled default config:</p>
+<p>When relying on netstat -natp on the host, I haven’t seen any packet heading towards google or showing a connection between my host ip directly to google.<br>
+Here;s what I see instead, Just the Gateway listening on eth0 and a bunch of python connections from localhost 127.0.0.1 headed to a second column of localhost destination 127.0.0.1.<br>
+Again, I will post these logs if you need to know more</p>
+<p>On workstation netstat -natp output before shutting down Tor and interrupting connection:</p>
+<blockquote>Active Internet connections (servers and established)                                                                                          
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name                                               
+tcp        0      0 127.0.0.1:9050          0.0.0.0:*               LISTEN      -                                                              
+tcp        0      0 127.0.0.1:9051          0.0.0.0:*               LISTEN      -                                                              
+tcp        0      0 127.0.0.1:9150          0.0.0.0:*               LISTEN      -                                                              
+tcp        0      0 127.0.0.1:9151          0.0.0.0:*               LISTEN      -                                                              
+tcp        0      0 127.0.0.1:11109         0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33412         TIME_WAIT   -               
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33414         TIME_WAIT   -               
+tcp        1      0 192.168.0.11:35406      74.125.28.104:80        CLOSE_WAIT  6767/python     
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33406         TIME_WAIT   -               
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33408         TIME_WAIT   -               
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33410         TIME_WAIT   -               
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33416         TIME_WAIT   -               
+tcp        0      0 192.168.0.11:40537      192.168.0.10:9108       ESTABLISHED 8343/curl.whonix-or
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33402         TIME_WAIT   -               
+tcp        0      0 127.0.0.1:9151          127.0.0.1:33404         TIME_WAIT   -             </blockquote>
+<p>After restarting Tor and doing s close:</p>
+<blockquote>Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 127.0.0.1:9050          0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:9051          0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:9150          0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:9151          0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:11109         0.0.0.0:*               LISTEN      -               
+tcp        1      1 192.168.0.11:35406      74.125.28.104:80        LAST_ACK    -             </blockquote>
+          <p><a href="http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313/1</link>
+        <pubDate>Sat, 07 Jun 2014 00:44:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-313-1</guid>
+        <source url="http://forums.whonix.org/t/testers-wanted-new-fin-ack-rst-ack-leak-test-part-2/313.rss">Testers wanted! New FIN ACK / RST ACK Leak Test - Part 2</source>
+      </item>
+  </channel>
+</rss>

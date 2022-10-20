@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Cpfpd data/options / control-port-filter-python hardening</title>
+    <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146</link>
+    <description>This thread is for discussion of service hardening for cpfpd and gathering data that makes it easier to set permissions.</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 13 Feb 2017 19:40:43 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><code>re-enable tor-controlport-filter.service systemd hardening</code>:<br>
+<a href="https://phabricator.whonix.org/T631">https://phabricator.whonix.org/T631</a></p>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/13</link>
+        <pubDate>Mon, 13 Feb 2017 19:40:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-13</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>I misunderstood what you were pointing out Troubadour, but now I opened a ticket to keep track of it for Debian Stretch. <a href="https://phabricator.whonix.org/T362">https://phabricator.whonix.org/T362</a></p>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/12</link>
+        <pubDate>Tue, 23 Jun 2015 13:09:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-12</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Looks like Debian jessie’s version of systemd comes without seccomp support. Debian sid currently contains a recent enough version. This will likely easily be possible once we’re based on Debian stretch.</p>
+<p>Source:</p>
+<ul>
+<li><a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=760299">https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=760299</a></li>
+<li><a href="https://packages.debian.org/search?keywords=systemd">https://packages.debian.org/search?keywords=systemd</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/11</link>
+        <pubDate>Tue, 23 Jun 2015 01:03:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-11</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[troubadour]]></dc:creator>
+        <description><![CDATA[
+            <p>I’m not sure that seccomp is enabled in systemd. cpfpd opens and closes its configuration file, starts a server for the requests, opens a socket to the control port… That’s a lot of system calls. To be checked.</p>
+<p>Perhaps nothing new to you, but Firejail Seccomp looks like an good contender in this field. It was added very recently to the Debian FTP archive (<a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=777671" rel="nofollow noopener">https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=777671</a>). Available in sid only, not in Debian stretch / testing.</p>
+<p>From the firs look: amongst some features, it uses secomp sytem call filters (default blacklist, can be expanded or used along a whitelist), it’s configurable with profiles, there is a --private option that mounts /home and /root in in a tmp file system, destroyed when the sanbox is closed… AND it’s compatible with AppArmor.</p>
+<p>It’s very easy to use. The browser I’m using to write this was started with</p>
+<pre><code class="lang-auto"></code></pre>
+<p>Tor Browser is still contained by AppArmor.</p>
+<p>Using start-tor-browser and not start-tor-browser.desktop because the latter is detached and the sandbox parent process terminates.</p>
+<p>The --debug option gives a fair idea of what the default installed version is doing.</p>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/10</link>
+        <pubDate>Mon, 22 Jun 2015 20:53:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-10</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>It works. The trouble (or lack of) starts when I try to harden it further, removing "permissions". At this moment, the only allowed system call is 'kill', which is not much, but control-port-filter-python.service is still restarting without issue. Am I missing something?</blockquote>
+<p>No that’s great. I used strace to give me a rough idea of what the minimal syscalls it must have to function and you discovered it needs even less than what I thought.</p>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/9</link>
+        <pubDate>Mon, 22 Jun 2015 17:53:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-9</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[troubadour]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="7" data-topic="1146">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/d9b06d/40.png" class="avatar"> troubadour:</div>
+<blockquote>
+<p>but control-port-filter-python.service is still restarting without issue. Am I missing something?</p>
+</blockquote>
+</aside>
+<p>systemctl – version reports</p>
+<p><code>systemd 215
++PAM +AUDIT +SELINUX +IMA +SYSVINIT +LIBCRYPTSETUP +GCRYPT +ACL +XZ -SECCOMP -APPARMOR</code><br>
+-SECCOMP should explain it, and  -APPARMOR <a href="https://phabricator.whonix.org/T355" rel="nofollow noopener">https://phabricator.whonix.org/T355</a></p>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/8</link>
+        <pubDate>Mon, 22 Jun 2015 14:56:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-8</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[troubadour]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Deny reads to interpreter:
+https://github.com/Whonix/control-port-filter-python/pull/1</blockquote>
+The line
+[code]/usr/bin/python{2,3}.[0-7]* r,[/code]
+is generated by aa-genprof, as standard when it encounters a python script, I guess. It's not needed in cpfpd profile so, we don't have to deny it. It was simply removed in https://github.com/troubadoour/control-port-filter-python/commit/e3dd6731e2570abebc370851bdc45fb12973353d.
+<p>torbrowser-launcher probably has to read /usr/bin/python, but it can be safely denied without altering the functioning of the program.</p>
+<blockquote>More hardening options enabled:
+https://github.com/Whonix/control-port-filter-python/pull/2</blockquote>
+seccomp' SystemCallFilter looks interesting, whitelisting the system calls allowed to the process, much like AppApmor is doing with the files.
+<p>Have tested cpfpd with the modified unit file in <a href="https://github.com/HulaHoopWhonix/control-port-filter-python/commit/c86b9ed6ffda98b3ca3b1a4235230f8df44b2076" rel="nofollow noopener">https://github.com/HulaHoopWhonix/control-port-filter-python/commit/c86b9ed6ffda98b3ca3b1a4235230f8df44b2076</a>. It works. The trouble (or lack of) starts when I try to harden it further, removing “permissions”. At this moment, the only allowed system call is ‘kill’, which is not much, but control-port-filter-python.service is still restarting without issue. Am I missing something?</p>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/7</link>
+        <pubDate>Mon, 22 Jun 2015 14:32:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-7</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://phabricator.whonix.org/T360" class="onebox" target="_blank">https://phabricator.whonix.org/T360</a></p>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/6</link>
+        <pubDate>Sun, 21 Jun 2015 18:00:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-6</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>cpfpd pull requests:</p>
+<p>Deny reads to interpreter:<br>
+</p><aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="https://github.com/Whonix/control-port-filter-python/pull/1" target="_blank" rel="nofollow noopener">github.com/Whonix/control-port-filter-python</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://github.com/HulaHoopWhonix" target="_blank" rel="nofollow noopener">
+    <img alt="HulaHoopWhonix" src="https://avatars3.githubusercontent.com/u/7875239?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="https://github.com/Whonix/control-port-filter-python/pull/1" target="_blank" rel="nofollow noopener">Tested deny read interpreter rule. Works ok</a>
+</h4>
+
+<div class="date">
+  by <a href="https://github.com/HulaHoopWhonix" target="_blank" rel="nofollow noopener">HulaHoopWhonix</a>
+  on <a href="https://github.com/Whonix/control-port-filter-python/pull/1" target="_blank" rel="nofollow noopener">02:18PM - 20 Jun 15</a>
+</div>
+
+<div class="github-commit-stats">
+  <strong>1 commits</strong>
+  changed <strong>1 files</strong>
+  with <strong>3 additions</strong>
+  and <strong>0 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>More hardening options enabled:<br>
+</p><aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="https://github.com/Whonix/control-port-filter-python/pull/2" target="_blank" rel="nofollow noopener">github.com/Whonix/control-port-filter-python</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://github.com/HulaHoopWhonix" target="_blank" rel="nofollow noopener">
+    <img alt="HulaHoopWhonix" src="https://avatars3.githubusercontent.com/u/7875239?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="https://github.com/Whonix/control-port-filter-python/pull/2" target="_blank" rel="nofollow noopener">Update control-port-filter-python.service</a>
+</h4>
+
+<div class="date">
+  by <a href="https://github.com/HulaHoopWhonix" target="_blank" rel="nofollow noopener">HulaHoopWhonix</a>
+  on <a href="https://github.com/Whonix/control-port-filter-python/pull/2" target="_blank" rel="nofollow noopener">02:36PM - 20 Jun 15</a>
+</div>
+
+<div class="github-commit-stats">
+  <strong>1 commits</strong>
+  changed <strong>1 files</strong>
+  with <strong>18 additions</strong>
+  and <strong>0 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/5</link>
+        <pubDate>Sun, 21 Jun 2015 17:29:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-5</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>systemd.exec blogpost goes into a little more detail than manpage:<br>
+<a href="http://0pointer.de/blog/projects/security.html" class="onebox" target="_blank">http://0pointer.de/blog/projects/security.html</a></p>
+<p>Way to check if the restrictions are taking effect by cutting down whitelisted calls to see if the process fails (it should):<br>
+<a href="https://www.mail-archive.com/systemd-devel@lists.freedesktop.org/msg32389.html" class="onebox" target="_blank">https://www.mail-archive.com/systemd-devel@lists.freedesktop.org/msg32389.html</a></p>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/4</link>
+        <pubDate>Thu, 18 Jun 2015 01:56:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-4</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks to <a href="http://www.freedesktop.org/software/systemd/man/systemd.exec.html" data-bbcode="true">systemd.exec</a> much confinement of cpfpd can be easily done. These configuration additions to /lib/systemd/system/control-port-filter-python.service bring:</p>
+<p>syscall whitelisting of only those calls on there.<br>
+/usr /boot and /etc are read-only.<br>
+access to /home /run/user is denied.<br>
+turns off all physical device access.</p>
+<p>Settings have been tested as working.</p>
+<p>That’s a great start  <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=5" title=":wink:" class="emoji" alt=":wink:"> <img src="//forums.whonix.org/images/emoji/twitter/smiley.png?v=5" title=":smiley:" class="emoji" alt=":smiley:"> and even more tightening up is possible as more features can be tried.</p>
+<p>Troubadour please double check that cpfpd is running fine before adding these settings to the .service file.</p>
+<blockquote>PrivateDevices=true
+<p>ProtectSystem=full<br>
+ProtectHome=true</p>
+<p>NoNewPrivileges=true</p>
+<p>SystemCallFilter=close<br>
+SystemCallFilter=open<br>
+SystemCallFilter=link<br>
+SystemCallFilter=access<br>
+SystemCallFilter=kill<br>
+SystemCallFilter=ioctl<br>
+SystemCallFilter=readlink<br>
+SystemCallFilter=stat64<br>
+SystemCallFilter=getsockopt</p>
+<p>SystemCallArchitectures=native</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/3</link>
+        <pubDate>Wed, 17 Jun 2015 23:42:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-3</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>This is a basic attempt to figure out what syscalls are used by the process:</p>
+<blockquote>user@host:~$ strace -cf /usr/sbin/cpfpd restart
+Process 11246 attached
+Process 11247 attached
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 85.23    0.030436           0     65710     65529 close
+ 11.20    0.004000          55        73           rt_sigaction
+  2.20    0.000787           3       265           read
+  0.99    0.000353           3       126           mmap2
+  0.38    0.000136           0       902       727 open
+  0.00    0.000000           0        27           write
+  0.00    0.000000           0        11        11 link
+  0.00    0.000000           0         3           unlink
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           chdir
+  0.00    0.000000           0         4           time
+  0.00    0.000000           0        10        10 access
+  0.00    0.000000           0         1         1 kill
+  0.00    0.000000           0         1           dup
+  0.00    0.000000           0        18           brk
+  0.00    0.000000           0         6         2 ioctl
+  0.00    0.000000           0         1           umask
+  0.00    0.000000           0         3           dup2
+  0.00    0.000000           0         1           getppid
+  0.00    0.000000           0         1           setsid
+  0.00    0.000000           0        13           gettimeofday
+  0.00    0.000000           0         4         2 readlink
+  0.00    0.000000           0        85           munmap
+  0.00    0.000000           0         2           clone
+  0.00    0.000000           0         2           uname
+  0.00    0.000000           0        14           mprotect
+  0.00    0.000000           0         6           _llseek
+  0.00    0.000000           0        10           select
+  0.00    0.000000           0         1           rt_sigprocmask
+  0.00    0.000000           0         1           getcwd
+  0.00    0.000000           0         1           getrlimit
+  0.00    0.000000           0       247       188 stat64
+  0.00    0.000000           0         7           lstat64
+  0.00    0.000000           0       257           fstat64
+  0.00    0.000000           0         2           getuid32
+  0.00    0.000000           0         2           getgid32
+  0.00    0.000000           0         1           geteuid32
+  0.00    0.000000           0         1           getegid32
+  0.00    0.000000           0         1           setuid32
+  0.00    0.000000           0         1           setgid32
+  0.00    0.000000           0         4           getdents64
+  0.00    0.000000           0         2           fcntl64
+  0.00    0.000000           0         1           futex
+  0.00    0.000000           0         1           set_thread_area
+  0.00    0.000000           0         1           set_tid_address
+  0.00    0.000000           0         2           openat
+  0.00    0.000000           0         3           set_robust_list
+  0.00    0.000000           0         3           prlimit64
+  0.00    0.000000           0         1         1 getsockopt
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.035712                 67841     66471 total
+user@host:~$ strace -cf /usr/sbin/cpfpd
+usage: cpfpd start|stop|restart
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 43.09    0.000290           1       250           read
+ 21.99    0.000148           2        76           munmap
+ 17.98    0.000121           1       165           close
+ 16.94    0.000114           0       890       727 open
+  0.00    0.000000           0         2           write
+  0.00    0.000000           0         2           unlink
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         4           time
+  0.00    0.000000           0        10        10 access
+  0.00    0.000000           0        12           brk
+  0.00    0.000000           0         6         2 ioctl
+  0.00    0.000000           0         1           gettimeofday
+  0.00    0.000000           0         4         2 readlink
+  0.00    0.000000           0         1           uname
+  0.00    0.000000           0        14           mprotect
+  0.00    0.000000           0         6           _llseek
+  0.00    0.000000           0        68           rt_sigaction
+  0.00    0.000000           0         1           rt_sigprocmask
+  0.00    0.000000           0         1           getcwd
+  0.00    0.000000           0         1           getrlimit
+  0.00    0.000000           0       117           mmap2
+  0.00    0.000000           0       236       188 stat64
+  0.00    0.000000           0         7           lstat64
+  0.00    0.000000           0       244           fstat64
+  0.00    0.000000           0         1           getuid32
+  0.00    0.000000           0         1           getgid32
+  0.00    0.000000           0         1           geteuid32
+  0.00    0.000000           0         1           getegid32
+  0.00    0.000000           0         4           getdents64
+  0.00    0.000000           0         2           fcntl64
+  0.00    0.000000           0         1           futex
+  0.00    0.000000           0         1           set_thread_area
+  0.00    0.000000           0         1           set_tid_address
+  0.00    0.000000           0         2           openat
+  0.00    0.000000           0         1           set_robust_list
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000673                  2135       929 total</blockquote>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/2</link>
+        <pubDate>Wed, 17 Jun 2015 18:34:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-2</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+      <item>
+        <title>Cpfpd data/options / control-port-filter-python hardening</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>This thread is for discussion of service hardening for cpfpd and gathering data that makes it easier to set permissions.</p>
+          <p><a href="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146/1</link>
+        <pubDate>Wed, 17 Jun 2015 18:32:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1146-1</guid>
+        <source url="http://forums.whonix.org/t/cpfpd-data-options-control-port-filter-python-hardening/1146.rss">Cpfpd data/options / control-port-filter-python hardening</source>
+      </item>
+  </channel>
+</rss>

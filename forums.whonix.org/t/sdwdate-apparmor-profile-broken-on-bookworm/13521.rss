@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>sdwdate AppArmor profile broken on Bookworm</title>
+    <link>http://forums.whonix.org/t/sdwdate-apparmor-profile-broken-on-bookworm/13521</link>
+    <description>Morphing Debian Bookworm to Kicksecure (tested on `ppc64el`, but I expect `amd64` to work the same way) results in `sdwdate` hitting this AppArmor failure:
+
+```
+AVC apparmor=&quot;DENIED&quot; operation=&quot;create&quot; profile=&quot;/usr/bin/sdwdate&quot; pid=1225 comm=&quot;url_to_unixtime&quot; family=&quot;inet&quot; sock_type=&quot;stream&quot; protocol=6 requested_mask=&quot;create&quot; denied_mask=&quot;create&quot;
+```
+
+Checking whether networking is enabled for `sdwdate`&#39;s AppArmor profile indicates that it is not:
+
+```
+$ /usr/sbin/apparmor_parser -p /etc/apparmor.d/usr.bin.sdwdate | grep network
+## {{{ whonix-[gw|ws]-network-conf
+## {{{ kicksecure-network-conf
+```
+
+Checking other profiles indicates that it is enabled there:
+
+```
+$ /usr/sbin/apparmor_parser -p /etc/apparmor.d/usr.lib.libreoffice.program.soffice.bin | grep network
+## {{{ whonix-[gw|ws]-network-conf
+## {{{ kicksecure-network-conf
+  # to vast speed increases when working with network-based lookups.
+  # TCP/UDP network access
+  network inet  stream,
+  network inet6 stream,
+  network inet  dgram,
+  network inet6 dgram,
+  network netlink raw,
+  network bluetooth,
+$ /usr/sbin/apparmor_parser -p /etc/apparmor.d/system_tor | grep network
+## {{{ whonix-[gw|ws]-network-conf
+## {{{ kicksecure-network-conf
+  # to vast speed increases when working with network-based lookups.
+  # TCP/UDP network access
+  network inet  stream,
+  network inet6 stream,
+  network inet  dgram,
+  network inet6 dgram,
+  network netlink raw,
+  network tcp,
+  network udp,
+```
+
+AppArmor is [Deny by Default](https://security.stackexchange.com/questions/222526/is-apparmor-default-deny) for all confined processes, so omitting the `network` rules is expected to result in no network access, which explains why `sdwdate` is failing.  So why does this only happen in Bookworm but not Bullseye?  It [appears](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=712451#126) that Debian (I guess due to kernel-related reasons?) does not support the `network` rules until AppArmor v3.0.  Bookworm [is the first](https://packages.debian.org/search?keywords=apparmor&amp;searchon=names&amp;exact=1&amp;suite=all&amp;section=all) Debian suite that is at least v3.0.  Hence why this bug in `sdwdate`&#39;s AppArmor profile never got noticed.
+
+I&#39;m happy to open a PR to fix this (seems all that&#39;s needed is to add `network inet stream,` to `/etc/apparmor.d/abstractions/url_to_unixtime`, but I&#39;m open to putting that rule somewhere else if you prefer).  But, since this involved some pretty heavy debugging/research to figure out this fix, I&#39;m posting my findings here first for peer review purposes so that it&#39;s hopefully easy to determine whether I&#39;m on the right track.
+
+Related minor questions: should I add `inet6` as well in case `sdwdate` users are trying to access Tor&#39;s SOCKS port via IPv6?  Should I add `dgram` as future-proofing for when Tor supports SOCKS over QUIC?</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 08 Apr 2022 04:11:21 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/sdwdate-apparmor-profile-broken-on-bookworm/13521.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>sdwdate AppArmor profile broken on Bookworm</title>
+        <dc:creator><![CDATA[JeremyRand]]></dc:creator>
+        <description><![CDATA[
+            <p>PR submitted: <a href="https://github.com/Whonix/sdwdate/pull/38" class="inline-onebox" rel="noopener nofollow ugc">AppArmor: explicitly allow network access by JeremyRand · Pull Request #38 · Whonix/sdwdate · GitHub</a></p>
+          <p><a href="http://forums.whonix.org/t/sdwdate-apparmor-profile-broken-on-bookworm/13521/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sdwdate-apparmor-profile-broken-on-bookworm/13521/3</link>
+        <pubDate>Fri, 08 Apr 2022 04:11:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13521-3</guid>
+        <source url="http://forums.whonix.org/t/sdwdate-apparmor-profile-broken-on-bookworm/13521.rss">sdwdate AppArmor profile broken on Bookworm</source>
+      </item>
+      <item>
+        <title>sdwdate AppArmor profile broken on Bookworm</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Btw <a href="https://www.whonix.org/wiki/AppArmor#apparmor-info">apparmor-info</a> might be handy.</p>
+<aside class="quote no-group" data-username="JeremyRand" data-post="1" data-topic="13521">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/j/f475e1/40.png" class="avatar"> JeremyRand:</div>
+<blockquote>
+<p>I’m happy to open a PR to fix this (seems all that’s needed is to add <code>network inet stream,</code> to <code>/etc/apparmor.d/abstractions/url_to_unixtime</code>,</p>
+</blockquote>
+</aside>
+<p>If that works, that is a great solution! Analyzing this bug is very much appreciated!</p>
+<aside class="quote no-group" data-username="JeremyRand" data-post="1" data-topic="13521">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/j/f475e1/40.png" class="avatar"> JeremyRand:</div>
+<blockquote>
+<p>Related minor questions: should I add <code>inet6</code> as well in case <code>sdwdate</code> users are trying to access Tor’s SOCKS port via IPv6? Should I add <code>dgram</code> as future-proofing for when Tor supports SOCKS over QUIC?</p>
+</blockquote>
+</aside>
+<p>Yes, please. I guess having these issues by the time when this happens would be quite a lot time so better getting this done now seems more efficient.</p>
+          <p><a href="http://forums.whonix.org/t/sdwdate-apparmor-profile-broken-on-bookworm/13521/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sdwdate-apparmor-profile-broken-on-bookworm/13521/2</link>
+        <pubDate>Mon, 04 Apr 2022 11:04:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13521-2</guid>
+        <source url="http://forums.whonix.org/t/sdwdate-apparmor-profile-broken-on-bookworm/13521.rss">sdwdate AppArmor profile broken on Bookworm</source>
+      </item>
+      <item>
+        <title>sdwdate AppArmor profile broken on Bookworm</title>
+        <dc:creator><![CDATA[JeremyRand]]></dc:creator>
+        <description><![CDATA[
+            <p>Morphing Debian Bookworm to Kicksecure (tested on <code>ppc64el</code>, but I expect <code>amd64</code> to work the same way) results in <code>sdwdate</code> hitting this AppArmor failure:</p>
+<pre><code class="lang-auto">AVC apparmor="DENIED" operation="create" profile="/usr/bin/sdwdate" pid=1225 comm="url_to_unixtime" family="inet" sock_type="stream" protocol=6 requested_mask="create" denied_mask="create"
+</code></pre>
+<p>Checking whether networking is enabled for <code>sdwdate</code>'s AppArmor profile indicates that it is not:</p>
+<pre><code class="lang-auto">$ /usr/sbin/apparmor_parser -p /etc/apparmor.d/usr.bin.sdwdate | grep network
+## {{{ whonix-[gw|ws]-network-conf
+## {{{ kicksecure-network-conf
+</code></pre>
+<p>Checking other profiles indicates that it is enabled there:</p>
+<pre><code class="lang-auto">$ /usr/sbin/apparmor_parser -p /etc/apparmor.d/usr.lib.libreoffice.program.soffice.bin | grep network
+## {{{ whonix-[gw|ws]-network-conf
+## {{{ kicksecure-network-conf
+  # to vast speed increases when working with network-based lookups.
+  # TCP/UDP network access
+  network inet  stream,
+  network inet6 stream,
+  network inet  dgram,
+  network inet6 dgram,
+  network netlink raw,
+  network bluetooth,
+$ /usr/sbin/apparmor_parser -p /etc/apparmor.d/system_tor | grep network
+## {{{ whonix-[gw|ws]-network-conf
+## {{{ kicksecure-network-conf
+  # to vast speed increases when working with network-based lookups.
+  # TCP/UDP network access
+  network inet  stream,
+  network inet6 stream,
+  network inet  dgram,
+  network inet6 dgram,
+  network netlink raw,
+  network tcp,
+  network udp,
+</code></pre>
+<p>AppArmor is <a href="https://security.stackexchange.com/questions/222526/is-apparmor-default-deny" rel="noopener nofollow ugc">Deny by Default</a> for all confined processes, so omitting the <code>network</code> rules is expected to result in no network access, which explains why <code>sdwdate</code> is failing.  So why does this only happen in Bookworm but not Bullseye?  It <a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=712451#126" rel="noopener nofollow ugc">appears</a> that Debian (I guess due to kernel-related reasons?) does not support the <code>network</code> rules until AppArmor v3.0.  Bookworm <a href="https://packages.debian.org/search?keywords=apparmor&amp;searchon=names&amp;exact=1&amp;suite=all&amp;section=all" rel="noopener nofollow ugc">is the first</a> Debian suite that is at least v3.0.  Hence why this bug in <code>sdwdate</code>'s AppArmor profile never got noticed.</p>
+<p>I’m happy to open a PR to fix this (seems all that’s needed is to add <code>network inet stream,</code> to <code>/etc/apparmor.d/abstractions/url_to_unixtime</code>, but I’m open to putting that rule somewhere else if you prefer).  But, since this involved some pretty heavy debugging/research to figure out this fix, I’m posting my findings here first for peer review purposes so that it’s hopefully easy to determine whether I’m on the right track.</p>
+<p>Related minor questions: should I add <code>inet6</code> as well in case <code>sdwdate</code> users are trying to access Tor’s SOCKS port via IPv6?  Should I add <code>dgram</code> as future-proofing for when Tor supports SOCKS over QUIC?</p>
+          <p><a href="http://forums.whonix.org/t/sdwdate-apparmor-profile-broken-on-bookworm/13521/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sdwdate-apparmor-profile-broken-on-bookworm/13521/1</link>
+        <pubDate>Mon, 04 Apr 2022 05:21:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13521-1</guid>
+        <source url="http://forums.whonix.org/t/sdwdate-apparmor-profile-broken-on-bookworm/13521.rss">sdwdate AppArmor profile broken on Bookworm</source>
+      </item>
+  </channel>
+</rss>

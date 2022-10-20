@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>Logging build script output to tty and log - Development - Whonix Forum</title>
+    <meta name="description" content="I&amp;#39;ve written down the requirements for a perfect log command: 
+
+
+show stdout/stderr of the script in tty while the script is running
+show colors produced by the script in tty while the script is running
+create a log file&amp;hellip;">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="101.html" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../c/news/21.html">NEWS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;Logging build script output to tty and log&#39;" href="101.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/logging-build-script-output-to-tty-and-log/101" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/logging-build-script-output-to-tty-and-log/101" />
+<meta property="og:title" content="Logging build script output to tty and log" />
+<meta name="twitter:title" content="Logging build script output to tty and log" />
+<meta property="og:description" content="I’ve written down the requirements for a perfect log command:   show stdout/stderr of the script in tty while the script is running show colors produced by the script in tty while the script is running create a log file of all stdout/stderr the script produced have the log without colors don’t break the ability to read input from stdin  Apparently no such jack of all trades device has been found. The following command fulfills all requirements everything, but stripping colors from the log.   Str..." />
+<meta name="twitter:description" content="I’ve written down the requirements for a perfect log command:   show stdout/stderr of the script in tty while the script is running show colors produced by the script in tty while the script is running create a log file of all stdout/stderr the script produced have the log without colors don’t break the ability to read input from stdin  Apparently no such jack of all trades device has been found. The following command fulfills all requirements everything, but stripping colors from the log.   Str..." />
+<meta property="article:published_time" content="2014-02-25T15:32:52+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../index.html">
+          <img src="../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="101.html">Logging build script output to tty and log</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../c/development/8.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #25AAE2'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>Development</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="101.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-02-25T15:32:52Z' class='post-time'>
+                February 25, 2014,  3:32pm
+              </time>
+              <meta itemprop='dateModified' content='2014-02-25T15:32:52Z'>
+          <span itemprop='position'>#1</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I’ve written down the requirements for a perfect log command:</p>
+<ul>
+<li>show stdout/stderr of the script in tty while the script is running</li>
+<li>show colors produced by the script in tty while the script is running</li>
+<li>create a log file of all stdout/stderr the script produced</li>
+<li>have the log without colors</li>
+<li>don’t break the ability to read input from stdin</li>
+</ul>
+<p>Apparently no such jack of all trades device has been found. The following command fulfills all requirements everything, but stripping colors from the log.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>Stripping the color from the log is possible as well.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>(<a href="../../../external.html?link=http://www.commandlinefu.com/commands/view/2318/fix-a-typescript-file-created-by-the-script-program-to-remove-control-characters" data-bbcode="true">source</a>); (There might be <a href="../../../external.html?link=https://unix.stackexchange.com/questions/14684/removing-control-chars-including-console-codes-colours-from-script-output" data-bbcode="true">other</a> methods or entirely different (better/perfect) approaches to the log issue.</p>
+<p>Haven’t tested a full build using the <code>script</code> approach yet.</p>
+<p>Does this suffice?</p>
+        </div>
+
+        <meta itemprop='headline' content='Logging build script output to tty and log'>
+          <meta itemprop='keywords' content=''>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Occq'><span itemprop='name'>Occq</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="101.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-02-25T16:53:20Z' class='post-time'>
+                February 25, 2014,  4:53pm
+              </time>
+              <meta itemprop='dateModified' content='2014-02-25T16:53:20Z'>
+          <span itemprop='position'>#2</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>First one look great, second one looks like a nightmare <img src="../../images/emoji/twitter/smileyae52.png?v=5" title=":smiley:" class="emoji" alt=":smiley:"></p>
+<p>I’ll give both a test when time allows.</p>
+        </div>
+
+        <meta itemprop='headline' content='Logging build script output to tty and log'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Occq'><span itemprop='name'>Occq</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="101.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-02-26T18:33:07Z' class='post-time'>
+                February 26, 2014,  6:33pm
+              </time>
+              <meta itemprop='dateModified' content='2014-02-26T18:33:07Z'>
+          <span itemprop='position'>#3</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote" data-post="1" data-topic="101">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><code>sudo script -a -f ~/log -c ./whonix_build --build --tor-gateway</code></p>
+</blockquote>
+</aside>
+<p>script: unrecognized option ‘–build’.</p>
+<p>Can we disable colors in the Whonix build script?</p>
+<p>[quote=“Patrick, post:7, topic:89”][quote author=Occq link=topic=70.msg605#msg605 date=1393189348]<br>
+There is one problem with the build script error handler.</p>
+<p>If the build fails in the middle (for whatever reason, like if you forgot to set disk space to more than 8GB. Stupid mistake) the script keeps running because it requires user input. That is highly impractical for those of us who use input log redirection. We don’t see the question, we can’t answer it.</p>
+<pre><code class="lang-auto">"Please enter c and press enter to continue..
+"Please enter to cleanup and exit"</code></pre>
+<p>Short term solution is to delete user input option and end the script when it breaks (no continue choice, direct auto exit).</p>
+<p>Oh and bare metal was run successfull with India as the location (the same settings failed in the last version) so update-locale seems fixed.<br>
+[/quote]</p>
+<p>I see. This is non-ideal. Should documented for now. And improved for Whonix 8 + 1.</p>
+<p>I don’t want to entirely remove this feature. Has proven very useful in development. Could be disabled by default and enabled with a build configuration.[/quote]</p>
+<p>So far the disabled-by-default option seems most easy to implement.</p>
+        </div>
+
+        <meta itemprop='headline' content='Logging build script output to tty and log'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="101.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-02-26T18:39:07Z' class='post-time'>
+                February 26, 2014,  6:39pm
+              </time>
+              <meta itemprop='dateModified' content='2014-02-26T18:39:07Z'>
+          <span itemprop='position'>#4</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Command needs to be quotes. Fixed in original post.</p>
+<blockquote>sudo script -a -f ~/log -c "./whonix_build --build --tor-gateway"</blockquote>
+<p>With the <code>script</code> (typescript) logging method working, is there still benefit in disabling user input in the error handler?</p>
+        </div>
+
+        <meta itemprop='headline' content='Logging build script output to tty and log'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="101.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-02-26T18:42:58Z' class='post-time'>
+                February 26, 2014,  6:42pm
+              </time>
+              <meta itemprop='dateModified' content='2014-02-26T18:42:58Z'>
+          <span itemprop='position'>#5</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Why disable colors? Because it may help to strip colors from the log?</p>
+<p>Colors are configured in help-steps/pre in function “colors”. By not running the “colors” function (which could be configured by a command line option, environment variable and/or build configuration), variables such as ${red} would be empty and therefore not producing any output, i.e. no color.</p>
+<p>I personally like having colors in tty output. Makes following the process, noticing important messages, navigation, debugging simpler.</p>
+        </div>
+
+        <meta itemprop='headline' content='Logging build script output to tty and log'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Occq'><span itemprop='name'>Occq</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="101.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-02-26T21:36:04Z' class='post-time'>
+                February 26, 2014,  9:36pm
+              </time>
+              <meta itemprop='dateModified' content='2014-02-26T21:36:04Z'>
+          <span itemprop='position'>#6</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Colors encoding ([[0m  ) that appears in a log are disturbing (IMO). If it’s either no colors or that encoding (00;32m) I would rather go with no colors.</p>
+<p>Disabling user input by default gives us time to figure out something that works.</p>
+        </div>
+
+        <meta itemprop='headline' content='Logging build script output to tty and log'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="101.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-02-26T22:31:50Z' class='post-time'>
+                February 26, 2014, 10:31pm
+              </time>
+              <meta itemprop='dateModified' content='2014-02-26T22:31:50Z'>
+          <span itemprop='position'>#7</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote" data-post="6" data-topic="101">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v2/letter/o/49beb7/40.png" class="avatar"> Occq:</div>
+<blockquote>
+<p>Colors encoding ([[0m  ) that appears in a log are disturbing (IMO). If it’s either no colors or that encoding (00;32m) I would rather go with no colors.</p>
+</blockquote>
+</aside>
+<p>I preferred an alternative command or log wrapper script, that can do that. There must be some way.</p>
+<aside class="quote" data-post="6" data-topic="101">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v2/letter/o/49beb7/40.png" class="avatar"> Occq:</div>
+<blockquote>
+<p>Disabling user input by default gives us time to figure out something that works.</p>
+</blockquote>
+</aside>
+<p>What doesn’t work? The colors in the log? I consider this a minor issue. Is it that bad to run a single command to strip colors from it?</p>
+        </div>
+
+        <meta itemprop='headline' content='Logging build script output to tty and log'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="101.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2014-02-26T22:34:25Z' class='post-time'>
+                February 26, 2014, 10:34pm
+              </time>
+              <meta itemprop='dateModified' content='2014-02-26T22:34:25Z'>
+          <span itemprop='position'>#8</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Colors in Whonix’s build script can also be disabled by running.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>No kidding.  <img src="../../images/emoji/twitter/winkae52.png?v=5" title=":wink:" class="emoji" alt=":wink:"> (It’s a standard feature, looks like.)</p>
+<p>Before building. (Don’t forget to use adding -E to sudo then (sudo -E …) then, because environment variables need to preserved.)</p>
+        </div>
+
+        <meta itemprop='headline' content='Logging build script output to tty and log'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

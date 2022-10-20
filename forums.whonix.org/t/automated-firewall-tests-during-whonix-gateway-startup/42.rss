@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Automated firewall tests during whonix gateway startup</title>
+    <link>http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42</link>
+    <description>When whonix gateway starts, it checks if it can connect to the internet through tor and display an useful log message. This is handy. This helps noticing when things go wrong, like not so long ago when tor was failing to start due to the apparmor bug.
+
+But this is not the only scenario to worry about.
+
+How about this one: due to a bug in firewall, whonix gateway fails to block udp and this causes leaks. Strictly theoretically, does whonix gateway check for this scenario somewhere? Maybe it could at least display the firewall rules explicitly at startup (unless you think this is just lots of unwanted info on screen)?
+
+In perspective, having this feature can serve whonix well, since linux is getting a new filtering stack and I expect firewalls to start breaking when people will start rewriting their netfilter/iptables rulesets.</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 29 Jan 2014 16:51:19 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Automated firewall tests during whonix gateway startup</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>You enumerate the features of the workstation.</blockquote>
+These are Whonix features, not Whonix-Workstation specific features.
+<blockquote>it would be good to have some more transparency on the gateway about stuff that gets blocked on it by the firewall in the general case.</blockquote>
+Whonix-Gateway doesn't know if a Whonix-Default-Workstation or a Whonix-Custom-Workstation is being used. Best you could do is comment in the out commented log commands in Whonix-Gateway's firewall and watch the log. There is no /etc/whonix_firewall.d option for that yet but one could easily added if that was of any help. I doubt it will help, because what's logged in the firewall log, didn't leak. It was once useful when developing the firewall to see if everything works or if anything gets blocked which shouldn't be blocked. Also reading the log requires quite some knowledge about networking. Maybe there are any fancy graphical user interfaces making that a bit simpler to grasp.
+<blockquote>Notice that it only mentions few basic network settings.</blockquote>
+Which is the most important thing. Once you've set up the Whonix-Custom-Workstation to only have one network card which is only connected by an internal network ("Whonix") to Whonix-Gateway, there can't be any leaks. That's what I was talking about above as well.
+<blockquote>Perhaps, as a first step, it could be improved to mention a minimum set of restricting, OS agnostic firewall rules that should be applied to the workstation.</blockquote>
+A Whonix-Default/Custom-Workstation firewall is of limited use. Not zero, but limited. See Design Notes here:
+https://github.com/Whonix/Whonix/blob/master/man/whonix_workstation/whonix_firewall.8.ronn
+<blockquote>The idea is that we have to worry less about let's say UDP leaks through the gateway if we configure the workstation behind it (not necessarily the whonix workstation, which is configured properly)  to explicitly block outgoing UDP.</blockquote>
+Whonix-Default-Workstation isn't configured by default to block UDP.
+<p>Whonix-Gateway blocks all UDP other than port 53 (DNS) traffic, which is forwarded to Tor’s DnsPort. (Unless you disable WORKSTATION_TRANSPARENT_DNS in /etc/whonix_firewall.d/.)</p>
+<p>No help from Whonix-Default/Custom-Workstation required to prevent UDP leaks. Not requiring this, i.e. not requiring to trust Whonix-Default/Custom-Workstation is one of the most basic designs in Whonix.</p>
+<blockquote>So, the question becomes this: if the workstation has a default DROP policy for all network data,</blockquote>
+It doesn't.
+<blockquote>what's a minimum set of ACCEPT rules to make it functional through the whonix gateway?</blockquote>
+Depends on how much functionality you want. You could block everything except connections to TCP-only IP 192.168.0.10 port 9100 and then use that Tor SocksPort with Tor Browser.
+<blockquote>Just by analogy with the rest of network settings mentioned there: it tells what IP to set, what gateway address, what DNS server, could do the same for firewall rules.</blockquote>
+The thing I could imagine adding there would be "Experts can have a look here:
+https://github.com/Whonix/Whonix/blob/master/whonix_workstation/usr/bin/whonix_firewall
+And consider applying this to the Whonix-Custom-Workstation.". I don't reserve a lot time to discuss Whonix-Workstation's firewall. It is one of the less important things to improve security.
+<p>That <a href="https://www.whonix.org/wiki/Other_Operating_Systems">https://www.whonix.org/wiki/Other_Operating_Systems</a> article is too difficult anyway. Too few people are able to properly set up an operating system with all the features which a Whonix-Custom-Workstation has. Saying “Your responsibility to …” in the table (<a href="https://www.whonix.org/wiki/Other_Operating_Systems#Table">https://www.whonix.org/wiki/Other_Operating_Systems#Table</a>) is more than non-ideal. I think things like secure network time synchronization are crucial. But how does one set that up on a Whonix-Custom-Ubuntu/Fedora/BSD-Workstation? I guess very few bother to extract the missing pieces from Whonix’s source code. I think time is better spend on other tickets (<a href="https://github.com/Whonix/Whonix/issues">https://github.com/Whonix/Whonix/issues</a>) such “as splitting Whonix into smaller packages” (<a href="https://github.com/Whonix/Whonix/issues/40">https://github.com/Whonix/Whonix/issues/40</a>). When that was implemented, installing the missing pieces such as sdwdate could be simpler if it was possible to run “sudo apt-get install sdwdate”.</p>
+          <p><a href="http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42/4</link>
+        <pubDate>Wed, 29 Jan 2014 16:51:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-42-4</guid>
+        <source url="http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42.rss">Automated firewall tests during whonix gateway startup</source>
+      </item>
+      <item>
+        <title>Automated firewall tests during whonix gateway startup</title>
+        <dc:creator><![CDATA[Greenwhonix]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="2" data-topic="42">
+<div class="title">
+<div class="quote-controls"></div>
+ adrelanos:</div>
+<blockquote>
+<p>[quote]since linux is getting a new filtering stack</p>
+</blockquote>
+</aside>
+<p>Source?[/quote]</p>
+<p>Nftables is part of kernel 3.13. I didn’t document myself about how it works, but its syntax is sexy, much closer to the syntax of BSD firewalls, I believe this can be a great quick adoption reason.</p>
+<aside class="quote" data-post="2" data-topic="42">
+<div class="title">
+<div class="quote-controls"></div>
+ adrelanos:</div>
+<blockquote>
+<p>[quote]How about this one: due to a bug in firewall, whonix gateway fails to block udp and this causes leaks.</p>
+</blockquote>
+</aside>
+<p>I wouldn’t know how there could be a leak.</p>
+<ul>
+<li>IP forwarding is disabled.</li>
+<li>When Whonix-Gateway is offline, Whonix-Workstation cannot connect.</li>
+<li>When Tor does not start or cannot connect, Whonix-Workstation cannot connect.</li>
+<li>When Whonix-Gateway does not have load any firewall rules at all, Whonix-Workstation can only speak to Tor’s SocksPorts listening on Whonix-Gateway’s internal network eth1.</li>
+<li>When Whonix-Gateway does not have load any firewall rules at all, even Whonix-Gateway itself can not connect to the internet. System DNS is disabled. Other applications (apt-get, sdwdate) are configured to use Tor SocksPort’s.<br>
+(See also <a href="https://www.whonix.org/wiki/Install_Software#Whonix-Workstation_is_firewalled" rel="nofollow noopener">https://www.whonix.org/wiki/Install_Software#Whonix-Workstation_is_firewalled</a> and read “All traffic from Whonix-Workstation and Whonix-Gateway is routed over Tor.” and the footnotes.)</li>
+</ul>
+<p>On the contrary. I think enabling UDP clearnet access for Whonix-Workstation would be difficult. You first would have to enable IP forwarding, then follow some guide on how to use Linux as a router (such as <a href="http://www.yourownlinux.com/2013/07/how-to-configure-ubuntu-as-router.html" rel="nofollow noopener">http://www.yourownlinux.com/2013/07/how-to-configure-ubuntu-as-router.html</a>). All rules I’ve seen are all requiring IP forwarding, MASQUERADE and FORWARD. You can’t add such rules by accident (bug).[/quote]</p>
+<p>Note that we talk about different things here. I mean the threat of leaks on gateway. You enumerate the features of the workstation. But in a general case, there’s no whonix workstation behind the gateway. There’s a very fresh forum post made by someone who is experimenting with windows as workstation. Now, while the official debian linux based workstation is and will be the main and most widely used workstation, it would be good to have some more transparency on the gateway about stuff that gets blocked on it by the firewall in the general case.</p>
+<p>What made me think about this whole thing was <a href="https://www.whonix.org/wiki/Other_Operating_Systems" rel="nofollow noopener">https://www.whonix.org/wiki/Other_Operating_Systems</a></p>
+<p>Notice that it only mentions few basic network settings. Perhaps, as a first step, it could be improved to mention a minimum set of restricting, OS agnostic firewall rules that should be applied to the workstation. The idea is that we have to worry less about let’s say UDP leaks through the gateway if we configure the workstation behind it (not necessarily the whonix workstation, which is configured properly)  to explicitly block outgoing UDP. So, the question becomes this: if the workstation has a default DROP policy for all network data, what’s a minimum set of ACCEPT rules to make it functional through the whonix gateway? I think having this mentioned somewhere in the wiki page mentioned above, in human language, not as reference to the whonix workstation firewall script, would make it a good addition. Just by analogy with the rest of network settings mentioned there: it tells what IP to set, what gateway address, what DNS server, could do the same for firewall rules.</p>
+          <p><a href="http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42/3</link>
+        <pubDate>Wed, 29 Jan 2014 03:23:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-42-3</guid>
+        <source url="http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42.rss">Automated firewall tests during whonix gateway startup</source>
+      </item>
+      <item>
+        <title>Automated firewall tests during whonix gateway startup</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>since linux is getting a new filtering stack</blockquote>
+Source?
+<blockquote>How about this one: due to a bug in firewall, whonix gateway fails to block udp and this causes leaks.</blockquote>
+<p>I wouldn’t know how there could be a leak.</p>
+<ul>
+<li>IP forwarding is disabled.</li>
+<li>When Whonix-Gateway is offline, Whonix-Workstation cannot connect.</li>
+<li>When Tor does not start or cannot connect, Whonix-Workstation cannot connect.</li>
+<li>When Whonix-Gateway does not have load any firewall rules at all, Whonix-Workstation can only speak to Tor’s SocksPorts listening on Whonix-Gateway’s internal network eth1.</li>
+<li>When Whonix-Gateway does not have load any firewall rules at all, even Whonix-Gateway itself can not connect to the internet. System DNS is disabled. Other applications (apt-get, sdwdate) are configured to use Tor SocksPort’s.<br>
+(See also <a href="https://www.whonix.org/wiki/Install_Software#Whonix-Workstation_is_firewalled">https://www.whonix.org/wiki/Install_Software#Whonix-Workstation_is_firewalled</a> and read “All traffic from Whonix-Workstation and Whonix-Gateway is routed over Tor.” and the footnotes.)</li>
+</ul>
+<p>On the contrary. I think enabling UDP clearnet access for Whonix-Workstation would be difficult. You first would have to enable IP forwarding, then follow some guide on how to use Linux as a router (such as <a href="http://www.yourownlinux.com/2013/07/how-to-configure-ubuntu-as-router.html">http://www.yourownlinux.com/2013/07/how-to-configure-ubuntu-as-router.html</a>). All rules I’ve seen are all requiring IP forwarding, MASQUERADE and FORWARD. You can’t add such rules by accident (bug).</p>
+<p>See also:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/Technical_Introduction#With_more_technical_terms" target="_blank" title="12:36PM - 10 April 2020">Whonix – 10 Apr 20</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="" height="">
+
+<h3><a href="https://www.whonix.org/wiki/Dev/Technical_Introduction#With_more_technical_terms" target="_blank">Dev/Technical Introduction - Whonix</a></h3>
+
+<p>Introduction into Whonix ™ Technical Design.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/Design-Gateway#Network_Configuration" target="_blank" title="04:42PM - 01 August 2019">Whonix – 1 Aug 19</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="" height="">
+
+<h3><a href="https://www.whonix.org/wiki/Dev/Design-Gateway#Network_Configuration" target="_blank">Dev/Design-Gateway - Whonix</a></h3>
+
+<p>Detailed Technical Design of Whonix-Gateway ™</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>And also (not automated, unfortunately):<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/Leak_Tests" target="_blank" title="01:52PM - 10 December 2019">Whonix – 10 Dec 19</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="" height="">
+
+<h3><a href="https://www.whonix.org/wiki/Dev/Leak_Tests" target="_blank">Dev/Leak Tests - Whonix</a></h3>
+
+<p>Testing for IP/DNS Leaks</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>Maybe it could at least display the firewall rules explicitly at startup (unless you think this is just lots of unwanted info on screen)?</blockquote>
+<p>That would be the output of “sudo iptables --list”. Too much output to be useful. I can’t make head or tail of it without thinking hard about it. If it was shown at boot, I would probably ignore it.</p>
+<p>What however could be to check on Whonix-Gateway could be the result of:</p>
+<pre><code class="lang-auto">cat /proc/sys/net/ipv4/ip_forward</code></pre>
+<p>Which should always be.</p>
+<blockquote>0</blockquote>
+Whonixcheck could automate that and do it on every boot and every time it's autorun. IP forwarding normally doesn't enable itself, but to prevent users from shooting their own feet, why not warn about it.
+<blockquote>In perspective, having this feature can serve whonix well</blockquote>
+Sure. By all means. Please contribute an automated test suite. Tails recently got one, perhaps some code can be re-used in Whonix or at least learn from it.
+          <p><a href="http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42/2</link>
+        <pubDate>Tue, 28 Jan 2014 18:53:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-42-2</guid>
+        <source url="http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42.rss">Automated firewall tests during whonix gateway startup</source>
+      </item>
+      <item>
+        <title>Automated firewall tests during whonix gateway startup</title>
+        <dc:creator><![CDATA[Greenwhonix]]></dc:creator>
+        <description><![CDATA[
+            <p>When whonix gateway starts, it checks if it can connect to the internet through tor and display an useful log message. This is handy. This helps noticing when things go wrong, like not so long ago when tor was failing to start due to the apparmor bug.</p>
+<p>But this is not the only scenario to worry about.</p>
+<p>How about this one: due to a bug in firewall, whonix gateway fails to block udp and this causes leaks. Strictly theoretically, does whonix gateway check for this scenario somewhere? Maybe it could at least display the firewall rules explicitly at startup (unless you think this is just lots of unwanted info on screen)?</p>
+<p>In perspective, having this feature can serve whonix well, since linux is getting a new filtering stack and I expect firewalls to start breaking when people will start rewriting their netfilter/iptables rulesets.</p>
+          <p><a href="http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42/1</link>
+        <pubDate>Tue, 28 Jan 2014 17:32:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-42-1</guid>
+        <source url="http://forums.whonix.org/t/automated-firewall-tests-during-whonix-gateway-startup/42.rss">Automated firewall tests during whonix gateway startup</source>
+      </item>
+  </channel>
+</rss>

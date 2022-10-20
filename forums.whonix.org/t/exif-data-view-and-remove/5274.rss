@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Exif data view and remove</title>
+    <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274</link>
+    <description>I want to make sure images I prepare or edit do not contain any EXIF data. Is there a tool included in Whonix for that? if not, anything recommended?</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 06 Jun 2018 07:38:56 +0000</lastBuildDate>
+    <category>General Tor and Anonymity Talk</category>
+    <atom:link href="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <p>For what it’s worth:</p>
+<blockquote>
+<p>#!/bin/bash</p>
+<p>if [ $# -eq 0 ]<br>
+then<br>
+echo "No arguments supplied"<br>
+else</p>
+<p>exiftool -all= $1			# Clean all metadata<br>
+qpdf --linearize $1 $1		# Linearize pdf<br>
+exiftool -PDF-update:all= $1	# Test: try to recover metadata</p>
+<p>echo ""<br>
+echo "Result:"<br>
+echo "======="<br>
+set -x<br>
+exiftool $1			# Verify final state</p>
+<p>fi</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/16</link>
+        <pubDate>Wed, 06 Jun 2018 07:38:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-16</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="13" data-topic="5274" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/cdc98d/40.png" class="avatar"> torbrowser:</div>
+<blockquote>
+<p>I am also concerned about PDF metadata. MAT does not support PDFs, and when I use exiftool:</p>
+<blockquote>
+<p>exiftool -all= filename.pdf</p>
+</blockquote>
+<p>It cleans the data, but warns:</p>
+<blockquote>
+<p>Warning: [minor] ExifTool PDF edits are reversible. Deleted tags may be recovered!</p>
+</blockquote>
+<p>And indeed, running</p>
+<blockquote>
+<p>exiftool -PDF-update:all= filename.pdf</p>
+</blockquote>
+<p>recovers the metadata.</p>
+<p>As stated in <a href="http://owl.phy.queensu.ca/~phil/exiftool/TagNames/PDF.html" rel="nofollow noopener">http://owl.phy.queensu.ca/~phil/exiftool/TagNames/PDF.html</a></p>
+<blockquote>
+<p>All metadata edits are reversible. While this would normally be considered an advantage, it is a potential security problem because old information is never actually deleted from the file. (However, after running ExifTool the old information may be removed permanently using the “qpdf” utility with this command: “qpdf --linearize in.pdf out.pdf”.)</p>
+</blockquote>
+<p>This looks good. After using qpdf I don’t manage to recover the data.</p>
+</blockquote>
+</aside>
+<p>yes. there are some added steps for removing metadata from a pdf with exiftool. it’s not simply a cli command. a config file needs to go with it. and then qdpf, iirc.</p>
+<p>however, here’s another trick. again, the main concern should be not creating the problematic metadata. create a vm that is torfified. scrub your images (if you need any) before adding to a pdf format in the vm. create pdf and remove metadata from there. left over may be trivial and torified. but, if metadata is in image itself, and it’s traceable, game over.</p>
+<p>update.<br>
+install programs with following command:</p>
+<blockquote>
+<p>sudo apt-get install pdftk qpdf</p>
+</blockquote>
+<p>here’s a script that can work to a degree. paste the following into a executable  bash script.</p>
+<blockquote>
+<p>cp $1 temp.delete.pdf<br>
+cp $1 backup.pdf<br>
+pdftk $1 dump_data &gt; output.txt<br>
+nano output.txt<br>
+pdftk $1 update_info output.txt output temp.delete.pdf<br>
+exiftool -all:all= temp.delete.pdf<br>
+qpdf --linearize temp.delete.pdf temp.delete2.pdf<br>
+mv temp.delete2.pdf $1<br>
+rm output.txt temp.delete.pdf</p>
+</blockquote>
+<p>the script will take an original pdf file and overwrite it with a new stripped pdf file. execute it with the name of your bash script and the pdf you want to work on. when nano opens, blank out all the metadata fields and save. when you are done, run a test for metadata with exiftool and mat. foolproof? no. but worked in the past. if it goes wrong, original pdf is saved as backup.pdf.</p>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/15</link>
+        <pubDate>Wed, 06 Jun 2018 07:33:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-15</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <p>I must have a PDF with as output, with the original image included (after redacted).</p>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/14</link>
+        <pubDate>Wed, 06 Jun 2018 06:56:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-14</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <p>I am also concerned about PDF metadata. MAT does not support PDFs, and when I use exiftool:</p>
+<blockquote>
+<p>exiftool -all= filename.pdf</p>
+</blockquote>
+<p>It cleans the data, but warns:</p>
+<blockquote>
+<p>Warning: [minor] ExifTool PDF edits are reversible. Deleted tags may be recovered!</p>
+</blockquote>
+<p>And indeed, running</p>
+<blockquote>
+<p>exiftool -PDF-update:all= filename.pdf</p>
+</blockquote>
+<p>recovers the metadata.</p>
+<p>As stated in <a href="http://owl.phy.queensu.ca/~phil/exiftool/TagNames/PDF.html" rel="nofollow noopener">http://owl.phy.queensu.ca/~phil/exiftool/TagNames/PDF.html</a></p>
+<blockquote>
+<p>All metadata edits are reversible. While this would normally be considered an advantage, it is a potential security problem because old information is never actually deleted from the file. (However, after running ExifTool the old information may be removed permanently using the “qpdf” utility with this command: “qpdf --linearize in.pdf out.pdf”.)</p>
+</blockquote>
+<p>This looks good. After using qpdf I don’t manage to recover the data.</p>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/13</link>
+        <pubDate>Wed, 06 Jun 2018 06:54:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-13</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="11" data-topic="5274" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Scanners have the same pitfalls. For best results you want to run the docs thru an OCR and publish the (edited/redacted) text output as plain text.</p>
+</blockquote>
+</aside>
+<p>ocr can still have the issue of exposing a leaker if a host was paranoid enough to offer different text versions of docs that correlate to id. i’ve honestly viewed the sharing of leaked docs as more of a journalistic fetish than something that is required. in the past, committed journalists could confirm what was leaked to them in docs by dogged questioning of other sources and mouth pieces. on top of which, i’ve found the lack of ethics around the publication of leaks especially troubling. given that publications have ridden this rodeo before, i don’t see why there isn’t some agreed upon version of a type of release in which a journalist informs a source of the potential risks of their employer publishing the leaked material, and then asking for permission to publish the leaked physical material. frankly, a bit amazed greenwald’s publication didn’t have such foresight, particularly given how they’ve claimed they can’t release all of snowden’s material based on such an agreement.</p>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/12</link>
+        <pubDate>Wed, 06 Jun 2018 04:34:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-12</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Scanners have the same pitfalls. For best results you want to run the docs thru an OCR and publish the (edited/redacted) text output as plain text.</p>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/11</link>
+        <pubDate>Wed, 06 Jun 2018 03:18:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-11</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="9" data-topic="5274" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/cdc98d/40.png" class="avatar"> torbrowser:</div>
+<blockquote>
+<aside class="quote" data-post="6" data-topic="5274">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Your camera sensors leave a detectable fingerprint traced back to you. MAT and EXIF removal won’t save you. You need a new offline burner phone camera for this purpose</p>
+</blockquote>
+</aside>
+<p>Thanks for the information. In the case I’m dealing with I don’t share photos taken by myself. It’s actually scanned documents I receive (I don’t have control over the scanning device either). I need to redact some information using editing tools, clean them of any identifiable data, then share.</p>
+</blockquote>
+</aside>
+<p>question whether or not you actually need to share such documents rather than simply sharing the information you received by them. something as innocuous as the placement of a comma or 2 could correlate to a person who accessed and provided the documents. additionally, depending on where the document came from, access to such documents may be logged and closely guarded, which may narrow the pool of suspected leakers. imho, people share documentary proof from sources too easily when it’s not even needed, which leads to situations like reality winner’s. meanwhile, in that case, the publication of the actual documents didn’t actually add anything to the story, but has landed a source in confinement who may face additional years in prison.</p>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/10</link>
+        <pubDate>Tue, 05 Jun 2018 13:45:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-10</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="6" data-topic="5274">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Your camera sensors leave a detectable fingerprint traced back to you. MAT and EXIF removal won’t save you. You need a new offline burner phone camera for this purpose</p>
+</blockquote>
+</aside>
+<p>Thanks for the information. In the case I’m dealing with I don’t share photos taken by myself. It’s actually scanned documents I receive (I don’t have control over the scanning device either). I need to redact some information using editing tools, clean them of any identifiable data, then share.</p>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/9</link>
+        <pubDate>Mon, 04 Jun 2018 04:21:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-9</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p><a href="https://www.whonix.org/wiki/Surfing_Posting_Blogging#Anonymous_Photo_Sharing" rel="nofollow noopener">https://www.whonix.org/wiki/Surfing_Posting_Blogging#Anonymous_Photo_Sharing</a></p>
+</blockquote>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="" height="">
+      <a href="https://www.whonix.org/wiki/Surfing_Posting_Blogging" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/400;"><img src="//forums.whonix.org/uploads/default/original/2X/9/97e97a4bc99a74ce075a50763755d850d732bfa1.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Surfing_Posting_Blogging" target="_blank" rel="nofollow noopener">Surfing Posting Blogging</a></h3>
+
+<p>Surf, Blog and Post anonymously on the Internet. Essential knowledge to avoid detection.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/8</link>
+        <pubDate>Sun, 03 Jun 2018 05:18:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-8</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="5274" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/cdc98d/40.png" class="avatar"> torbrowser:</div>
+<blockquote>
+<p>I want to make sure images I prepare or edit do not contain any EXIF data. Is there a tool included in Whonix for that? if not, anything recommended?</p>
+</blockquote>
+</aside>
+<p>EXIF is a small part of the story. Your camera sensors leave a detectable fingerprint traced back to you. MAT and EXIF removal won’t save you. You need a new offline burner phone camera for this purpose</p>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/6</link>
+        <pubDate>Sat, 02 Jun 2018 18:02:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-6</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <p>Cool, the CLI of MAT is quick and easy. Still struggling with setting a printer.</p>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/5</link>
+        <pubDate>Wed, 30 May 2018 15:09:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-5</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://www.whonix.org/wiki/Metadata#MAT_-_Metadata_Anonymisation_Toolkit" rel="nofollow noopener">https://www.whonix.org/wiki/Metadata#MAT_-_Metadata_Anonymisation_Toolkit</a></p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="" height="">
+      <a href="https://www.whonix.org/wiki/Metadata" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:523/197;"><img src="//forums.whonix.org/uploads/default/original/2X/d/ddb8cd2e7aff99596ee5a166aac949d4ffa0f8a8.png" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Metadata" target="_blank" rel="nofollow noopener">Metadata</a></h3>
+
+<p>Anonymize Files - Clear Metadata - Remove Location Tracking - Use the Metadata Anonymisation Toolkit (MAT)</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/4</link>
+        <pubDate>Wed, 30 May 2018 15:01:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-4</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <p>Right. I will use GIMP so I think everything should actually appear in File - properties.</p>
+<p>I might be especially dumb today, I don’t see any printer configuration option in KDE’s System Settings.<br>
+I use a USB printer, it appears in the “Devices -&gt; USB” menu of VirtualBox, checked. It works on the host. When I try to print from kwrite for example, I only have option to print to a pdf.</p>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/3</link>
+        <pubDate>Wed, 30 May 2018 14:50:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-3</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <p>mat is still a tool used by many for this and is included with whonix.  however, it may not be up to the task any more.  the developer announced they were not giving it priority for awhile due to health issues and the last update was 3 january, 2016.</p>
+<p><a href="https://mat.boum.org" class="onebox" target="_blank" rel="nofollow noopener">https://mat.boum.org</a></p>
+<blockquote>
+<p>Current status<br>
+The MAT maintenance and development is currently on hold, mostly for health reasons. I might go back to it at some point in the future.</p>
+</blockquote>
+<p>exiftool can also do this to a degree and will also be installed in the whonix workstation. <a href="http://www.linux-magazine.com/Online/Blogs/Productivity-Sauce/Remove-EXIF-Metadata-from-Photos-with-exiftool" rel="nofollow noopener">http://www.linux-magazine.com/Online/Blogs/Productivity-Sauce/Remove-EXIF-Metadata-from-Photos-with-exiftool</a></p>
+<p>however, best bet is to set whatever software you are using to create the images to not save any metadata at all if possible, or as little as possible.</p>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/2</link>
+        <pubDate>Wed, 30 May 2018 13:57:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-2</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+      <item>
+        <title>Exif data view and remove</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <p>I want to make sure images I prepare or edit do not contain any EXIF data. Is there a tool included in Whonix for that? if not, anything recommended?</p>
+          <p><a href="http://forums.whonix.org/t/exif-data-view-and-remove/5274/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/exif-data-view-and-remove/5274/1</link>
+        <pubDate>Wed, 30 May 2018 13:26:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5274-1</guid>
+        <source url="http://forums.whonix.org/t/exif-data-view-and-remove/5274.rss">Exif data view and remove</source>
+      </item>
+  </channel>
+</rss>

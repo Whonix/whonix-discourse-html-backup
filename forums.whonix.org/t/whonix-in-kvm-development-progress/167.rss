@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix in KVM Development Progress</title>
+    <link>http://forums.whonix.org/t/whonix-in-kvm-development-progress/167</link>
+    <description>[html]&lt;p&gt;You are welcome to check out the build documentation for next major Whonix version (9) (&lt;a href=&quot;https://www.whonix.org/wiki/Dev/Build_Documentation/9_full&quot;&gt;https://www.whonix.org/wiki/Dev/Build_Documentation/9_full&lt;/a&gt;) (which is still in development!). It will be possible to choose between different build targets –virtualbox, –qcow2 (most likely if you’re interested in KVM) and –bare-metal using the whonix_build script.&lt;/p&gt;
+&lt;p&gt;Check out the script, which is responsible for converting the raw image to a .qcow2 image: &lt;a href=&quot;https://github.com/Whonix/Whonix/blob/master/build-steps.d/2400_convert-img-to-qcow2&quot;&gt;https://github.com/Whonix/Whonix/blob/master/build-steps.d/2400_convert-img-to-qcow2&lt;/a&gt;&lt;/p&gt;
+&lt;div id=&quot;LC45&quot;&gt;For better performance, we are now using “-o preallocation=metadata” for better performance (as per this blog post: &lt;a href=&quot;http://www.ilsistemista.net/index.php/virtualization/11-kvm-io-slowness-on-rhel-6.html&quot;&gt;http://www.ilsistemista.net/index.php/virtualization/11-kvm-io-slowness-on-rhel-6.html) &lt;/a&gt;and “-o cluster_size=2M” as per qemu-img’s man page. The latter increased the sparse size from 2,5 GB to 2,9 GB (as per test: &lt;a href=&quot;https://www.whonix.org/wiki/Dev/KVM#Set_cluster_size_512_-_2MB_for_better_performance.3F&quot;&gt;https://www.whonix.org/wiki/Dev/KVM#Set_cluster_size_512_-_2MB_for_better_performance.3F&lt;/a&gt;) but this is a compromise we can make for better performance. This space would most likely be used anyway when the image gets booted.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div&gt;The build process for building, signing, compressing and uploading .qcow2 images has been streamlined to make maintenance of additional .qcow2 images less time consuming and therefore more maintainable. This is done in the &lt;a href=&quot;https://github.com/Whonix/whonix-developer-meta-files/blob/master/release/compress_qcow2&quot;&gt;https://github.com/Whonix/whonix-developer-meta-files/blob/master/release/compress_qcow2&lt;/a&gt; script which gets run by release automation script &lt;a href=&quot;https://github.com/Whonix/whonix-developer-meta-files/blob/master/release/new_release&quot;&gt;https://github.com/Whonix/whonix-developer-meta-files/blob/master/release/new_release&lt;/a&gt; as a standard step.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div&gt;The bad news is, using Whonix with KVM will likely be more difficult than using Whonix with VirtualBox, because neither KVM nor virt-manager have a feature for importing prepackaged appliances. VirtualBox’s .ova appliance import feature makes redistributing virtual machines so much simpler, because it keeps care of storing all VM settings and image compression during transfer.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div&gt;Compression of .qcow2 images unfortunately is necessary, otherwise transfer using rsync (uploading) or download using a browser would take very long. (Also as per &lt;a href=&quot;https://unix.stackexchange.com/questions/120091/how-can-i-speed-up-operations-on-sparse-files-with-tar-gzip-rsync&quot;&gt;https://unix.stackexchange.com/questions/120091/how-can-i-speed-up-operations-on-sparse-files-with-tar-gzip-rsync&lt;/a&gt;.) This means an extra step for users, they need to uncompressed the tar.gz we’re providing.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div&gt;Also copying around decompressed .qcow2 images (for backup or replication) isn’t that simple as per forum post &lt;a href=&quot;https://www.whonix.org/forum/index.php/board,1.0.html&quot;&gt;https://www.whonix.org/forum/index.php/board,1.0.html. &lt;/a&gt;On some systems it may be possible to copy them using the console using cp with the sparse parameter, so it will again be a sparse file. Also decompression using some tools may result in a non-sparse file. We still have to research this better and document best practices on how to end up with sparse files.&lt;/div&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;div&gt;&lt;/div&gt;
+&lt;div&gt;We’re happy to welcome HulaHoop (&lt;a href=&quot;HulaHoop&quot;&gt;https://www.whonix.org/forum/index.php?action=profile;u=87&lt;/a&gt;) back to Whonix KVM development who contributed steps into direction of running Whonix in KVM.&lt;/div&gt;
+&lt;div&gt;&lt;/div&gt;
+&lt;div&gt;&lt;/div&gt;
+&lt;div&gt;&lt;/div&gt;
+&lt;div&gt;Our current KVM documentation draft can be found here:&lt;/div&gt;
+&lt;div&gt;&lt;a href=&quot;https://www.whonix.org/wiki/KVM&quot;&gt;https://www.whonix.org/wiki/KVM
+
+&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div&gt;&lt;/div&gt;
+&lt;div&gt;There are still blockers, that prevent us from recommending wider use of Whonix in KVM:&lt;/div&gt;
+&lt;div&gt;&lt;a href=&quot;https://www.whonix.org/wiki/Dev/KVM#Blockers&quot;&gt;https://www.whonix.org/wiki/Dev/KVM#Blockers&lt;/p&gt;
+&lt;p&gt;&lt;/a&gt;&lt;/div&gt;
+&lt;div&gt;And there are other open questions (improving security, performance, etc.) we like to answer:&lt;/div&gt;
+&lt;div&gt;&lt;a href=&quot;https://www.whonix.org/wiki/Dev/KVM#Non-Blockers&quot;&gt;https://www.whonix.org/wiki/Dev/KVM#Non-Blockers&lt;/p&gt;
+&lt;p&gt;&lt;/a&gt;If you are interested to see Whonix in KVM, please consider joining our development efforts!&lt;/div&gt;
+[/html]</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 18 Mar 2014 18:10:20 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-in-kvm-development-progress/167.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix in KVM Development Progress</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[html]</p><p>You are welcome to check out the build documentation for next major Whonix version (9) (<a href="https://www.whonix.org/wiki/Dev/Build_Documentation/9_full">https://www.whonix.org/wiki/Dev/Build_Documentation/9_full</a>) (which is still in development!). It will be possible to choose between different build targets –virtualbox, –qcow2 (most likely if you’re interested in KVM) and –bare-metal using the whonix_build script.</p>
+<p>Check out the script, which is responsible for converting the raw image to a .qcow2 image: <a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/2400_convert-img-to-qcow2">https://github.com/Whonix/Whonix/blob/master/build-steps.d/2400_convert-img-to-qcow2</a></p>
+<div>For better performance, we are now using “-o preallocation=metadata” for better performance (as per this blog post: <a href="http://www.ilsistemista.net/index.php/virtualization/11-kvm-io-slowness-on-rhel-6.html">http://www.ilsistemista.net/index.php/virtualization/11-kvm-io-slowness-on-rhel-6.html) </a>and “-o cluster_size=2M” as per qemu-img’s man page. The latter increased the sparse size from 2,5 GB to 2,9 GB (as per test: <a href="https://www.whonix.org/wiki/Dev/KVM#Set_cluster_size_512_-_2MB_for_better_performance.3F">https://www.whonix.org/wiki/Dev/KVM#Set_cluster_size_512_-_2MB_for_better_performance.3F</a>) but this is a compromise we can make for better performance. This space would most likely be used anyway when the image gets booted.
+</div>
+<div>The build process for building, signing, compressing and uploading .qcow2 images has been streamlined to make maintenance of additional .qcow2 images less time consuming and therefore more maintainable. This is done in the <a href="https://github.com/Whonix/whonix-developer-meta-files/blob/master/release/compress_qcow2">https://github.com/Whonix/whonix-developer-meta-files/blob/master/release/compress_qcow2</a> script which gets run by release automation script <a href="https://github.com/Whonix/whonix-developer-meta-files/blob/master/release/new_release">https://github.com/Whonix/whonix-developer-meta-files/blob/master/release/new_release</a> as a standard step.
+</div>
+<div>The bad news is, using Whonix with KVM will likely be more difficult than using Whonix with VirtualBox, because neither KVM nor virt-manager have a feature for importing prepackaged appliances. VirtualBox’s .ova appliance import feature makes redistributing virtual machines so much simpler, because it keeps care of storing all VM settings and image compression during transfer.
+</div>
+<div>Compression of .qcow2 images unfortunately is necessary, otherwise transfer using rsync (uploading) or download using a browser would take very long. (Also as per <a href="https://unix.stackexchange.com/questions/120091/how-can-i-speed-up-operations-on-sparse-files-with-tar-gzip-rsync">https://unix.stackexchange.com/questions/120091/how-can-i-speed-up-operations-on-sparse-files-with-tar-gzip-rsync</a>.) This means an extra step for users, they need to uncompressed the tar.gz we’re providing.
+</div>
+<div>Also copying around decompressed .qcow2 images (for backup or replication) isn’t that simple as per forum post <a href="https://www.whonix.org/forum/index.php/board,1.0.html">https://www.whonix.org/forum/index.php/board,1.0.html. </a>On some systems it may be possible to copy them using the console using cp with the sparse parameter, so it will again be a sparse file. Also decompression using some tools may result in a non-sparse file. We still have to research this better and document best practices on how to end up with sparse files.</div>
+<p></p>
+<div></div>
+<div>We’re happy to welcome HulaHoop (<a href="http://forums.whonix.org">https://www.whonix.org/forum/index.php?action=profile;u=87</a>) back to Whonix KVM development who contributed steps into direction of running Whonix in KVM.</div>
+<div></div>
+<div></div>
+<div></div>
+<div>Our current KVM documentation draft can be found here:</div>
+<div>
+<a href="https://www.whonix.org/wiki/KVM">https://www.whonix.org/wiki/KVM
+<p></p></a>
+</div>
+<div></div>
+<div>There are still blockers, that prevent us from recommending wider use of Whonix in KVM:</div>
+<div><a href="https://www.whonix.org/wiki/Dev/KVM#Blockers">https://www.whonix.org/wiki/Dev/KVM#Blockers
+<p></p></a></div>
+<div>And there are other open questions (improving security, performance, etc.) we like to answer:</div>
+<div>
+<a href="https://www.whonix.org/wiki/Dev/KVM#Non-Blockers">https://www.whonix.org/wiki/Dev/KVM#Non-Blockers
+<p></p></a>If you are interested to see Whonix in KVM, please consider joining our development efforts!</div>
+[/html]
+          <p><a href="http://forums.whonix.org/t/whonix-in-kvm-development-progress/167/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-in-kvm-development-progress/167/1</link>
+        <pubDate>Tue, 18 Mar 2014 18:10:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-167-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-in-kvm-development-progress/167.rss">Whonix in KVM Development Progress</source>
+      </item>
+  </channel>
+</rss>

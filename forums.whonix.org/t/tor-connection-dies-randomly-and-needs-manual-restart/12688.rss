@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Tor connection dies randomly and needs manual restart</title>
+    <link>http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688</link>
+    <description>Tor connection in Whonix-Gateway dies and when it dies, it doesn&#39;t recover but the `/var/run/tor/log` says:
+
+```
+[NOTICE] Tried for 100 seconds to get a connection to [scrubbed]:[xxx]. Giving up.
+```
+
+It&#39;s probably all selected guard nodes are gone and Tor is not picking new ones. The only solution is to restart Tor manually.
+
+```
+sudo systemctl restart tor@default
+```
+
+After restarting Tor the connection is up again.
+
+Is it safe to make cron job that detects Tor connectivity and restarts Tor daemon? Has Whonix any built-in tool for checking that?
+
+Or alternatively, can you configure Tor to pick another guard nodes when they&#39;re off for large amount of time? How is it insecure?
+
+The second issue, `/var/run/tor/log` grows up and when tmpfs goes to 100%, Tor connection breaks and the only way to restart Whonix-Gateway or (if still possible) stop Tor, delete this file and start again.
+
+```
+sudo systemctl stop tor@default
+sudo rm /var/run/tor/log
+sudo systemctl start tor@default
+```
+
+Most logged infomation are useless. Where can I change logging level?</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 11 Sep 2022 19:20:46 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Tor connection dies randomly and needs manual restart</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Probably <a href="https://www.whonix.org/wiki/Reporting_Bugs#Generic_Bug_Reproduction">Generic Bug Reproduction</a> required. Specifically <a href="https://www.whonix.org/wiki/Tor#Tor_Generic_Bug_Reproduction">Tor Generic Bug Reproduction</a>.</p>
+<p>The same would probably happen if Tor was installed on the host operating system. Could you please test iof that is the case?</p>
+<p>If so, that would be unspecific to Whonix.</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://www.whonix.org/wiki/Unspecific">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/a/a4/Whonix-home-favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener" title="07:49PM - 25 July 2022">Whonix – 25 Jul 22</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:250/500;"><img src="https://www.whonix.org/w/images/7/74/Booster132.png" class="thumbnail" width="250" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener">Information Booster might be Available!</a></h3>
+
+  <p>Utilizing other resources to help solve questions/issues unspecific to Whonix ™.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688/5</link>
+        <pubDate>Sun, 11 Sep 2022 19:20:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12688-5</guid>
+        <source url="http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688.rss">Tor connection dies randomly and needs manual restart</source>
+      </item>
+      <item>
+        <title>Tor connection dies randomly and needs manual restart</title>
+        <dc:creator><![CDATA[whonyx]]></dc:creator>
+        <description><![CDATA[
+            <p>Problem still exists. Example errors:</p>
+<pre><code class="lang-auto">[warn] Tried for 120 seconds to get a connection to [scrubbed]:0. Giving up. (waiting for circuit)
+[warn] Tried for 120 seconds to get a connection to [scrubbed]:0. Giving up. (waiting for circuit)
+[warn] Tried for 120 seconds to get a connection to [scrubbed]:0. Giving up. (waiting for circuit)
+
+[warn] Guard [guard name] (guard ID) is failing an extremely large amount of circuits. This could indicate a route manipulation attack, extreme network overload, or a bug. Success counts are 71/243. Use counts are 56/56. 70 circuits completed, 0 were unusable, 0 collapsed, and 10 timed out. For reference, your timeout cutoff is 60 seconds.
+
+[notice] Closed 1 streams for service [scrubbed].onion for reason resolve failed. Fetch status: No more HSDi available to query.
+
+[notice] No circuits are opened. Relaxed timeout for circuit 1945 (a General-purpose client 3-hop circuit state waiting to see how other guards perform with channel state open) to 85410ms. However, it appears the circuit has timed out anyway.
+
+[warn] Giving up on launching a rendezvous circuit to [scrubbed] for hidden service [scrubbed]
+</code></pre>
+<p>This usually happens when host system is under heavier load than when idle. Anyone else experienced this issue?</p>
+<p>Turning off Tor and deleting state file helps (another guard is picked) but this is very bad solution for security reasons.</p>
+<p>Probably <strong>vanguards</strong> are closing circuits. Changing configuration of vanguards <code>/etc/tor/anon-vanguards.conf</code> would help but which of these configuration flags can be safely changed without lowering anonymity?</p>
+<p>Also, which config options to change to examine this problem better? To solve this issue, you would need more what exactly is going on on the system.</p>
+          <p><a href="http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688/4</link>
+        <pubDate>Sun, 11 Sep 2022 12:39:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12688-4</guid>
+        <source url="http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688.rss">Tor connection dies randomly and needs manual restart</source>
+      </item>
+      <item>
+        <title>Tor connection dies randomly and needs manual restart</title>
+        <dc:creator><![CDATA[whonyx]]></dc:creator>
+        <description><![CDATA[
+            <p>This issue may occur when host or guest system runs out of RAM and needs swapping. This needs further examination whether this may cause error “Tried for X seconds to get a connection to [scrubbed]”. It looks like the entry node fails circuits but my experiment with multiple Whonix-Workstation machines running (some software need a lot of RAM so I increased RAM in VM settings to 1.5 GB while Whonix-Gateway remained still only 384 MB) Tor connection was almost dead due to failing circuits.</p>
+<p>If this is true, the solution is to add more RAM to physical machine.</p>
+          <p><a href="http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688/3</link>
+        <pubDate>Sun, 19 Dec 2021 23:29:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12688-3</guid>
+        <source url="http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688.rss">Tor connection dies randomly and needs manual restart</source>
+      </item>
+      <item>
+        <title>Tor connection dies randomly and needs manual restart</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="whonyx" data-post="1" data-topic="12688">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/w/dbc845/40.png" class="avatar"> whonyx:</div>
+<blockquote>
+<p>It’s probably all selected guard nodes are gone and Tor is not picking new ones.</p>
+</blockquote>
+</aside>
+<p>Could be a general Tor network issue. An active attack on specific Tor users is also conceivable as part of searching for a specific user. If traffic keeps getting interrupted at one side, it also gets corrupted at the destination. Correlate.</p>
+<aside class="quote no-group" data-username="whonyx" data-post="1" data-topic="12688">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/w/dbc845/40.png" class="avatar"> whonyx:</div>
+<blockquote>
+<p>Has Whonix any built-in tool for checking that?</p>
+</blockquote>
+</aside>
+<p>No.</p>
+<aside class="quote no-group" data-username="whonyx" data-post="1" data-topic="12688">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/w/dbc845/40.png" class="avatar"> whonyx:</div>
+<blockquote>
+<p>Is it safe to make cron job that detects Tor connectivity and restarts Tor daemon?</p>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-username="whonyx" data-post="1" data-topic="12688">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/w/dbc845/40.png" class="avatar"> whonyx:</div>
+<blockquote>
+<p>Or alternatively, can you configure Tor to pick another guard nodes when they’re off for large amount of time? How is it insecure?</p>
+</blockquote>
+</aside>
+<p>I recommend:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener" title="09:01PM - 26 September 2021">Whonix – 26 Sep 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:85/170;"><img src="https://www.whonix.org/w/images/7/74/Booster132.png" class="thumbnail" width="85" height="170"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener">Information Booster might be Available!</a></h3>
+
+  <p>Utilizing other resources to help solve questions/issues unspecific to Whonix ™.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-username="whonyx" data-post="1" data-topic="12688">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/w/dbc845/40.png" class="avatar"> whonyx:</div>
+<blockquote>
+<p>The second issue, <code>/var/run/tor/log</code> grows up and when tmpfs goes to 100%, Tor connection breaks and the only way to restart Whonix-Gateway or (if still possible) stop Tor, delete this file and start again.</p>
+<pre><code class="lang-auto">sudo systemctl stop tor@default
+sudo rm /var/run/tor/log
+sudo systemctl start tor@default
+</code></pre>
+<p>Most logged infomation are useless. Where can I change logging level?</p>
+</blockquote>
+</aside>
+<p>One issue = one forum thread please.<br>
+Please create a separate forum thread for that.</p>
+          <p><a href="http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688/2</link>
+        <pubDate>Sat, 30 Oct 2021 16:23:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12688-2</guid>
+        <source url="http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688.rss">Tor connection dies randomly and needs manual restart</source>
+      </item>
+      <item>
+        <title>Tor connection dies randomly and needs manual restart</title>
+        <dc:creator><![CDATA[whonyx]]></dc:creator>
+        <description><![CDATA[
+            <p>Tor connection in Whonix-Gateway dies and when it dies, it doesn’t recover but the <code>/var/run/tor/log</code> says:</p>
+<pre><code class="lang-auto">[NOTICE] Tried for 100 seconds to get a connection to [scrubbed]:[xxx]. Giving up.
+</code></pre>
+<p>It’s probably all selected guard nodes are gone and Tor is not picking new ones. The only solution is to restart Tor manually.</p>
+<pre><code class="lang-auto">sudo systemctl restart tor@default
+</code></pre>
+<p>After restarting Tor the connection is up again.</p>
+<p>Is it safe to make cron job that detects Tor connectivity and restarts Tor daemon? Has Whonix any built-in tool for checking that?</p>
+<p>Or alternatively, can you configure Tor to pick another guard nodes when they’re off for large amount of time? How is it insecure?</p>
+<p>The second issue, <code>/var/run/tor/log</code> grows up and when tmpfs goes to 100%, Tor connection breaks and the only way to restart Whonix-Gateway or (if still possible) stop Tor, delete this file and start again.</p>
+<pre><code class="lang-auto">sudo systemctl stop tor@default
+sudo rm /var/run/tor/log
+sudo systemctl start tor@default
+</code></pre>
+<p>Most logged infomation are useless. Where can I change logging level?</p>
+          <p><a href="http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688/1</link>
+        <pubDate>Sat, 30 Oct 2021 08:29:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12688-1</guid>
+        <source url="http://forums.whonix.org/t/tor-connection-dies-randomly-and-needs-manual-restart/12688.rss">Tor connection dies randomly and needs manual restart</source>
+      </item>
+  </channel>
+</rss>

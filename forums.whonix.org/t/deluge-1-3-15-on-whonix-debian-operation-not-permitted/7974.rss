@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Deluge 1.3.15 on Whonix Debian: Operation not permitted</title>
+    <link>http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974</link>
+    <description>Hi There,
+
+I know the rules of posting in the forum. So I searched for the error in this forum and found only 9 results. 5 to 6 are 5 to 6 years old. One from 2017 is regarding mac and others were not useful. hence I&#39;m posting this topic. 
+
+Yesterday I installed Deluge 1.3.15 on my VirtualBox Whonix Debian. I&#39;m new to Linux and everything around it. I&#39;m not been able to download any torrent because just after a second status says &quot;Operation not permitted&quot;.
+
+libtorrent: 1.1.11.0. 
+
+When I searched for any clues I found this link: https://bugs.archlinux.org/task/29414
+
+it says &quot;Deluge doesn&#39;t work with package libtorrent-rasterbar 0.16.0-1. Works fine with libtorrent-rasterbar 0.15.10-1.&quot;
+
+Not sure if this applies to me as well. 
+
+Please help....</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 30 Aug 2019 06:40:18 +0000</lastBuildDate>
+    <category>VirtualBox</category>
+    <atom:link href="http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Deluge 1.3.15 on Whonix Debian: Operation not permitted</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="1" data-topic="7974">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/ba9def/40.png" class="avatar"> samirwarsi:</div>
+<blockquote>
+<p>Operation not permitted</p>
+</blockquote>
+</aside>
+<p>Cause: Speculation, software trying to use UDP.</p>
+<p>As per <a href="https://www.whonix.org/wiki/Tor#UDP" rel="nofollow noopener">https://www.whonix.org/wiki/Tor#UDP</a></p>
+<blockquote>
+<p>The Tor software does not yet support UDP, <a href="https://www.whonix.org/wiki/Tor#cite_note-11" rel="nofollow noopener">[11]</a> although Tor provides a DnsPort.</p>
+</blockquote>
+<blockquote>
+<p>If UDP is urgently required in Whonix ™, a limited workaround is provided. For the most secure method, see <a href="https://www.whonix.org/wiki/Tunnel_UDP_over_Tor" rel="nofollow noopener">Tunnel UDP over Tor</a>.</p>
+</blockquote>
+<blockquote>
+<p><a href="https://trac.torproject.org/projects/tor/ticket/7830" rel="nofollow noopener">https://trac.torproject.org/projects/tor/ticket/7830</a></p>
+</blockquote>
+<p>Because of this, whonix-firewall rejects UDP. This matches the state of affairs and results in a better error message than just dropping the package silently. Also rejecting rather than dropping the locally generated pacakge might improve connecitivty if the application retires with TCP.</p>
+<p>This is implemented here:</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonix-firewall/blob/master/usr/bin/whonix-workstation-firewall#L428-L445" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonix-firewall/blob/master/usr/bin/whonix-workstation-firewall#L428-L445" target="_blank" rel="nofollow noopener">Whonix/whonix-firewall/blob/master/usr/bin/whonix-workstation-firewall#L428-L445</a></h4>
+<pre class="onebox"><code class="lang-"><ol class="start lines" start="428" style="counter-reset: li-counter 427 ;">
+<li>## Not sure about the next one. UDP is not supported by Tor, why not</li>
+<li>## block any outgoing UDP. Might have unwanted side effects when tunneling</li>
+<li>## UDP over Tor.</li>
+<li>## https://www.whonix.org/wiki/Tunnel_UDP_over_Tor</li>
+<li>##</li>
+<li>## All other non-TCP protocol traffic gets rejected.</li>
+<li>## iptables knows 7 different protocols and all.</li>
+<li>## (tcp, udp, udplite, icmp, esp, ah, sctp or all)</li>
+<li>##</li>
+<li>## (1) ping torproject.org</li>
+<li>##     4 packets transmitted, 0 received, 100% packet loss, time 3000ms</li>
+<li>##</li>
+<li>## (2) ping torproject.org</li>
+<li>##     From 10.152.152.11 icmp_seq=1 Destination Port Unreachable</li>
+<li>##     0 packets transmitted, 0 received, +100 errors</li>
+<li>##</li>
+<li>## The next rule ensures, that only tcp can leave and achieves the desired result from (2).</li>
+<li>$iptables_cmd -A OUTPUT ! -p tcp -j REJECT --reject-with icmp-port-unreachable</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Commenting this out will NOT result in Tor supporting UDP / making UDP work.</p>
+          <p><a href="http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974/4</link>
+        <pubDate>Fri, 30 Aug 2019 06:40:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7974-4</guid>
+        <source url="http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974.rss">Deluge 1.3.15 on Whonix Debian: Operation not permitted</source>
+      </item>
+      <item>
+        <title>Deluge 1.3.15 on Whonix Debian: Operation not permitted</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <code>samirwarsi</code></p>
+<p>Welcome to the Whonix community!</p>
+<aside class="quote no-group" data-post="1" data-topic="7974">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/ba9def/40.png" class="avatar"> samirwarsi:</div>
+<blockquote>
+<p>I know the rules of posting in the forum. So I searched for the error in this forum and found only 9 results. 5 to 6 are 5 to 6 years old. One from 2017 is regarding mac and others were not useful. hence I’m posting this topic.</p>
+</blockquote>
+</aside>
+<p>By saying other post where not useful…I assume your read <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a>’s take on this (which I agree with)</p>
+<aside class="quote no-group" data-post="2" data-topic="7768">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"><a href="//forums.whonix.org/t/configuration-deluge-on-tor/7768/2">Configuration deluge on tor</a>
+</div>
+<blockquote>
+<p>Well then you already know it is the digital equivalent of being an asshole. It’s easy enough to get working if you are determined but we won;'t go out of our way to help you drain limited resources that some people badly need.</p>
+</blockquote>
+</aside>
+<p><a href="https://whonix.org/wiki/File_Sharing#The_Tor_Project_Opinion" rel="nofollow noopener">https://whonix.org/wiki/File_Sharing#The_Tor_Project_Opinion</a></p>
+<blockquote>
+<p>Over the last decade, the Tor Project has been fairly consistent in advising against torrenting over the Tor network. In response to the 2010 paper <a href="https://hal.inria.fr/file/index/docid/471556/filename/TorBT.pdf" rel="nofollow noopener">Compromising Tor Anonymity Exploiting P2P Information Leakage</a> – which detailed P2P information leakage over Tor that could compromise a (non-Whonix) user’s identity – <a href="https://blog.torproject.org/blog/bittorrent-over-tor-isnt-good-idea" rel="nofollow noopener">Roger Dingledine</a> stated in 2010:</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974/3</link>
+        <pubDate>Thu, 29 Aug 2019 23:03:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7974-3</guid>
+        <source url="http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974.rss">Deluge 1.3.15 on Whonix Debian: Operation not permitted</source>
+      </item>
+      <item>
+        <title>Deluge 1.3.15 on Whonix Debian: Operation not permitted</title>
+        <dc:creator><![CDATA[Lilias]]></dc:creator>
+        <description><![CDATA[
+            <p>First, torrenting over tor is discouraged because it wastes valuable bandwidth.<br>
+And torrenting isn’t anonymous just because you use tor, you can still be fingerprinted.</p>
+<p><a href="https://blog.torproject.org/bittorrent-over-tor-isnt-good-idea" class="onebox" target="_blank" rel="nofollow noopener">https://blog.torproject.org/bittorrent-over-tor-isnt-good-idea</a></p>
+<p>Second, tor only uses TCP, where many aspects of bittorent require UDP, such as DHT and most trackers.</p>
+<p>In my opinion you’re much better off just using a VPN for bittorrent.</p>
+          <p><a href="http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974/2</link>
+        <pubDate>Thu, 29 Aug 2019 21:56:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7974-2</guid>
+        <source url="http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974.rss">Deluge 1.3.15 on Whonix Debian: Operation not permitted</source>
+      </item>
+      <item>
+        <title>Deluge 1.3.15 on Whonix Debian: Operation not permitted</title>
+        <dc:creator><![CDATA[samirwarsi]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi There,</p>
+<p>I know the rules of posting in the forum. So I searched for the error in this forum and found only 9 results. 5 to 6 are 5 to 6 years old. One from 2017 is regarding mac and others were not useful. hence I’m posting this topic.</p>
+<p>Yesterday I installed Deluge 1.3.15 on my VirtualBox Whonix Debian. I’m new to Linux and everything around it. I’m not been able to download any torrent because just after a second status says “Operation not permitted”.</p>
+<p>libtorrent: 1.1.11.0.</p>
+<p>When I searched for any clues I found this link: <a href="https://bugs.archlinux.org/task/29414" rel="nofollow noopener">https://bugs.archlinux.org/task/29414</a></p>
+<p>it says “Deluge doesn’t work with package libtorrent-rasterbar 0.16.0-1. Works fine with libtorrent-rasterbar 0.15.10-1.”</p>
+<p>Not sure if this applies to me as well.</p>
+<p>Please help…</p>
+          <p><a href="http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974/1</link>
+        <pubDate>Thu, 29 Aug 2019 20:33:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7974-1</guid>
+        <source url="http://forums.whonix.org/t/deluge-1-3-15-on-whonix-debian-operation-not-permitted/7974.rss">Deluge 1.3.15 on Whonix Debian: Operation not permitted</source>
+      </item>
+  </channel>
+</rss>

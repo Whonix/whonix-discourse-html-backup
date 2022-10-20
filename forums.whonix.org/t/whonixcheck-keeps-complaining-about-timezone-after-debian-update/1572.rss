@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonixcheck keeps complaining about timezone after Debian update</title>
+    <link>http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572</link>
+    <description>I am an experienced Linux developer with some familiarity with Tor. I have tried an older version of Whonix in the past, but I am new to Qubes OS. Last week I installed Qubes OS 3.0 with Whonix templates. Things worked well until I installed security updates in all template VMs.
+
+First whonixcheck alerted me to the fact that unwanted packages had been pulled in by the updates, namely [tt]ntpdate[/tt] and [tt]chrony[/tt]. So I purged them as recommended by whonixcheck. Bug report: This whonixcheck advice was not Qubes-aware, so it wrongly told me to remove these packages from the AppVM [i]dom0 -&gt; Start Menu -&gt; &#39;whonix&#39; -&gt; Konsole[/i] instead of the TemplateVMs whonix-ws and whonix-gw.
+
+In order to avoid pulling in undesired packages, it might be wise to modify the [tt]apt[/tt] configuration as recommended by Zwiebelfreunde for Tor Exit servers &lt;[url=https://www.torservers.net/wiki/setup/server]https://www.torservers.net/wiki/setup/server[/url]&gt;:
+[code]
+# disable debian default that pulls in recommended packages:
+cd /etc/apt/apt.conf.d
+wget https://raw.githubusercontent.com/torservers/server-config-templates/master/06norecommends
+[/code]
+
+At the same time, whonixcheck complained about an unexpected timezone setting, and I am unable to correct it. Even after changing the contents of /etc/timezone from UTC to Etc/UTC in both template VMs, the old value is back after a reboot, and whonixcheck complains again.
+
+Then I noticed that TorBrowser was gone. Whonix offered to re-install it using its TorBrowser-Updater. That was denied by AppArmor, so I disabled it. Now I can use TorBrowser, but whonixcheck keeps complaining about the timezone even after reboots.
+
+It is possible that AppArmor plays a role in this mess. I had enabled it two days ago, and it generated DENIED entries in the kernel.log of whonix-gw for [tt]/usr/sbin/cpfpd[/tt] not being allowed to read from &quot;/rw/usrlocal/lib/python2.7/dist-packages/&quot;. I would paste the exact warning here, but copy &amp; paste does not work (yes, I tried the three-step dance ctrl-shift-c ctrl-shift-v ctrl-v but the destination clipboard still contained an old value).
+
+These are my package sources:
+[code]
+user@host~$ egrep -rv &#39;^#|^$&#39; /etc/apt/sources.list.d/
+/etc/apt/sources.list.d/debian.list:deb http://security.debian.org jessie/updates main contrib non-free
+/etc/apt/sources.list.d/debian.list:deb http://ftp.us.debian.org/debian jessie main contrib non-free
+/etc/apt/sources.list.d/whonix.list:deb http://mirror.whonix.de/whonixdevelopermetafiles/internal/ testers main
+/etc/apt/sources.list.d/torproject.list:deb http://deb.torproject.org/torproject.org jessie main
+/etc/apt/sources.list.d/qubes-r3.list:deb [arch=amd64] http://deb.qubes-os.org/r3.0/vm jessie main
+[/code]</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 08 Nov 2015 19:18:52 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonixcheck keeps complaining about timezone after Debian update</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks!</p>
+<blockquote>fixed output with advice in Qubes when incorrect timezone is being set</blockquote>
+https://github.com/Whonix/whonixcheck/commit/26713b4737cb7d9fe87ffe39f741ebada7f352e9
+<p>Fix will come in whonixcheck 3.8.</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/9</link>
+        <pubDate>Sun, 08 Nov 2015 19:18:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1572-9</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572.rss">Whonixcheck keeps complaining about timezone after Debian update</source>
+      </item>
+      <item>
+        <title>Whonixcheck keeps complaining about timezone after Debian update</title>
+        <dc:creator><![CDATA[qubenix]]></dc:creator>
+        <description><![CDATA[
+            <p>Fixed after applying to TemplateVM. <em>facepalm</em></p>
+<p>For informational purposes here are the outputs you asked for:</p>
+<pre><code class="lang-auto">user@host:~$ cat /etc/timezone
+UTC
+user@host:~$ cat /var/lib/dpkg/info/qubes-whonix.postinst | grep -i utc
+user@host:~$ cat /etc/qubes/protected-files.d/qubes-whonix.conf
+## This file is part of Whonix.
+## Copyright (C) 2012 - 2014 Patrick Schleizer &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+## Not calling this file simply qubes-whonix to avoid conflicts with the in
+## earlier versions auto generated file with the same name. Also one day we
+## might wish to only parse config files ending with '.conf'.
+
+## anon-(gw|ws)-dns-conf
+/etc/resolv.conf
+
+## anon-base-files
+/etc/hostname
+/etc/hosts
+
+## timezone-utc
+/etc/localtime
+/etc/timezone
+user@host:~$ sudo su
+root@host:/home/user# echo "Etc/UTC" &gt; /etc/timezone
+root@host:/home/user# cp "/usr/share/zoneinfo/Etc/UTC" "/etc/localtime"
+cp: overwrite ‘/etc/localtime’? y
+root@host:/home/user# cat /etc/timezone /etc/localtime
+Etc/UTC
+TZif2UTCTZif2UTC
+UTC0
+root@host:/home/user# cat /usr/share/zoneinfo/Etc/UTC 
+TZif2UTCTZif2UTC
+UTC0
+root@host:/home/user# exit
+exit
+user@host:~$ whonixcheck
+[INFO] [whonixcheck] whonix-ws-testers-TEMPLATE | Whonix-Workstation | TemplateVM | Sun Nov  8 15:49:36 UTC 2015
+[INFO] [whonixcheck] Connected to Tor.
+[INFO] [whonixcheck] SocksPort Test: Testing Tor's SocksPort...
+[INFO] [whonixcheck] SocksPort Test Result: Connected to Tor. IP: 209.133.66.214
+[INFO] [whonixcheck] TransPort Test: Testing Tor's TransPort...
+[INFO] [whonixcheck] TransPort Test Result: Connected to Tor. IP: 77.247.181.163
+[INFO] [whonixcheck] Stream Isolation Test Result: Functional.
+[INFO] [whonixcheck] Whonix News Download: Checking for Whonix news and updates...
+x whonix_feature_blog.txt
+x whonix_gateway_1.9-1_deb_news
+x whonix_gateway_valid_build_versions
+x whonix_gateway_valid_deb_versions
+x whonix_important_blog.txt
+x whonix_workstation_1.9-1_deb_news
+x whonix_workstation_valid_build_versions
+x whonix_workstation_valid_deb_versions
+[INFO] [whonixcheck] Whonix News Result:
+√ Up to date: whonix-workstation-packages-dependencies 2.8-1
+√ Up to date: Whonix Build Version: 11.0.0.3.0
+[INFO] [whonixcheck] Debian Package Update Check: Checking for software updates via apt-get... ( Documentation: https://www.whonix.org/wiki/Update )
+[INFO] [whonixcheck] Debian Package Update Check Result: No updates found via apt-get.
+[INFO] [whonixcheck] Whonix APT Repository: Enabled.
+When the Whonix team releases TESTERS updates,
+they will be AUTOMATICALLY installed (when you run apt-get dist-upgrade)
+along with updated packages from the Debian team. Please
+read https://www.whonix.org/wiki/Trust to understand the risk.
+If you want to change this, use:
+    sudo whonix_repository
+user@host:~$</code></pre>
+<p>Started about 5 days ago.</p>
+<p>To reproduce I believe you can just install 11, set testers repo, upgrade, and run whonixcheck.</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/8</link>
+        <pubDate>Sun, 08 Nov 2015 16:13:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1572-8</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572.rss">Whonixcheck keeps complaining about timezone after Debian update</source>
+      </item>
+      <item>
+        <title>Whonixcheck keeps complaining about timezone after Debian update</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes, whonixcheck is wrong. This has to be done in the TemplateVM.</p>
+<p>[hr]</p>
+<p>qu฿enix, did you apply this in your TemplateVM?</p>
+<p>[hr]</p>
+<p>Since when did this happen? What are the steps to reproduce this issue? Get Whonix 11 + update from testers repository?</p>
+<p>[hr]</p>
+<p>The contents of /etc/timezone really is UTC, not /etc/UTC?</p>
+<pre><code class="lang-auto"></code></pre>
+<p>[hr]</p>
+<p>Please check the contents of /var/lib/dpkg/info/qubes-whonix.postinst by running the following command.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>It should return nothing. I.e. qubes-whonix.postinst should no longer modify that file.</p>
+<p>[hr]</p>
+<p>What are the contents of /etc/qubes/protected-files.d/qubes-whonix.conf?</p>
+<pre><code class="lang-auto"></code></pre>
+<p>Should be:</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/qubes-whonix/blob/master/etc/qubes/protected-files.d/qubes-whonix.conf" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/qubes-whonix/blob/master/etc/qubes/protected-files.d/qubes-whonix.conf" target="_blank" rel="nofollow noopener">Whonix/qubes-whonix/blob/master/etc/qubes/protected-files.d/qubes-whonix.conf</a></h4>
+<pre><code class="lang-conf">## Copyright (C) 2012 - 2018 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+## Not calling this file simply qubes-whonix to avoid conflicts with the in
+## earlier versions auto generated file with the same name. Also one day we
+## might wish to only parse config files ending with '.conf'.
+
+## anon-base-files
+/etc/hostname
+/etc/hosts
+
+## timezone-utc
+/etc/localtime
+/etc/timezone
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<pre><code class="lang-auto">## This file is part of Whonix.
+## Copyright (C) 2012 - 2014 Patrick Schleizer &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+## Not calling this file simply qubes-whonix to avoid conflicts with the in
+## earlier versions auto generated file with the same name. Also one day we
+## might wish to only parse config files ending with '.conf'.
+
+## anon-(gw|ws)-dns-conf
+/etc/resolv.conf
+
+## anon-base-files
+/etc/hostname
+/etc/hosts
+
+## timezone-utc
+/etc/localtime
+/etc/timezone</code></pre>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/7</link>
+        <pubDate>Sun, 08 Nov 2015 14:17:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1572-7</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572.rss">Whonixcheck keeps complaining about timezone after Debian update</source>
+      </item>
+      <item>
+        <title>Whonixcheck keeps complaining about timezone after Debian update</title>
+        <dc:creator><![CDATA[qubenix]]></dc:creator>
+        <description><![CDATA[
+            <p>I’m having this same time issue on testers/xfce, Qubes 3.0. Every time I do whonixcheck I get this:</p>
+<pre><code class="lang-auto">ERROR: Check Timezone Result: 
+/etc/timezone settings different from Whonix defaults. 
+timezone_file_expected_content: Etc/UTC 
+timezone_file_actual_content: UTC 
+ERROR: Check Timezone Result: 
+Settings different from Whonix defaults. (See above!) 
+You could try to fix this. 
+dom0 -&gt; Start Menu -&gt; ServiceVM: whonix-WS-testers -&gt; Konsole
+sudo su 
+echo "Etc/UTC" &gt; /etc/timezone 
+cp "/usr/share/zoneinfo/Etc/UTC" "/etc/localtime"
+It is generally recommended to keep the default as per Whonix Design. [1] If you did not change timezone related settings, please report this Whonix bug. 
+If you know what you are doing, feel free to disable this check. Create a file /etc/whonix.d/50_whonixcheck_user and add: 
+whonixcheck_skip_functions+=" check_timezone "</code></pre>
+<p>As digitalcourage wrote, following these steps doesn’t help and the problem persists after reboots.</p>
+<p>Freshly updated packages as of posting.</p>
+<p>I should also mention that I opted to not use AppArmor so we can rule that out.</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/6</link>
+        <pubDate>Sat, 07 Nov 2015 16:14:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1572-6</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572.rss">Whonixcheck keeps complaining about timezone after Debian update</source>
+      </item>
+      <item>
+        <title>Whonixcheck keeps complaining about timezone after Debian update</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“digitalcourage, post:1, topic:1572”]In order to avoid pulling in undesired packages, it might be wise to modify the [tt]apt[/tt] configuration as recommended by Zwiebelfreunde for Tor Exit servers &lt;<a href="https://www.torservers.net/wiki/setup/server" data-bbcode="true">https://www.torservers.net/wiki/setup/server</a>&gt;:</p>
+<p>[code]</p>
+<h1>disable debian default that pulls in recommended packages:</h1>
+<p>cd /etc/apt/apt.conf.d<br>
+wget <a href="https://raw.githubusercontent.com/torservers/server-config-templates/master/06norecommends">https://raw.githubusercontent.com/torservers/server-config-templates/master/06norecommends</a><br>
+[/code][/quote]<br>
+This should be a separate discussion in the development forum:<br>
+<a href="https://www.whonix.org/forum/index.php/board,5.0.html">https://www.whonix.org/forum/index.php/board,5.0.html</a></p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/5</link>
+        <pubDate>Wed, 04 Nov 2015 13:18:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1572-5</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572.rss">Whonixcheck keeps complaining about timezone after Debian update</source>
+      </item>
+      <item>
+        <title>Whonixcheck keeps complaining about timezone after Debian update</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“digitalcourage, post:1, topic:1572”]I am an experienced Linux developer with some familiarity with Tor. I have tried an older version of Whonix in the past, but I am new to Qubes OS. Last week I installed Qubes OS 3.0 with Whonix templates. Things worked well until I installed security updates in all template VMs.</p>
+<p>First whonixcheck alerted me to the fact that unwanted packages had been pulled in by the updates, namely [tt]ntpdate[/tt] and [tt]chrony[/tt]. So I purged them as recommended by whonixcheck. Bug report: This whonixcheck advice was not Qubes-aware, so it wrongly told me to remove these packages from the AppVM <span class="bbcode-i">dom0 -&gt; Start Menu -&gt; ‘whonix’ -&gt; Konsole</span> instead of the TemplateVMs whonix-ws and whonix-gw.</p>
+<p>In order to avoid pulling in undesired packages, it might be wise to modify the [tt]apt[/tt] configuration as recommended by Zwiebelfreunde for Tor Exit servers &lt;<a href="https://www.torservers.net/wiki/setup/server" data-bbcode="true">https://www.torservers.net/wiki/setup/server</a>&gt;:</p>
+<pre><code class="lang-auto"># disable debian default that pulls in recommended packages:
+cd /etc/apt/apt.conf.d
+wget https://raw.githubusercontent.com/torservers/server-config-templates/master/06norecommends</code></pre>
+<p>At the same time, whonixcheck complained about an unexpected timezone setting, and I am unable to correct it. Even after changing the contents of /etc/timezone from UTC to Etc/UTC in both template VMs, the old value is back after a reboot, and whonixcheck complains again.</p>
+<p>Then I noticed that TorBrowser was gone. Whonix offered to re-install it using its TorBrowser-Updater. That was denied by AppArmor, so I disabled it. Now I can use TorBrowser, but whonixcheck keeps complaining about the timezone even after reboots.</p>
+<p>It is possible that AppArmor plays a role in this mess. I had enabled it two days ago, and it generated DENIED entries in the kernel.log of whonix-gw for [tt]/usr/sbin/cpfpd[/tt] not being allowed to read from “/rw/usrlocal/lib/python2.7/dist-packages/”. I would paste the exact warning here, but copy &amp; paste does not work (yes, I tried the three-step dance ctrl-shift-c ctrl-shift-v ctrl-v but the destination clipboard still contained an old value).</p>
+<p>These are my package sources:</p>
+<p><code>
+user@host~$ egrep -rv '^#|^$' /etc/apt/sources.list.d/
+/etc/apt/sources.list.d/debian.list:deb http://security.debian.org jessie/updates main contrib non-free
+/etc/apt/sources.list.d/debian.list:deb http://ftp.us.debian.org/debian jessie main contrib non-free
+/etc/apt/sources.list.d/whonix.list:deb http://mirror.whonix.de/whonixdevelopermetafiles/internal/ testers main
+/etc/apt/sources.list.d/torproject.list:deb http://deb.torproject.org/torproject.org jessie main
+/etc/apt/sources.list.d/qubes-r3.list:deb [arch=amd64] http://deb.qubes-os.org/r3.0/vm jessie main
+</code>[/quote]<br>
+Thanks!</p>
+<p>A lot issues come from the testers repository. I just now updated that repository. Good you’re using <a href="http://mirror.whonix.de/whonixdevelopermetafiles/internal/">http://mirror.whonix.de/whonixdevelopermetafiles/internal/</a> which is updated a bit faster. (More explanation: <a href="https://www.whonix.org/wiki/Whonix-APT-Repository#Repository_Location_URI">https://www.whonix.org/wiki/Whonix-APT-Repository#Repository_Location_URI</a>)</p>
+<p>Please update your TemplateVMs, restart the VM, and see what still applies. In case it hasn’t been addressed yet, in that case just copy and paste what you wrote before.</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/4</link>
+        <pubDate>Wed, 04 Nov 2015 13:17:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1572-4</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572.rss">Whonixcheck keeps complaining about timezone after Debian update</source>
+      </item>
+      <item>
+        <title>Whonixcheck keeps complaining about timezone after Debian update</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>PS: Tor-Browser was not really gone, but the menu (I am using XFCE) was looking in the wrong place: [tt]/home/user/.tb/[/tt]</blockquote>
+Not the wrong place. It's the new place.
+(https://phabricator.whonix.org/T338)
+<blockquote>After allowing Tor-Browser-Updater to do its work, I have three Tor-Browsers lying around: [tt]/usr/bin/torbrowser[/tt], [tt]/home/user/tor-browser_en-US/[/tt] and [tt]/home/user/.tb/tor-browser_en-US/[/tt]. Not ideal.</blockquote>
+/usr/bin/torbrowser is a wrapper to start /home/user/.tb/...
+You can delete /home/user/tor-browser_en-US if applicable or move to /home/user/.tb/tor-browser_en-US.
+          <p><a href="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/3</link>
+        <pubDate>Wed, 04 Nov 2015 13:08:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1572-3</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572.rss">Whonixcheck keeps complaining about timezone after Debian update</source>
+      </item>
+      <item>
+        <title>Whonixcheck keeps complaining about timezone after Debian update</title>
+        <dc:creator><![CDATA[digitalcourage]]></dc:creator>
+        <description><![CDATA[
+            <p>PS: Tor-Browser was not really gone, but the menu (I am using XFCE) was looking in the wrong place: [tt]/home/user/.tb/[/tt]</p>
+<p>After allowing Tor-Browser-Updater to do its work, I have three Tor-Browsers lying around: [tt]/usr/bin/torbrowser[/tt], [tt]/home/user/tor-browser_en-US/[/tt] and [tt]/home/user/.tb/tor-browser_en-US/[/tt]. Not ideal.</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/2</link>
+        <pubDate>Wed, 04 Nov 2015 10:59:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1572-2</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572.rss">Whonixcheck keeps complaining about timezone after Debian update</source>
+      </item>
+      <item>
+        <title>Whonixcheck keeps complaining about timezone after Debian update</title>
+        <dc:creator><![CDATA[digitalcourage]]></dc:creator>
+        <description><![CDATA[
+            <p>I am an experienced Linux developer with some familiarity with Tor. I have tried an older version of Whonix in the past, but I am new to Qubes OS. Last week I installed Qubes OS 3.0 with Whonix templates. Things worked well until I installed security updates in all template VMs.</p>
+<p>First whonixcheck alerted me to the fact that unwanted packages had been pulled in by the updates, namely [tt]ntpdate[/tt] and [tt]chrony[/tt]. So I purged them as recommended by whonixcheck. Bug report: This whonixcheck advice was not Qubes-aware, so it wrongly told me to remove these packages from the AppVM <span class="bbcode-i">dom0 -&gt; Start Menu -&gt; ‘whonix’ -&gt; Konsole</span> instead of the TemplateVMs whonix-ws and whonix-gw.</p>
+<p>In order to avoid pulling in undesired packages, it might be wise to modify the [tt]apt[/tt] configuration as recommended by Zwiebelfreunde for Tor Exit servers &lt;<a href="https://www.torservers.net/wiki/setup/server" data-bbcode="true" rel="nofollow noopener">https://www.torservers.net/wiki/setup/server</a>&gt;:</p>
+<pre><code class="lang-auto"># disable debian default that pulls in recommended packages:
+cd /etc/apt/apt.conf.d
+wget https://raw.githubusercontent.com/torservers/server-config-templates/master/06norecommends</code></pre>
+<p>At the same time, whonixcheck complained about an unexpected timezone setting, and I am unable to correct it. Even after changing the contents of /etc/timezone from UTC to Etc/UTC in both template VMs, the old value is back after a reboot, and whonixcheck complains again.</p>
+<p>Then I noticed that TorBrowser was gone. Whonix offered to re-install it using its TorBrowser-Updater. That was denied by AppArmor, so I disabled it. Now I can use TorBrowser, but whonixcheck keeps complaining about the timezone even after reboots.</p>
+<p>It is possible that AppArmor plays a role in this mess. I had enabled it two days ago, and it generated DENIED entries in the kernel.log of whonix-gw for [tt]/usr/sbin/cpfpd[/tt] not being allowed to read from “/rw/usrlocal/lib/python2.7/dist-packages/”. I would paste the exact warning here, but copy &amp; paste does not work (yes, I tried the three-step dance ctrl-shift-c ctrl-shift-v ctrl-v but the destination clipboard still contained an old value).</p>
+<p>These are my package sources:</p>
+<pre><code class="lang-auto">user@host~$ egrep -rv '^#|^$' /etc/apt/sources.list.d/
+/etc/apt/sources.list.d/debian.list:deb http://security.debian.org jessie/updates main contrib non-free
+/etc/apt/sources.list.d/debian.list:deb http://ftp.us.debian.org/debian jessie main contrib non-free
+/etc/apt/sources.list.d/whonix.list:deb http://mirror.whonix.de/whonixdevelopermetafiles/internal/ testers main
+/etc/apt/sources.list.d/torproject.list:deb http://deb.torproject.org/torproject.org jessie main
+/etc/apt/sources.list.d/qubes-r3.list:deb [arch=amd64] http://deb.qubes-os.org/r3.0/vm jessie main</code></pre>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572/1</link>
+        <pubDate>Wed, 04 Nov 2015 10:03:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1572-1</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-keeps-complaining-about-timezone-after-debian-update/1572.rss">Whonixcheck keeps complaining about timezone after Debian update</source>
+      </item>
+  </channel>
+</rss>

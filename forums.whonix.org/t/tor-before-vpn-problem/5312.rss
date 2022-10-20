@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Tor before VPN problem</title>
+    <link>http://forums.whonix.org/t/tor-before-vpn-problem/5312</link>
+    <description>1. Added another Whonix-Workstation, with a new MAC created by VirtualBox, and 10.152.152.12 set in /etc/network/interfaces.d/30_non-qubes-whonix
+
+2. Used Tor Browser Downloader, everything works well.
+
+3. Ran sudo apt-get update &amp;&amp; sudo apt-get dist-upgrade. Everything is good.
+
+4. D/L VPN specific files from my VPN provider. Copied them to /etc/openvpn
+
+5, Followed the instructions in https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN carefully, step by step
+
+6. Once done and I ran 
+
+&gt;sudo service openvpn@openvpn start
+
+I get no error messages.
+
+When I run
+
+&gt;sudo service openvpn@openvpn status
+
+Initially everything looks good. Active: active (running) in green. And all the messages seem positive.
+However there is no connection. When I repeat (after say 10 seconds)
+
+&gt;sudo service openvpn@openvpn status
+
+I get &quot;Active: failed&quot; in red, with the error:
+
+&gt; host ovpn-openvpn[24580]: WARNING: Failed running command (--up/--down): external program exited with error status: 2
+
+When I try to debug start on the command line as in the instructions, a long sequence of positive messages finally ends with:
+
+&gt;sbin/resolvconf: 159: / sbin/resolvconf: cannot create tun0.openvpn_new.27993: permission denied
+&gt;WARNING: Failed running command (--up/--down): external program exited with error status: 2
+
+I tried to look in the toubleshooting section, I do use tun0 and not tun</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 13 Aug 2018 03:53:14 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/tor-before-vpn-problem/5312.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Tor before VPN problem</title>
+        <dc:creator><![CDATA[Henry]]></dc:creator>
+        <description><![CDATA[
+            <p>I see. So I’ll have to duplicate the VM first / create a snapshot or start from fresh. Will wait till I have some spare time.</p>
+<p>Regarding ping in my initial posts, I wasn’t trying to ping the Gateway, I was pinging other sites from the Workstation. That works nicely when the Tor before VPN setup is done.</p>
+          <p><a href="http://forums.whonix.org/t/tor-before-vpn-problem/5312/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-before-vpn-problem/5312/8</link>
+        <pubDate>Mon, 13 Aug 2018 03:53:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5312-8</guid>
+        <source url="http://forums.whonix.org/t/tor-before-vpn-problem/5312.rss">Tor before VPN problem</source>
+      </item>
+      <item>
+        <title>Tor before VPN problem</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Could be, could not be.</p>
+<p>ping btw:<br>
+<a href="https://www.whonix.org/wiki/FAQ#Why_can.27t_I_Ping_the_Whonix-Gateway.3F">https://www.whonix.org/wiki/FAQ#Why_can.27t_I_Ping_the_Whonix-Gateway.3F</a></p>
+          <p><a href="http://forums.whonix.org/t/tor-before-vpn-problem/5312/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-before-vpn-problem/5312/7</link>
+        <pubDate>Sun, 12 Aug 2018 18:40:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5312-7</guid>
+        <source url="http://forums.whonix.org/t/tor-before-vpn-problem/5312.rss">Tor before VPN problem</source>
+      </item>
+      <item>
+        <title>Tor before VPN problem</title>
+        <dc:creator><![CDATA[Henry]]></dc:creator>
+        <description><![CDATA[
+            <p>Follow up on the above (which has been working smoothly since my last post).</p>
+<p>If I upgrade from Whonix 13 to Whonix 14 using the instructions in <a href="https://www.whonix.org/wiki/Upgrading_Whonix_13_to_Whonix_14" rel="nofollow noopener">https://www.whonix.org/wiki/Upgrading_Whonix_13_to_Whonix_14</a>, can it break the setup of Tor before VPN?</p>
+          <p><a href="http://forums.whonix.org/t/tor-before-vpn-problem/5312/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-before-vpn-problem/5312/6</link>
+        <pubDate>Sun, 12 Aug 2018 17:30:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5312-6</guid>
+        <source url="http://forums.whonix.org/t/tor-before-vpn-problem/5312.rss">Tor before VPN problem</source>
+      </item>
+      <item>
+        <title>Tor before VPN problem</title>
+        <dc:creator><![CDATA[Henry]]></dc:creator>
+        <description><![CDATA[
+            <p>I think I solved it.</p>
+<p>I previously skipped the section of “Prevent Bypassing of the Tunnel-Link” (I thought it’s optional), so ping and nslookup and traceroute worked but curl and wget and tor browser didn’t.</p>
+<p>So I deactivate the uwt wrappers with</p>
+<blockquote>
+<p>uwrtwrapper_global=“0”</p>
+</blockquote>
+<p>in /etc/uwt.d/50_user.conf</p>
+<p>and set</p>
+<blockquote>
+<p>TOR_TRANSPROXY=1</p>
+</blockquote>
+<p>in /etc/enviornment</p>
+<p>and</p>
+<blockquote>
+<p>TB_NO_TOR_CON_CHECK=1<br>
+CURL_PROXY="–fail"</p>
+</blockquote>
+<p>in /etc/torbrowser.d/50_user.conf</p>
+<p>Then, I restarted the machine and… nothing worked! not even ping…</p>
+<p>I then noticed the permissions I set before in /usr/lib/tmpfiles.d/50_openvpn_unpriv.conf were wrong. I used 755 instead of 775 in one of the lines. I fixed it, restarted the service and things seem to work, including tor browser.</p>
+<p>Hope it stays that way!</p>
+          <p><a href="http://forums.whonix.org/t/tor-before-vpn-problem/5312/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-before-vpn-problem/5312/5</link>
+        <pubDate>Sat, 09 Jun 2018 14:29:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5312-5</guid>
+        <source url="http://forums.whonix.org/t/tor-before-vpn-problem/5312.rss">Tor before VPN problem</source>
+      </item>
+      <item>
+        <title>Tor before VPN problem</title>
+        <dc:creator><![CDATA[Henry]]></dc:creator>
+        <description><![CDATA[
+            <p>I now noticed I had an extra line in the /etc/sudoers.d/tunnel-unpriv file, between</p>
+<blockquote>
+<p>tunnel ALL=(ALL) NOPASSWD: /bin/ip<br>
+tunnel ALL=(ALL) NOPASSWD: /usr/sbin/openvpn *<br>
+Defaults:tunnel !requiretty</p>
+</blockquote>
+<p>and</p>
+<blockquote>
+<p>Defaults:tunnel env_keep += script_type<br>
+Defaults:tunnel env_keep += dev</p>
+</blockquote>
+<p>I removed that line, and I now get good results while running</p>
+<blockquote>
+<p>sudo service openvpn@openvpn status</p>
+</blockquote>
+<p>I also manage to get results for ping and nslookup.</p>
+<p>However when I run something like</p>
+<blockquote>
+<p>curl <a href="http://check.torproject.org" rel="nofollow noopener">check.torproject.org</a></p>
+</blockquote>
+<p>or</p>
+<blockquote>
+<p>curl <a href="http://example.com/" rel="nofollow noopener">http://example.com/</a></p>
+</blockquote>
+<p>or any other site, it just freezes.</p>
+<p>Also, nothing gets loaded with Tor Browser.</p>
+<p>When I debug again, I get:</p>
+<blockquote>
+<p>/etc/resolvconf/update.d/libc: 133: /etc/resolvconf/update.d/libc: cannot create /etc/resolvconf/run/resolv.conf_new.4036: Permission denied<br>
+run-parts: /etc/resolvconf/update.d/libc exited with return code 2<br>
+WARNING: Failed running command (–up/–down): external program exited with error status: 1<br>
+Exiting due to fatal error</p>
+</blockquote>
+<p>I now changed ownership and permissions, output of ls is now:</p>
+<blockquote>
+<p>ls -al /run/resolvconf</p>
+</blockquote>
+<blockquote>
+<p>drwxrwxr-x  3 root   tunnel 100 Jun  8 21:17 .<br>
+drwxr-xr-x 31 root   root   840 Jun  8 21:04 …<br>
+-rwxrwxr-x  1 root   tunnel   0 Jun  8 21:02 enable-updates<br>
+drwxrwxr-x  2 root   tunnel  60 Jun  8 21:17 interface<br>
+-rw-r–r--  1 tunnel tunnel 171 Jun  8 21:17 resolv.conf</p>
+</blockquote>
+<p>I noticed resolv.conf was</p>
+<blockquote>
+<p>-rwxrwxr-x  1 root tunnel 151 Jun  8 21:02 resolv.conf</p>
+</blockquote>
+<p>but when I restart the openvpn@openvpn service again, it changes back to:</p>
+<blockquote>
+<p>-rw-r–r--  1 tunnel tunnel 171 Jun  8 21:17 resolv.conf</p>
+</blockquote>
+<hr>
+<p>After the changes in permissions / ownership, I debug again, and the only error I get it:</p>
+<blockquote>
+<p>Note: Cannot set tx queue length on tun0: Operation not permitted (errno=1)</p>
+</blockquote>
+<p>But it runs until</p>
+<blockquote>
+<p>Initialization Sequence Completed</p>
+</blockquote>
+<p>Doesn’t exit for some reason. When I break it, no connection to any site again.</p>
+          <p><a href="http://forums.whonix.org/t/tor-before-vpn-problem/5312/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-before-vpn-problem/5312/4</link>
+        <pubDate>Sat, 09 Jun 2018 11:20:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5312-4</guid>
+        <source url="http://forums.whonix.org/t/tor-before-vpn-problem/5312.rss">Tor before VPN problem</source>
+      </item>
+      <item>
+        <title>Tor before VPN problem</title>
+        <dc:creator><![CDATA[Henry]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi 0brand,</p>
+<p>Thank you for your quick reply. Please see below:</p>
+<blockquote>
+<p>user@host:/etc/openvpn$ ls -al /run/resolvconf<br>
+total 4<br>
+drwxr-xr-x  3 root tunnel 100 Jun  8 19:42 .<br>
+drwxr-xr-x 31 root root   840 Jun  8 19:40 …<br>
+-rw-r–r--  1 root root     0 Jun  8 19:42 enable-updates<br>
+drwxrwxr-x  2 root tunnel  60 Jun  8 20:00 interface<br>
+-rw-r–r--  1 root root   171 Jun  8 19:42 resolv.conf</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/tor-before-vpn-problem/5312/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-before-vpn-problem/5312/3</link>
+        <pubDate>Sat, 09 Jun 2018 10:53:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5312-3</guid>
+        <source url="http://forums.whonix.org/t/tor-before-vpn-problem/5312.rss">Tor before VPN problem</source>
+      </item>
+      <item>
+        <title>Tor before VPN problem</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi Henry,</p>
+<p>Sorry your having trouble with your VPN configuration.</p>
+<p>Could you please run the following command and post the output.</p>
+<p><code>ls -al /run/resolvconf</code></p>
+          <p><a href="http://forums.whonix.org/t/tor-before-vpn-problem/5312/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-before-vpn-problem/5312/2</link>
+        <pubDate>Sat, 09 Jun 2018 10:19:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5312-2</guid>
+        <source url="http://forums.whonix.org/t/tor-before-vpn-problem/5312.rss">Tor before VPN problem</source>
+      </item>
+      <item>
+        <title>Tor before VPN problem</title>
+        <dc:creator><![CDATA[Henry]]></dc:creator>
+        <description><![CDATA[
+            <ol>
+<li>
+<p>Added another Whonix-Workstation, with a new MAC created by VirtualBox, and 10.152.152.12 set in /etc/network/interfaces.d/30_non-qubes-whonix</p>
+</li>
+<li>
+<p>Used Tor Browser Downloader, everything works well.</p>
+</li>
+<li>
+<p>Ran sudo apt-get update &amp;&amp; sudo apt-get dist-upgrade. Everything is good.</p>
+</li>
+<li>
+<p>D/L VPN specific files from my VPN provider. Copied them to /etc/openvpn</p>
+</li>
+</ol>
+<p>5, Followed the instructions in <a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN" rel="nofollow noopener">https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN</a> carefully, step by step</p>
+<ol start="6">
+<li>Once done and I ran</li>
+</ol>
+<blockquote>
+<p>sudo service openvpn@openvpn start</p>
+</blockquote>
+<p>I get no error messages.</p>
+<p>When I run</p>
+<blockquote>
+<p>sudo service openvpn@openvpn status</p>
+</blockquote>
+<p>Initially everything looks good. Active: active (running) in green. And all the messages seem positive.<br>
+However there is no connection. When I repeat (after say 10 seconds)</p>
+<blockquote>
+<p>sudo service openvpn@openvpn status</p>
+</blockquote>
+<p>I get “Active: failed” in red, with the error:</p>
+<blockquote>
+<p>host ovpn-openvpn[24580]: WARNING: Failed running command (–up/–down): external program exited with error status: 2</p>
+</blockquote>
+<p>When I try to debug start on the command line as in the instructions, a long sequence of positive messages finally ends with:</p>
+<blockquote>
+<p>sbin/resolvconf: 159: / sbin/resolvconf: cannot create tun0.openvpn_new.27993: permission denied<br>
+WARNING: Failed running command (–up/–down): external program exited with error status: 2</p>
+</blockquote>
+<p>I tried to look in the toubleshooting section, I do use tun0 and not tun</p>
+          <p><a href="http://forums.whonix.org/t/tor-before-vpn-problem/5312/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-before-vpn-problem/5312/1</link>
+        <pubDate>Sat, 09 Jun 2018 09:35:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5312-1</guid>
+        <source url="http://forums.whonix.org/t/tor-before-vpn-problem/5312.rss">Tor before VPN problem</source>
+      </item>
+  </channel>
+</rss>

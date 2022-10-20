@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Apt-get update fails on Whonix Gateway - Should I be worried?</title>
+    <link>http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745</link>
+    <description>I&#39;m using whonix 9, I always run whonixcheck once a day and today I got this error:
+
+W: Failed to fetch http://ftp.us.debian.org/debian/dist/wheezy/contrib/binary-i386/Packages 404 Not Found
+
+W: Failed to fetch http://ftp.us.debian.org/debian/dist/wheezy/non-free/binary-i386/Packages 404 Not Found
+
+E: Some index files failed to download. They have been ignored, or old ones used instead.
+
+
+Now, i&#39;m not an expert about linux, should I be worried? Do you suggest to wait until it&#39;s fixed this problem or can I use Whonix Gateway anyway?
+
+Thank You!</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 13 Dec 2014 17:40:19 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Apt-get update fails on Whonix Gateway - Should I be worried?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I am not recalling anyone having posted this until here.</p>
+<p>If it’s a gateway, getting a new one would be simplest. (No need to eventually backup data from a workstation in comparison.)</p>
+<p>Otherwise you might be able to fix this by going through the usual apt troubleshooting instructions. (As per <a href="https://www.whonix.org/wiki/About#Based_on_Debian.)">https://www.whonix.org/wiki/About#Based_on_Debian.)</a></p>
+          <p><a href="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/8</link>
+        <pubDate>Sat, 13 Dec 2014 17:40:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-745-8</guid>
+        <source url="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745.rss">Apt-get update fails on Whonix Gateway - Should I be worried?</source>
+      </item>
+      <item>
+        <title>Apt-get update fails on Whonix Gateway - Should I be worried?</title>
+        <dc:creator><![CDATA[user7985495]]></dc:creator>
+        <description><![CDATA[
+            <p>still same problems here, anyway with apt-get upgrade I managed to keep updated some packages anyway.</p>
+<p>Do you think that completely destroy/erase this gateway and installing a new one can solve this?</p>
+<p>Anyone have the same problem here? I’m running the gateway with virtualbox installed on a linux distro, debian based… maybe this can help you to understand the reason of this error</p>
+          <p><a href="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/7</link>
+        <pubDate>Sat, 13 Dec 2014 17:34:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-745-7</guid>
+        <source url="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745.rss">Apt-get update fails on Whonix Gateway - Should I be worried?</source>
+      </item>
+      <item>
+        <title>Apt-get update fails on Whonix Gateway - Should I be worried?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“JasonJAyalaP, post:5, topic:745”]<a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a><br>
+I’m wondering why whonixcheck would be looking at /dist/ if debian has it named /dists/. Try it. Copy and paste it in your browser.[/quote]<br>
+whonixcheck doesn’t do anything related to /dist /dists/. It just runs apt-get and parses its output. Code:<br>
+</p><aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonixcheck/blob/Whonix9/usr/lib/whonixcheck/check_operating_system" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonixcheck/blob/Whonix9/usr/lib/whonixcheck/check_operating_system" target="_blank" rel="nofollow noopener">Whonix/whonixcheck/blob/Whonix9/usr/lib/whonixcheck/check_operating_system</a></h4>
+<pre><code class="lang-">#!/bin/bash
+
+## This file is part of Whonix.
+## Copyright (C) 2012 - 2014 Patrick Schleizer &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+check_operating_system() {
+   trap "error_handler" ERR
+
+   ## Running apt-get update as user (non-root).
+   ## Depends on exception set in /etc/sudoers.d/.
+   ## Minimal custom script.
+   local MSG="Debian Package Update Check: Checking for software updates via apt-get..."
+   $output ${output_opts[@]} --messagecli --typecli "info" --titlecli "$TITLE" --message "$MSG"
+   local apt_get_exit_code
+   apt_get_exit_code="0"
+   sudo "/usr/lib/apt-get-update" &gt;/dev/null &amp;
+   apt_get_update_pid="$!"
+   wait "$apt_get_update_pid" || { apt_get_exit_code="$?" ; true; };
+   unset apt_get_update_pid
+</code></pre>
+
+  This file has been truncated. <a href="https://github.com/Whonix/whonixcheck/blob/Whonix9/usr/lib/whonixcheck/check_operating_system" target="_blank" rel="nofollow noopener">show original</a>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/6</link>
+        <pubDate>Thu, 11 Dec 2014 18:22:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-745-6</guid>
+        <source url="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745.rss">Apt-get update fails on Whonix Gateway - Should I be worried?</source>
+      </item>
+      <item>
+        <title>Apt-get update fails on Whonix Gateway - Should I be worried?</title>
+        <dc:creator><![CDATA[JasonJAyalaP]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a><br>
+I’m wondering why whonixcheck would be looking at /dist/ if debian has it named /dists/. Try it. Copy and paste it in your browser.</p>
+          <p><a href="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/5</link>
+        <pubDate>Thu, 11 Dec 2014 18:02:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-745-5</guid>
+        <source url="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745.rss">Apt-get update fails on Whonix Gateway - Should I be worried?</source>
+      </item>
+      <item>
+        <title>Apt-get update fails on Whonix Gateway - Should I be worried?</title>
+        <dc:creator><![CDATA[user7985495]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:3, topic:745”]<a class="mention" href="http://forums.whonix.org/u/user7985495">@user7985495</a>:<br>
+Just now documentation on how to handle such cases has been updated:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Security_Guide#Updates" target="_blank" rel="nofollow noopener" title="03:23AM - 18 June 2019">Whonix – 18 Jun 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/426;"><img src="https://www.whonix.org/w/images/1/19/Padlock-597495-640.jpg" class="thumbnail" width="640" height="426"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Security_Guide#Updates" target="_blank" rel="nofollow noopener">Security Guide - Whonix</a></h3>
+
+<p>THIS WIKI PAGE IS DEPRECATED AND OUTDATED. PLEASE REFER TO THE BASIC SECURITY GUIDE SECTION - https://www.whonix.org/wiki/Documentation</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+Please check and tell us if that solved your issue.[/quote]
+<p>I’ve tried whonixcheck, of course same problem.</p>
+<p>I’ve tried sudo service tor restart too. Same problem.</p>
+<p>I’ve tried also this:</p>
+<p>[code]tor-ctrl -a /var/run/tor/control.authcookie -P 9051 -c “signal newnym”</p>
+<p>[/code]</p>
+<p>Now I get this error:</p>
+<p>W: Failed to fetch <a href="http://ftp.us.debian.org/debian/dist/wheezy/contrib/binary-i386/Packages" rel="nofollow noopener">http://ftp.us.debian.org/debian/dist/wheezy/contrib/binary-i386/Packages</a> Bad header line</p>
+<p>W: Failed to fetch <a href="http://ftp.us.debian.org/debian/dist/wheezy/non-free/binary-i386/Packages" rel="nofollow noopener">http://ftp.us.debian.org/debian/dist/wheezy/non-free/binary-i386/Packages</a> Bad header line</p>
+<p>W: Failed to fetch <a href="http://ftp.us.debian.org/debian/dist/wheezy/contrib/i18n/Translation-en" rel="nofollow noopener">http://ftp.us.debian.org/debian/dist/wheezy/contrib/i18n/Translation-en</a> Bad header line</p>
+<p>W: Failed to fetch <a href="http://ftp.us.debian.org/debian/dist/wheezy/non-free/i18n/Translation-en" rel="nofollow noopener">http://ftp.us.debian.org/debian/dist/wheezy/non-free/i18n/Translation-en</a> Bad header line</p>
+          <p><a href="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/4</link>
+        <pubDate>Thu, 11 Dec 2014 16:20:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-745-4</guid>
+        <source url="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745.rss">Apt-get update fails on Whonix Gateway - Should I be worried?</source>
+      </item>
+      <item>
+        <title>Apt-get update fails on Whonix Gateway - Should I be worried?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/jasonjayalap">@JasonJAyalaP</a><br>
+Dunno about dist vs dists.</p>
+<p><a class="mention" href="http://forums.whonix.org/u/user7985495">@user7985495</a>:<br>
+Just now documentation on how to handle such cases has been updated:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Security_Guide#Updates" target="_blank" title="03:23AM - 18 June 2019">Whonix – 18 Jun 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/426;"><img src="https://www.whonix.org/w/images/1/19/Padlock-597495-640.jpg" class="thumbnail" width="640" height="426"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Security_Guide#Updates" target="_blank">Security Guide - Whonix</a></h3>
+
+<p>THIS WIKI PAGE IS DEPRECATED AND OUTDATED. PLEASE REFER TO THE BASIC SECURITY GUIDE SECTION - https://www.whonix.org/wiki/Documentation</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+Please check and tell us if that solved your issue.
+          <p><a href="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/3</link>
+        <pubDate>Wed, 10 Dec 2014 22:03:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-745-3</guid>
+        <source url="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745.rss">Apt-get update fails on Whonix Gateway - Should I be worried?</source>
+      </item>
+      <item>
+        <title>Apt-get update fails on Whonix Gateway - Should I be worried?</title>
+        <dc:creator><![CDATA[JasonJAyalaP]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/user7985495">@user7985495</a><br>
+The error is not suggestive of any particular security problem, but should be cleared up soon (you normally want updates!).</p>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a><br>
+Er. Shouldn’t it be “/dists/” and not /dist/ ? Did debian just change that?</p>
+          <p><a href="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/2</link>
+        <pubDate>Wed, 10 Dec 2014 20:12:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-745-2</guid>
+        <source url="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745.rss">Apt-get update fails on Whonix Gateway - Should I be worried?</source>
+      </item>
+      <item>
+        <title>Apt-get update fails on Whonix Gateway - Should I be worried?</title>
+        <dc:creator><![CDATA[user7985495]]></dc:creator>
+        <description><![CDATA[
+            <p>I’m using whonix 9, I always run whonixcheck once a day and today I got this error:</p>
+<p>W: Failed to fetch <a href="http://ftp.us.debian.org/debian/dist/wheezy/contrib/binary-i386/Packages" rel="nofollow noopener">http://ftp.us.debian.org/debian/dist/wheezy/contrib/binary-i386/Packages</a> 404 Not Found</p>
+<p>W: Failed to fetch <a href="http://ftp.us.debian.org/debian/dist/wheezy/non-free/binary-i386/Packages" rel="nofollow noopener">http://ftp.us.debian.org/debian/dist/wheezy/non-free/binary-i386/Packages</a> 404 Not Found</p>
+<p>E: Some index files failed to download. They have been ignored, or old ones used instead.</p>
+<p>Now, i’m not an expert about linux, should I be worried? Do you suggest to wait until it’s fixed this problem or can I use Whonix Gateway anyway?</p>
+<p>Thank You!</p>
+          <p><a href="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745/1</link>
+        <pubDate>Wed, 10 Dec 2014 16:25:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-745-1</guid>
+        <source url="http://forums.whonix.org/t/apt-get-update-fails-on-whonix-gateway-should-i-be-worried/745.rss">Apt-get update fails on Whonix Gateway - Should I be worried?</source>
+      </item>
+  </channel>
+</rss>

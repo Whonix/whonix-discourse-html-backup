@@ -1,0 +1,1326 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+    <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008</link>
+    <description>We&#39;re currently working on a full system apparmor policy to confine all userspace processes but this has 2 issues:
+
+1) It doesn&#39;t use more restrictive profiles for user applications. A PDF viewer shouldn&#39;t have the same profile as init.
+
+2) It can&#39;t make use of technologies like namespaces and seccomp. Seccomp especially is *vital* for kernel attack surface reduction.
+
+We should automatically sandbox user applications for better confinement with more restrictive rules.
+
+I think we should create a &quot;Whonix app launcher&quot; which sets up a restrictive sandbox. It should:
+
+* Use different users for each applications. This ensures apps can&#39;t access each other&#39;s data.
+
+* Be confined by a far more restrictive apparmor profile.
+
+* Use namespaces and seccomp (preferably via bubblewrap).
+
+* Not break too many legitimate usecases.
+
+I&#39;ve created a non-working draft to do this.
+
+Main script: https://paste.debian.net/hidden/6838a50f/
+
+Apparmor profile: https://paste.debian.net/hidden/73be65d3/
+
+Config file: https://paste.debian.net/hidden/f0606f29/
+
+I&#39;m not sure how we&#39;re going to choose which apps to sandbox. Maybe via packages&#39; `Section:`?
+
+Mobile OSes take a similar approach which we can use for inspiration:
+
+https://source.android.com/security/app-sandbox
+
+ https://www.apple.com/ca/business/docs/site/iOS_Security_Guide.pdf
+
+ https://developer.mozilla.org/en-US/docs/Archive/B2G_OS/Security/System_security (now defunct)
+
+Edit by Patrick:
+
+https://www.whonix.org/wiki/Sandbox-app-launcher
+
+https://github.com/Whonix/sandbox-app-launcher/</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 02 Sep 2022 20:38:41 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[fusion82409475]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello.<br>
+I can’t start applications via “sandbox-app-launcher start”. The terminal gives the following output: “bwrap: Can’t find source path /sys/devices: Permission denied”.<br>
+And it works with any application. Previously used the command “sudo sandbox-app-launcher setup”, which completed successfully.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/374">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/374</link>
+        <pubDate>Fri, 02 Sep 2022 20:38:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-374</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Better but still lots of things broken.</p>
+<pre><code>sandbox-app-launcher start env
+</code></pre>
+<blockquote>
+<p>/etc/X11/Xsession.d/20torbrowser: line 19: /usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh: Permission denied<br>
+/etc/X11/Xsession.d/20uwt: line 14: /usr/libexec/uwt/uwt.sh: Permission denied<br>
+/etc/X11/Xsession.d/20whonix: line 7: /usr/libexec/whonix-base-files/whonix.sh: Permission denied<br>
+/etc/X11/Xsession.d/20whonix-welcome-page: line 7: /usr/libexec/whonix-welcome-page/env_var.sh: Permission denied<br>
+/etc/X11/Xsession.d/50default_editor: line 7: /usr/libexec/default-editor/default_editor.sh: Permission denied<br>
+/etc/X11/Xsession.d/50tb_default_browser: line 7: /usr/libexec/tb-default-browser/tb_default_browser.sh: Permission denied</p>
+</blockquote>
+<p>I don’t think I’ll be working on sandbox-app-launcher soon. Help welcome!</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/373">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/373</link>
+        <pubDate>Sun, 24 Jul 2022 21:30:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-373</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I will add:<br>
+<code>--ro-bind-try /usr/libexec /usr/libexec</code></p>
+<p>Otherwise <code>/etc/X11/Xsession.d/20torbrowser</code> cannot see <code>/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh</code> which then breaks Tor Browser.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/372">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/372</link>
+        <pubDate>Sun, 24 Jul 2022 21:26:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-372</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <pre><code class="lang-auto">  10&lt; &lt;(getent passwd root ${app_user} nobody) \
+  11&lt; &lt;(getent group root ${app_user} nobody) \
+</code></pre>
+<p>Due to <a href="https://forums.whonix.org/t/delete-disable-nobody-user-from-whonix-passwd/14085" class="inline-onebox">Delete/Disable nobody user from whonix passwd</a> I’ll remove <code>nobody</code>.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/371">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/371</link>
+        <pubDate>Sun, 24 Jul 2022 18:05:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-371</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>Its whonix qubes default no changes:</p>
+<pre><code class="lang-auto">user@host:~$ ls -la /home
+total 12
+drwxr-xr-x  3 root root 4096 Sep 15  2021 .
+drwxr-xr-x 20 root root 4096 Jul 14 14:10 ..
+drwx------ 20 user user 4096 Jul  9 09:40 user
+user@host:~$
+</code></pre>
+<p>Patrick via Whonix Forum:</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/370">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/370</link>
+        <pubDate>Sun, 24 Jul 2022 17:15:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-370</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Does folder <code>/home</code> exist in that VM? To check:</p>
+<pre><code>ls -la /home</code></pre>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/369">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/369</link>
+        <pubDate>Sun, 24 Jul 2022 17:00:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-369</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox allowlistedgeneric" data-onebox-src="https://www.kicksecure.com/wiki/Sandbox-app-launcher">
+  <header class="source">
+      <img src="https://www.kicksecure.com/w/images/4/45/Kicksecure-home-favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://www.kicksecure.com/wiki/Sandbox-app-launcher" target="_blank" rel="noopener nofollow ugc" title="01:55PM - 21 May 2022">Kicksecure – 21 May 22</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/360;"><img src="https://www.kicksecure.com/w/images/6/60/Sandboxing123123.png" class="thumbnail" width="640" height="360"></div>
+
+<h3><a href="https://www.kicksecure.com/wiki/Sandbox-app-launcher" target="_blank" rel="noopener nofollow ugc">sandbox-app-launcher - Sandboxed Application Launcher</a></h3>
+
+  <p>sandbox-app-launcher is an application launcher that starts each app inside its own restrictive sandbox. It runs each app as its own user, in a bubblewrap sandbox and confined by AppArmor.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Still has TODO not yet written, produce errors:</p>
+<pre><code class="lang-auto">root@host:~# sandbox-app-launcher setup torbrowser
+ERROR: Directory '/home/sandbox-app-launcher-appdata' does not exist. This package was not installed properly.
+root@host:~# apt install sandbox-app-launcher-appdata
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+E: Unable to locate package sandbox-app-launcher-appdata
+root@host:~#
+</code></pre>
+<pre><code class="lang-auto">root@host:~# sandbox-app-launcher setup torbrowser
+ERROR: File '/usr/share/sandbox-app-launcher/wrapper-script-wx-wx' does not exist. This package was not installed properly.
+</code></pre>
+<pre><code class="lang-auto">root@host:~# DEBDEBUG=1 apt install --reinstall sandbox-app-launcher
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+0 upgraded, 0 newly installed, 1 reinstalled, 0 to remove and 0 not upgraded.
+Need to get 37.3 kB of archives.
+After this operation, 0 B of additional disk space will be used.
+Get:1 tor+https://deb.whonix.org bullseye-testers/main amd64 sandbox-app-launcher all 0:5.3-1 [37.3 kB]
+Fetched 37.3 kB in 1s (27.2 kB/s)         
+(Reading database ... 58705 files and directories currently installed.)
+Preparing to unpack .../sandbox-app-launcher_0%3a5.3-1_all.deb ...
+Unpacking sandbox-app-launcher (5.3-1) over (5.3-1) ...
+++ '[' '' = true ']'
+++ colors
+++ '[' xterm-256color = '' ']'
+++ [[ -t 2 ]]
++++ type -t errorhandlergeneral
+++ '[' '' = function ']'
++++ trap -p ERR
+++ '[' '' = '' ']'
+++ trap error_handler_pre ERR
+++ bash -n /usr/libexec/helper-scripts/pre.bsh
+++ bash -n /var/lib/dpkg/info/sandbox-app-launcher.postrm
+++ own_filename=sandbox-app-launcher.postrm
+++ source_config_folder
+++ '[' sandbox-app-launcher = '' ']'
+++ pre_bsh_settings_folder=sandbox-app-launcher_maint.d
+++ shopt -s nullglob
+++ local i
+++ true 'folder 1: /etc/sandbox-app-launcher_maint.d/*.conf'
+++ true 'folder 2: /usr/local/etc/sandbox-app-launcher_maint.d/*.conf'
+++ shopt -u nullglob
+++ check_scripts_to_skip
+++ local skip_script
++ set -e
++ true '
+#####################################################################
+## INFO: BEGIN: sandbox-app-launcher postrm upgrade' '5.3-1
+#####################################################################
+'
++ rm -rf /var/cache/sandbox-app-launcher-autogenerated
++ getent passwd
++ grep -q sal-
++ true 'INFO: debhelper beginning here.'
++ '[' upgrade = purge ']'
++ true 'INFO: Done with debhelper.'
++ true '
+#####################################################################
+## INFO: END  : sandbox-app-launcher postrm upgrade' '5.3-1
+#####################################################################
+'
++ exit 0
+Setting up sandbox-app-launcher (5.3-1) ...
+++ '[' '' = true ']'
+++ colors
+++ '[' xterm-256color = '' ']'
+++ [[ -t 2 ]]
++++ type -t errorhandlergeneral
+++ '[' '' = function ']'
++++ trap -p ERR
+++ '[' '' = '' ']'
+++ trap error_handler_pre ERR
+++ bash -n /usr/libexec/helper-scripts/pre.bsh
+++ bash -n /var/lib/dpkg/info/sandbox-app-launcher.postinst
+++ own_filename=sandbox-app-launcher.postinst
+++ source_config_folder
+++ '[' sandbox-app-launcher = '' ']'
+++ pre_bsh_settings_folder=sandbox-app-launcher_maint.d
+++ shopt -s nullglob
+++ local i
+++ true 'folder 1: /etc/sandbox-app-launcher_maint.d/*.conf'
+++ true 'folder 2: /usr/local/etc/sandbox-app-launcher_maint.d/*.conf'
+++ shopt -u nullglob
+++ check_scripts_to_skip
+++ local skip_script
++ set -e
++ true '
+#####################################################################
+## INFO: BEGIN: sandbox-app-launcher postinst configure' '5.3-1
+#####################################################################
+'
++ main_app_dir=/usr/share/sandbox-app-launcher
++ auto_dir=/var/cache/sandbox-app-launcher-autogenerated
++ appdata_dir=/home/sandbox-app-launcher-appdata
++ shared_dir=/home/sandbox-app-launcher-appdata/shared
++ wrapper_script=/usr/share/sandbox-app-launcher/wrapper-script
++ for dir in "${main_app_dir}" "${auto_dir}" "${appdata_dir}"
++ '[' -d /usr/share/sandbox-app-launcher ']'
++ for dir in "${main_app_dir}" "${auto_dir}" "${appdata_dir}"
++ '[' -d /var/cache/sandbox-app-launcher-autogenerated ']'
++ mkdir -m 755 /var/cache/sandbox-app-launcher-autogenerated
++ for dir in "${main_app_dir}" "${auto_dir}" "${appdata_dir}"
++ '[' -d /home/sandbox-app-launcher-appdata ']'
++ mkdir -m 755 /home/sandbox-app-launcher-appdata
++ '[' -d /home/sandbox-app-launcher-appdata/shared ']'
++ mkdir -m 1777 /home/sandbox-app-launcher-appdata/shared
++ cp /usr/share/sandbox-app-launcher/wrapper-script /usr/share/sandbox-app-launc
+her/wrapper-script-wx
++ compiler_flags='-lseccomp -ldl -D_GNU_SOURCE -Wdate-time -D_FORTIFY_SOURCE=2 -
+g -O2 -fstack-protector-all -Wformat -Werror=format-security -Wl,-z,relro -Wl,-z
+,now'
++ /usr/share/sandbox-app-launcher/autogen-seccomp /usr/share/sandbox-app-launche
+r/seccomp-whitelist
++ /usr/share/sandbox-app-launcher/autogen-seccomp /usr/share/sandbox-app-launche
+r/seccomp-whitelist-wx
++ LANG=C
++ str_replace seccomp-filter.bpf seccomp-filter-wx.bpf /var/cache/sandbox-app-la
+uncher-autogenerated/seccomp-wx.c
++ gcc /var/cache/sandbox-app-launcher-autogenerated/seccomp.c -o /var/cache/sand
+box-app-launcher-autogenerated/seccomp -lseccomp -ldl -D_GNU_SOURCE -Wdate-time 
+-D_FORTIFY_SOURCE=2 -g -O2 -fstack-protector-all -Wformat -Werror=format-securit
+y -Wl,-z,relro -Wl,-z,now
++ gcc /var/cache/sandbox-app-launcher-autogenerated/seccomp-wx.c -o /var/cache/s
+andbox-app-launcher-autogenerated/seccomp-wx -lseccomp -ldl -D_GNU_SOURCE -Wdate
+-time -D_FORTIFY_SOURCE=2 -g -O2 -fstack-protector-all -Wformat -Werror=format-s
+ecurity -Wl,-z,relro -Wl,-z,now
++ chmod 700 /var/cache/sandbox-app-launcher-autogenerated/seccomp /var/cache/san
+dbox-app-launcher-autogenerated/seccomp-wx
++ /var/cache/sandbox-app-launcher-autogenerated/seccomp
++ /var/cache/sandbox-app-launcher-autogenerated/seccomp-wx
++ true 'INFO: debhelper beginning here.'
++ '[' configure = configure ']'
++ APP_PROFILE=/etc/apparmor.d/sandbox-app-launcher
++ '[' -f /etc/apparmor.d/sandbox-app-launcher ']'
++ LOCAL_APP_PROFILE=/etc/apparmor.d/local/sandbox-app-launcher
++ test -e /etc/apparmor.d/local/sandbox-app-launcher
++ aa-enabled --quiet
++ apparmor_parser -r -T -W /etc/apparmor.d/sandbox-app-launcher
++ true 'INFO: Done with debhelper.'
++ true '
+#####################################################################
+## INFO: END  : sandbox-app-launcher postinst configure' '5.3-1
+#####################################################################
+'
++ exit 0
+Processing triggers for man-db (2.9.4-2) ...
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/368">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/368</link>
+        <pubDate>Sat, 23 Jul 2022 22:12:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-368</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Awesome! All merged. Left some inline comments.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/367">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/367</link>
+        <pubDate>Tue, 08 Jun 2021 06:11:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-367</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubpullrequest">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/sandbox-app-launcher/pull/61" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/sandbox-app-launcher/pull/61" target="_blank" rel="noopener nofollow ugc">Add option to list all currently configured sandboxes</a>
+    </h4>
+
+    <div class="branches">
+      <code>Whonix:master</code> ← <code>madaidan:list</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2021-06-04" data-time="19:29:40" data-timezone="UTC">07:29PM - 04 Jun 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/madaidan" target="_blank" rel="noopener nofollow ugc">
+          <img alt="madaidan" src="https://avatars.githubusercontent.com/u/50278627?v=4" class="onebox-avatar-inline" width="20" height="20">
+          madaidan
+        </a>
+      </div>
+
+      <div class="lines" title="1 commits changed 1 files with 8 additions and 1 deletions">
+        <a href="https://github.com/Whonix/sandbox-app-launcher/pull/61/files" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+8</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/366">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/366</link>
+        <pubDate>Fri, 04 Jun 2021 19:29:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-366</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubpullrequest">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/sandbox-app-launcher/pull/60" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/sandbox-app-launcher/pull/60" target="_blank" rel="noopener nofollow ugc">Fix AppArmor</a>
+    </h4>
+
+    <div class="branches">
+      <code>Whonix:master</code> ← <code>madaidan:fix-apparmor</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2021-06-04" data-time="19:24:23" data-timezone="UTC">07:24PM - 04 Jun 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/madaidan" target="_blank" rel="noopener nofollow ugc">
+          <img alt="madaidan" src="https://avatars.githubusercontent.com/u/50278627?v=4" class="onebox-avatar-inline" width="20" height="20">
+          madaidan
+        </a>
+      </div>
+
+      <div class="lines" title="2 commits changed 3 files with 19 additions and 14 deletions">
+        <a href="https://github.com/Whonix/sandbox-app-launcher/pull/60/files" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+19</span>
+          <span class="removed">-14</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">https://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launche<span class="show-more-container"><a href="https://github.com/Whonix/sandbox-app-launcher/pull/60" target="_blank" rel="noopener nofollow ugc" class="show-more">…</a></span><span class="excerpt hidden">r/9008/364</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/365">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/365</link>
+        <pubDate>Fri, 04 Jun 2021 19:24:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-365</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>It would be useful to have a <code>list</code> argument to list all the currently configured sandboxes. Could simply be:</p>
+<pre><code>getent passwd | grep "sal" | sed -e 's/:.*//g' | str_replace "sal-" ""
+</code></pre>
+<p>Also since <a href="https://github.com/Whonix/sandbox-app-launcher/commit/f939fe8b579063478576e8fab02e3468a09dd03c" class="inline-onebox" rel="noopener nofollow ugc">replace dynamic wrapper script creation with static script · Whonix/sandbox-app-launcher@f939fe8 · GitHub</a>, the AppArmor profile is now broken: <a href="https://github.com/Whonix/sandbox-app-launcher/blob/master/etc/apparmor.d/sandbox-app-launcher" class="inline-onebox" rel="noopener nofollow ugc">sandbox-app-launcher/sandbox-app-launcher at master · Whonix/sandbox-app-launcher · GitHub</a></p>
+<p>Profile <code>sandbox-app-launcher</code> applies to <code>/var/cache/sandbox-app-launcher-autogenerated/wrappers/**</code> and profile <code>sandbox-app-launcher-wx</code> applies to <code>/var/cache/sandbox-app-launcher-autogenerated/wrappers-wx/**</code></p>
+<p>Since those directories no longer exist, we will need to create 2 copies of the static wrapper script: <code>wrapper-script</code> and <code>wrapper-script-wx</code>, confined by their respective AppArmor profiles.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/364">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/364</link>
+        <pubDate>Thu, 03 Jun 2021 22:01:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-364</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="361" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Please have a look.</p>
+</blockquote>
+</aside>
+<p>Looks good to me.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/363">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/363</link>
+        <pubDate>Thu, 03 Jun 2021 20:56:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-363</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <pre><code>sandbox-app-launcher start vlc "abc cde" "file 2"
+</code></pre>
+<p>This is actually good:</p>
+<blockquote>
+<p>[0000738ee3f89d00] filesystem stream error: cannot open file /home/sandbox-app-launcher-appdata/vlc/abc cde (No such file or directory)<br>
+[0000738ee3f8f480] filesystem stream error: cannot open file /home/sandbox-app-launcher-appdata/vlc/file 2 (No such file or directory)</p>
+</blockquote>
+<blockquote>
+<p>Your input can’t be opened:<br>
+VLC is unable to open the MRL ‘file:///home/sandbox-app-launcher-appdata/vlc/abc%20cde’. Check the log for details.<br>
+Your input can’t be opened:<br>
+VLC is unable to open the MRL ‘file:///home/sandbox-app-launcher-appdata/vlc/file%202’. Check the log for details.</p>
+</blockquote>
+<p>It shows proper whitespace hanlding. Previously VLC (example, any application) would have attempted to open 4 files (abc, def, file, 2) instead of 2 files (“abc def”, “file 2”).</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/362">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/362</link>
+        <pubDate>Tue, 01 Jun 2021 11:17:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-362</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>It’s implemented. We have now proper whitespace support. Please have a look.<br>
+Not too beautiful code. Some imperfections.</p>
+<ul>
+<li>
+<code>bwrap_args</code> still does not have proper whitespace support but that’s not user facing since path to <code>shared_dir</code> is hardcoded.</li>
+<li>Lots of variables have to be passed from <code>sandbox-app-launcher</code> to <code>brwap-wrapper</code> since we cannot preserve environment (<code>sudo -E</code>).</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/361">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/361</link>
+        <pubDate>Tue, 01 Jun 2021 11:15:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-361</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>Ah, I understand now. That would be good to implement.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/360">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/360</link>
+        <pubDate>Sat, 29 May 2021 20:32:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-360</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="madaidan" data-post="358" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>We’d still need the subshell for the file descriptors.</p>
+</blockquote>
+</aside>
+<p>Yes, but that is OK…?</p>
+<aside class="quote no-group" data-username="madaidan" data-post="358" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>How would that fix it?</p>
+</blockquote>
+</aside>
+<p>We’d have proper whitespace handling… The pseudo code:</p>
+<p><code>sandbox-app-launcher</code>:</p>
+<pre><code class="lang-auto">  sudo \
+    --set-home \
+    --user="${app_user}" \
+    sandbox_app_launcher_debug="$sandbox_app_launcher_debug" \
+    app_path="$app_path" \
+    /usr/share/sandbox-app-launcher/bwrap-wrapper
+</code></pre>
+<p><code>bwrap-wrapper</code>:</p>
+<pre><code class="lang-auto">  bwrap \
+...
+  --ro-bind "${main_app_dir}/machine-id /etc/machine-id" \
+  --ro-bind "${wrapper_script}" "${wrapper_script}" \
+  10&lt; &lt;(getent passwd root "${app_user}" nobody) \
+  11&lt; &lt;(getent group root "${app_user}" nobody) \
+  12&lt; "${seccomp_filter}" \
+  "${bwrap_args}" \
+  "${wrapper_script}" "${@}"
+</code></pre>
+<p>Using <code>"${@}"</code> (or <code>"$@"</code>) would fix whitespace handling.</p>
+<p>If that sounds good, I am eager to implement this.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/359">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/359</link>
+        <pubDate>Sat, 29 May 2021 20:22:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-359</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="356" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Do you think it would be a good idea to move that into its own <code>/usr/share/sandbox-app-launcher/bwrap-wrapper</code> script? Then I believe whitespace handling could be easily fixed.</p>
+</blockquote>
+</aside>
+<p>How would that fix it? We’d still need the subshell for the file descriptors.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/358">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/358</link>
+        <pubDate>Sat, 29 May 2021 19:42:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-358</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[FrozenCat]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="madaidan" data-post="296" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Not yet.</p>
+</blockquote>
+</aside>
+<p>I think it’s better to just lay a few files in the root mount namespace shared by multiple applications and guard the files with apparmor so that only applications that need the shared files can access them.</p>
+<ul>
+<li>/run/user-id/sway-ipc-*</li>
+<li>/run/user-id/wayland-*</li>
+<li>shared dbus sessions.</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/357">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/357</link>
+        <pubDate>Wed, 14 Apr 2021 13:54:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-357</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Currently we don’t have proper whitespace handling.</p>
+<pre><code class="lang-auto">    bash -c "
+  bwrap \
+  --ro-bind /bin /bin \
+...
+  --ro-bind ${main_app_dir}/machine-id /etc/machine-id \
+...
+  10&lt; &lt;(getent passwd root ${app_user} nobody) \
+  11&lt; &lt;(getent group root ${app_user} nobody) \
+  12&lt; ${seccomp_filter} \
+  ${bwrap_args} \
+  ${wrapper_script} ${@}"
+</code></pre>
+<p>User names or folder names with white spaces wouldn’t work, but we don’t have these and check that there are no such characters.</p>
+<p>Arguments however <code>${@}</code> would be broken. Such as</p>
+<pre><code>sandbox-app-launcher start vlc "my video"
+</code></pre>
+<p>would break. That would result in VLC trying to open a file <code>my</code> and a file <code>video</code>.</p>
+<p>It could be made to work similar to: <a href="https://github.com/Whonix/apparmor-profile-everything/commit/d3eccd40b1547114159ef5309518a75f14800391">https://github.com/Whonix/apparmor-profile-everything/commit/d3eccd40b1547114159ef5309518a75f14800391</a></p>
+<p>But since the brwap command is very lengthy, that would be rather ugly.</p>
+<p>I guess we couldn’t even use</p>
+<pre><code class="lang-auto">command+=("--ro-bind /bin /bin")
+command+=("--ro-bind /usr/bin /usr/bin")
+...
+</code></pre>
+<p>Because that would be interpreted as:</p>
+<blockquote>
+<p>‘–ro-bind /bin /bin’</p>
+</blockquote>
+<p>And not as intended as:</p>
+<blockquote>
+<p>–ro-bind /bin /bin</p>
+</blockquote>
+<p>However, the following would probably work</p>
+<pre><code class="lang-auto">command+=("--ro-bind")
+command+=("/bin")
+command+=("/bin")
+...
+bash -c "${command[@]}"
+</code></pre>
+<p>but make code look much worse. (60 lines of bwrap command would become I guestimate 180 lines.)</p>
+<p>The issue comes from bash subshell opening with another double quote <code>bash -c "</code>:</p>
+<pre><code class="lang-auto">  sudo \
+...
+    bash -c "
+  bwrap \
+...
+  --seccomp 12 \
+  10&lt; &lt;(getent passwd root ${app_user} nobody) \
+  11&lt; &lt;(getent group root ${app_user} nobody) \
+  12&lt; ${seccomp_filter} \
+  ${bwrap_args} \
+  ${wrapper_script} ${@}"
+</code></pre>
+<p>Do you think it would be a good idea to move that into its own <code>/usr/share/sandbox-app-launcher/bwrap-wrapper</code> script? Then I believe whitespace handling could be easily fixed.</p>
+<p>(No need for <code>command+=("--ro-bind")</code> or <code>"${command[@]}"</code>.)</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/356">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/356</link>
+        <pubDate>Wed, 31 Mar 2021 20:59:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-356</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group quote-modified" data-username="madaidan" data-post="354" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<aside class="quote no-group quote-modified" data-username="Patrick" data-post="352" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>i.e. path to binary and command line options. All three variables (debug, app_path and args) could be set in sal. Then we could have a “static” script in a different file. sal would set appropriate variables and the script would serve the same purpose. No more need to have 1 script per application or dynamic wrapper script generation.</p>
+<blockquote>
+<p>What do you think?</p>
+</blockquote>
+</blockquote>
+</aside>
+<p>That would be great.</p>
+</blockquote>
+</aside>
+<p>Done.</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/f939fe8b579063478576e8fab02e3468a09dd03c" target="_blank" rel="noopener">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/f939fe8b579063478576e8fab02e3468a09dd03c" target="_blank" rel="noopener">replace dynamic wrapper script creation with static script</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-03-31" data-time="19:36:47" data-timezone="UTC">07:36PM - 31 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 2 files with 63 additions and 108 deletions">
+        <a href="https://github.com/Whonix/sandbox-app-launcher/commit/f939fe8b579063478576e8fab02e3468a09dd03c" target="_blank" rel="noopener">
+          <span class="added">+63</span>
+          <span class="removed">-108</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">for code simplification
+https://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/352</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group quote-modified" data-username="madaidan" data-post="354" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<aside class="quote no-group" data-username="Patrick" data-post="351" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Should <code>remove</code> also do the following?</p>
+</blockquote>
+</aside>
+<p>Yes.</p>
+</blockquote>
+</aside>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/24ca2da82bc90add9cc1fe38ccb826714c4127fd" target="_blank" rel="noopener">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/24ca2da82bc90add9cc1fe38ccb826714c4127fd" target="_blank" rel="noopener">wait (blocking) for processes inside the sandbox to be killed</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-03-31" data-time="20:10:23" data-timezone="UTC">08:10PM - 31 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 42 additions and 2 deletions">
+        <a href="https://github.com/Whonix/sandbox-app-launcher/commit/24ca2da82bc90add9cc1fe38ccb826714c4127fd" target="_blank" rel="noopener">
+          <span class="added">+42</span>
+          <span class="removed">-2</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/355">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/355</link>
+        <pubDate>Wed, 31 Mar 2021 20:12:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-355</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="350" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>userdel: sal-ristretto mail spool (/var/mail/sal-ristretto) not found</p>
+</blockquote>
+</aside>
+<p>That’s a harmless error. <code>userdel --remove</code> attempts to delete the mail spool, as well as the home folder but since we don’t setup a mail spool, there’s nothing to delete.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="350" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Should we change from default login shell <code>/bin/bash</code> to <code>/bin/false</code>?</p>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-username="Patrick" data-post="351" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Should <code>remove</code> also do the following?</p>
+</blockquote>
+</aside>
+<p>Yes.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="352" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>i.e. path to binary and command line options. All three variables (debug, app_path and args) could be set in sal. Then we could have a “static” script in a different file. sal would set appropriate variables and the script would serve the same purpose. No more need to have 1 script per application or dynamic wrapper script generation.</p>
+<p>What do you think?</p>
+</blockquote>
+</aside>
+<p>That would be great.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/354">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/354</link>
+        <pubDate>Wed, 31 Mar 2021 16:37:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-354</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="348" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>That’s a cool idea. It might break an exploit chain, disable some exploit payloads, make exploitation harder. Non-perfect as per <a href="https://forums.whonix.org/t/are-non-perfect-defenses-that-defeat-off-the-shelf-viruses-a-worthwhile-development-goal/8040">Are non-perfect Defenses that defeat off-the-shelf Viruses a worthwhile Development Goal?</a> or could it be in some cases really strong?</p>
+</blockquote>
+</aside>
+<p>I’m not sure if it would be very strong. The impacts need more research.</p>
+<p>It could make our dynamic native code execution / W^X restrictions stronger. Currently those don’t cover interpreters (i.e. shell, python, etc. scripts; this should probably be documented in the wiki) but with these restrictions, if the app doesn’t actually need them, those interpreters won’t be available within the sandbox for an attacker to possibly abuse. For example, with Chromium, bash and python aren’t accessible in the sandbox.</p>
+<p>Another possible advantage is that it could limit the amount of code reuse gadgets available to an attacker in the sandbox to complement W^X. However, I highly doubt this will be significant and it will most likely be negligible since all necessary gadgets would probably be in libc, etc. already. There has been research on the ineffectiveness of removing gadgets within a singular binary (<a href="https://arxiv.org/abs/1902.10880" rel="noopener nofollow ugc">https://arxiv.org/abs/1902.10880</a>) and when considering a complete sandboxed environment with a lot of accessible binaries/libraries, it’d be even less effective.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="348" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>I am wondering why nobody earlier got that idea? Or did someone?</p>
+</blockquote>
+</aside>
+<p>grsecurity’s RBAC did.</p>
+<p><a href="https://grsecurity.net/featureset/rbac" class="onebox" target="_blank" rel="noopener nofollow ugc">https://grsecurity.net/featureset/rbac</a></p>
+<aside class="quote no-group" data-username="Patrick" data-post="348" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Therefore it might make sense to run the parser (and its dependencies) itself through either sandbox-app-launcher, bubblewrap and/or some mandatory access control?</p>
+</blockquote>
+</aside>
+<p>Maybe. Vulnerabilities have been discovered in <code>objdump</code> before: <a href="https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=objdump" rel="noopener nofollow ugc">https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=objdump</a></p>
+<aside class="quote no-group" data-username="Patrick" data-post="348" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Really required to use printf instead of bash’s built-in <code>echo</code>?</p>
+</blockquote>
+</aside>
+<p>We could just use <code>echo</code>.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/353">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/353</link>
+        <pubDate>Wed, 31 Mar 2021 16:30:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-353</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/133558cc97d3ee0523f555a53dfb2c9a1cd5daa8" target="_blank" rel="noopener">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/133558cc97d3ee0523f555a53dfb2c9a1cd5daa8" target="_blank" rel="noopener">fix wrapper script creation and access rights</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-03-31" data-time="14:38:09" data-timezone="UTC">02:38PM - 31 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 91 additions and 60 deletions">
+        <a href="https://github.com/Whonix/sandbox-app-launcher/commit/133558cc97d3ee0523f555a53dfb2c9a1cd5daa8" target="_blank" rel="noopener">
+          <span class="added">+91</span>
+          <span class="removed">-60</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Well, that’s fixed and was an interesting exercise. However, I think the wrapper creation inside sal is quite ugly code wise.</p>
+<p>Do we really need a dynamically generated wrapper script?</p>
+<p>The only dynamic parts are really just A) <code>set -x</code>, bash xtrace for debugging or not which is not super important and could be implemented to only do that if some variable is set and B)</p>
+<pre><code>"/path/to/app" "${@}"
+</code></pre>
+<p>i.e. path to binary and command line options. All three variables (debug, app_path and args) could be set in sal. Then we could have a “static” script in a different file. sal would set appropriate variables and the script would serve the same purpose. No more need to have 1 script per application or dynamic wrapper script generation.</p>
+<p>What do you think?</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/352">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/352</link>
+        <pubDate>Wed, 31 Mar 2021 14:44:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-352</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Should <code>remove</code> also do the following?</p>
+<pre><code class="lang-auto">  ## Don't leave any left-over processes such as the D-Bus daemon.
+  killall -9 -u "${app_user}"
+</code></pre>
+<p>Though, is going to be slightly more complicated as <code>killall</code> is asynchronous. Sends only a signal to process. Doesn’t block/wait until really killed the process.</p>
+<hr>
+<p>Need to fix some bugs that I just introduced. Working on it now.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/351">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/351</link>
+        <pubDate>Wed, 31 Mar 2021 13:41:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-351</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+      <item>
+        <title>System-wide sandboxing framework - sandbox-app-launcher</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/1f181df1709b63e113397c94ea29b425d01d1b7f" target="_blank" rel="noopener">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/1f181df1709b63e113397c94ea29b425d01d1b7f" target="_blank" rel="noopener">run all checks before start</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-03-31" data-time="12:52:06" data-timezone="UTC">12:52PM - 31 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 19 additions and 12 deletions">
+        <a href="https://github.com/Whonix/sandbox-app-launcher/commit/1f181df1709b63e113397c94ea29b425d01d1b7f" target="_blank" rel="noopener">
+          <span class="added">+19</span>
+          <span class="removed">-12</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">https://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/325</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/cc319021ad289c78ffcde4889809f4757dac3840" target="_blank" rel="noopener">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/cc319021ad289c78ffcde4889809f4757dac3840" target="_blank" rel="noopener">minor usability improvements</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-03-31" data-time="13:00:46" data-timezone="UTC">01:00PM - 31 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 5 additions and 2 deletions">
+        <a href="https://github.com/Whonix/sandbox-app-launcher/commit/cc319021ad289c78ffcde4889809f4757dac3840" target="_blank" rel="noopener">
+          <span class="added">+5</span>
+          <span class="removed">-2</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">* Downgraded messages if removal previously completed to `INFO:`. Not an issue to worry the user with.
+* Show `INFO:` after `setup`...</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/83b68c672277269207e9bb0a0ca6b2e5a3517a33" target="_blank" rel="noopener">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/83b68c672277269207e9bb0a0ca6b2e5a3517a33" target="_blank" rel="noopener">unduplicate/remove permission check code in function run_program</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-03-31" data-time="13:06:24" data-timezone="UTC">01:06PM - 31 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 0 additions and 10 deletions">
+        <a href="https://github.com/Whonix/sandbox-app-launcher/commit/83b68c672277269207e9bb0a0ca6b2e5a3517a33" target="_blank" rel="noopener">
+          <span class="added">+0</span>
+          <span class="removed">-10</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">since already done exactly the same in function setup_or_check which runs anyhow</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/a9a760071be1266157e989178e898d685a0de01a" target="_blank" rel="noopener">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/sandbox-app-launcher/commit/a9a760071be1266157e989178e898d685a0de01a" target="_blank" rel="noopener">improve command to create wrapper script for more self-explanatory bash xtrace</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-03-31" data-time="13:27:37" data-timezone="UTC">01:27PM - 31 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 3 additions and 3 deletions">
+        <a href="https://github.com/Whonix/sandbox-app-launcher/commit/a9a760071be1266157e989178e898d685a0de01a" target="_blank" rel="noopener">
+          <span class="added">+3</span>
+          <span class="removed">-3</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p>I am experiencing one strange issue.</p>
+<pre><code>sudo sandbox-app-launcher setup ristretto
+</code></pre>
+<blockquote>
+<p>INFO: Done, setup complete, OK.</p>
+</blockquote>
+<pre><code>sudo sandbox-app-launcher remove ristretto
+</code></pre>
+<blockquote>
+<p>userdel: sal-ristretto mail spool (/var/mail/sal-ristretto) not found<br>
+INFO: Done, removal complete, OK.</p>
+</blockquote>
+<p>sal does the right things in bash xtrace as far as I can see…</p>
+<pre><code>adduser --home /home/sandbox-app-launcher-appdata/ristretto --no-create-home --&gt; disabled-login --gecos '' sal-ristretto
+</code></pre>
+<p>Ok.</p>
+<pre><code>userdel --remove --force sal-ristretto
+</code></pre>
+<blockquote>
+<p>userdel: sal-ristretto mail spool (/var/mail/sal-ristretto) not found</p>
+</blockquote>
+<p>Any idea?</p>
+<hr>
+<pre><code>cat /etc/passwd | grep ristretto
+</code></pre>
+<blockquote>
+<p>sal-ristretto:x:1001:1001:,:/home/sandbox-app-launcher-appdata/ristretto:/bin/bash</p>
+</blockquote>
+<p>Should we change from default login shell <code>/bin/bash</code> to <code>/bin/false</code>?</p>
+<p>To do so we would add to <code>adduser</code>:</p>
+<pre><code>--shell /bin/false
+</code></pre>
+<hr>
+<p>Will stop making changes for now.</p>
+          <p><a href="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/350">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/350</link>
+        <pubDate>Wed, 31 Mar 2021 13:33:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9008-350</guid>
+        <source url="http://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008.rss">System-wide sandboxing framework - sandbox-app-launcher</source>
+      </item>
+  </channel>
+</rss>

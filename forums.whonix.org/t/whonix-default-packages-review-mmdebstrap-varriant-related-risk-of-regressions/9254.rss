@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix default packages review - mmdebstrap varriant related - risk of regressions</title>
+    <link>http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254</link>
+    <description>**Long, full details. TLDR in next post.**
+
+It came to my attention that rsyslog is installed by default in Non-Qubes-Whonix. There is really no need for it nowadays. Among other non-essential packages.
+
+Found the root cause. It&#39;s related to which mmdebstrap (or same for debootstrap) variant gets used.
+
+Symptom:
+
+----
+
+These are the &quot;important&quot; packages.
+
+&gt; I: installing remaining packages inside the chroot...
+&gt; Reading package lists...
+&gt; Building dependency tree...
+&gt; adduser is already the newest version (3.118).
+&gt; apt is already the newest version (1.8.2).
+&gt; debconf is already the newest version (1.5.71).
+&gt; debian-archive-keyring is already the newest version (2019.1).
+&gt; gpgv is already the newest version (2.2.12-1+deb10u1).
+&gt; mawk is already the newest version (1.3.3-17+b3).
+&gt; libpam-modules is already the newest version (1.3.1-5).
+&gt; libpam-modules-bin is already the newest version (1.3.1-5).
+&gt; libpam-runtime is already the newest version (1.3.1-5).
+&gt; passwd is already the newest version (1:4.5-1.1).
+&gt; fdisk is already the newest version (2.33.1-0.1).
+&gt; The following additional packages will be installed:
+&gt;   dirmngr dmsetup gnupg gnupg-l10n gnupg-utils gpg gpg-agent gpg-wks-client
+&gt;   gpg-wks-server gpgconf gpgsm initramfs-tools-core klibc-utils libapparmor1
+&gt;   libapt-inst2.0 libargon2-1 libassuan0 libbsd0 libcap2 libcap2-bin
+&gt;   libcom-err2 libcryptsetup12 libdevmapper1.02.1 libdns-export1104
+&gt;   libeatmydata1 libelf1 libestr0 libexpat1 libext2fs2 libfastjson4 libidn11
+&gt;   libip4tc0 libip6tc0 libiptc0 libisc-export1100 libjson-c3 libklibc libkmod2
+&gt;   libksba8 libldap-2.4-2 libldap-common liblocale-gettext-perl liblognorm5
+&gt;   libmnl0 libncurses6 libnetfilter-conntrack3 libnewt0.52 libnfnetlink0
+&gt;   libnftnl11 libnpth0 libpopt0 libprocps7 libpython-stdlib libpython2-stdlib
+&gt;   libpython2.7-minimal libpython2.7-stdlib libreadline7 libsasl2-2
+&gt;   libsasl2-modules-db libslang2 libsqlite3-0 libtext-charwidth-perl
+&gt;   libtext-iconv-perl libtext-wrapi18n-perl libxtables12 linux-base lsb-base
+&gt;   mime-support pinentry-curses python-minimal python2 python2-minimal
+&gt;   python2.7 python2.7-minimal xxd
+
+----
+
+These are the &quot;important&quot; packages and the resulting dependencies begging installed.
+
+&gt; The following NEW packages will be installed:
+&gt;   apt-transport-tor apt-utils bsdmainutils cpio cron debconf-i18n dirmngr
+&gt;   dmidecode dmsetup e2fslibs e2fsprogs eatmydata gdbm-l10n gnupg gnupg-l10n
+&gt;   gnupg-utils gnupg2 gpg gpg-agent gpg-wks-client gpg-wks-server gpgconf gpgsm
+&gt;   ifupdown init initramfs-tools initramfs-tools-core iproute2 iptables
+&gt;   iputils-ping isc-dhcp-client isc-dhcp-common klibc-utils kmod less
+&gt;   libapparmor1 libapt-inst2.0 libargon2-1 libassuan0 libbsd0 libcap2
+&gt;   libcap2-bin libcom-err2 libcomerr2 libcryptsetup12 libdevmapper1.02.1
+&gt;   libdns-export1104 libeatmydata1 libelf1 libestr0 libexpat1 libext2fs2
+&gt;   libfastjson4 libidn11 libip4tc0 libip6tc0 libiptc0 libisc-export1100
+&gt;   libjson-c3 libklibc libkmod2 libksba8 libldap-2.4-2 libldap-common
+&gt;   liblocale-gettext-perl liblognorm5 libmnl0 libncurses6
+&gt;   libnetfilter-conntrack3 libnewt0.52 libnfnetlink0 libnftnl11 libnpth0
+&gt;   libpopt0 libprocps7 libpython-stdlib libpython2-stdlib libpython2.7-minimal
+&gt;   libpython2.7-stdlib libreadline7 libsasl2-2 libsasl2-modules-db libslang2
+&gt;   libsqlite3-0 libss2 libssl1.1 libtext-charwidth-perl libtext-iconv-perl
+&gt;   libtext-wrapi18n-perl libxtables12 linux-base logrotate lsb-base
+&gt;   mime-support mount nano netbase pinentry-curses procps python python-minimal
+&gt;   python2 python2-minimal python2.7 python2.7-minimal readline-common rsyslog
+&gt;   sensible-utils systemd systemd-sysv tasksel tasksel-data tzdata udev
+&gt;   vim-common vim-tiny whiptail xxd
+&gt; 0 upgraded, 118 newly installed, 0 to remove and 0 not upgraded.
+&gt; Need to get 31.4 MB of archives.
+
+----
+
+Quote https://manpages.debian.org/buster/mmdebstrap/mmdebstrap.1.en.html#VARIANTS
+
+&gt; # VARIANTS
+&gt; 
+&gt; All package sets also include the direct and indirect hard dependencies (but not recommends) of the selected package sets. The variants **minbase** , **buildd** and **-** , resemble the package sets that debootstrap would install with the same *--variant* argument.
+&gt; 
+&gt; **extract**
+&gt; 
+&gt; Installs nothing by default (not even &quot;Essential:yes&quot; packages). Packages given by the &quot;--include&quot; option are extracted but will not be installed.
+&gt; 
+&gt; **custom**
+&gt; 
+&gt; Installs nothing by default (not even &quot;Essential:yes&quot; packages). Packages given by the &quot;--include&quot; option will be installed. If another mode than **chrootless** was selected and dpkg was not part of the included package set, then this variant will fail because it cannot configure the packages.
+&gt; 
+&gt; **essential**
+&gt; 
+&gt; &quot;Essential:yes&quot; packages.
+&gt; 
+&gt; **apt**
+&gt; 
+&gt; The **essential** set plus apt.
+&gt; 
+&gt; **required** , **minbase**
+&gt; 
+&gt; The **essential** set plus all packages with Priority:required and apt.
+&gt; 
+&gt; **buildd**
+&gt; 
+&gt; The **minbase** set plus build-essential.
+&gt; 
+&gt; **important** , **debootstrap** , **-**
+&gt; 
+&gt; The **required** set plus all packages with Priority:important. This is the default of debootstrap.
+&gt; 
+&gt; **standard**
+&gt; 
+&gt; The **important** set plus all packages with Priority:standard.
+
+&quot;important&quot; is the mmdebstrap default (which includes the following partially unwanted packages such as rsyslog). Now downgraded to &quot;required&quot; in Whonix git master.
+
+Even if we want to keep these packages these should be re-added in https://github.com/Whonix/anon-meta-packages/blob/master/debian/control</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 05 Apr 2020 17:36:01 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix default packages review - mmdebstrap varriant related - risk of regressions</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="9254">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>apt-utils - contains apt-extracttemplates which sounds somewhat important “apt-extracttemplates is used to extract config and template files<br>
+from debian packages. It is used mainly by debconf(1) to prompt for<br>
+configuration questions before installation of packages.” - but these debconf prompts are bad for usability and APT automation anyhow. Let’s try without unless there is already a reason why it’s needed.</p>
+</blockquote>
+</aside>
+<blockquote>
+<p>debconf: delaying package configuration, since apt-utils is not installed</p>
+</blockquote>
+<p>I guess we don’t get rid of these prompts but delay those. Therefore better added.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254/5</link>
+        <pubDate>Sun, 05 Apr 2020 17:36:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9254-5</guid>
+        <source url="http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254.rss">Whonix default packages review - mmdebstrap varriant related - risk of regressions</source>
+      </item>
+      <item>
+        <title>Whonix default packages review - mmdebstrap varriant related - risk of regressions</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="3" data-topic="9254">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Needed for signing Whonix builds</p>
+</blockquote>
+</aside>
+<p>It’s about packages installed early in the image.<br>
+Unrelated to host (build) system.<br>
+Missing host build dependence should be added here:</p>
+<ul>
+<li><a href="https://github.com/Whonix/Whonix/blob/master/buildconfig.d/30_dependencies.conf">https://github.com/Whonix/Whonix/blob/master/buildconfig.d/30_dependencies.conf</a></li>
+<li>or if virtualizer / target platform specific here: <a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/1120_prepare-build-machine">https://github.com/Whonix/Whonix/blob/master/build-steps.d/1120_prepare-build-machine</a>
+</li>
+</ul>
+<aside class="quote no-group quote-modified" data-username="Patrick" data-post="2" data-topic="9254">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<blockquote>
+<ul>
+<li>gpg-wks-server - Do we need this?</li>
+<li>gpgsm (GNU privacy guard - S/MIME version) - Do we need this?</li>
+</ul>
+</blockquote>
+<p>No</p>
+</blockquote>
+</aside>
+<p>Ok, good. Thanks you for looking into this! <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<aside class="quote no-group quote-modified" data-username="Patrick" data-post="2" data-topic="9254">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<blockquote>
+<p>dmidecode</p>
+</blockquote>
+<p>Reads cpu serial no.</p>
+</blockquote>
+</aside>
+<p>Yes but no real need to have that package installed early or have it installed by default for everyone?</p>
+<aside class="quote no-group quote-modified" data-username="Patrick" data-post="2" data-topic="9254">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<blockquote>
+<ul>
+<li>dmsetup - required for auto mounting?</li>
+<li>udev - probably required for auto mounting? <a href="https://phabricator.whonix.org/T961">fix USB auto mounting bug / document</a> / <a href="https://forums.whonix.org/t/disk-usb-automount-in-kicksecure/8728/21">Disk &amp; USB Automount in Kicksecure</a>
+</li>
+</ul>
+</blockquote>
+<p>Yes</p>
+</blockquote>
+</aside>
+<p>Will answer in <a href="https://forums.whonix.org/t/disk-usb-automount-in-kicksecure/8728/21" class="inline-onebox">Disk &amp; USB Automount in Kicksecure</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254/4</link>
+        <pubDate>Sat, 04 Apr 2020 16:48:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9254-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254.rss">Whonix default packages review - mmdebstrap varriant related - risk of regressions</source>
+      </item>
+      <item>
+        <title>Whonix default packages review - mmdebstrap varriant related - risk of regressions</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="9254">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>gpg-agent - Do we need this?</p>
+</blockquote>
+</aside>
+<p>Needed for signing Whonix builds</p>
+<aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="9254">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<ul>
+<li>gpg-wks-server - Do we need this?</li>
+<li>gpgsm (GNU privacy guard - S/MIME version) - Do we need this?</li>
+</ul>
+</blockquote>
+</aside>
+<p>No</p>
+<aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="9254">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>dmidecode</p>
+</blockquote>
+</aside>
+<p>Reads cpu serial no.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="9254">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<ul>
+<li>dmsetup - required for auto mounting?</li>
+<li>udev - probably required for auto mounting? <a href="https://phabricator.whonix.org/T961">fix USB auto mounting bug / document</a> / <a href="https://forums.whonix.org/t/disk-usb-automount-in-kicksecure/8728/21">Disk &amp; USB Automount in Kicksecure</a>
+</li>
+</ul>
+</blockquote>
+</aside>
+<p>Yes</p>
+          <p><a href="http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254/3</link>
+        <pubDate>Sat, 04 Apr 2020 13:48:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9254-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254.rss">Whonix default packages review - mmdebstrap varriant related - risk of regressions</source>
+      </item>
+      <item>
+        <title>Whonix default packages review - mmdebstrap varriant related - risk of regressions</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>The basic idea is that as few packages as possible should be installed at the debootstrap (mmdebstrap) stage. Only essential “required” packages should be installed to have a functional base Debian image which then can be built on top. Everything else should be managed by meta packages (<a href="https://github.com/Whonix/anon-meta-packages/blob/master/debian/control">anon-meta-packages</a>), as a dependency of a Whonix package or as dependencies. The results in better control which packages get installed, leads to fewer unneeded packages, less sources for issues, faster upgrades, smaller image size.</p>
+<hr>
+<ul>
+<li>lsb-base - Has many <code>reverse-depends lsb-base</code> that will hopefully pull this if required.</li>
+<li>mime-support - Not sure. Not many <code>reverse-depends mime-support</code>. If missing, opening some files such as jpeg in ristretto or other default application pairings might break. Let’s try without.</li>
+<li>readline-common - Not sure. Very few <code>reverse-depends readline-common</code>. Let’s try without.</li>
+</ul>
+<hr>
+<ul>
+<li>apt-transport-tor - Not needed here since kicksecure-dependencies-cli will pull it.</li>
+<li>apt-utils - contains apt-extracttemplates which sounds somewhat important “apt-extracttemplates is used to extract config and template files<br>
+from debian packages. It is used mainly by debconf(1) to prompt for<br>
+configuration questions before installation of packages.” - but these debconf prompts are bad for usability and APT automation anyhow. Let’s try without unless there is already a reason why it’s needed.</li>
+<li>bsdmainutils - Does not seem important.</li>
+<li>cpio - Not needed here since initramfs-tools-core will pull it.</li>
+<li>dmidecode - Looks not important. Try without.</li>
+<li>e2fslibs - transitional package. Try without.</li>
+<li>e2fsprogs - contains <code>fsck.ext4</code>, will add to kicksecure-dependencies-cli.</li>
+<li>eatmydata - no need.</li>
+<li>gdbm-l10n, gnupg-l10n, debconf-i18n - Language packages, multi language support out of scope for now, will drop</li>
+</ul>
+<hr>
+<ul>
+<li>dmsetup - required for auto mounting?</li>
+<li>udev - probably required for auto mounting? <a href="https://phabricator.whonix.org/T961">fix USB auto mounting bug / document</a> / <a href="https://forums.whonix.org/t/disk-usb-automount-in-kicksecure/8728/21" class="inline-onebox">Disk &amp; USB Automount in Kicksecure</a>
+</li>
+</ul>
+<hr>
+<ul>
+<li>gnupg (full suite of GnuPG) - Do we want this? Just a meta package that pulls 	dirmngr, gnupg-utils, gpg-wks-client, gpg-wks-server, gpgsm, gpgv.</li>
+<li>gnupg-utils - Does not seem important. Do we need this?</li>
+<li>gnupg2 - dummy transitional package</li>
+<li>gpg (GNU Privacy Guard – minimalist public key operations) - whonix-workstation-packages-recommended-cli will pull it.</li>
+<li>gpgconf - gpg depends on it there we get this anyhow.</li>
+<li>dirmngr - whonix-workstation-packages-recommended-cli will pull it.</li>
+<li>gpg-agent - Do we need this?</li>
+<li>gpg-wks-client - Do we need this? Web Key Service protocol. Probably best discussed in separate forum thread.</li>
+<li>gpg-wks-server - Do we need this?</li>
+<li>gpgsm (GNU privacy guard - S/MIME version) - Do we need this?</li>
+</ul>
+<hr>
+<ul>
+<li>iptables - whonix-firewall package depends on it, no need here.</li>
+<li>initramfs-tools - Not needed here since non-qubes-vm-enhancements-cli already depends on it.</li>
+<li>initramfs-tools-core - Not needed here since initramfs-tools will pull it as dependency.</li>
+</ul>
+<hr>
+<ul>
+<li>ifupdown - Not needed here since whonix-[gw|ws]-network-conf pulls ifupdown as a dependency.</li>
+<li>iproute2 - Not needed here ifupdown will pull it as dependency and whonix-[gw|ws]-network-conf depends on ifupdown.</li>
+<li>iputils-ping - Not needed here since kicksecure-dependencies-cli already depends on it.</li>
+<li>isc-dhcp-client, isc-dhcp-common - We don’t want this and if we wanted for kicksecure-network-conf or something the dependency should be defined in that package</li>
+</ul>
+<hr>
+<ul>
+<li>klibc-utils - initramfs-tools-core will pull it as dependency.</li>
+<li>kmod - Not needed here since linux image packages will pull it as dependency.</li>
+<li>less - kicksecure-dependencies-cli will pull it as dependency.</li>
+<li>linux-base - Not needed here since linux image packages will pull it as dependency.</li>
+<li>mount - systemd will pull it as dependency therefore we will still have it and not needed here.</li>
+<li>nano - kicksecure-dependencies-cli will pull it as dependency.</li>
+<li>netbase - whonix-[gw|ws]-network-conf pull it as dependency, therefore not needed here.</li>
+<li>pinentry-curses - whonix-workstation-packages-recommended-gui pull <code>pinentry-qt | pinentry-x11</code> as dependency therefore probably not required here.</li>
+<li>procps - seems important, contains many essential debugging tools <code>ps</code>, <code>kill</code>, <code>free</code> and more. Will add to kicksecure-dependencies-cli</li>
+<li>python, python-minimal, python2, python2-minimal, python2.7, python2.7-minimal - Not needed during debootstrap (mmdebstrap) phase, if needed as dependency later it will be pulled as dependency automatically anyhow.</li>
+<li>rsyslog - not needed</li>
+<li>sensible-utils - probably good to add to some Whonix meta package for usability.</li>
+</ul>
+<hr>
+<ul>
+<li>systemd - That is interesting. A few Whonix packages pull it as dependency but no Whonix meta package (anon-meta-packages) depends on it. Probably also should not… A cleaner solution (no functional difference) is the next package.</li>
+<li>init - Some Whonix meta package should pull it as dependency.</li>
+<li>systemd-sysv - Debian package <code>init</code> <code>Depends:</code> on systemd-sysv. Therefore no need to explicitly add a <code>Depends:</code> anywhere.</li>
+<li>cron - logrotate depends on it. Therefore we will still have this. Maybe we can/should replace cron with <a href="https://packages.debian.org/buster/systemd-cron">https://packages.debian.org/buster/systemd-cron</a> ?</li>
+<li>logrotate - Not needed here since packages that use it pull it as dependency. Should check later if that is still required nowadays or replaced by systemd.</li>
+</ul>
+<hr>
+<ul>
+<li>tasksel - we don’t use tasksel</li>
+<li>tzdata - Will make package timezone-utc pull it as dependency.</li>
+<li>vim-common, vim-tiny - Not installed by default in anon-meta-packages, should be suggested there if shall be installed by default, droppping at this stage:</li>
+<li>whiptail - if anything needs that, it should pull it as a dependency</li>
+<li>xxd - if anything needs that, it should pull it as a dependency</li>
+</ul>
+<hr>
+<p>Trusting that any libs will be pulled automatically as a dependency.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254/2</link>
+        <pubDate>Fri, 03 Apr 2020 16:33:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9254-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254.rss">Whonix default packages review - mmdebstrap varriant related - risk of regressions</source>
+      </item>
+      <item>
+        <title>Whonix default packages review - mmdebstrap varriant related - risk of regressions</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><strong>Long, full details. TLDR in next post.</strong></p>
+<p>It came to my attention that rsyslog is installed by default in Non-Qubes-Whonix. There is really no need for it nowadays. Among other non-essential packages.</p>
+<p>Found the root cause. It’s related to which mmdebstrap (or same for debootstrap) variant gets used.</p>
+<p>Symptom:</p>
+<hr>
+<p>These are the “important” packages.</p>
+<blockquote>
+<p>I: installing remaining packages inside the chroot…<br>
+Reading package lists…<br>
+Building dependency tree…<br>
+adduser is already the newest version (3.118).<br>
+apt is already the newest version (1.8.2).<br>
+debconf is already the newest version (1.5.71).<br>
+debian-archive-keyring is already the newest version (2019.1).<br>
+gpgv is already the newest version (2.2.12-1+deb10u1).<br>
+mawk is already the newest version (1.3.3-17+b3).<br>
+libpam-modules is already the newest version (1.3.1-5).<br>
+libpam-modules-bin is already the newest version (1.3.1-5).<br>
+libpam-runtime is already the newest version (1.3.1-5).<br>
+passwd is already the newest version (1:4.5-1.1).<br>
+fdisk is already the newest version (2.33.1-0.1).<br>
+The following additional packages will be installed:<br>
+dirmngr dmsetup gnupg gnupg-l10n gnupg-utils gpg gpg-agent gpg-wks-client<br>
+gpg-wks-server gpgconf gpgsm initramfs-tools-core klibc-utils libapparmor1<br>
+libapt-inst2.0 libargon2-1 libassuan0 libbsd0 libcap2 libcap2-bin<br>
+libcom-err2 libcryptsetup12 libdevmapper1.02.1 libdns-export1104<br>
+libeatmydata1 libelf1 libestr0 libexpat1 libext2fs2 libfastjson4 libidn11<br>
+libip4tc0 libip6tc0 libiptc0 libisc-export1100 libjson-c3 libklibc libkmod2<br>
+libksba8 libldap-2.4-2 libldap-common liblocale-gettext-perl liblognorm5<br>
+libmnl0 libncurses6 libnetfilter-conntrack3 libnewt0.52 libnfnetlink0<br>
+libnftnl11 libnpth0 libpopt0 libprocps7 libpython-stdlib libpython2-stdlib<br>
+libpython2.7-minimal libpython2.7-stdlib libreadline7 libsasl2-2<br>
+libsasl2-modules-db libslang2 libsqlite3-0 libtext-charwidth-perl<br>
+libtext-iconv-perl libtext-wrapi18n-perl libxtables12 linux-base lsb-base<br>
+mime-support pinentry-curses python-minimal python2 python2-minimal<br>
+python2.7 python2.7-minimal xxd</p>
+</blockquote>
+<hr>
+<p>These are the “important” packages and the resulting dependencies begging installed.</p>
+<blockquote>
+<p>The following NEW packages will be installed:<br>
+apt-transport-tor apt-utils bsdmainutils cpio cron debconf-i18n dirmngr<br>
+dmidecode dmsetup e2fslibs e2fsprogs eatmydata gdbm-l10n gnupg gnupg-l10n<br>
+gnupg-utils gnupg2 gpg gpg-agent gpg-wks-client gpg-wks-server gpgconf gpgsm<br>
+ifupdown init initramfs-tools initramfs-tools-core iproute2 iptables<br>
+iputils-ping isc-dhcp-client isc-dhcp-common klibc-utils kmod less<br>
+libapparmor1 libapt-inst2.0 libargon2-1 libassuan0 libbsd0 libcap2<br>
+libcap2-bin libcom-err2 libcomerr2 libcryptsetup12 libdevmapper1.02.1<br>
+libdns-export1104 libeatmydata1 libelf1 libestr0 libexpat1 libext2fs2<br>
+libfastjson4 libidn11 libip4tc0 libip6tc0 libiptc0 libisc-export1100<br>
+libjson-c3 libklibc libkmod2 libksba8 libldap-2.4-2 libldap-common<br>
+liblocale-gettext-perl liblognorm5 libmnl0 libncurses6<br>
+libnetfilter-conntrack3 libnewt0.52 libnfnetlink0 libnftnl11 libnpth0<br>
+libpopt0 libprocps7 libpython-stdlib libpython2-stdlib libpython2.7-minimal<br>
+libpython2.7-stdlib libreadline7 libsasl2-2 libsasl2-modules-db libslang2<br>
+libsqlite3-0 libss2 libssl1.1 libtext-charwidth-perl libtext-iconv-perl<br>
+libtext-wrapi18n-perl libxtables12 linux-base logrotate lsb-base<br>
+mime-support mount nano netbase pinentry-curses procps python python-minimal<br>
+python2 python2-minimal python2.7 python2.7-minimal readline-common rsyslog<br>
+sensible-utils systemd systemd-sysv tasksel tasksel-data tzdata udev<br>
+vim-common vim-tiny whiptail xxd<br>
+0 upgraded, 118 newly installed, 0 to remove and 0 not upgraded.<br>
+Need to get 31.4 MB of archives.</p>
+</blockquote>
+<hr>
+<p>Quote <a href="https://manpages.debian.org/buster/mmdebstrap/mmdebstrap.1.en.html#VARIANTS">https://manpages.debian.org/buster/mmdebstrap/mmdebstrap.1.en.html#VARIANTS</a></p>
+<blockquote>
+<h1>VARIANTS</h1>
+<p>All package sets also include the direct and indirect hard dependencies (but not recommends) of the selected package sets. The variants <strong>minbase</strong> , <strong>buildd</strong> and <strong>-</strong> , resemble the package sets that debootstrap would install with the same <em>–variant</em> argument.</p>
+<p><strong>extract</strong></p>
+<p>Installs nothing by default (not even “Essential:yes” packages). Packages given by the “–include” option are extracted but will not be installed.</p>
+<p><strong>custom</strong></p>
+<p>Installs nothing by default (not even “Essential:yes” packages). Packages given by the “–include” option will be installed. If another mode than <strong>chrootless</strong> was selected and dpkg was not part of the included package set, then this variant will fail because it cannot configure the packages.</p>
+<p><strong>essential</strong></p>
+<p>“Essential:yes” packages.</p>
+<p><strong>apt</strong></p>
+<p>The <strong>essential</strong> set plus apt.</p>
+<p><strong>required</strong> , <strong>minbase</strong></p>
+<p>The <strong>essential</strong> set plus all packages with Priority:required and apt.</p>
+<p><strong>buildd</strong></p>
+<p>The <strong>minbase</strong> set plus build-essential.</p>
+<p><strong>important</strong> , <strong>debootstrap</strong> , <strong>-</strong></p>
+<p>The <strong>required</strong> set plus all packages with Priority:important. This is the default of debootstrap.</p>
+<p><strong>standard</strong></p>
+<p>The <strong>important</strong> set plus all packages with Priority:standard.</p>
+</blockquote>
+<p>“important” is the mmdebstrap default (which includes the following partially unwanted packages such as rsyslog). Now downgraded to “required” in Whonix git master.</p>
+<p>Even if we want to keep these packages these should be re-added in <a href="https://github.com/Whonix/anon-meta-packages/blob/master/debian/control">https://github.com/Whonix/anon-meta-packages/blob/master/debian/control</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254/1</link>
+        <pubDate>Fri, 03 Apr 2020 13:27:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9254-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-default-packages-review-mmdebstrap-varriant-related-risk-of-regressions/9254.rss">Whonix default packages review - mmdebstrap varriant related - risk of regressions</source>
+      </item>
+  </channel>
+</rss>

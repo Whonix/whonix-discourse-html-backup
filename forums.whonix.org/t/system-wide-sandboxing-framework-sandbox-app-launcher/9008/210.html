@@ -1,0 +1,2667 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>System-wide sandboxing framework - sandbox-app-launcher - #210 by Patrick - Development - Whonix Forum</title>
+    <meta name="description" content="We’re currently working on a full system apparmor policy to confine all userspace processes but this has 2 issues: 
+
+
+It doesn’t use more restrictive profiles for user applications. A PDF viewer shouldn’t have the same p&amp;hellip;">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="../90081c8b.html?page=11" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../../c/news/21.html">NEWS</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;System-wide sandboxing framework - sandbox-app-launcher&#39;" href="../9008.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/210" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/210" />
+<meta property="og:title" content="System-wide sandboxing framework - sandbox-app-launcher" />
+<meta name="twitter:title" content="System-wide sandboxing framework - sandbox-app-launcher" />
+<meta property="og:description" content="There is a lot stuff in /etc/X11/Xsession.d. I am looking for ways to parse all in a generic way.  find /etc/X11/Xsession.d   /etc/X11/Xsession.d/  /etc/X11/Xsession.d/50default_editor  /etc/X11/Xsession.d/50panic_on_oops  /etc/X11/Xsession.d/20uwt  /etc/X11/Xsession.d/50anon-apps-config  /etc/X11/Xsession.d/30x11-common_xresources  /etc/X11/Xsession.d/50security-misc  /etc/X11/Xsession.d/20whonix-welcome-page  /etc/X11/Xsession.d/20torbrowser  /etc/X11/Xsession.d/95dbus_update-activation-env  /..." />
+<meta name="twitter:description" content="There is a lot stuff in /etc/X11/Xsession.d. I am looking for ways to parse all in a generic way.  find /etc/X11/Xsession.d   /etc/X11/Xsession.d/  /etc/X11/Xsession.d/50default_editor  /etc/X11/Xsession.d/50panic_on_oops  /etc/X11/Xsession.d/20uwt  /etc/X11/Xsession.d/50anon-apps-config  /etc/X11/Xsession.d/30x11-common_xresources  /etc/X11/Xsession.d/50security-misc  /etc/X11/Xsession.d/20whonix-welcome-page  /etc/X11/Xsession.d/20torbrowser  /etc/X11/Xsession.d/95dbus_update-activation-env  /..." />
+<meta property="article:published_time" content="2020-10-29T21:38:19+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+        <link rel="prev" href="../90081448.html?page=10">
+        <link rel="next" href="../9008ce37.html?page=12">
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../../index.html">
+          <img src="../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="../9008.html">System-wide sandboxing framework - sandbox-app-launcher</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../../c/development/8.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #25AAE2'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>Development</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+      <div class="topic-category">
+        <div class='discourse-tags list-tags'>
+            <a href='../../../tag/component_security.html' class='discourse-tag' rel="tag">component_security</a>, 
+            <a href='../../../tag/status_open_issue_todo.html' class='discourse-tag' rel="tag">status_open_issue_todo</a>
+        </div>
+      </div>
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-29T17:43:01Z' class='post-time'>
+                October 29, 2020,  5:43pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-29T17:43:01Z'>
+          <span itemprop='position'>#205</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>This is an issue in a Qubes TempalteBasedVM.</p>
+<pre><code>sandbox-app-launcher firefox
+</code></pre>
+<blockquote>
+<p>ERROR: Must run as root.</p>
+</blockquote>
+<pre><code>sudo sandbox-app-launcher firefox
+</code></pre>
+<blockquote>
+<p>bwrap: Can’t find source path /home/sandbox-app-launcher-appdata/firefox: Permission denied</p>
+</blockquote>
+<p>The issue is that after reboot the new user created by useradd is lost but the home folder might still exist.</p>
+<p>Reasons for using adduser instead of useradd:</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/dist-base-files/blob/master/debian/dist-base-files.postinst#L79-L96" target="_blank">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="../../../../external.html?link=https://github.com/Whonix/dist-base-files/blob/master/debian/dist-base-files.postinst#L79-L96" target="_blank">Whonix/dist-base-files/blob/master/debian/dist-base-files.postinst#L79-L96</a></h4>
+<pre class="onebox"><code class="lang-postinst"><ol class="start lines" start="79" style="counter-reset: li-counter 78 ;">
+<li>## Use --no-create-home and leave home folder creation to pam mkhomedir</li>
+<li>## https://phabricator.whonix.org/T913</li>
+<li>## https://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/4</li>
+<li>##</li>
+<li>## old:</li>
+<li>#useradd --no-create-home --password "$password" --user-group --shell /bin/bash "$user_to_be_created"</li>
+<li>##</li>
+<li>## Prefer adduser rather than useradd.</li>
+<li>##</li>
+<li>## No need to user --user-group since this is Debian adduser default.</li>
+<li>## No need to use --shell since it defaults to /bin/bash anyhow and should be left to adduser configuration file.</li>
+<li>##</li>
+<li>## Quote adduser man page:</li>
+<li>## With the --disabled-login option, the account will be created but will be disabled until a password is set.</li>
+<li>## The --disabled-password option will not set a password, but login is still possible (for example with SSH RSA keys).</li>
+<li>##</li>
+<li>## Use --disabled-login and --gecos to run adduser in non-interactive mode.</li>
+<li>adduser --no-create-home --disabled-login --gecos "" "$user_to_be_created"</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+          <meta itemprop='keywords' content='component_security, status_open_issue_todo'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-29T17:45:18Z' class='post-time'>
+                October 29, 2020,  5:45pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-29T17:45:18Z'>
+          <span itemprop='position'>#206</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/7422542236cf913708e2c042826e6f26d3d06e21" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/7422542236cf913708e2c042826e6f26d3d06e21" target="_blank">port from useradd to adduser</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-29" data-time="17:39:34" data-timezone="UTC">05:39PM - 29 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 5 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/7422542236cf913708e2c042826e6f26d3d06e21" target="_blank">
+          <span class="added">+5</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">https://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/205</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>But got another issue now.</p>
+<blockquote>
+<p>bwrap: Can’t find source path /home/sandbox-app-launcher-appdata/nano: Permission denied</p>
+</blockquote>
+<pre><code>sudo stat /home/sandbox-app-launcher-appdata/nano
+</code></pre>
+<blockquote>
+<p>File: /home/sandbox-app-launcher-appdata/nano<br>
+Access: (0700/drwx------)  Uid: ( 1003/sandbox-nano)   Gid: ( 1003/sandbox-nano)</p>
+</blockquote>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-29T17:53:36Z' class='post-time'>
+                October 29, 2020,  5:53pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-29T17:53:36Z'>
+          <span itemprop='position'>#207</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <pre><code>stat /home/sandbox-app-launcher-appdata
+</code></pre>
+<blockquote>
+<p>File: /home/sandbox-app-launcher-appdata<br>
+Access: (0750/drwxr-x—)  Uid: (    0/    root)   Gid: (    0/    root)</p>
+</blockquote>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-29T18:03:22Z' class='post-time'>
+                October 29, 2020,  6:03pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-29T18:03:22Z'>
+          <span itemprop='position'>#208</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>This fixes it.</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/38fc2abea7589a2d2032b7631978eecb6f9bf5f2" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/38fc2abea7589a2d2032b7631978eecb6f9bf5f2" target="_blank">set owner of app_homedir to app_user</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-29" data-time="18:02:46" data-timezone="UTC">06:02PM - 29 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 4 additions and 0 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/38fc2abea7589a2d2032b7631978eecb6f9bf5f2" target="_blank">
+          <span class="added">+4</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">https://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/206</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/e78bf74b26985d5e2d7dbf02c1ebff69aca70225" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/e78bf74b26985d5e2d7dbf02c1ebff69aca70225" target="_blank">fix</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-29" data-time="18:04:25" data-timezone="UTC">06:04PM - 29 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/e78bf74b26985d5e2d7dbf02c1ebff69aca70225" target="_blank">
+          <span class="added">+1</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-29T20:46:36Z' class='post-time'>
+                October 29, 2020,  8:46pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-29T20:46:36Z'>
+          <span itemprop='position'>#209</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/0408cb4f2c845be5293b720192fc4c290ffa92fc" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/0408cb4f2c845be5293b720192fc4c290ffa92fc" target="_blank">set correct HOME variable during Tor Browser installation</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-29" data-time="20:46:01" data-timezone="UTC">08:46PM - 29 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/0408cb4f2c845be5293b720192fc4c290ffa92fc" target="_blank">
+          <span class="added">+1</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-29T21:38:19Z' class='post-time'>
+                October 29, 2020,  9:38pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-29T21:38:19Z'>
+          <span itemprop='position'>#210</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>There is a lot stuff in <code>/etc/X11/Xsession.d</code>. I am looking for ways to parse all in a generic way.</p>
+<pre><code>find /etc/X11/Xsession.d
+</code></pre>
+<blockquote>
+<p>/etc/X11/Xsession.d/<br>
+/etc/X11/Xsession.d/50default_editor<br>
+/etc/X11/Xsession.d/50panic_on_oops<br>
+/etc/X11/Xsession.d/20uwt<br>
+/etc/X11/Xsession.d/50anon-apps-config<br>
+/etc/X11/Xsession.d/30x11-common_xresources<br>
+/etc/X11/Xsession.d/50security-misc<br>
+/etc/X11/Xsession.d/20whonix-welcome-page<br>
+/etc/X11/Xsession.d/20torbrowser<br>
+/etc/X11/Xsession.d/95dbus_update-activation-env<br>
+/etc/X11/Xsession.d/99x11-common_start<br>
+/etc/X11/Xsession.d/50tb_default_browser<br>
+/etc/X11/Xsession.d/90x11-common_ssh-agent<br>
+/etc/X11/Xsession.d/75dbus_dbus-launch<br>
+/etc/X11/Xsession.d/50x11-common_determine-startup<br>
+/etc/X11/Xsession.d/40open_link_confirmation_kde<br>
+/etc/X11/Xsession.d/20qt-gnome-desktop-session-id<br>
+/etc/X11/Xsession.d/35x11-common_xhost-local<br>
+/etc/X11/Xsession.d/40x11-common_xsessionrc<br>
+/etc/X11/Xsession.d/20qt-x11-no-mitshm<br>
+/etc/X11/Xsession.d/90gpg-agent<br>
+/etc/X11/Xsession.d/20x11-common_process-args<br>
+/etc/X11/Xsession.d/25xdg-qubes-settings<br>
+/etc/X11/Xsession.d/40open_link_confirmation<br>
+/etc/X11/Xsession.d/50torbrowser_default_browser<br>
+/etc/X11/Xsession.d/20whonix<br>
+/etc/X11/Xsession.d/90qubes-keymap</p>
+</blockquote>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-29T21:39:29Z' class='post-time'>
+                October 29, 2020,  9:39pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-29T21:39:29Z'>
+          <span itemprop='position'>#211</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Here is an example wrapper script that I’ve been auto generating:<br>
+<code>/var/cache/sandbox-app-launcher-autogenerated/wrappers-wx/torbrowser</code></p>
+<pre><code>#!/bin/sh
+
+## Using sh because /etc/X11/Xsession is written in sh.
+
+## Debugging.
+set -x
+
+export sandbox_app_launcher_wrapper_script=true
+SYSSESSIONDIR=/etc/X11/Xsession.d
+SESSIONFILES=$(run-parts --list $SYSSESSIONDIR)
+if [ -n "$SESSIONFILES" ]; then
+  set +e
+  for SESSIONFILE in $SESSIONFILES; do
+    if [ "$SESSIONFILE" = "/etc/X11/Xsession.d/99x11-common_start" ]; then
+       continue
+    fi
+    . $SESSIONFILE
+  done
+  set -e
+fi
+"/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/start-tor-browser" "${@}"</code></pre>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-29T21:41:33Z' class='post-time'>
+                October 29, 2020,  9:41pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-29T21:41:33Z'>
+          <span itemprop='position'>#212</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Here is the relevant xtrace.</p>
+<pre><code class="lang-auto">+ export sandbox_app_launcher_wrapper_script=true
++ SYSSESSIONDIR=/etc/X11/Xsession.d
++ run-parts --list /etc/X11/Xsession.d
++ SESSIONFILES=/etc/X11/Xsession.d/20qt-gnome-desktop-session-id
+/etc/X11/Xsession.d/20qt-x11-no-mitshm
+/etc/X11/Xsession.d/20torbrowser
+/etc/X11/Xsession.d/20uwt
+/etc/X11/Xsession.d/20whonix
+/etc/X11/Xsession.d/20whonix-welcome-page
+/etc/X11/Xsession.d/20x11-common_process-args
+/etc/X11/Xsession.d/25xdg-qubes-settings
+/etc/X11/Xsession.d/30x11-common_xresources
+/etc/X11/Xsession.d/35x11-common_xhost-local
+/etc/X11/Xsession.d/40open_link_confirmation
+/etc/X11/Xsession.d/40open_link_confirmation_kde
+/etc/X11/Xsession.d/40x11-common_xsessionrc
+/etc/X11/Xsession.d/50anon-apps-config
+/etc/X11/Xsession.d/50default_editor
+/etc/X11/Xsession.d/50panic_on_oops
+/etc/X11/Xsession.d/50security-misc
+/etc/X11/Xsession.d/50tb_default_browser
+/etc/X11/Xsession.d/50torbrowser_default_browser
+/etc/X11/Xsession.d/50x11-common_determine-startup
+/etc/X11/Xsession.d/75dbus_dbus-launch
+/etc/X11/Xsession.d/90gpg-agent
+/etc/X11/Xsession.d/90qubes-keymap
+/etc/X11/Xsession.d/90x11-common_ssh-agent
+/etc/X11/Xsession.d/95dbus_update-activation-env
+/etc/X11/Xsession.d/99x11-common_start
++ [ -n /etc/X11/Xsession.d/20qt-gnome-desktop-session-id
+/etc/X11/Xsession.d/20qt-x11-no-mitshm
+/etc/X11/Xsession.d/20torbrowser
+/etc/X11/Xsession.d/20uwt
+/etc/X11/Xsession.d/20whonix
+/etc/X11/Xsession.d/20whonix-welcome-page
+/etc/X11/Xsession.d/20x11-common_process-args
+/etc/X11/Xsession.d/25xdg-qubes-settings
+/etc/X11/Xsession.d/30x11-common_xresources
+/etc/X11/Xsession.d/35x11-common_xhost-local
+/etc/X11/Xsession.d/40open_link_confirmation
+/etc/X11/Xsession.d/40open_link_confirmation_kde
+/etc/X11/Xsession.d/40x11-common_xsessionrc
+/etc/X11/Xsession.d/50anon-apps-config
+/etc/X11/Xsession.d/50default_editor
+/etc/X11/Xsession.d/50panic_on_oops
+/etc/X11/Xsession.d/50security-misc
+/etc/X11/Xsession.d/50tb_default_browser
+/etc/X11/Xsession.d/50torbrowser_default_browser
+/etc/X11/Xsession.d/50x11-common_determine-startup
+/etc/X11/Xsession.d/75dbus_dbus-launch
+/etc/X11/Xsession.d/90gpg-agent
+/etc/X11/Xsession.d/90qubes-keymap
+/etc/X11/Xsession.d/90x11-common_ssh-agent
+/etc/X11/Xsession.d/95dbus_update-activation-env
+/etc/X11/Xsession.d/99x11-common_start ]
++ set +e
++ [ /etc/X11/Xsession.d/20qt-gnome-desktop-session-id = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/20qt-gnome-desktop-session-id
++ [ -z  ]
++ export GNOME_DESKTOP_SESSION_ID=
++ [ /etc/X11/Xsession.d/20qt-x11-no-mitshm = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/20qt-x11-no-mitshm
++ export QT_X11_NO_MITSHM=1
++ [ /etc/X11/Xsession.d/20torbrowser = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/20torbrowser
++ [ -x /usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh ]
++ . /usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh
++ export TOR_SKIP_LAUNCH=1
++ export TOR_SOCKS_IPC_PATH=/run/anon-ws-disable-stacked-tor/127.0.0.1_9150.sock
++ export TOR_CONTROL_IPC_PATH=/run/anon-ws-disable-stacked-tor/127.0.0.1_9151.sock
++ export TOR_SKIP_CONTROLPORTTEST=1
++ export TOR_NO_DISPLAY_NETWORK_SETTINGS=1
++ [ /etc/X11/Xsession.d/20uwt = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/20uwt
++ [ -x /usr/lib/uwt/uwt.sh ]
++ . /usr/lib/uwt/uwt.sh
++ export TORSOCKS_LOG_LEVEL=1
++ [ /etc/X11/Xsession.d/20whonix = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/20whonix
++ [ -x /usr/lib/whonix/whonix.sh ]
++ . /usr/lib/whonix/whonix.sh
++ export WHONIX=1
++ export TOR_HIDE_BROWSER_LOGO=1
++ [ /etc/X11/Xsession.d/20whonix-welcome-page = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/20whonix-welcome-page
++ [ -x /usr/lib/whonix-welcome-page/env_var.sh ]
++ . /usr/lib/whonix-welcome-page/env_var.sh
++ [  =  ]
++ TOR_DEFAULT_HOMEPAGE=/usr/share/homepage/whonix-welcome-page/whonix.html
++ export TOR_DEFAULT_HOMEPAGE
++ [ /etc/X11/Xsession.d/20x11-common_process-args = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/20x11-common_process-args
++ cat 
+cat: '': No such file or directory
++ OPTIONS=
++ true
++ [ /etc/X11/Xsession.d/25xdg-qubes-settings = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/25xdg-qubes-settings
++ [ -x /usr/bin/xsettingsd ]
++ [ /etc/X11/Xsession.d/30x11-common_xresources = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/30x11-common_xresources
++ [ -d  ]
++ has_option allow-user-resources
++ [  !=  ]
++ return 1
++ [ /etc/X11/Xsession.d/35x11-common_xhost-local = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/35x11-common_xhost-local
++ type xhost
++ id -un
++ xhost +si:localuser:sandbox-torbrowser
+localuser:sandbox-torbrowser being added to access control list
++ [ /etc/X11/Xsession.d/40open_link_confirmation = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/40open_link_confirmation
++ [ -x /usr/lib/open-link-confirmation/open-link-confirmation.sh ]
++ . /usr/lib/open-link-confirmation/open-link-confirmation.sh
++ export BROWSER=/usr/lib/open_link_confirmation
++ [ /etc/X11/Xsession.d/40open_link_confirmation_kde = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/40open_link_confirmation_kde
++ [ -z  ]
++ XDG_CONFIG_DIRS=/etc/xdg
++ export XDG_CONFIG_DIRS=/usr/share/open-link-confirmation/:/etc/xdg
++ [ /etc/X11/Xsession.d/40x11-common_xsessionrc = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/40x11-common_xsessionrc
++ [ -r  ]
++ [ /etc/X11/Xsession.d/50anon-apps-config = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/50anon-apps-config
++ [ -z /usr/share/open-link-confirmation/:/etc/xdg ]
++ export XDG_CONFIG_DIRS=/usr/share/anon-apps-config/:/usr/share/open-link-confirmation/:/etc/xdg
++ [ -z  ]
++ XDG_DATA_DIRS=/usr/local/share/:/usr/share/
++ export XDG_DATA_DIRS=/usr/share/anon-apps-config/share/:/usr/local/share/:/usr/share/
++ [ /etc/X11/Xsession.d/50default_editor = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/50default_editor
++ [ -x /usr/lib/default-editor/default_editor.sh ]
++ . /usr/lib/default-editor/default_editor.sh
++ [  =  ]
++ command -v mousepad
++ VISUAL=mousepad
++ export VISUAL
++ [ /etc/X11/Xsession.d/50panic_on_oops = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/50panic_on_oops
++ [ -x /usr/lib/security-misc/panic-on-oops ]
++ sudo --non-interactive /usr/lib/security-misc/panic-on-oops
+sudo: effective uid is not 0, is /usr/bin/sudo on a file system with the 'nosuid' option set or an NFS file system without root privileges?
++ [ /etc/X11/Xsession.d/50security-misc = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/50security-misc
++ [ -z /usr/share/anon-apps-config/:/usr/share/open-link-confirmation/:/etc/xdg ]
++ export XDG_CONFIG_DIRS=/usr/share/security-misc/:/usr/share/anon-apps-config/:/usr/share/open-link-confirmation/:/etc/xdg
++ [ /etc/X11/Xsession.d/50tb_default_browser = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/50tb_default_browser
++ [ -x /usr/lib/tb-default-browser/tb_default_browser.sh ]
++ . /usr/lib/tb-default-browser/tb_default_browser.sh
++ export BROWSER=/usr/bin/x-www-browser
++ [ /etc/X11/Xsession.d/50torbrowser_default_browser = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/50torbrowser_default_browser
++ [ -z /usr/share/security-misc/:/usr/share/anon-apps-config/:/usr/share/open-link-confirmation/:/etc/xdg ]
++ export XDG_CONFIG_DIRS=/usr/share/torbrowser-default-browser/:/usr/share/security-misc/:/usr/share/anon-apps-config/:/usr/share/open-link-confirmation/:/etc/xdg
++ [ /etc/X11/Xsession.d/50x11-common_determine-startup = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/50x11-common_determine-startup
++ [ -z  ]
++ has_option allow-user-xsession
++ [  !=  ]
++ return 1
++ [ -z  ]
++ [ -x /usr/bin/x-session-manager ]
++ [ -x /usr/bin/x-window-manager ]
++ [ -x /usr/bin/x-terminal-emulator ]
++ STARTUP=x-terminal-emulator
++ [ -z x-terminal-emulator ]
++ [ /etc/X11/Xsession.d/75dbus_dbus-launch = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/75dbus_dbus-launch
++ STARTDBUS=
++ DBUSLAUNCH=/usr/bin/dbus-launch
++ has_option use-session-dbus
++ [  !=  ]
++ return 1
++ [ -n  ]
++ [ /etc/X11/Xsession.d/90gpg-agent = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/90gpg-agent
++ gpgconf --list-dirs agent-socket
++ agent_sock=/home/sandbox-app-launcher-appdata/torbrowser/.gnupg/S.gpg-agent
++ export GPG_AGENT_INFO=/home/sandbox-app-launcher-appdata/torbrowser/.gnupg/S.gpg-agent:0:1
++ gpgconf --list-options gpg-agent
++ awk -F: /^enable-ssh-support:/{ print $10 }
++ [ -n  ]
++ [ /etc/X11/Xsession.d/90qubes-keymap = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/90qubes-keymap
++ /usr/bin/qubesdb-read /qubes-keyboard
+Failed connect to local daemon
++ QUBES_KEYMAP=
++ /bin/echo -e
++ QUBES_KEYMAP=
++ cat /home/sandbox-app-launcher-appdata/torbrowser/.config/qubes-keyboard-layout.rc
++ QUBES_USER_KEYMAP=
++ [ -n  ]
++ [ -n  ]
++ [ /etc/X11/Xsession.d/90x11-common_ssh-agent = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/90x11-common_ssh-agent
++ STARTSSH=
++ SSHAGENT=/usr/bin/ssh-agent
++ SSHAGENTARGS=
++ has_option use-ssh-agent
++ [  !=  ]
++ return 1
++ [ -n  ]
++ [ /etc/X11/Xsession.d/95dbus_update-activation-env = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/95dbus_update-activation-env
++ [ -n  ]
++ [ /etc/X11/Xsession.d/99x11-common_start = /etc/X11/Xsession.d/99x11-common_start ]
++ continue
++ set -e
++ /home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/start-tor-browser
+</code></pre>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-29T21:45:55Z' class='post-time'>
+                October 29, 2020,  9:45pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-29T21:45:55Z'>
+          <span itemprop='position'>#213</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Some stuff broken. Did not investigate this one yet:</p>
+<aside class="quote no-group" data-username="Patrick" data-post="212" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">+ . /etc/X11/Xsession.d/20x11-common_process-args
++ cat 
+cat: '': No such file or directory
+</code></pre>
+</blockquote>
+</aside>
+<hr>
+<p>This one we might not want?</p>
+<aside class="quote no-group" data-username="Patrick" data-post="212" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">+ type xhost
++ id -un
++ xhost +si:localuser:sandbox-torbrowser
+localuser:sandbox-torbrowser being added to access control list
+</code></pre>
+</blockquote>
+</aside>
+<hr>
+<p>Trivial issue, easy to fix / skip:</p>
+<aside class="quote no-group" data-username="Patrick" data-post="212" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">+ sudo --non-interactive /usr/lib/security-misc/panic-on-oops
+sudo: effective uid is not 0, is /usr/bin/sudo on a file system with the 'nosuid' option set or an NFS file system without root privileges?
+</code></pre>
+</blockquote>
+</aside>
+<p>This would could probably fix/patch to be skipped upstream:</p>
+<aside class="quote no-group" data-username="Patrick" data-post="212" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">+ /usr/bin/qubesdb-read /qubes-keyboard
+Failed connect to local daemon
+</code></pre>
+</blockquote>
+</aside>
+<hr>
+<p>Maybe useful:</p>
+<aside class="quote no-group" data-username="Patrick" data-post="212" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><code>+ export QT_X11_NO_MITSHM=1</code></p>
+</blockquote>
+</aside>
+<hr>
+<p>Useful stuff:</p>
+<aside class="quote no-group" data-username="Patrick" data-post="212" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">+ . /usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh
++ export TOR_SKIP_LAUNCH=1
++ export TOR_SOCKS_IPC_PATH=/run/anon-ws-disable-stacked-tor/127.0.0.1_9150.sock
++ export TOR_CONTROL_IPC_PATH=/run/anon-ws-disable-stacked-tor/127.0.0.1_9151.sock
++ export TOR_SKIP_CONTROLPORTTEST=1
++ export TOR_NO_DISPLAY_NETWORK_SETTINGS=1
+</code></pre>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-username="Patrick" data-post="212" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">+ [ /etc/X11/Xsession.d/20uwt = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/20uwt
++ [ -x /usr/lib/uwt/uwt.sh ]
++ . /usr/lib/uwt/uwt.sh
++ export TORSOCKS_LOG_LEVEL=1
+</code></pre>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-username="Patrick" data-post="212" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">+ . /usr/lib/whonix/whonix.sh
++ export WHONIX=1
++ export TOR_HIDE_BROWSER_LOGO=1
+</code></pre>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-username="Patrick" data-post="212" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">+ [ -x /usr/lib/whonix-welcome-page/env_var.sh ]
++ . /usr/lib/whonix-welcome-page/env_var.sh
++ [  =  ]
++ TOR_DEFAULT_HOMEPAGE=/usr/share/homepage/whonix-welcome-page/whonix.html
++ export TOR_DEFAULT_HOMEPAGE
+</code></pre>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-username="Patrick" data-post="212" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">+ export BROWSER=/usr/lib/open_link_confirmation
++ [ /etc/X11/Xsession.d/40open_link_confirmation_kde = /etc/X11/Xsession.d/99x11-common_start ]
++ . /etc/X11/Xsession.d/40open_link_confirmation_kde
++ [ -z  ]
++ XDG_CONFIG_DIRS=/etc/xdg
++ export XDG_CONFIG_DIRS=/usr/share/open-link-confirmation/:/etc/xdg
+</code></pre>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-username="Patrick" data-post="212" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">+ [ -x /usr/lib/default-editor/default_editor.sh ]
++ . /usr/lib/default-editor/default_editor.sh
++ [  =  ]
++ command -v mousepad
++ VISUAL=mousepad
++ export VISUAL
+</code></pre>
+</blockquote>
+</aside>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-29T21:53:13Z' class='post-time'>
+                October 29, 2020,  9:53pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-29T21:53:13Z'>
+          <span itemprop='position'>#214</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>(Not only useful for torbrowser. Any application.)<br>
+(Generic parsing of <code>/etc/X11/Xsession.d</code> also results in  <code>dbus-launch</code> which is run by <code>/etc/X11/Xsession.d/75dbus_dbus-launch</code>.)</p>
+<p>Created a branch <code>xsession-parsing</code>.</p>
+<p><a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/tree/xsession-parsing">https://github.com/Whonix/sandbox-app-launcher/tree/xsession-parsing</a></p>
+<p>The only commit so far:</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/005f4539faf95f3a8df2e96227da2b1da6cf5e85" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/005f4539faf95f3a8df2e96227da2b1da6cf5e85" target="_blank">parse folder /etc/X11/Xsession.d</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-29" data-time="21:47:38" data-timezone="UTC">09:47PM - 29 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 44 additions and 10 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/005f4539faf95f3a8df2e96227da2b1da6cf5e85" target="_blank">
+          <span class="added">+44</span>
+          <span class="removed">-10</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">https://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/210</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Is generic parsing of <code>/etc/X11/Xsession.d</code> worth going for? Or do you see risks with that?<br>
+Could there be even security features implemented in <code>/etc/X11/Xsession.d</code> which would be missed if we don’t do this?</p>
+<p>Or better just manually hard code, i.e. add more lines similar to this:</p>
+<pre><code>if [ -x /etc/X11/Xsession.d/20torbrowser ]; then
+  source /etc/X11/Xsession.d/20torbrowser
+fi</code></pre>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-30T20:44:47Z' class='post-time'>
+                October 30, 2020,  8:44pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-30T20:44:47Z'>
+          <span itemprop='position'>#215</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Patrick" data-post="214" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Is generic parsing of <code>/etc/X11/Xsession.d</code> worth going for? Or do you see risks with that?</p>
+</blockquote>
+</aside>
+<p>I don’t think executing a whole load of files we don’t strictly need is a good idea. This would probably only cause more issues. Do you have any examples of files we actually need other than the Tor Browser one?</p>
+<aside class="quote no-group" data-username="Patrick" data-post="214" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Could there be even security features implemented in <code>/etc/X11/Xsession.d</code> which would be missed if we don’t do this?</p>
+</blockquote>
+</aside>
+<p>I doubt it.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-31T10:30:11Z' class='post-time'>
+                October 31, 2020, 10:30am
+              </time>
+              <meta itemprop='dateModified' content='2020-10-31T10:30:11Z'>
+          <span itemprop='position'>#216</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Could you check please if it’s better to use <code>/etc/X11/Xsession.d/75dbus_dbus-launch</code> than running <code>dbus-launch</code> manually?</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/f84b79d9a4e2e64bad310c479739166b63cd0879" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/f84b79d9a4e2e64bad310c479739166b63cd0879" target="_blank">refactoring</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="09:35:45" data-timezone="UTC">09:35AM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 6 additions and 5 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/f84b79d9a4e2e64bad310c479739166b63cd0879" target="_blank">
+          <span class="added">+6</span>
+          <span class="removed">-5</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">introduce variable wrapper_script</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/41bf8e806b9b0dc314d1421e4066bdb3271b94c4" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/41bf8e806b9b0dc314d1421e4066bdb3271b94c4" target="_blank">re-generate wrapper script to make sure it's updated</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="09:36:43" data-timezone="UTC">09:36AM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 3 additions and 4 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/41bf8e806b9b0dc314d1421e4066bdb3271b94c4" target="_blank">
+          <span class="added">+3</span>
+          <span class="removed">-4</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/36e3a4860498f00fc12158a5cb5c5662024ba281" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/36e3a4860498f00fc12158a5cb5c5662024ba281" target="_blank">debugging</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="09:38:17" data-timezone="UTC">09:38AM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 5 additions and 0 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/36e3a4860498f00fc12158a5cb5c5662024ba281" target="_blank">
+          <span class="added">+5</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/f7a70b40286842f981feb81f0cca4ad04d7ebd57" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/f7a70b40286842f981feb81f0cca4ad04d7ebd57" target="_blank">selectively parse /etc/X11/Xsession.d files</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="09:54:47" data-timezone="UTC">09:54AM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 32 additions and 4 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/f7a70b40286842f981feb81f0cca4ad04d7ebd57" target="_blank">
+          <span class="added">+32</span>
+          <span class="removed">-4</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">https://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/210</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/47774f8a648aaba5792b7e223156f1a019f222c3" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/47774f8a648aaba5792b7e223156f1a019f222c3" target="_blank">hide output by adduser</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="10:00:03" data-timezone="UTC">10:00AM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/47774f8a648aaba5792b7e223156f1a019f222c3" target="_blank">
+          <span class="added">+1</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/489589bfd0463e0867c4f07b4c923244528f2804" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/489589bfd0463e0867c4f07b4c923244528f2804" target="_blank">remove remount_exec from tb_skip_functions since this was fixed in tb-starter</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="10:20:19" data-timezone="UTC">10:20AM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/489589bfd0463e0867c4f07b4c923244528f2804" target="_blank">
+          <span class="added">+1</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/bbcb91f0b0180062186282949d745ed3f0f25bcc" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/bbcb91f0b0180062186282949d745ed3f0f25bcc" target="_blank">port to use tb-starter's new tb_no_start=true environment variable</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="10:25:20" data-timezone="UTC">10:25AM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/bbcb91f0b0180062186282949d745ed3f0f25bcc" target="_blank">
+          <span class="added">+1</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">for easier readability than tb_skip_functions</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/9441406458bb36230c2c57f1f4c00922a16d5cbf" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/9441406458bb36230c2c57f1f4c00922a16d5cbf" target="_blank">comment</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="10:27:20" data-timezone="UTC">10:27AM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 0 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/9441406458bb36230c2c57f1f4c00922a16d5cbf" target="_blank">
+          <span class="added">+1</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-31T10:36:12Z' class='post-time'>
+                October 31, 2020, 10:36am
+              </time>
+              <meta itemprop='dateModified' content='2020-10-31T10:36:12Z'>
+          <span itemprop='position'>#217</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/1e1a493419239ef99989f0955b80e26255935c50" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/1e1a493419239ef99989f0955b80e26255935c50" target="_blank">show error message if no program name is given</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="10:35:19" data-timezone="UTC">10:35AM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 5 additions and 0 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/1e1a493419239ef99989f0955b80e26255935c50" target="_blank">
+          <span class="added">+5</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-31T11:10:39Z' class='post-time'>
+                October 31, 2020, 11:10am
+              </time>
+              <meta itemprop='dateModified' content='2020-10-31T11:10:39Z'>
+          <span itemprop='position'>#218</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>From usability perspective it seems a bit weird that one has to run:</p>
+<pre><code>sudo sandbox-app-launcher program [OPTIONS]
+</code></pre>
+<p>I.e. weird that user has to use <code>sudo</code>.</p>
+<p>I however understand that from a technical perspective, <code>sandbox-app-launcher</code> needs to run</p>
+<pre><code>sudo -H -u "${app_user}" bash -c "
+  bwrap
+</code></pre>
+<p>which requires <code>sudo</code>.</p>
+<p>Could we somehow simplify things for the user so the user could just run</p>
+<pre><code>sandbox-app-launcher program [OPTIONS]
+</code></pre>
+<p>instead of</p>
+<pre><code>sudo sandbox-app-launcher program [OPTIONS]
+</code></pre>
+<p>?</p>
+<p>This seems specifically useful since <code>sandbox-app-launcher</code> cannot support running applications as root anyhow. Running <code>sudo sandbox-app-launcher program [OPTIONS]</code> implies that the application runs as root which it doesn’t.</p>
+<p>From a usability perspective, running <code>sudo sandbox-app-launcher</code> should actually tell:</p>
+<blockquote>
+<p>ERROR: Running applications as root with sandbox-app-launcher is unsupported.</p>
+</blockquote>
+<p>Could we add a sudo wrapper for <code>sandbox-app-launcher</code>? Here is the idea:</p>
+<ul>
+<li>rename /usr/bin/sandbox-app-launcher to /usr/lib/sandbox-app-launcher</li>
+<li>introduce /usr/bin/sandbox-app-launcher with contents</li>
+</ul>
+<pre><code class="lang-auto">#!/bin/bash
+sudo /usr/lib/sandbox-app-launcher ${@}
+</code></pre>
+<ul>
+<li>introduce /etc/sudoers.d/sandbox-app-launcher with contents</li>
+</ul>
+<pre><code class="lang-auto">## All sudoers to run without a password.
+%sudo ALL=NOPASSWD: /usr/bin/sandbox-app-launcher *
+</code></pre>
+<p>Or even…</p>
+<pre><code class="lang-auto">## All users in group 'user' to run sandbox-app-launcher without a password.
+%user ALL=NOPASSWD: /usr/bin/sandbox-app-launcher *
+</code></pre>
+<p>But now we need to think about the security issues of that. The asterisk ("<code>*</code>") in <code>/usr/bin/sandbox-app-launcher *</code> could be an issue? Attack surface?</p>
+<ul>
+<li>A compromised user account could run each and every application under <code>sandbox-app-launcher</code> and thereby generate a lot useless <code>app_user</code> <code>sandbox-${app_name}</code> linux user accounts. This could be ignored for now since there are probably many opportunities for denial of service attacks from a locally compromised user account.</li>
+<li>Do you see any other issues? Would this give access to things which would otherwise not be accessible without <code>sudo</code> access?</li>
+</ul>
+<p>This is important in context of <code>PERSISTENT mode USER</code>…</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="../../../../external.html?link=https://www.whonix.org/wiki/Dev/boot_modes" target="_blank" title="10:02AM - 06 May 2020">Whonix – 6 May 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:120/63;"><img src="../../../../external.html?link=https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png" class="thumbnail" width="120" height="63"></div>
+
+<h3><a href="../../../../external.html?link=https://www.whonix.org/wiki/Dev/boot_modes" target="_blank">Multiple Boot Modes for Better Security - an Implementation of Untrusted Root</a></h3>
+
+<p>Persistent User / Live user / Persistent Secureadmin / Persistent Superadmin / Persistent Recovery Mode</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>…which will be a boot mode where there is no sudo/root access for the user. In such a boot mode, sandbox-app-launcher would also be most useful.</p>
+<p>What kind of security issues I am having in mind…</p>
+<p>Currently we use:</p>
+<pre><code>if [ -f "/etc/sandbox-app-launcher/${app_name}.conf" ]; then
+  . "/etc/sandbox-app-launcher/${app_name}.conf"
+fi
+</code></pre>
+<p>Which seems fine.</p>
+<p>However, if we had <code>source /home/user/.sandbox-app-launcher/config</code> that would be really bad, because then user <code>user</code> without access to <code>sudo</code> / root would get the ability the execute commands as <code>root</code>.</p>
+<p>Also if we didn’t use quotes for <code>"/etc/sandbox-app-launcher/${app_name}.conf"</code> there might be a possibility to specifically craft variable <code>app_name</code> (using <code>../</code> or similar) to make it <code>source</code> a file writeable in user home folder too. However, we already sanitize variable <code>app_name</code> so we wouldn’t have this issue either.</p>
+<p>Also putting a fake (attacker) binary into <code>~/bin</code> for purpose of getting a malicious variable <code>app_name</code> is not possible either since <code>sudo</code> sanitizes environment variables among <code>PATH</code> (which of course removes user’s <code>~/bin</code> from <code>PATH</code>).</p>
+<p>Similar threat model as restricted APT, <code>rapt</code>.</p>
+<p>That kind of security issues I am having in mind. Do you see any of these?</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-31T11:23:45Z' class='post-time'>
+                October 31, 2020, 11:23am
+              </time>
+              <meta itemprop='dateModified' content='2020-10-31T11:23:45Z'>
+          <span itemprop='position'>#219</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/9b39503d7f4bb132abb4a82ac9c80102210e2b43" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/9b39503d7f4bb132abb4a82ac9c80102210e2b43" target="_blank">fix /etc/X11/Xsession.d processing</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="11:23:14" data-timezone="UTC">11:23AM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 30 additions and 23 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/9b39503d7f4bb132abb4a82ac9c80102210e2b43" target="_blank">
+          <span class="added">+30</span>
+          <span class="removed">-23</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-31T11:55:31Z' class='post-time'>
+                October 31, 2020, 11:55am
+              </time>
+              <meta itemprop='dateModified' content='2020-10-31T11:55:31Z'>
+          <span itemprop='position'>#220</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/89602f94b21cabaab9f546e1911035f8e2a0ad7a" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/89602f94b21cabaab9f546e1911035f8e2a0ad7a" target="_blank">introduce environment variable `started_by_sandbox_app_launcher=true`</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="11:34:54" data-timezone="UTC">11:34AM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 0 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/89602f94b21cabaab9f546e1911035f8e2a0ad7a" target="_blank">
+          <span class="added">+1</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">so tb-starter (by Whonix developers) can act accordingly</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/581cb2f8bdc6e5781db8302f13e07d8bb95d6e42" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/581cb2f8bdc6e5781db8302f13e07d8bb95d6e42" target="_blank">start `torbrowser` (as installer) with `tb_installer_started_by_sandbox_app_launcher=true`</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="11:44:03" data-timezone="UTC">11:44AM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/581cb2f8bdc6e5781db8302f13e07d8bb95d6e42" target="_blank">
+          <span class="added">+1</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-31T12:30:40Z' class='post-time'>
+                October 31, 2020, 12:30pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-31T12:30:40Z'>
+          <span itemprop='position'>#221</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/4f737bf69c5ba29c6c56548f69f96ec00fb01c7b" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/4f737bf69c5ba29c6c56548f69f96ec00fb01c7b" target="_blank">fix, set home dir with adduser</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="12:29:30" data-timezone="UTC">12:29PM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/4f737bf69c5ba29c6c56548f69f96ec00fb01c7b" target="_blank">
+          <span class="added">+1</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-31T12:31:45Z' class='post-time'>
+                October 31, 2020, 12:31pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-31T12:31:45Z'>
+          <span itemprop='position'>#222</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/25fec6182c27cf885d66679c606709d6615cfc51" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/25fec6182c27cf885d66679c606709d6615cfc51" target="_blank">hide output by dbus-launch</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="12:31:23" data-timezone="UTC">12:31PM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/25fec6182c27cf885d66679c606709d6615cfc51" target="_blank">
+          <span class="added">+1</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-31T12:51:59Z' class='post-time'>
+                October 31, 2020, 12:51pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-31T12:51:59Z'>
+          <span itemprop='position'>#223</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/2cac091d672f1ca608e8f0779dde356bd008b1a3" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/2cac091d672f1ca608e8f0779dde356bd008b1a3" target="_blank">fix wrapper_script variable</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="12:51:36" data-timezone="UTC">12:51PM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 2 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/2cac091d672f1ca608e8f0779dde356bd008b1a3" target="_blank">
+          <span class="added">+2</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-31T13:17:48Z' class='post-time'>
+                October 31, 2020,  1:17pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-31T13:17:48Z'>
+          <span itemprop='position'>#224</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/5ea42f5aa4defe83702fbdebf7fa67db7ec82939" target="_blank">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/5ea42f5aa4defe83702fbdebf7fa67db7ec82939" target="_blank">debugging</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-31" data-time="13:01:41" data-timezone="UTC">01:01PM - 31 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 9 additions and 0 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/5ea42f5aa4defe83702fbdebf7fa67db7ec82939" target="_blank">
+          <span class="added">+9</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<pre><code>find /home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser -executable -type f
+</code></pre>
+<p>List of executable files in Tor Browser folder:</p>
+<pre><code>/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/start-tor-browser.desktop
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libmozavcodec.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libplds4.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libplc4.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/TorBrowser/Tor/libssl.so.1.1
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/TorBrowser/Tor/tor
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/TorBrowser/Tor/libevent-2.1.so.7
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/TorBrowser/Tor/libstdc++/libstdc++.so.6
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/TorBrowser/Tor/libcrypto.so.1.1
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/obfs4proxy
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/updater
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libmozsqlite3.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libnss3.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libnssutil3.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/firefox.real
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/start-tor-browser
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/abicheck
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libfreeblpriv3.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/gtk2/libmozgtk.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libmozgtk.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/execdesktop
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libmozsandbox.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/plugin-container
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/start-tor-browser.desktop
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libnssckbi.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libssl3.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libsmime3.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/liblgpllibs.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libnspr4.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libmozavutil.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/firefox
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libxul.so
+/home/sandbox-app-launcher-appdata/torbrowser/.tb/tor-browser/Browser/libsoftokn3.so
+</code></pre>
+<p>Therefore the following is likely creating issues for Tor Browser:</p>
+<pre><code>  if ! [ "$(stat -c %a "${app_homedir}")" = "700" ]; then
+    chmod 700 -R "${app_homedir}"
+  fi</code></pre>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+
+    <div role='navigation' itemscope itemtype='http://schema.org/SiteNavigationElement' class="topic-body crawler-post">
+        <span itemprop='name'><a rel="prev" itemprop="url" href="../90081448.html?page=10">← previous page</a></span>
+        <span itemprop='name'><b><a rel="next" itemprop="url" href="../9008ce37.html?page=12">next page →</a></b></span>
+    </div>
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

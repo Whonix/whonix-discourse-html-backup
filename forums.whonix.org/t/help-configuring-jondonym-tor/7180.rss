@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Help Configuring Jondonym -&gt; Tor</title>
+    <link>http://forums.whonix.org/t/help-configuring-jondonym-tor/7180</link>
+    <description>So first, I have the JonDo-Gateway VM -&gt; sys-whonix -&gt; workstation -&gt; internet setup, but I&#39;ve set everything up from http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/JonDonym
+But I always get the same output: the anon connection wizard gets stuck at 10%. I&#39;ve tried to reset the proxy on the sys-whonix system settings, i&#39;ve synced the clock perfectly, but it still fails.
+I&#39;m running qubes 4.0.1, with brand new VMs and the iptables and firewall are masked and stopped:
+&quot;In JonDo-Gateway ProxyVM, The iptables rules must be unloaded.
+
+If using Qubes, disable qubes-iptables and qubes-firewall systemd services. Non-Qubes users can skip this.
+
+sudo systemctl mask qubes-iptables
+sudo systemctl stop qubes-iptables
+sudo systemctl mask qubes-firewall
+sudo systemctl stop qubes-firewall&quot;
+
+sudo iptables-save | sed -e &#39;s/\[[0-9:]*\]/[0,0]/&#39; -e &#39;/^#/d&#39;
+returns the proper values:
+*mangle
+:PREROUTING ACCEPT [0,0]
+:INPUT ACCEPT [0,0]
+:FORWARD ACCEPT [0,0]
+:OUTPUT ACCEPT [0,0]
+:POSTROUTING ACCEPT [0,0]
+COMMIT
+*raw
+:PREROUTING ACCEPT [0,0]
+:OUTPUT ACCEPT [0,0]
+COMMIT
+*nat
+:PREROUTING ACCEPT [0,0]
+:INPUT ACCEPT [0,0]
+:OUTPUT ACCEPT [0,0]
+:POSTROUTING ACCEPT [0,0]
+COMMIT
+*filter
+:INPUT ACCEPT [0,0]
+:FORWARD ACCEPT [0,0]
+:OUTPUT ACCEPT [0,0]
+COMMIT
+
+And here&#39;s my Arm tor controller outputs: 13:22:24 [WARN] Proxy Client: unable to connect to 109.105.109.163:47779 (&quot;general SOCKS server failure&quot;) [1 duplicate hidden]
+ 13:22:23 [WARN] Proxy Client: unable to connect to 169.229.59.74:31493 (&quot;general SOCKS server failure&quot;) [1 duplicate hidden]
+ 13:22:20 [WARN] Proxy Client: unable to connect to 169.229.59.75:46328 (&quot;general SOCKS server failure&quot;) [1 duplicate hidden]
+ 13:22:15 [ARM_NOTICE] Unable to prepopulate bandwidth information (insufficient uptime)
+ 13:22:15 [ARM_WARN] The torrc differs from what tor&#39;s using. You can issue a sighup to reload the torrc values by pressing x.
+   - torrc value differs on line: 6
+   - configuration values are missing from the torrc: Bridge, Bridge, Bridge, Bridge, Bridge, ClientTransportPlugin, DisableNetwork, HTTPSProxy, RunAsDaemon, UseBridges
+
+The sudo nano /usr/local/etc/torrc.d/50_user.conf command is done as well (HTTPSProxy &lt;jondogateway ip:4001&gt;)
+
+The &quot;sudo -u debian-tor tor --verify-config&quot; command returned:
+Read configuration file &quot;/usr/local/etc/torrc.d/50_user.conf&quot;.
+Configuration was valid
+
+&quot;sudo service tor@default status&quot; returns active &amp; &quot;New control connection opened&quot;
+
+Reload tor returned general socks failures as well.
+
+I configured sys-whonix&#39;s &quot;system settings&quot; to NO PROXY.
+Can anyone help fix this?
+If you need more info, just tell me. Also if you can fix it, is this jondo setup persistent even if i reset PC/VM?</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 03 May 2019 06:43:19 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/help-configuring-jondonym-tor/7180.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Help Configuring Jondonym -&gt; Tor</title>
+        <dc:creator><![CDATA[anonymous4]]></dc:creator>
+        <description><![CDATA[
+            <p>UPDATE: I got it to work, but 1 issue: The main vm (ws) says that the proxy is refusing connections</p>
+          <p><a href="http://forums.whonix.org/t/help-configuring-jondonym-tor/7180/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/help-configuring-jondonym-tor/7180/2</link>
+        <pubDate>Sat, 20 Apr 2019 17:45:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7180-2</guid>
+        <source url="http://forums.whonix.org/t/help-configuring-jondonym-tor/7180.rss">Help Configuring Jondonym -&gt; Tor</source>
+      </item>
+      <item>
+        <title>Help Configuring Jondonym -&gt; Tor</title>
+        <dc:creator><![CDATA[anonymous4]]></dc:creator>
+        <description><![CDATA[
+            <p>So first, I have the JonDo-Gateway VM -&gt; sys-whonix -&gt; workstation -&gt; internet setup, but I’ve set everything up from <a href="http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/JonDonym" rel="nofollow noopener">http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/JonDonym</a><br>
+But I always get the same output: the anon connection wizard gets stuck at 10%. I’ve tried to reset the proxy on the sys-whonix system settings, i’ve synced the clock perfectly, but it still fails.<br>
+I’m running qubes 4.0.1, with brand new VMs and the iptables and firewall are masked and stopped:<br>
+"In JonDo-Gateway ProxyVM, The iptables rules must be unloaded.</p>
+<p>If using Qubes, disable qubes-iptables and qubes-firewall systemd services. Non-Qubes users can skip this.</p>
+<p>sudo systemctl mask qubes-iptables<br>
+sudo systemctl stop qubes-iptables<br>
+sudo systemctl mask qubes-firewall<br>
+sudo systemctl stop qubes-firewall"</p>
+<p>sudo iptables-save | sed -e ‘s/[[0-9:]*]/[0,0]/’ -e ‘/^#/d’<br>
+returns the proper values:<br>
+*mangle<br>
+:PREROUTING ACCEPT [0,0]<br>
+:INPUT ACCEPT [0,0]<br>
+:FORWARD ACCEPT [0,0]<br>
+:OUTPUT ACCEPT [0,0]<br>
+:POSTROUTING ACCEPT [0,0]<br>
+COMMIT<br>
+*raw<br>
+:PREROUTING ACCEPT [0,0]<br>
+:OUTPUT ACCEPT [0,0]<br>
+COMMIT<br>
+*nat<br>
+:PREROUTING ACCEPT [0,0]<br>
+:INPUT ACCEPT [0,0]<br>
+:OUTPUT ACCEPT [0,0]<br>
+:POSTROUTING ACCEPT [0,0]<br>
+COMMIT<br>
+*filter<br>
+:INPUT ACCEPT [0,0]<br>
+:FORWARD ACCEPT [0,0]<br>
+:OUTPUT ACCEPT [0,0]<br>
+COMMIT</p>
+<p>And here’s my Arm tor controller outputs: 13:22:24 [WARN] Proxy Client: unable to connect to 109.105.109.163:47779 (“general SOCKS server failure”) [1 duplicate hidden]<br>
+13:22:23 [WARN] Proxy Client: unable to connect to 169.229.59.74:31493 (“general SOCKS server failure”) [1 duplicate hidden]<br>
+13:22:20 [WARN] Proxy Client: unable to connect to 169.229.59.75:46328 (“general SOCKS server failure”) [1 duplicate hidden]<br>
+13:22:15 [ARM_NOTICE] Unable to prepopulate bandwidth information (insufficient uptime)<br>
+13:22:15 [ARM_WARN] The torrc differs from what tor’s using. You can issue a sighup to reload the torrc values by pressing x.</p>
+<ul>
+<li>torrc value differs on line: 6</li>
+<li>configuration values are missing from the torrc: Bridge, Bridge, Bridge, Bridge, Bridge, ClientTransportPlugin, DisableNetwork, HTTPSProxy, RunAsDaemon, UseBridges</li>
+</ul>
+<p>The sudo nano /usr/local/etc/torrc.d/50_user.conf command is done as well (HTTPSProxy )</p>
+<p>The “sudo -u debian-tor tor --verify-config” command returned:<br>
+Read configuration file “/usr/local/etc/torrc.d/50_user.conf”.<br>
+Configuration was valid</p>
+<p>“sudo service tor@default status” returns active &amp; “New control connection opened”</p>
+<p>Reload tor returned general socks failures as well.</p>
+<p>I configured sys-whonix’s “system settings” to NO PROXY.<br>
+Can anyone help fix this?<br>
+If you need more info, just tell me. Also if you can fix it, is this jondo setup persistent even if i reset PC/VM?</p>
+          <p><a href="http://forums.whonix.org/t/help-configuring-jondonym-tor/7180/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/help-configuring-jondonym-tor/7180/1</link>
+        <pubDate>Sat, 20 Apr 2019 17:30:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7180-1</guid>
+        <source url="http://forums.whonix.org/t/help-configuring-jondonym-tor/7180.rss">Help Configuring Jondonym -&gt; Tor</source>
+      </item>
+  </channel>
+</rss>

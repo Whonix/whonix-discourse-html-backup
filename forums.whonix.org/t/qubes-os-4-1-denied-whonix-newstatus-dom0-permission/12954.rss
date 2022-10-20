@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+    <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954</link>
+    <description>Hello,
+above dom0 permission warning dialog is displayed, when shutting down a Whonix Gateway different from `sys-whonix`.
+
+Given a freshly created gateway AppVM `sys-whonix-test`, the exact dialog message is:
+
+&gt; Denied: whonix.NewStatus
+Denied whonix.NewStatus+sys-whonix-test_shutdown from sys-whonix-test to sys-whonix
+
+Error reproduction
+```
+qvm-create -l yellow --template whonix-gw-16 --prop provides_network=True sys-whonix-test
+qvm-start sys-whonix-test
+qvm-shutdown sys-whonix-test #  here displays the error
+```
+`sys-whonix-test` has same tags as `sys-whonix`
+```
+[user@dom0 ~]$ qvm-tags sys-whonix-test
+anon-gateway
+audiovm-dom0
+created-by-dom0
+guivm-dom0
+````
+whonix.NewStatus permissions (default)
+```
+[user@dom0 ~]$ cat /etc/qubes-rpc/policy/whonix.NewStatus 
+$tag:anon-vm $tag:anon-gateway allow
+$tag:anon-vm sys-whonix allow
+$anyvm $anyvm deny
+```
+I am wondering, what `sys-whonix-test` needs to do with a different gateway `sys-whonix` at all.
+Might be, that `sys-whonix-test` is treated incorrectly as a workstation?
+
+Thanks for hints!
+
+----
+
+More details:
+The error can be solved by adding following permission to `/etc/qubes-rpc/policy/whonix.NewStatus`:
+
+```
+sys-whonix-test sys-whonix allow
+```
+
+, which raises the question, why is there any dependency between two gateways.
+
+Qubes 4.0 had worked flawlessly.</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 03 Jan 2022 08:44:25 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Qubes doesn’t backup and restore qvm-tags.</p>
+<p>Duplicate of:</p>
+<aside class="onebox githubissue">
+  <header class="source">
+
+      <a href="https://github.com/QubesOS/qubes-issues/issues/4167" target="_blank" rel="noopener">github.com/QubesOS/qubes-issues</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/QubesOS/qubes-issues/issues/4167" target="_blank" rel="noopener">Whonix and problem with Proxy Policy</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2018-07-30" data-time="19:17:39" data-timezone="UTC">07:17PM - 30 Jul 18 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="https://github.com/toxub23" target="_blank" rel="noopener">
+          <img alt="toxub23" src="https://avatars.githubusercontent.com/u/33116520?v=4" class="onebox-avatar-inline" width="20" height="20">
+          toxub23
+        </a>
+      </div>
+    </div>
+
+    <div class="labels">
+        <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">T: bug</span>
+        <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: Whonix</span>
+        <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">P: default</span>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">### Qubes OS version:
+R4.0
+
+### Affected component(s): 
+Whonix templates and<span class="show-more-container"><a href="http://forums.whonix.org" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden"> qubes.UpdatesProxy
+
+### Actual behavior:
+I have a Whonix template restored from a backup from Qubes R4. I have the latest Qubes OS R4. I have set whonix-gw / ws -&gt; sys-whonix-s -&gt; sys-firewall-s -&gt; sys-net-s.
+
+In /etc/qubes-rpc/policy/qubes.UpdatesProxy, I have a set of default values for ordinary templates, and among others
+$tag:whonix-updatevm $default allow,target=sys-whonix-s
+$tag:whonix-updatevm $anyvm deny
+
+Anyway, when I try to update whonix-ws / gw, whonix shows me the information that qubes proxy is not set.
+Maybe for the correct operation of whonix I need to edit some additional files?
+In qvm-tags whonix-gw / ws, I have "whonix-updatevm".</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/18</link>
+        <pubDate>Mon, 03 Jan 2022 08:44:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12954-18</guid>
+        <source url="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss">[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</source>
+      </item>
+      <item>
+        <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+        <dc:creator><![CDATA[mimp]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="16" data-topic="12954">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><code>qube “info” is not tagged as “anon-vm”</code> → That’s an issue. It should be.</p>
+<p>How did you create Qube <code>info</code>?</p>
+</blockquote>
+</aside>
+<p>This time I restored it from a backup from Qubes 4.0.4. Originally I would have cloned whonix-ws to create a standalone VM/qube. It’s possible this was a clone of a clone.</p>
+<p>Thanks for clarifying the scope of the tag “anon-vm”.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/17</link>
+        <pubDate>Sun, 02 Jan 2022 15:57:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12954-17</guid>
+        <source url="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss">[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</source>
+      </item>
+      <item>
+        <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="mimp" data-post="15" data-topic="12954">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/47e85d/40.png" class="avatar"> mimp:</div>
+<blockquote>
+<p>“sys-whonix” is tagged as “anon-gateway” and “anon-whonix” is tagged as “anon-vm”</p>
+</blockquote>
+</aside>
+<p>Expected.</p>
+<aside class="quote no-group" data-username="mimp" data-post="15" data-topic="12954">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/47e85d/40.png" class="avatar"> mimp:</div>
+<blockquote>
+<p>while “sys-info” is also tagged as “anon-gateway”, the qube “info” is not tagged as “anon-vm”</p>
+</blockquote>
+</aside>
+<p><code>qube “info” is not tagged as “anon-vm”</code> → That’s an issue. It should be.</p>
+<p>How did you create Qube <code>info</code>?</p>
+<p>In Qubes R4.0 the tag as inherited. Maybe some bug was introduced by Qubes R4.1 to not always copy the tag? //cc <a class="mention" href="http://forums.whonix.org/u/marmarek">@marmarek</a></p>
+<aside class="quote no-group" data-username="mimp" data-post="15" data-topic="12954">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/47e85d/40.png" class="avatar"> mimp:</div>
+<blockquote>
+<p>is not applied for “info”. One way to get it to work would be to tag “info” with “anon-vm”, but since I was not aware of all the implications of this</p>
+</blockquote>
+</aside>
+<p>This is safe. Currently only used for sdwdate-gui. Nothing will explode if adding anon-vm tag to a workstation.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/16</link>
+        <pubDate>Sun, 02 Jan 2022 09:33:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12954-16</guid>
+        <source url="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss">[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</source>
+      </item>
+      <item>
+        <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+        <dc:creator><![CDATA[mimp]]></dc:creator>
+        <description><![CDATA[
+            <p>the relevant results from qvm-tags are: “anon-gateway” and “anon-vm”</p>
+<p>“sys-whonix” is tagged as “anon-gateway” and “anon-whonix” is tagged as “anon-vm”</p>
+<p>while “sys-info” is also tagged as “anon-gateway”, the qube “info” is not tagged as “anon-vm”</p>
+<p>therefore the rule in /etc/qubes-rpc/policy/whonix.NewStatus:</p>
+<pre><code>$tag:anon-vm $tag: anon-gateway allow
+</code></pre>
+<p>is not applied for “info”. One way to get it to work would be to tag “info” with “anon-vm”, but since I was not aware of all the implications of this, I decided to add the new policy to whonix.NewStatus:</p>
+<pre><code> info sys-info allow
+</code></pre>
+<p>However, after stopping and starting “info” I got the same error regarding SdwdateStatus. This would have been resolved if I had added the tag “anon-vm” to “info”. But instead I did the less general approach of adding rules to <em>whonix.SdwdateStatus</em> as well as <em>whonix.GatewayCommand</em></p>
+<p>I stopped and started “info” and got no errors, so I think this solves that, and maybe provides some important connections for the “info” qube.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/15</link>
+        <pubDate>Sat, 01 Jan 2022 23:31:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12954-15</guid>
+        <source url="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss">[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</source>
+      </item>
+      <item>
+        <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+        <dc:creator><![CDATA[mimp]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group quote-modified" data-username="Patrick" data-post="12" data-topic="12954">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Not sure if that alone helps. It might become:</p>
+<blockquote>
+<p>denied whonix.NewStatus+info from info to sys-info</p>
+</blockquote>
+</blockquote>
+</aside>
+<p>Confirmed. I created:</p>
+<pre><code>/usr/local/etc/sdwdate-gui.d/50_user.conf
+</code></pre>
+<p>and added to it:</p>
+<pre><code> gateway=sys-info
+</code></pre>
+<p>and now I get the message you predicted. Will post after looking into the other stuff.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/14</link>
+        <pubDate>Thu, 30 Dec 2021 22:12:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12954-14</guid>
+        <source url="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss">[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</source>
+      </item>
+      <item>
+        <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Related:</p>
+<aside class="onebox githubfolder">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="32" height="32">
+
+      <a href="https://github.com/QubesOS/qubes-core-admin-addon-whonix/tree/master/qubes-rpc-policy" target="_blank" rel="noopener">github.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/345;"><img src="https://opengraph.githubassets.com/3ce6a352af6541fd2a936571c91b3427b82651e840b24a1ddc357ef1df7e16a9/QubesOS/qubes-core-admin-addon-whonix" class="thumbnail" width="690" height="345"></div>
+
+<h3><a href="https://github.com/QubesOS/qubes-core-admin-addon-whonix/tree/master/qubes-rpc-policy" target="_blank" rel="noopener">qubes-core-admin-addon-whonix/qubes-rpc-policy at master ·...</a></h3>
+
+  <p><a href="https://github.com/QubesOS/qubes-core-admin-addon-whonix/tree/master/qubes-rpc-policy" target="_blank" rel="noopener">master/qubes-rpc-policy</a></p>
+
+  <p><span class="label1">Contribute to QubesOS/qubes-core-admin-addon-whonix development by creating an account on GitHub.</span></p>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<ul>
+<li><a href="https://github.com/QubesOS/qubes-core-admin-addon-whonix/blob/master/qubes-rpc-policy/whonix.NewStatus.policy">https://github.com/QubesOS/qubes-core-admin-addon-whonix/blob/master/qubes-rpc-policy/whonix.NewStatus.policy</a></li>
+<li>dom0 file:</li>
+</ul>
+<blockquote>
+<p><code>/etc/qubes-rpc/policy/whonix.NewStatus</code></p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/13</link>
+        <pubDate>Wed, 29 Dec 2021 10:14:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12954-13</guid>
+        <source url="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss">[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</source>
+      </item>
+      <item>
+        <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="mimp" data-post="11" data-topic="12954">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/47e85d/40.png" class="avatar"> mimp:</div>
+<blockquote>
+<pre><code class="lang-auto">denied whonix.NewStatus+info from info to sys-whonix
+</code></pre>
+</blockquote>
+</aside>
+<p>Did you follow these instructions…?</p>
+<p><a href="https://www.whonix.org/wiki/Multiple_Whonix-Workstation#How-to:_Use_more_than_One_Whonix-Workstation_.E2.84.A2_-_Easy">How-to: Use more than One Whonix-Workstation ™ - Easy</a></p>
+<ul>
+<li><a href="https://www.whonix.org/wiki/Multiple_Whonix-Workstation#Qubes-Whonix_.E2.84.A2">Qubes-Whonix ™</a></li>
+</ul>
+<p>Not sure if that alone helps. It might become:</p>
+<blockquote>
+<p>denied whonix.NewStatus+info from info to sys-info</p>
+</blockquote>
+<p>In dom0:</p>
+<p>Check <code>qvm-tags</code>.  For comparison, check the default ones first.</p>
+<pre><code>qvm-tags sys-whonix
+</code></pre>
+<p>And.</p>
+<pre><code>qvm-tags anon-whonix
+</code></pre>
+<p>Then check for the multiple gateway / multiple workstation.</p>
+<pre><code>qvm-tags sys-info
+</code></pre>
+<p>And.</p>
+<pre><code>qvm-tags info</code></pre>
+          <p><a href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/12</link>
+        <pubDate>Wed, 29 Dec 2021 09:23:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12954-12</guid>
+        <source url="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss">[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</source>
+      </item>
+      <item>
+        <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+        <dc:creator><![CDATA[mimp]]></dc:creator>
+        <description><![CDATA[
+            <p>I’m getting this message too, though seems to be slightly different situation. I did a fresh install of Qubes 4.1rc3 and imported my qubes from previous version, then updated everything. This was just a couple days ago after the above fix.</p>
+<p>I am getting this message from whonix workstations that are set to connect through an alternative whonix gateway. For example:</p>
+<p>info = qube based on whonix-ws<br>
+sys-info = network qube based on whonix-gw<br>
+sys-whonix = default network qube based on whonix-gw</p>
+<p>info is set to use sys-info for network</p>
+<p>intermittently I will get a message like:</p>
+<pre><code>denied whonix.NewStatus+info from info to sys-whonix
+</code></pre>
+<p>This will just pop up when I’m not even doing anything with the qubes in question.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/11</link>
+        <pubDate>Tue, 28 Dec 2021 17:49:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12954-11</guid>
+        <source url="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss">[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</source>
+      </item>
+      <item>
+        <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubcommit">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/sdwdate-gui/commit/e371e234a15cbaf89181798a204192d2a92df089" target="_blank" rel="noopener">github.com/Whonix/sdwdate-gui</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/sdwdate-gui/commit/e371e234a15cbaf89181798a204192d2a92df089" target="_blank" rel="noopener">fix "Denied: whonix.NewStatus" dom0 permission when shutting down Whonix-Gateway [Qubes OS 4.1]</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-12-09" data-time="08:37:10" data-timezone="UTC">08:37AM - 09 Dec 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+
+      <div class="lines" title="changed 1 files with 6 additions and 5 deletions">
+        <a href="https://github.com/Whonix/sdwdate-gui/commit/e371e234a15cbaf89181798a204192d2a92df089" target="_blank" rel="noopener">
+          <span class="added">+6</span>
+          <span class="removed">-5</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">
+Thanks to @unknown for the bug report!
+
+https://forums.whonix.org/t/qubes-os-4-<span class="show-more-container"><a href="https://github.com/Whonix/sdwdate-gui/commit/e371e234a15cbaf89181798a204192d2a92df089" target="_blank" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">1-denied-whonix-newstatus-dom0-permission/12954</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/10</link>
+        <pubDate>Thu, 09 Dec 2021 08:38:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12954-10</guid>
+        <source url="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss">[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</source>
+      </item>
+      <item>
+        <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+        <dc:creator><![CDATA[unknown]]></dc:creator>
+        <description><![CDATA[
+            <p>Excellent, thank you!</p>
+          <p><a href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/9</link>
+        <pubDate>Mon, 06 Dec 2021 12:22:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12954-9</guid>
+        <source url="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss">[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</source>
+      </item>
+      <item>
+        <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Bug found probably.</p>
+<p><a href="https://github.com/Whonix/sdwdate-gui/blob/master/lib/systemd/system/sdwdate-gui-shutdown-notify.service">https://github.com/Whonix/sdwdate-gui/blob/master/lib/systemd/system/sdwdate-gui-shutdown-notify.service</a> runs <a href="https://github.com/Whonix/sdwdate-gui/blob/master/usr/libexec/sdwdate-gui/notify-shutdown">https://github.com/Whonix/sdwdate-gui/blob/master/usr/libexec/sdwdate-gui/notify-shutdown</a></p>
+<p>Actually it seems pointless for a Whonix-Gateway to notify any other VM of it being shutdown. So above script will soon be modified to exclude Whonix-Gateway.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/8</link>
+        <pubDate>Mon, 06 Dec 2021 09:23:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12954-8</guid>
+        <source url="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss">[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</source>
+      </item>
+      <item>
+        <title>[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</title>
+        <dc:creator><![CDATA[unknown]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello,<br>
+above dom0 permission warning dialog is displayed, when shutting down a Whonix Gateway different from <code>sys-whonix</code>.</p>
+<p>Given a freshly created gateway AppVM <code>sys-whonix-test</code>, the exact dialog message is:</p>
+<blockquote>
+<p>Denied: whonix.NewStatus<br>
+Denied whonix.NewStatus+sys-whonix-test_shutdown from sys-whonix-test to sys-whonix</p>
+</blockquote>
+<p>Error reproduction</p>
+<pre><code class="lang-auto">qvm-create -l yellow --template whonix-gw-16 --prop provides_network=True sys-whonix-test
+qvm-start sys-whonix-test
+qvm-shutdown sys-whonix-test #  here displays the error
+</code></pre>
+<p><code>sys-whonix-test</code> has same tags as <code>sys-whonix</code></p>
+<pre><code class="lang-auto">[user@dom0 ~]$ qvm-tags sys-whonix-test
+anon-gateway
+audiovm-dom0
+created-by-dom0
+guivm-dom0
+</code></pre>
+<p>whonix.NewStatus permissions (default)</p>
+<pre><code class="lang-auto">[user@dom0 ~]$ cat /etc/qubes-rpc/policy/whonix.NewStatus 
+$tag:anon-vm $tag:anon-gateway allow
+$tag:anon-vm sys-whonix allow
+$anyvm $anyvm deny
+</code></pre>
+<p>I am wondering, what <code>sys-whonix-test</code> needs to do with a different gateway <code>sys-whonix</code> at all.<br>
+Might be, that <code>sys-whonix-test</code> is treated incorrectly as a workstation?</p>
+<p>Thanks for hints!</p>
+<hr>
+<p>More details:<br>
+The error can be solved by adding following permission to <code>/etc/qubes-rpc/policy/whonix.NewStatus</code>:</p>
+<pre><code class="lang-auto">sys-whonix-test sys-whonix allow
+</code></pre>
+<p>, which raises the question, why is there any dependency between two gateways.</p>
+<p>Qubes 4.0 had worked flawlessly.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954/1</link>
+        <pubDate>Sat, 04 Dec 2021 09:13:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12954-1</guid>
+        <source url="http://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954.rss">[Qubes OS 4.1] &quot;Denied: whonix.NewStatus&quot; dom0 permission</source>
+      </item>
+  </channel>
+</rss>

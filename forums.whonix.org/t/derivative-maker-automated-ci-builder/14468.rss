@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Derivative Maker Automated CI Builder</title>
+    <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468</link>
+    <description>https://github.com/Mycobee/derivative-maker/pull/1/files
+
+Per request of @Patrick , I created a CI integration for the `derivative-maker` repository.
+
+## What it does
+
+This tool runs a Github Actions workflow when a commit is pushed.
+
+The workflow runs an automation suite on a remote server. The suite was created with Ansible and lives in the `automated_builder` directory
+
+Currently I have a Debian VPS setup on digital ocean, that I am willing to maintain for the Whonix project.
+
+see `derivative-maker/automated_builder/README.md` on my branch for more technical details about how to run it.
+
+### Current blockers
+
+When the `derivative-maker/derivative-maker --build` runs on the most recent commit, I am met with errors:
+
+```
+last_failed_bash_command: &quot;$source_code_folder_dist/packages/kicksecure/genmkfile/usr/bin/genmkfile&quot; reprepro-remove
+```
+
+I tried hardcoding the tag `16.0.5.3` to be built, and ran in to the same errors. I ultimately went ahead and built it with the latest commit because this is the way it should function in the future. Attached is a log of the build errors
+
+
+[details=&quot;Log details&quot;]
+```
+############################################################
+ERROR in ././build-steps.d/1200_create-debian-packages detected!
+
+dist_build_version: f69a4c663d6dfa1105c145770b2ef2aea8704214
+dist_build_error_counter: 1
+benchmark: 00:00:00
+last_failed_exit_code: 254
+trap_signal_type_previous: unset
+trap_signal_type_last    : ERR
+
+process_backtrace_result:
+1: : init
+2: : sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+3: : sshd: ansible [priv]
+4: : sshd: ansible@pts/4
+5: : /bin/sh -c /usr/bin/python3 /home/ansible/.ansible/tmp/ansible-tmp-1660320029.2783656-1983-3611384331708/AnsiballZ_command.py &amp;&amp; sleep 0
+6: : /usr/bin/python3 /home/ansible/.ansible/tmp/ansible-tmp-1660320029.2783656-1983-3611384331708/AnsiballZ_command.py
+7: : /bin/sh -c /home/ansible/derivative-maker/derivative-maker --flavor whonix-gateway-xfce --target virtualbox --build &gt;&gt; /home/ansible/build.log 2&gt;&amp;1
+8: : /bin/bash /home/ansible/derivative-maker/derivative-maker --flavor whonix-gateway-xfce --target virtualbox --build
+9: : /bin/bash ././build-steps.d/1200_create-debian-packages
+
+function_trace_result:
+main (line number: 406)
+build_run_function (line number: 35)
+main (line number: 402)
+build_run_function (line number: 35)
+create-debian-packages (line number: 392)
+build_run_function (line number: 35)
+create_derivative_distribution_debian_packages (line number: 354)
+errorhandlergeneral (line number: 380)
+errorhandlerprocessshared (line number: 209)
+
+
+last_failed_bash_command: &quot;$source_code_folder_dist/packages/kicksecure/genmkfile/usr/bin/genmkfile&quot; reprepro-remove
+############################################################
+&#39;
+++ unset error_reason
+++ &#39;[&#39; ERR = INT &#39;]&#39;
+++ &#39;[&#39; ERR = TERM &#39;]&#39;
+++ &#39;[&#39; ERR = ERR &#39;]&#39;
+++ &#39;[&#39; &#39;!&#39; 0 = 0 &#39;]&#39;
+++ true &#39;INFO: dist_build_auto_retry set to 0 (--retry-max). No auto retry.&#39;
+++ unset dist_build_auto_retry_counter
+++ true
+++ ignore_error=false
+++ answer=
+++ &#39;[&#39; ERR = ERR &#39;]&#39;
+++ &#39;[&#39; &#39;&#39; = true &#39;]&#39;
+++ &#39;[&#39; -t 0 &#39;]&#39;
+++ true &#39;INFO: stdin connected to terminal, using interactive error handler.&#39;
+++ true &#39;ERROR in ././build-steps.d/1200_create-debian-packages detected!
+
+Please have a look above (the block within ###...).
+
+ - Please enter c and press enter to ignore the error and continue building. (Recommended against!)
+ - Please press r and enter to retry.
+ - Please press s and enter to open an chroot interactive shell.
+ - Please press a and enter to abort.&#39;
+++ read -p &#39;Answer? &#39; answer
+Answer?
+[/details]
+
+I would upload the full log file for posterity, but it seems as though I am unable to upload a txt file on this discourse instance. @Patrick any chance you could help with this?
+
+## Next Steps
+
+1. Once the builds successfully work, we need to put them somewhere...probably as a github actions artifact. That said, they may be too large and this might require some sort of s3 bucket or remote place to push them.
+
+2. Set up the build to load the OVA in to virtual box on the remote server, so @Patrick can VNC in to the server and test the running VMs after build
+
+#### Longer term goals
+
+3. Run WATS testing suite automatically on the new VMs
+
+4. Make WATS more useful and robust</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 16 Oct 2022 19:37:11 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="bee" data-post="132" data-topic="14468" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/bee/40/2338_2.png" class="avatar"> bee:</div>
+<blockquote>
+<p>working on getting a fork of WATS running today <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=12" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+</blockquote>
+</aside>
+<p>Woot woot! It is running !!! <img src="//forums.whonix.org/images/emoji/twitter/raised_hands.png?v=12" title=":raised_hands:" class="emoji" alt=":raised_hands:"></p>
+<p>Now I have some cleaning up to do, then will get it to run via CI next, when tags are built <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=12" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/133">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/133</link>
+        <pubDate>Sun, 16 Oct 2022 19:37:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-133</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>working on getting a fork of WATS running today <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=12" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/132">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/132</link>
+        <pubDate>Sun, 16 Oct 2022 15:47:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-132</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>I <strong>think</strong> (could def be wrong) this should pretty much work out of the box. I dynamically set all the URLs with built in github environment variables. Maybe allow github actions on the new repo, and push a dummy tag, then I can look at the logs if something breaks?? For now it all seems okay, at least when I run <code>grep -irn 'derivative' ./automated_builder</code> I don’t see anything that should be problematic or break</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/131">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/131</link>
+        <pubDate>Sun, 16 Oct 2022 15:20:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-131</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Could you please update from <code>https://github.com/derivative-maker/derivative-maker</code> to <code>https://github.com/Whonix/derivative-maker</code>?</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/130">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/130</link>
+        <pubDate>Sat, 15 Oct 2022 10:23:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-130</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="18" data-topic="14733">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img loading="lazy" alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/streamlining-dev-collaboration/14733/18">Streamlining Dev Collaboration</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/organization/9"><span class="badge-category-bg" style="background-color: #c3c3d1;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Building up the organization and success of the Whonix project. (contribute)">Organization</span></a>
+  </div>
+  <blockquote>
+    True. For user support chat, well <a href="https://www.whonix.org/wiki/Project_Chat">see this</a>. But for developers, if it helps, I’d give it another try. 
+
+Ok, so this one can certainly be fixed. 
+
+
+<a href="http://github.com/adrelanos">github.com/adrelanos</a> - if you find Whonix to depend on it, and report that, then that’s a bug. That repo is supposed to be just a user mirror. Then it will be moved to <a href="http://github.com/Kicksecure">github.com/Kicksecure</a> or <a href="http://github.com/Whonix">github.com/Whonix</a>. These ones I am happy to fix quickly since easy to do and low time effort.
+derivative-maker/derivative-maker: Yeah, that previous was Whonix…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/129">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/129</link>
+        <pubDate>Sat, 15 Oct 2022 10:23:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-129</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Extremely useful! Very good contribution. Now I am confident I didn’t break the build since I would get an e-mail if something is broken (something as simple as a forgotten git push). Also a good feeling to have a different, more picky build environment to know other stuff such as the mount related stuff is solid.</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/128">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/128</link>
+        <pubDate>Tue, 11 Oct 2022 22:19:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-128</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> has the CI been useful for you yet? feedback/criticism is welcome <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=12" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/127">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/127</link>
+        <pubDate>Tue, 11 Oct 2022 21:42:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-127</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>Now that we have CI for commits and tags, I am going to work on having WATS run every time a tag is pushed…then I will work on making WATS more robust</p>
+<p>Planning to try to get some of that automated testing fired up this weekend. I might make a new repo based off the fork you have in your github <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a>…will research more and hopefully get ya some automated tag testing built in in the not too distant future</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/126">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/126</link>
+        <pubDate>Tue, 11 Oct 2022 19:32:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-126</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you! Merged.</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/125">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/125</link>
+        <pubDate>Sat, 01 Oct 2022 10:39:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-125</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> PR up for ya</p><aside class="onebox githubpullrequest" data-onebox-src="https://github.com/derivative-maker/derivative-maker/pull/2">
+  <header class="source">
+
+      <a href="https://github.com/derivative-maker/derivative-maker/pull/2" target="_blank" rel="noopener nofollow ugc">github.com/derivative-maker/derivative-maker</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/derivative-maker/derivative-maker/pull/2" target="_blank" rel="noopener nofollow ugc">Create seperate build process for commits and tags</a>
+    </h4>
+
+    <div class="branches">
+      <code>derivative-maker:master</code> ← <code>Mycobee:seperate_tags_and_commits</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2022-09-30" data-time="21:16:42" data-timezone="UTC">09:16PM - 30 Sep 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/Mycobee" target="_blank" rel="noopener nofollow ugc">
+          <img alt="Mycobee" src="https://avatars.githubusercontent.com/u/41843577?v=4" class="onebox-avatar-inline" width="20" height="20">
+          Mycobee
+        </a>
+      </div>
+
+      <div class="lines" title="1 commits changed 16 files with 93 additions and 664 deletions">
+        <a href="https://github.com/derivative-maker/derivative-maker/pull/2/files" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+93</span>
+          <span class="removed">-664</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">This one is good to go @adrelanos</p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/124">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/124</link>
+        <pubDate>Fri, 30 Sep 2022 21:17:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-124</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>“Diet” builds for commits are taking about 70 minutes…Full builds with tags are taking about 115 minutes.</p>
+<p>Maybe once I get the GUI and WATs running, we can add some cores to the box and parralellize the builds so they dont take so long</p>
+<p>2 cores build the workstation, 2 cores build the gateway or something like that</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/123">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/123</link>
+        <pubDate>Fri, 30 Sep 2022 14:44:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-123</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>I am doing WATS then…more valuable. We will create kicksecure stuff later</p>
+<p>Testing my code today. I will let you know when it is working, then you can merge my new branch for commit and tag builds</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/122">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/122</link>
+        <pubDate>Fri, 30 Sep 2022 14:36:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-122</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I guess WATS is more important. It seems pretty unlikely (though possible) that Whonix-Gateway and Whonix-Workstation build succeeds but Kicksecure build fails. I guess adding Kicksecure builds would be a lot easier than WATS. Kicksecure builds just need slightly different build parameters.</p>
+<ul>
+<li>–flavor whonix-gateway-xfce</li>
+<li>–flavor whonix-workstation-xfce</li>
+<li>–flavor kicksecure-xfce</li>
+</ul>
+<p>But not important which one you pick first.</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/121">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/121</link>
+        <pubDate>Fri, 30 Sep 2022 10:16:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-121</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> I hopefully will have a solution in the not too distant future for both tagged VMs and commit VMs…testing it now and fixing bugs</p>
+<p>My next question is, do we want CI for building kicksecure VM? If so, when do we want that? Currently <code>derivative-maker</code> CI is set up to follow this logic</p>
+<pre><code class="lang-nohighlight"># if commit without tag is pushed, 
+# create Whonix Gateway and Workstation with --remote-derivative-packages 
+# if tag is pushed 
+# create full Whonix Gateway and Workstation builds without remote packages
+</code></pre>
+<p>Do we care about building kicksecure?? Or just focus on getting whonix + WATS first, then worry about kicksecure later?</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/120">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/120</link>
+        <pubDate>Fri, 30 Sep 2022 00:43:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-120</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Good reasoning. Makes sense. Please do. Linode why not. Nothing security critical will be running on that server. It’s basically a developer usability tool. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=12" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/119">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/119</link>
+        <pubDate>Mon, 26 Sep 2022 19:32:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-119</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="bee" data-post="117" data-topic="14468">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/bee/40/2338_2.png" class="avatar"> bee:</div>
+<blockquote>
+<p>it will cost $24 a month</p>
+</blockquote>
+</aside>
+<p>or $20 a month if we were to switch to Linode. Might be worth it, idk. Is there any reaason to trust one cloud provider over another? Or should price be the main concern? Avoiding microsoft, google, and AWS seems good on principle bc fuckem</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/118">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/118</link>
+        <pubDate>Mon, 26 Sep 2022 16:28:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-118</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="114" data-topic="14468">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Seems like the 50 GB disk is sufficient and upgrade RAM from 2 GB to 4 GB?</p>
+</blockquote>
+</aside>
+<p>I will test this out and make sure it works. If it does work, it will cost $24 a month. I am willing to configure WATS to run on it before asking to transfer VPS to a Whonix specific cloud VPS account.</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/117">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/117</link>
+        <pubDate>Mon, 26 Sep 2022 16:27:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-117</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Xfce for sure. Since that’s also what Kicksecure / Whonix are using atm.</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/116">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/116</link>
+        <pubDate>Sun, 25 Sep 2022 00:52:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-116</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>Ill give it a whirl. Any rec for GUI on the Debian host <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> ?</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/115">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/115</link>
+        <pubDate>Sun, 25 Sep 2022 00:14:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-115</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Quote <a href="https://www.whonix.org/wiki/RAM#Whonix_%E2%84%A2_RAM_and_VRAM_Defaults">Whonix ™ RAM and VRAM Defaults</a>:</p>
+<blockquote>
+<ul>
+<li>Whonix ™ Xfce:
+<ul>
+<li>Whonix-Gateway Xfce - 1280 MB RAM and 128 MB VRAM.</li>
+<li>Whonix-Workstation ™ Xfce - 2048 MB RAM and 128 MB VRAM.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>(Up to date at time of writing. This might be outdated in the future. Wiki takes precedence.)</p>
+<p>Not sure <a href="https://www.whonix.org/wiki/RAM#Whonix-Workstation_%E2%84%A2_Xfce_RAM_Saving_Mode">Whonix-Workstation ™ Xfce RAM Saving Mode</a> is worth it. Probably not.</p>
+<p>So in conclusion, 4 GB should be sufficient for host + VMs with default settings?</p>
+<p>On <a href="https://www.whonix.org/wiki/System_Requirements" class="inline-onebox">System Requirements - Whonix</a> we say “10 GB free hard drive space.” (but there’s no automated monitoring should that change).</p>
+<aside class="quote no-group" data-username="bee" data-post="113" data-topic="14468">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/bee/40/2338_2.png" class="avatar"> bee:</div>
+<blockquote>
+<p>Currently it is 2gb of RAM and 50gb disk</p>
+</blockquote>
+</aside>
+<p>Seems like the 50 GB disk is sufficient and upgrade RAM from 2 GB to 4 GB?</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/114">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/114</link>
+        <pubDate>Sat, 24 Sep 2022 21:01:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-114</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes, but we will need to make it much larger. Currently it is 2gb of RAM and 50gb disk</p>
+<p>How much resources would be required by the “smallest” machine that can effectively run host + GUI + Whonix VMs ??</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/113">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/113</link>
+        <pubDate>Sat, 24 Sep 2022 14:34:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-113</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Could we also use the existing server to run VMs and run wats?</p>
+<p>Testing that includes GUI seems exponentially more useful.</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/112">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/112</link>
+        <pubDate>Fri, 23 Sep 2022 18:44:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-112</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="110" data-topic="14468">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>How can we reliably avoid spawning tons of droplets but forgetting to shut them down (due to bug), ending up with 100s of droplets that all have to be paid?</p>
+</blockquote>
+</aside>
+<p>Write conditional logic that will not spawn new droplets if droplets already exist, be careful about changing source code in the CI. DigitalOcean has a max limit of 25 droplets set by default, this would prevent hundreds from being created</p>
+<p>Alternatively we could simply have 1 large server, and skip automatic droplet creation. This server could run everything and a GUI, 40ish bucks a month. Save lots of time, easy to do.</p>
+<p>If we are going to run WATS as it was built, we must have a GUI on the VPS. Alternatively, we could have a smaller server and simply create some sort of CLI testing of the builds, which would be a lot easier to set up than GUI testing of the new builds. But also not as good for verifying things work properly with new whonix builds</p>
+<ul>
+<li>curl an address</li>
+<li>download some packages</li>
+<li>other misc things that can be verified with CLI?? not sure what all would be useful</li>
+</ul>
+<aside class="quote no-group" data-username="Patrick" data-post="110" data-topic="14468">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Hm. That seems like a huge ask. More than I’d dare asking for.</p>
+</blockquote>
+</aside>
+<p>I want to work to help the project. I am willing to spend time on whatever you feel is most important. I will do my best to stay engaged. You can pick what is most useful to you and the project, and I will build it if I am able.</p>
+<p>I dont mind spending time if it is helpful. Building the automated builder CI took probably took total of 50 hours or so (I didn’t count). I do this work outside of my normal job, so thats why I say “weeks”…a few hours here, a few hours there sort of thing…not 100s of hours or anything like that.</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/111">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/111</link>
+        <pubDate>Wed, 21 Sep 2022 19:13:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-111</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>First coming to mind: How can we reliably avoid spawning tons of droplets but forgetting to shut them down (due to bug), ending up with 100s of droplets that all have to be paid?</p>
+<aside class="quote no-group" data-username="bee" data-post="108" data-topic="14468">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/bee/40/2338_2.png" class="avatar"> bee:</div>
+<blockquote>
+<p>It will probably take me a few weeks.</p>
+</blockquote>
+</aside>
+<p>Hm. That seems like a huge ask. More than I’d dare asking for. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=12" title=":slight_smile:" class="emoji" alt=":slight_smile:"> Not sure it’s worth the effort then. Not sure how often I’d actually use the VNC.</p>
+<p>The CI as now is very useful as I don’t build every commit / every tag locally.</p>
+<p>Every now and then I am building and testing locally anyhow.</p>
+<p>But running wats on CI seems highly useful.</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/110">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/110</link>
+        <pubDate>Wed, 21 Sep 2022 18:35:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-110</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+      <item>
+        <title>Derivative Maker Automated CI Builder</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>Is everyone having fun?? Fun is the cornerstone !</p>
+          <p><a href="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/109">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468/109</link>
+        <pubDate>Wed, 21 Sep 2022 18:18:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14468-109</guid>
+        <source url="http://forums.whonix.org/t/derivative-maker-automated-ci-builder/14468.rss">Derivative Maker Automated CI Builder</source>
+      </item>
+  </channel>
+</rss>

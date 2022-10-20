@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix VirtualBox 15.0.0.8.9 - Testers Wanted!</title>
+    <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961</link>
+    <description>https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png
+
+# Testers Wanted!
+
+Download the Testers-Only version of Whonix for VirtualBox:
+
+https://www.whonix.org/wiki/VirtualBox_Testers_Only_Version
+
+----
+
+Alternatively, in-place release upgrade is possible upgrade using [Whonix testers repository](https://www.whonix.org/wiki/Project-APT-Repository).
+
+----
+
+This release would not have been possible without the numerous supporters of Whonix!
+
+----
+
+Please Donate!
+
+https://www.whonix.org/wiki/Donate
+
+----
+
+Please Contribute!
+
+https://www.whonix.org/wiki/Contribute
+
+----
+
+# Notable Changes
+
+* VirtualBox:
+  * [Had to](https://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-7-testers-wanted-vanguards-tcp-isn-leak-protection-extensive-hardening/8914/4) increase Whonix-Gateway default RAM to 1280 MB. Otherwise VirtualBox guest additions kernel modules would fail to compile.
+* i2p
+  * preparation for installation of i2p by default
+    * do not autostart i2p.service if installed
+    * do not autostart privoxy.service if installed
+    * do not autostart i2p.service in Qubes TemplateVM
+    * do not autostart privoxy.service in Qubes TemplateVM
+  * i2p is not yet installed by default because of this [reason](https://forums.whonix.org/t/installation-and-fix-of-i2p-inside-whonix-workstation-by-default/8610/106?u=patrick).
+* apparmor-profile-everything (not installed by default yet) enhancements
+* hardened-kernel (not installed by default yet) enhancements
+* first-boot-skel: fix /etc/skel/.bashrc to /home/user/.bashrc handling if home folder is completely empty
+* LKRG (not installed by default yet) enhancements
+  * [fix](https://forums.whonix.org/t/dkms-kernel-modules-lkrg-and-tirdad-fail-to-properly-recompile-on-kernel-upgrade/8931) compilation using DKMS on kernel upgrade by adding support for make variable KERNELRELEASE (DKMS sets it)
+  * Auto load LKRG after installation. Since LKRG now supports module parameters and VirtualBox host [support](https://www.openwall.com/lists/lkrg-users/2020/01/25/2), it can be automatically started after installation since it would no longer kill VirtualBox VMs running on a host.
+* security-misc:
+  * [Restricts](https://forums.whonix.org/t/sysrq-magic-sysrq-key/8079) the [SysRq](https://www.whonix.org/wiki/SysRq) key so it can only be used for shutdowns and the Secure Attention Key.
+  * remove-system-map: use shred instead of rm
+  * Disable the busmaster bit on all PCI bridges during very early boot to avoid holes in IOMMU.
+    * `GRUB_CMDLINE_LINUX=&quot;$GRUB_CMDLINE_LINUX efi=disable_early_pci_dma&quot;`
+    * https://mjg59.dreamwidth.org/54433.html
+    * https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4444f8541dad16fefd9b8807ad1451e806ef1d94
+  * Only allow symlinks to be followed when outside of a world-writable sticky directory, or when the owner of the symlink and follower match, or when the directory owner matches the symlink&#39;s owner. Prevent hardlinks from being created by users that do not have read/write access to the source file. These prevent many TOCTOU races.
+     * `fs.protected_symlinks=1`
+     * `fs.protected_hardlinks=1`
+  * Restrict loading TTY line disciplines to CAP_SYS_MODULE to prevent unprivileged attackers from loading vulnerable line disciplines with the TIOCSETD ioctl which has been used in exploits before such as https://a13xp0p0v.github.io/2017/03/24/CVE-2017-2636.html
+    * https://lkml.org/lkml/2019/4/15/890
+    * `dev.tty.ldisc_autoload=0`
+  * Tor Browser: update to `9.0.5`
+* tirdad
+  *  [fix](https://forums.whonix.org/t/dkms-kernel-modules-lkrg-and-tirdad-fail-to-properly-recompile-on-kernel-upgrade/8931) compilation using DKMS on kernel upgrade by adding support for make variable KERNELRELEASE (DKMS sets it)
+* usability-misc
+  * add [dpkg-noninteractive](https://github.com/Whonix/usability-misc/compare/bd68a636e96fed2183468fa2dff11aa41077506e...b2906d2ff19252aa133bb28ae025c5e011e17a50#diff-6c843b512a028989c8d03bfca584de4c) wrapper script
+  * https://forums.whonix.org/t/speeding-up-apt-update-with-acquire-languages-none-and-contents-deb-defaultenabled-false-its-so-much-faster/8894/2
+    * `Acquire::Languages none;`
+    * `Acquire::IndexTargets::deb::Contents-deb::DefaultEnabled false;`
+
+It also includes the changes of the previous testers only version 8 days ago.
+
+https://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-7-testers-wanted-vanguards-tcp-isn-leak-protection-extensive-hardening/8914
+
+----
+
+# Full difference of all changes
+
+ https://github.com/Whonix/Whonix/compare/15.0.0.8.7-developers-only...15.0.0.8.9-developers-only
+
+----
+
+# About Whonix
+
+Whonix is being used by Edward Snowden, journalists such as Micah Lee, used by the Freedom of the Press Foundation and Qubes OS. It has a 7 years history of keeping its users safe from real world attacks. [1]
+
+The split architecture of Whonix relies on leveraging virtualization technology as a sandbox for vulnerable user applications on endpoints. This is a widely known weakness exploited by entities that want to circumvent cryptography and system integrity. Our Linux distribution come with a wide selection of data protection tools and hardened applications for document/image publishing and communications. We are the first to deploy [tirdad](https://github.com/Whonix/tirdad), which addresses the long known problem of CPU activity affecting TCP traffic properties in visible ways on the network and [vanguards](https://github.com/mikeperry-tor/vanguards), an enhancement for Tor produced by the developers of Tor, which protects against guard discovery and related traffic analysis attacks. [Live Mode](https://www.whonix.org/wiki/Whonix_Live) was recently added. We deliver the first ever solutions for user behavior masking privacy protections such as Kloak. [Kloak](https://github.com/Whonix/kloak) prevents websites from [recognizing](https://www.whonix.org/wiki/Keystroke_Deanonymization) who the typist is by altering keystroke timing signatures that are unique to everyone.
+
+In the future we plant to deploy a [hardened Linux kernel](https://github.com/Whonix/hardened-kernel) with the minimal amount of modules needed to get the job done, an [apparmor profile for the whole system](https://github.com/Whonix/apparmor-profile-everything), as well as [LKRG](https://www.whonix.org/wiki/Linux_Kernel_Runtime_Guard_LKRG), the Linux Kernel Runtime Guard, which [kills whole classes of kernel exploits](https://www.whonix.org/wiki/Linux_Kernel_Runtime_Guard_LKRG#comparison_table).
+
+----
+
+[1]
+
+* https://twitter.com/Snowden/status/1165607338973130752 [[archive]](https://web.archive.org/web/https://twitter.com/Snowden/status/1165607338973130752)
+* https://twitter.com/snowden/status/781495273726025728 [[archive]](https://web.archive.org/web/https://twitter.com/snowden/status/781495273726025728)
+* https://twitter.com/Snowden/status/1175435436501667840 [[archive]](https://web.archive.org/web/https://twitter.com/Snowden/status/1175435436501667840)
+* [Micah Lee, Journalist and Security Engineer at The Intercept and Advocate for Freedom of the Press, Developer of OnionShare and Tor Browser Launcher.](https://theintercept.com/2015/09/16/getting-hacked-doesnt-bad/) [[archive]](https://web.archive.org/web/https://theintercept.com/2015/09/16/getting-hacked-doesnt-bad/)
+* [SecureDrop Journalist Workstation environment for submission handling is based on Qubes-Whonix](https://github.com/freedomofpress/securedrop-workstation) [[archive]](https://web.archive.org/web/https://github.com/freedomofpress/securedrop-workstation)
+* [History](https://www.whonix.org/wiki/History)
+* https://en.wikipedia.org/wiki/Whonix [[archive]](https://web.archive.org/web/https://en.wikipedia.org/wiki/Whonix)
+* https://www.qubes-os.org [[archive]](https://web.archive.org/web/https://www.qubes-os.org)
+* [Whonix Protection against Real World Attacks](https://www.whonix.org/wiki/Security_in_Real_World)</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 02 Apr 2020 19:35:17 +0000</lastBuildDate>
+    <category>News</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix VirtualBox 15.0.0.8.9 - Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Whonix developers don’t create the VirtualBox host software. Whonix developers only create the VMs running inside VirtualBox. Nothing any VM is doing should be capable of crashing the VirtualBox host software. The is a VirtualBox host software bug. The only option to get this fixed is reporting this issue to the developers of VirtualBox. If you intent do so, please see:</p>
+<p>See this:</p>
+<ul>
+<li><a href="https://www.whonix.org/wiki/VirtualBox/Troubleshooting#Submit_A_Bug_Report">https://www.whonix.org/wiki/VirtualBox/Troubleshooting#Submit_A_Bug_Report</a></li>
+<li><a href="https://www.whonix.org/wiki/Dev/VirtualBox#VirtualBox_Bug_Reports">https://www.whonix.org/wiki/Dev/VirtualBox#VirtualBox_Bug_Reports</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961/4</link>
+        <pubDate>Thu, 02 Apr 2020 19:35:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8961-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961.rss">Whonix VirtualBox 15.0.0.8.9 - Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.8.9 - Testers Wanted!</title>
+        <dc:creator><![CDATA[hellresistor]]></dc:creator>
+        <description><![CDATA[
+            <h1>WOW SORRY I AM USING Whonix XFCE 15.0.0.9.4 ! NOT 15.0.0.8.9<br>
+MY BAD</h1>
+<p>Maybe a little later but I am getting this (on picture).</p>
+<p>What I have done to get thats?! (Following the biggest Whonix FAQ)</p>
+<ul>
+<li>Just have imported VM-Gateway on Virtual Box (in Debian sys).</li>
+<li>Change Password</li>
+<li>Updates</li>
+<li>Remove rsyslog</li>
+<li>Install ZeroFree (Its this cause the problem!)</li>
+</ul>
+<p>Do a reboot to enter on Recovery Mode to Run final zerofree commands… Not ask to root/user password. Stops here.</p>
+<p>Hope was only to me <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=9" title=":wink:" class="emoji" alt=":wink:"></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/4/4ad69bbd01d6d1751c828abda6824d642c5c4c22.png" data-download-href="//forums.whonix.org/uploads/default/4ad69bbd01d6d1751c828abda6824d642c5c4c22" title="zerofreeafter boot recovery"><img src="//forums.whonix.org/uploads/default/optimized/2X/4/4ad69bbd01d6d1751c828abda6824d642c5c4c22_2_690x435.png" alt="zerofreeafter boot recovery" data-base62-sha1="aG380doO2WtRqRPYl0wkAYU3mEO" width="690" height="435" srcset="//forums.whonix.org/uploads/default/optimized/2X/4/4ad69bbd01d6d1751c828abda6824d642c5c4c22_2_690x435.png, //forums.whonix.org/uploads/default/optimized/2X/4/4ad69bbd01d6d1751c828abda6824d642c5c4c22_2_1035x652.png 1.5x, //forums.whonix.org/uploads/default/original/2X/4/4ad69bbd01d6d1751c828abda6824d642c5c4c22.png 2x" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/4/4ad69bbd01d6d1751c828abda6824d642c5c4c22_2_10x10.png"></a></div><p></p>
+<p>EDITED</p>
+<p>Well. Seems some time waiting. has booted.! And with so configs <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=9" title=":wink:" class="emoji" alt=":wink:"> (zerofree job), because cant enter on recovery.<br>
+I am continue editing this</p>
+<p>PS: I have done this on older version 15.0.8.7 succefully. on this version no</p>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961/3</link>
+        <pubDate>Thu, 02 Apr 2020 19:19:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8961-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961.rss">Whonix VirtualBox 15.0.0.8.9 - Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.8.9 - Testers Wanted!</title>
+        <dc:creator><![CDATA[Thinkablemellow]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="1" data-topic="8961">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>i2p is not yet installed by default because of this <a href="https://forums.whonix.org/t/installation-and-fix-of-i2p-inside-whonix-workstation-by-default/8610/106">reason</a>.</p>
+</blockquote>
+</aside>
+<p>I may also add that another reason is also the Outdated Version in the Debian Buster Repo.<br>
+Users should also not install it later for that reason.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961/2</link>
+        <pubDate>Tue, 18 Feb 2020 17:58:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8961-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961.rss">Whonix VirtualBox 15.0.0.8.9 - Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.8.9 - Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>                    <a href="https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png" target="_blank" class="onebox" rel="nofollow ugc noopener">
+            <img src="https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png" width="690" height="362">
+          </a>
+
+</p>
+<h1>Testers Wanted!</h1>
+<p>Download the Testers-Only version of Whonix for VirtualBox:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/VirtualBox_Testers_Only_Version" target="_blank" title="06:38AM - 10 September 2019">whonix.org – 10 Sep 19</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/d/d5/Virtualbox_logo.png" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://www.whonix.org/wiki/VirtualBox_Testers_Only_Version" target="_blank">Whonix ™ for VirtualBox - Testers Only Version - Whonix</a></h3>
+
+<p>Whonix ™ for VirtualBox - Testers Only Version</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p>Alternatively, in-place release upgrade is possible upgrade using <a href="https://www.whonix.org/wiki/Project-APT-Repository">Whonix testers repository</a>.</p>
+<hr>
+<p>This release would not have been possible without the numerous supporters of Whonix!</p>
+<hr>
+<p>Please Donate!</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Donate" target="_blank" title="09:48AM - 09 February 2020">whonix.org – 9 Feb 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/432;"><img src="https://www.whonix.org/w/images/8/83/Payment.jpg" class="thumbnail" width="640" height="432"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Donate" target="_blank">Donating to Whonix ™ - Whonix</a></h3>
+
+<p>PayPal, Bitcoin, Monero, Bank Wire</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p>Please Contribute!</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Contribute" target="_blank" title="08:09PM - 21 November 2019">whonix.org – 21 Nov 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:483/500;"><img src="https://www.whonix.org/w/images/0/07/Computer_n_screen.png" class="thumbnail" width="483" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Contribute" target="_blank">Ways To Contribute - Whonix</a></h3>
+
+<p>Spread, Follow, Develop, Testing, Donate. Contribute to Freedom Software / Open Source.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<h1>Notable Changes</h1>
+<ul>
+<li>VirtualBox:
+<ul>
+<li>
+<a href="https://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-7-testers-wanted-vanguards-tcp-isn-leak-protection-extensive-hardening/8914/4">Had to</a> increase Whonix-Gateway default RAM to 1280 MB. Otherwise VirtualBox guest additions kernel modules would fail to compile.</li>
+</ul>
+</li>
+<li>i2p
+<ul>
+<li>preparation for installation of i2p by default
+<ul>
+<li>do not autostart i2p.service if installed</li>
+<li>do not autostart privoxy.service if installed</li>
+<li>do not autostart i2p.service in Qubes TemplateVM</li>
+<li>do not autostart privoxy.service in Qubes TemplateVM</li>
+</ul>
+</li>
+<li>i2p is not yet installed by default because of this <a href="https://forums.whonix.org/t/installation-and-fix-of-i2p-inside-whonix-workstation-by-default/8610/106">reason</a>.</li>
+</ul>
+</li>
+<li>apparmor-profile-everything (not installed by default yet) enhancements</li>
+<li>hardened-kernel (not installed by default yet) enhancements</li>
+<li>first-boot-skel: fix /etc/skel/.bashrc to /home/user/.bashrc handling if home folder is completely empty</li>
+<li>LKRG (not installed by default yet) enhancements
+<ul>
+<li>
+<a href="https://forums.whonix.org/t/dkms-kernel-modules-lkrg-and-tirdad-fail-to-properly-recompile-on-kernel-upgrade/8931">fix</a> compilation using DKMS on kernel upgrade by adding support for make variable KERNELRELEASE (DKMS sets it)</li>
+<li>Auto load LKRG after installation. Since LKRG now supports module parameters and VirtualBox host <a href="https://www.openwall.com/lists/lkrg-users/2020/01/25/2">support</a>, it can be automatically started after installation since it would no longer kill VirtualBox VMs running on a host.</li>
+</ul>
+</li>
+<li>security-misc:
+<ul>
+<li>
+<a href="https://forums.whonix.org/t/sysrq-magic-sysrq-key/8079">Restricts</a> the <a href="https://www.whonix.org/wiki/SysRq">SysRq</a> key so it can only be used for shutdowns and the Secure Attention Key.</li>
+<li>remove-system-map: use shred instead of rm</li>
+<li>Disable the busmaster bit on all PCI bridges during very early boot to avoid holes in IOMMU.
+<ul>
+<li><code>GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX efi=disable_early_pci_dma"</code></li>
+<li><a href="https://mjg59.dreamwidth.org/54433.html">https://mjg59.dreamwidth.org/54433.html</a></li>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4444f8541dad16fefd9b8807ad1451e806ef1d94">https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4444f8541dad16fefd9b8807ad1451e806ef1d94</a></li>
+</ul>
+</li>
+<li>Only allow symlinks to be followed when outside of a world-writable sticky directory, or when the owner of the symlink and follower match, or when the directory owner matches the symlink’s owner. Prevent hardlinks from being created by users that do not have read/write access to the source file. These prevent many TOCTOU races.
+<ul>
+<li><code>fs.protected_symlinks=1</code></li>
+<li><code>fs.protected_hardlinks=1</code></li>
+</ul>
+</li>
+<li>Restrict loading TTY line disciplines to CAP_SYS_MODULE to prevent unprivileged attackers from loading vulnerable line disciplines with the TIOCSETD ioctl which has been used in exploits before such as <a href="https://a13xp0p0v.github.io/2017/03/24/CVE-2017-2636.html">https://a13xp0p0v.github.io/2017/03/24/CVE-2017-2636.html</a>
+<ul>
+<li><a href="https://lkml.org/lkml/2019/4/15/890">https://lkml.org/lkml/2019/4/15/890</a></li>
+<li><code>dev.tty.ldisc_autoload=0</code></li>
+</ul>
+</li>
+<li>Tor Browser: update to <code>9.0.5</code>
+</li>
+</ul>
+</li>
+<li>tirdad
+<ul>
+<li>
+<a href="https://forums.whonix.org/t/dkms-kernel-modules-lkrg-and-tirdad-fail-to-properly-recompile-on-kernel-upgrade/8931">fix</a> compilation using DKMS on kernel upgrade by adding support for make variable KERNELRELEASE (DKMS sets it)</li>
+</ul>
+</li>
+<li>usability-misc
+<ul>
+<li>add <a href="https://github.com/Whonix/usability-misc/compare/bd68a636e96fed2183468fa2dff11aa41077506e...b2906d2ff19252aa133bb28ae025c5e011e17a50#diff-6c843b512a028989c8d03bfca584de4c">dpkg-noninteractive</a> wrapper script</li>
+<li>
+<a href="https://forums.whonix.org/t/speeding-up-apt-update-with-acquire-languages-none-and-contents-deb-defaultenabled-false-its-so-much-faster/8894/2" class="inline-onebox">Speeding up "apt update" with Acquire::Languages=none and Contents-deb::DefaultEnabled=false - It's so much faster!</a>
+<ul>
+<li><code>Acquire::Languages none;</code></li>
+<li><code>Acquire::IndexTargets::deb::Contents-deb::DefaultEnabled false;</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>It also includes the changes of the previous testers only version 8 days ago.</p>
+<aside class="quote quote-modified" data-post="1" data-topic="8914">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-7-testers-wanted-vanguards-tcp-isn-leak-protection-extensive-hardening/8914">Whonix VirtualBox 15.0.0.8.7 - Testers Wanted! - vanguards; TCP ISN Leak Protection; Extensive Hardening! <img src="//forums.whonix.org/images/emoji/twitter/fire.png?v=9" title="fire" alt="fire" class="emoji"></a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/news"><span class="badge-category-bg" style="background-color: #AB9364;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="News posted by Whonix staff. The Whonix Blog. Stay Tuned. (rss)">News</span></a>
+  </div>
+  <blockquote>
+    <a href="https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png" target="_blank" class="onebox" rel="nofollow ugc noopener">
+            [image]
+          </a>
+ 
+Testers Wanted!
+Download the Testers-Only version of Whonix for VirtualBox: 
+
+
+
+Alternatively, in-place release upgrade is possible upgrade using <a href="https://www.whonix.org/wiki/Project-APT-Repository">Whonix testers repository</a>. 
+
+Highlights
+
+Add <a href="https://github.com/mikeperry-tor/vanguards">vanguards</a>, which protects against guard discovery and related traffic analysis attacks and fixes <a href="https://nvd.nist.gov/vuln/detail/CVE-2020-8516">CVE-2020-8516 Hidden Service deanonymization</a>.
+Implement <a href="https://forums.whonix.org/t/tcp-isn-cpu-information-leak-protection-tirdad/8552">TCP ISN CPU Information Leak Protection</a> to prevent <a href="https://dl.acm.org/citation.cfm?id=1180410">de-anonymization of Tor onion services</a> by installing <a href="https://github.com/Whonix/tirdad">Tirdad k…</a>
+  </blockquote>
+</aside>
+
+<hr>
+<h1>Full difference of all changes</h1>
+<p><a href="https://github.com/Whonix/Whonix/compare/15.0.0.8.7-developers-only...15.0.0.8.9-developers-only">https://github.com/Whonix/Whonix/compare/15.0.0.8.7-developers-only...15.0.0.8.9-developers-only</a></p>
+<hr>
+<h1>About Whonix</h1>
+<p>Whonix is being used by Edward Snowden, journalists such as Micah Lee, used by the Freedom of the Press Foundation and Qubes OS. It has a 7 years history of keeping its users safe from real world attacks. [1]</p>
+<p>The split architecture of Whonix relies on leveraging virtualization technology as a sandbox for vulnerable user applications on endpoints. This is a widely known weakness exploited by entities that want to circumvent cryptography and system integrity. Our Linux distribution come with a wide selection of data protection tools and hardened applications for document/image publishing and communications. We are the first to deploy <a href="https://github.com/Whonix/tirdad">tirdad</a>, which addresses the long known problem of CPU activity affecting TCP traffic properties in visible ways on the network and <a href="https://github.com/mikeperry-tor/vanguards">vanguards</a>, an enhancement for Tor produced by the developers of Tor, which protects against guard discovery and related traffic analysis attacks. <a href="https://www.whonix.org/wiki/Whonix_Live">Live Mode</a> was recently added. We deliver the first ever solutions for user behavior masking privacy protections such as Kloak. <a href="https://github.com/Whonix/kloak">Kloak</a> prevents websites from <a href="https://www.whonix.org/wiki/Keystroke_Deanonymization">recognizing</a> who the typist is by altering keystroke timing signatures that are unique to everyone.</p>
+<p>In the future we plant to deploy a <a href="https://github.com/Whonix/hardened-kernel">hardened Linux kernel</a> with the minimal amount of modules needed to get the job done, an <a href="https://github.com/Whonix/apparmor-profile-everything">apparmor profile for the whole system</a>, as well as <a href="https://www.whonix.org/wiki/Linux_Kernel_Runtime_Guard_LKRG">LKRG</a>, the Linux Kernel Runtime Guard, which <a href="https://www.whonix.org/wiki/Linux_Kernel_Runtime_Guard_LKRG#comparison_table">kills whole classes of kernel exploits</a>.</p>
+<hr>
+<p>[1]</p>
+<ul>
+<li>
+<a href="https://twitter.com/Snowden/status/1165607338973130752">https://twitter.com/Snowden/status/1165607338973130752</a> <a href="https://web.archive.org/web/https://twitter.com/Snowden/status/1165607338973130752">[archive]</a>
+</li>
+<li>
+<a href="https://twitter.com/snowden/status/781495273726025728">https://twitter.com/snowden/status/781495273726025728</a> <a href="https://web.archive.org/web/https://twitter.com/snowden/status/781495273726025728">[archive]</a>
+</li>
+<li>
+<a href="https://twitter.com/Snowden/status/1175435436501667840">https://twitter.com/Snowden/status/1175435436501667840</a> <a href="https://web.archive.org/web/https://twitter.com/Snowden/status/1175435436501667840">[archive]</a>
+</li>
+<li>
+<a href="https://theintercept.com/2015/09/16/getting-hacked-doesnt-bad/">Micah Lee, Journalist and Security Engineer at The Intercept and Advocate for Freedom of the Press, Developer of OnionShare and Tor Browser Launcher.</a> <a href="https://web.archive.org/web/https://theintercept.com/2015/09/16/getting-hacked-doesnt-bad/">[archive]</a>
+</li>
+<li>
+<a href="https://github.com/freedomofpress/securedrop-workstation">SecureDrop Journalist Workstation environment for submission handling is based on Qubes-Whonix</a> <a href="https://web.archive.org/web/https://github.com/freedomofpress/securedrop-workstation">[archive]</a>
+</li>
+<li><a href="https://www.whonix.org/wiki/History">History</a></li>
+<li>
+<a href="https://en.wikipedia.org/wiki/Whonix">https://en.wikipedia.org/wiki/Whonix</a> <a href="https://web.archive.org/web/https://en.wikipedia.org/wiki/Whonix">[archive]</a>
+</li>
+<li>
+<a href="https://www.qubes-os.org">https://www.qubes-os.org</a> <a href="https://web.archive.org/web/https://www.qubes-os.org">[archive]</a>
+</li>
+<li><a href="https://www.whonix.org/wiki/Security_in_Real_World">Whonix Protection against Real World Attacks</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961/1</link>
+        <pubDate>Tue, 18 Feb 2020 17:40:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8961-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961.rss">Whonix VirtualBox 15.0.0.8.9 - Testers Wanted!</source>
+      </item>
+  </channel>
+</rss>

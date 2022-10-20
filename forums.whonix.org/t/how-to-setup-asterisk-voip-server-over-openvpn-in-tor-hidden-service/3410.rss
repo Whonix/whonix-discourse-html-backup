@@ -1,0 +1,648 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+    <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410</link>
+    <description>First create OpenSSL CA with easy-rsa or OpenSSL for OpenVPN.
+
+This is OpenVPN server configuration file:
+&gt; tls-server
+&gt; port 1194
+&gt; proto tcp
+&gt; dev tun
+&gt; ca /etc/ssl/ca.crt
+&gt; cert /etc/ssl/server.crt
+&gt; key /etc/ssl/server.key
+&gt; dh /etc/ssl/dh2048.pem
+&gt; topology subnet
+&gt; server 10.0.0.0 255.255.0.0
+&gt; ifconfig-pool-persist ipp.txt
+&gt; keepalive 10 120
+&gt; cipher AES-256-CBC
+&gt; max-clients 100
+&gt; persist-key
+&gt; persist-tun
+&gt; status /var/log/openvpn-status.log
+&gt; log /var/log/openvpn.log
+&gt; log-append /var/log/openvpn-append.log
+&gt; verb 3
+&gt; auth SHA512
+
+This is OpenVPN client configuration file:
+&gt; client
+&gt; dev tun
+&gt; proto tcp
+&gt; remote hiddenservicexxx.onion 1194
+&gt; resolv-retry infinite
+&gt; nobind
+&gt; persist-key
+&gt; persist-tun
+&gt; ca /home/norbert/new/ca.crt
+&gt; cert /home/norbert/new/demo-norbert.crt
+&gt; key /home/norbert/new/demo-norbert.key
+&gt; cipher AES-256-CBC
+&gt; auth SHA512
+&gt; verb 3
+&gt; socks-proxy 127.0.0.1 9050
+&gt; remote-cert-tls server
+
+This is Asterisk sip.conf configuration file:
+&gt;     [general]
+&gt;     transport=udp
+&gt;     port=5060
+&gt;     bindaddr=10.0.0.1
+&gt;     disallow=all
+&gt;     allow=ulaw
+&gt;     allow=alaw
+&gt;     allow=gsm
+&gt;     directmedia=no
+&gt;     nat=yes
+&gt;     localnet=10.0.0.0/255.255.0.0
+
+&gt;     [friends_internal](!)
+&gt;     type=friend
+&gt;     host=dynamic
+&gt;     context=from-internal
+&gt;     disallow=all
+&gt;     allow=ulaw
+&gt;     allow=alaw
+&gt;     allow=gsm
+
+&gt;     [demo-alice](friends_internal)
+&gt;     secret=password
+
+&gt;     [demo-bob](friends_internal)
+&gt;     secret=password
+
+&gt;     [demo-norbert](friends_internal)
+&gt;     secret=password
+
+This is Asterisk extensions.conf configuration file:
+&gt; [from-internal]
+&gt; exten=&gt;6001,1,Dial(SIP/demo-alice,20)
+&gt; exten=&gt;6002,1,Dial(SIP/demo-bob,20)
+
+This is Tor hidden service server torrc configuration file:
+&gt; HiddenServiceDir /usr/local/torhs/winternight/
+&gt; HiddenServicePort 1194 127.0.0.1:1194
+
+This is Tor client configuration file:
+&gt; `SOCKSPort 9050`
+
+That&#39;s all. It&#39;s working with 1s delay.
+Enjoy. :)</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 05 Jul 2020 20:09:36 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+        <dc:creator><![CDATA[Norbert_Szczybelski]]></dc:creator>
+        <description><![CDATA[
+            <p>Evening <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a></p>
+<p>I submitted changes.<br>
+Please correct me if something are wrong.</p>
+<p>Thank You. <img src="//forums.whonix.org/images/emoji/twitter/slightly_smiling_face.png?v=9" title=":slightly_smiling_face:" class="emoji" alt=":slightly_smiling_face:"></p>
+          <p><a href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/12</link>
+        <pubDate>Sun, 05 Jul 2020 20:09:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3410-12</guid>
+        <source url="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</source>
+      </item>
+      <item>
+        <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>You could add instructions here too:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/VoIP" target="_blank" title="11:48AM - 19 June 2020">Whonix – 19 Jun 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:89/50;"><img src="https://www.whonix.org/w/images/f/f9/Sound-856771640.png" class="thumbnail" width="89" height="50"></div>
+
+<h3><a href="https://www.whonix.org/wiki/VoIP" target="_blank">Voice over IP (VoIP)</a></h3>
+
+<p>Anonymous Voice over IP (VoIP). Encrypted, anonymous phone calls using the Tor Anonymity Network.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Or on a dedicated page if that seems better.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/11</link>
+        <pubDate>Sun, 05 Jul 2020 11:57:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3410-11</guid>
+        <source url="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</source>
+      </item>
+      <item>
+        <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Norbert_Szczybelski" data-post="6" data-topic="3410">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/norbert_szczybelski/40/2502_2.png" class="avatar"> Norbert_Szczybelski:</div>
+<blockquote>
+<p>Reading IETF RFC 6347 and thinking about DTLS over TCP.</p>
+<p>This is old configuration of Asterisk but I will do some research and publish results.</p>
+</blockquote>
+</aside>
+<p>Awesome, that could relieve the users from having to configure OpenVPN at all.</p>
+<aside class="quote no-group" data-username="Norbert_Szczybelski" data-post="8" data-topic="3410">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/norbert_szczybelski/40/2502_2.png" class="avatar"> Norbert_Szczybelski:</div>
+<blockquote>
+<p>I not tested but you can also start BIND DNS Server for hostnames against IP addresses.</p>
+</blockquote>
+</aside>
+<p>If using TCP directly I wonder if VOoIP clients can just parse the onion service name directly instead of configuring DNS. Better that way for security. Tor also has a feature “MAPADDRESS” that lets you assign a custom non-public IP address to a specific onion address which can make things easier.</p>
+<aside class="quote no-group" data-username="Norbert_Szczybelski" data-post="9" data-topic="3410">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/norbert_szczybelski/40/2502_2.png" class="avatar"> Norbert_Szczybelski:</div>
+<blockquote>
+<p>I am not provide any security warranty, just share information.</p>
+</blockquote>
+</aside>
+<p>Yeah I know thanks. We’ve listed the liboqs on our wiki.</p>
+<aside class="quote no-group" data-username="Norbert_Szczybelski" data-post="9" data-topic="3410">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/norbert_szczybelski/40/2502_2.png" class="avatar"> Norbert_Szczybelski:</div>
+<blockquote>
+<p>PQCrypto-VPN on GitHub</p>
+</blockquote>
+</aside>
+<p>Comment:<br>
+This is a MS project and I have no faith in anything crypto from that company. They aren’t using NTRU which is the most robust lattice crypto algo that exists.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="32" height="32">
+      <a href="https://github.com/Microsoft/PQCrypto-VPN" target="_blank">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars2.githubusercontent.com/u/6154722?s=400&amp;v=4" class="thumbnail onebox-avatar" width="400" height="400">
+
+<h3><a href="https://github.com/Microsoft/PQCrypto-VPN" target="_blank">microsoft/PQCrypto-VPN</a></h3>
+
+<p>Post-quantum Cryptography VPN. Contribute to microsoft/PQCrypto-VPN development by creating an account on GitHub.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Nonetheless it’s useful to know what the landscape looks like out there.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/10</link>
+        <pubDate>Fri, 03 Jul 2020 12:47:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3410-10</guid>
+        <source url="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</source>
+      </item>
+      <item>
+        <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+        <dc:creator><![CDATA[Norbert_Szczybelski]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/anontor">@anontor</a> There are also post-quantum OpenVPN project.</p>
+<p>OPEN QUANTUM SAFE<br>
+open-quantum-safe on GitHub<br>
+open-quantum-safe/liboqs on GitHub<br>
+PQCrypto-VPN on GitHub</p>
+<p>I am not provide any security warranty, just share information.</p>
+<p>Norbert.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/9</link>
+        <pubDate>Fri, 03 Jul 2020 05:04:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3410-9</guid>
+        <source url="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</source>
+      </item>
+      <item>
+        <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+        <dc:creator><![CDATA[Norbert_Szczybelski]]></dc:creator>
+        <description><![CDATA[
+            <p>Morning <a class="mention" href="http://forums.whonix.org/u/anontor">@anontor</a></p>
+<p>I have now lot of work but i will study your improvments.</p>
+<p>My main conception of this tutorial was to proof that VoIP can work in Tor.</p>
+<p>This is chrooted configuration but if someone really need to start that kind of network, please isolate servers in virtual machines.</p>
+<p>I prefer FreeBSD bhyve.</p>
+<p>Also update CPU microcode against Spectre and Meltdown vulnerabilities.</p>
+<p>I ilustrate simply setup.<br>
+172.16.0.1/10.8.0.1 OpenVPN Server bhyve VM.<br>
+172.16.0.2/10.8.0.10 OpenVPN Client with Apache bhyve VM.<br>
+172.16.0.3/10.8.0.20 OpenVPN Client with Asterisk bhyve VM.<br>
+172.16.0.4/10.8.0.30 OpenVPN Client with UnrealIRCd bhyve VM.</p>
+<p>Setup static IP addresses in ccd directory for these servers.</p>
+<p>I not tested but you can also start BIND DNS Server for hostnames against IP addresses.</p>
+<p>Norbert.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/8</link>
+        <pubDate>Thu, 02 Jul 2020 21:29:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3410-8</guid>
+        <source url="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</source>
+      </item>
+      <item>
+        <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/norbert_szczybelski">@Norbert_Szczybelski</a></p>
+<p>I like your setup! Openvpn has always been one of my key softwares in most of my tasks; very versatile and adaptable to almost anything. Usin it over a hidden service is a great idea.<br>
+To add to your already great effort, a couple more options you can use for your server config file are:<br>
+tls-crypt ta.key 0<br>
+key-direction 0<br>
+For the option of encrypting the control channel with aes256-ctr so handshake is not visible. Not required of course, but an option. If you use this, do not use the “tls-auth” option or “auth” options. tls-crypt uses sha256 (built in).<br>
+reneg-sec <br>
+This allows you to set the interval between new control-channel handshakes. The default with no setting enabled is 1 hour. If you wanted 5 minutes for example, put “reneg-sec 300”<br>
+You can use elliptic curves too instead of rsa. To do so add:<br>
+dh none<br>
+ecdh-curve secp384r1 (or whatever your OpenSSL or other SSL software can support)<br>
+This next one can help if there is too big a latency:<br>
+socket-flags TCP_NODELAY<br>
+None of the above are vital, and your config is excellent on its own, I just was expanding on it.<br>
+If you use any of the options, in the client side you should use “key-direction 1” and a corresponding “tls-crypt” option as well since they have to match in client and server. The “reneg-sec” option can be on either or both sides. The lowest value is what takes precedence.<br>
+To use elliptic curves options, your client and server certs and keys will need to be generated with those parameters through something like easy-rsa, or openssl, or something.<br>
+In Openssl setups (and maybe in others, but I have not tried yet) you have an option to set the hash for the pseudo random number generator. The option “prng sha512 64” would set it to sha512 for example. “prng sha256 32” would be sha256 and so on. If used, set this option in both client and server configs. This is an advanced config option that usually you do not need to play with, but you can if you know what you are doing.<br>
+You can also (in Openssl) choose what engine the crypto uses. Every system may have different options. The command:<br>
+sudo openvpn --show-engines<br>
+shows what is available on your system. In Openssl, confirm with:<br>
+openssl engine<br>
+To set the option, add an option to client and server: “engine dynamic” (or whatever choice those commands showed you)<br>
+Again, Openvpn does all this already, but sometimes there are special cases where you want control over such things. If you are not sure, then do not use the option.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/7</link>
+        <pubDate>Thu, 02 Jul 2020 19:07:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3410-7</guid>
+        <source url="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</source>
+      </item>
+      <item>
+        <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+        <dc:creator><![CDATA[Norbert_Szczybelski]]></dc:creator>
+        <description><![CDATA[
+            <p>Good morning HulaHoop.</p>
+<p>Reading IETF RFC 6347 and thinking about DTLS over TCP.</p>
+<p>This is old configuration of Asterisk but I will do some research and publish results.</p>
+<p>I was testing on two Android phones.<br>
+I dont remember what VoIP client software I was used.</p>
+<p>Norbert.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/6</link>
+        <pubDate>Thu, 02 Jul 2020 11:33:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3410-6</guid>
+        <source url="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</source>
+      </item>
+      <item>
+        <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/norbert_szczybelski">@Norbert_Szczybelski</a> Awesome. So is there a VoIP client setup/configuration step too or how do users communicate?</p>
+<p>Can Asterix be setup to use TCP instead? That would simplify things a lot.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/5</link>
+        <pubDate>Wed, 01 Jul 2020 13:15:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3410-5</guid>
+        <source url="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</source>
+      </item>
+      <item>
+        <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+        <dc:creator><![CDATA[Norbert_Szczybelski]]></dc:creator>
+        <description><![CDATA[
+            <h1>UPDATE</h1>
+<p>Generate encryption keys with OpenSSL.</p>
+<p>OpenVPN server openvpn.conf configuration file:</p>
+<pre><code>mode server
+tls-server
+dev tun
+proto tcp-server
+port 1194
+
+server 10.8.0.0 255.255.0.0
+ 
+ca /vpn/ca.crt
+cert /vpn/server.crt
+key /vpn/server.key
+dh /vpn/dh2048.pem
+tls-crypt /vpn/ta.key
+ 
+cipher AES-256-CBC
+auth SHA3-512
+ 
+log /var/log/openvpn.log
+status /var/log/openvpn-status.log
+ 
+user nobody
+group nobody
+persist-key
+persist-tun
+chroot /usr/local/etc/openvpn/jail
+auth-nocache
+
+# If you want to allow clients to communicate between themselves e.g. start own services like UnrealIRCd Servers.
+client-to-client
+client-config-dir /ccd
+</code></pre>
+<p>OpenVPN clients client.conf configuration file:</p>
+<pre><code>tls-client
+remote-cert-tls server
+dev tun
+
+&lt;connection&gt;
+remote youroniondomain.onion 1194 tcp-client
+socks-proxy 127.0.0.1 9050
+&lt;/connection&gt;
+
+cipher AES-256-CBC
+auth SHA3-512
+  
+user nobody
+group nogroup
+persist-key
+persist-tun
+chroot /etc/openvpn/jail
+auth-nocache
+ 
+log /var/log/openvpn/openvpn.log
+status /var/log/openvpn/openvpn-status.log
+ 
+&lt;ca&gt;
+&lt;/ca&gt;
+  
+&lt;cert&gt;
+&lt;/cert&gt;
+  
+&lt;key&gt;
+&lt;/key&gt;
+
+&lt;tls-crypt&gt;
+&lt;/tls-crypt&gt;
+</code></pre>
+<p>Tor Hidden Service torrc configuration file:</p>
+<pre><code>HiddenServiceDir /usr/local/torhs/szczybelski/
+HiddenServicePort 1194 127.0.0.1:1194
+</code></pre>
+<p>Tor clients torrc configuration file:</p>
+<p><code>SOCKSPort 9050</code></p>
+<p>Asterisk sip.conf configuration file:</p>
+<pre><code>[general]
+transport=udp
+port=5060
+bindaddr=10.8.0.1
+disallow=all
+allow=ulaw
+allow=alaw
+allow=gsm
+directmedia=no
+nat=yes
+localnet=10.8.0.0/255.255.0.0
+ 
+[friends_internal](!)
+type=friend
+host=dynamic
+context=from-internal
+disallow=all
+allow=ulaw
+allow=alaw
+allow=gsm
+ 
+[demo-alice](friends_internal)
+secret=password
+ 
+[demo-bob](friends_internal)
+secret=password
+ 
+[demo-norbert](friends_internal)
+secret=password
+</code></pre>
+<p>Asterisk extensions.conf configuration file:</p>
+<pre><code>[from-internal]
+exten=&gt;6001,1,Dial(SIP/demo-alice,20)
+exten=&gt;6002,1,Dial(SIP/demo-bob,20)
+exten=&gt;6003,1,Dial(SIP/demo-norbert,20)
+</code></pre>
+<p>That’s all!<br>
+It’s working with 1 s delay.</p>
+<p>Enjoy!</p>
+          <p><a href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/4</link>
+        <pubDate>Wed, 01 Jul 2020 08:01:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3410-4</guid>
+        <source url="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</source>
+      </item>
+      <item>
+        <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+        <dc:creator><![CDATA[Norbert_Szczybelski]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello Patrick.</p>
+<p>That’s right. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/3</link>
+        <pubDate>Fri, 13 Jan 2017 01:08:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3410-3</guid>
+        <source url="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</source>
+      </item>
+      <item>
+        <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>To summarize it, to see if I got the right overview in my mind.</p>
+<ul>
+<li>You host a Tor hidden service.</li>
+<li>An OpenVPN server is reachable on that Tor hidden service.</li>
+<li>OpenVPN is used so you can <a href="https://www.whonix.org/wiki/Tunnel_UDP_over_Tor">tunnel UDP over Tor</a>.</li>
+<li>So you then can you Asterisk which is UDP only?</li>
+</ul>
+<p>It’s interesting!</p>
+<hr>
+<p>You didn’t like any of the other VoIP solutions we have in the wiki?</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/VoIP" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/360;"><img src="https://www.whonix.org/w/images/f/f9/Sound-856771640.png" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/VoIP" target="_blank" rel="nofollow noopener">VoIP</a></h3>
+
+<p>Anonymous Voice over IP (VOIP). Encrypted anonymous phone calls using the Tor Anonymity Network.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<aside class="onebox twitterstatus">
+  <header class="source">
+      <a href="https://twitter.com/Whonix/status/819363656370532353" target="_blank" rel="nofollow noopener">twitter.com</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://pbs.twimg.com/profile_images/747394861549162496/q6YdTSix_400x400.jpg" class="thumbnail onebox-avatar" width="321" height="321">
+<h4>
+  <a href="https://twitter.com/Whonix/status/819363656370532353" target="_blank" rel="nofollow noopener">
+    Whonix (Whonix)
+  </a>
+</h4>
+
+<div class="tweet">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.  <a target="_blank" href="http://dlvr.it/N5F1Dn" rel="nofollow noopener">dlvr.it/N5F1Dn</a>
+</div>
+
+<div class="date">
+  <a href="https://twitter.com/Whonix/status/819363656370532353" target="_blank" rel="nofollow noopener">2:01 AM - 12 Jan 2017</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/2</link>
+        <pubDate>Thu, 12 Jan 2017 21:59:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3410-2</guid>
+        <source url="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</source>
+      </item>
+      <item>
+        <title>How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</title>
+        <dc:creator><![CDATA[Norbert_Szczybelski]]></dc:creator>
+        <description><![CDATA[
+            <p>First create OpenSSL CA with easy-rsa or OpenSSL for OpenVPN.</p>
+<p>This is OpenVPN server configuration file:</p>
+<blockquote>
+<p>tls-server<br>
+port 1194<br>
+proto tcp<br>
+dev tun<br>
+ca /etc/ssl/ca.crt<br>
+cert /etc/ssl/server.crt<br>
+key /etc/ssl/server.key<br>
+dh /etc/ssl/dh2048.pem<br>
+topology subnet<br>
+server 10.0.0.0 255.255.0.0<br>
+ifconfig-pool-persist ipp.txt<br>
+keepalive 10 120<br>
+cipher AES-256-CBC<br>
+max-clients 100<br>
+persist-key<br>
+persist-tun<br>
+status /var/log/openvpn-status.log<br>
+log /var/log/openvpn.log<br>
+log-append /var/log/openvpn-append.log<br>
+verb 3<br>
+auth SHA512</p>
+</blockquote>
+<p>This is OpenVPN client configuration file:</p>
+<blockquote>
+<p>client<br>
+dev tun<br>
+proto tcp<br>
+remote hiddenservicexxx.onion 1194<br>
+resolv-retry infinite<br>
+nobind<br>
+persist-key<br>
+persist-tun<br>
+ca /home/norbert/new/ca.crt<br>
+cert /home/norbert/new/demo-norbert.crt<br>
+key /home/norbert/new/demo-norbert.key<br>
+cipher AES-256-CBC<br>
+auth SHA512<br>
+verb 3<br>
+socks-proxy 127.0.0.1 9050<br>
+remote-cert-tls server</p>
+</blockquote>
+<p>This is Asterisk sip.conf configuration file:</p>
+<blockquote>
+<pre><code>[general]
+transport=udp
+port=5060
+bindaddr=10.0.0.1
+disallow=all
+allow=ulaw
+allow=alaw
+allow=gsm
+directmedia=no
+nat=yes
+localnet=10.0.0.0/255.255.0.0
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>[friends_internal](!)
+type=friend
+host=dynamic
+context=from-internal
+disallow=all
+allow=ulaw
+allow=alaw
+allow=gsm
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>[demo-alice](friends_internal)
+secret=password
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>[demo-bob](friends_internal)
+secret=password
+</code></pre>
+</blockquote>
+<blockquote>
+<pre><code>[demo-norbert](friends_internal)
+secret=password
+</code></pre>
+</blockquote>
+<p>This is Asterisk extensions.conf configuration file:</p>
+<blockquote>
+<p>[from-internal]<br>
+exten=&gt;6001,1,Dial(SIP/demo-alice,20)<br>
+exten=&gt;6002,1,Dial(SIP/demo-bob,20)</p>
+</blockquote>
+<p>This is Tor hidden service server torrc configuration file:</p>
+<blockquote>
+<p>HiddenServiceDir /usr/local/torhs/winternight/<br>
+HiddenServicePort 1194 127.0.0.1:1194</p>
+</blockquote>
+<p>This is Tor client configuration file:</p>
+<blockquote>
+<p><code>SOCKSPort 9050</code></p>
+</blockquote>
+<p>That’s all. It’s working with 1s delay.<br>
+Enjoy. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410/1</link>
+        <pubDate>Wed, 11 Jan 2017 00:00:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3410-1</guid>
+        <source url="http://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410.rss">How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>How to isolate streams manually in a (non-Whonix) Qubes VM</title>
+    <link>http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944</link>
+    <description>Are the following assumptions correct?
+
+whonix-gw isolates traffic from whonix-ws by its SocksPort. This only works when software in whonix-ws is configured to use different SocksPorts (as outlined in the wiki: &lt;https://www.whonix.org/wiki/Stream_Isolation&gt;).
+
+A VM not based on whonix-ws normally won&#39;t utilize SocksPorts; whonix-gw will treat all traffic as it would with TransPort traffic from whonix-gw, i.e. it will as use the same circuit (while the traffic of each VM as a whole is isolated).
+
+&lt;img src=&#39;/uploads/default/original/2X/d/d51f1e7af1d29c09995cf7632231764aa1d1f801.jpg&#39;&gt;
+
+Now how would isolation by SocksPort need to be implemented for VMs not based on whonix-ws? Do they communicate with whonix-gw in the same way as whonix-ws? Would configuring an application to use a SocksPort be enough?
+
+Does whonix-gw treat all non-proxied traffic as TransPort traffic and SocksPort traffic as, well, that?
+
+I&#39;m sure there&#39;s is a clear answer to this somewhere in the wiki. However, I have been searching for it for quite some time without success. Is this documented anywhere?</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 03 Jun 2017 13:36:00 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>How to isolate streams manually in a (non-Whonix) Qubes VM</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="3" data-topic="3944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/u/278dde/40.png" class="avatar"> ubestemt:</div>
+<blockquote>
+<p>Install torsocks without tor and its dependencies (libevent tor<br>
+tor-geoipdb), e.g. manually in aptitude.</p>
+</blockquote>
+</aside>
+<p>Btw aptitude is not required for that.</p>
+<pre><code>sudo apt-get install --no-install-recommends torsocks
+</code></pre>
+<p>(And anon-ws-disable-stacked-tor [reboot required] might work as well as<br>
+per<br>
+<a href="https://www.whonix.org/wiki/Whonix_Packages_for_Debian_Hosts">https://www.whonix.org/wiki/Whonix_Packages_for_Debian_Hosts</a>)</p>
+          <p><a href="http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944/4</link>
+        <pubDate>Sat, 03 Jun 2017 13:36:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3944-4</guid>
+        <source url="http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944.rss">How to isolate streams manually in a (non-Whonix) Qubes VM</source>
+      </item>
+      <item>
+        <title>How to isolate streams manually in a (non-Whonix) Qubes VM</title>
+        <dc:creator><![CDATA[ubestemt]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for confirming!</p>
+<p>To isolate the traffic individual programs in a non-Whonix VM in Qubes I did the following:</p>
+<ol>
+<li>
+<p>Install <code>torsocks</code> <em>without</em> <code>tor</code> and its dependencies (<code>libevent tor tor-geoipdb</code>), e.g. manually in <code>aptitude</code>.</p>
+</li>
+<li>
+<p>Get the IP address of <code>sys-whonix</code> by running <code>ip route show</code>.</p>
+</li>
+<li>
+<p>Edit <code>/etc/tor/torsocks.conf</code> so that the corresponding lines read:</p>
+<ul>
+<li>
+<code>TorAddress 10.137.3.1</code> (or whatever IP address <code>ip route show</code> returns)</li>
+<li><code>IsolatePID 1</code></li>
+</ul>
+</li>
+</ol>
+<p>Now every command executed with <code>torsocks</code> should be relayed through an isolated stream. This is also what happened when I tried to run <code>torsocks curl ipinfo.io</code> multiple times.</p>
+<p>The isolation will only be as good as <code>torsocks</code> is. But any leaks will be relayed though that VM’s main Tor stream, just as the traffic of any program not launched through <code>torsocks</code>.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944/3</link>
+        <pubDate>Thu, 01 Jun 2017 14:17:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3944-3</guid>
+        <source url="http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944.rss">How to isolate streams manually in a (non-Whonix) Qubes VM</source>
+      </item>
+      <item>
+        <title>How to isolate streams manually in a (non-Whonix) Qubes VM</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="3944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/u/278dde/40.png" class="avatar"> ubestemt:</div>
+<blockquote>
+<p>whonix-gw isolates traffic from whonix-ws by its SocksPort. This only works when software in whonix-ws is configured to use different SocksPorts (as outlined in the wiki: <a href="https://www.whonix.org/wiki/Stream_Isolation">https://www.whonix.org/wiki/Stream_Isolation</a>).</p>
+</blockquote>
+</aside>
+<p>Yes.</p>
+<aside class="quote" data-post="1" data-topic="3944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/u/278dde/40.png" class="avatar"> ubestemt:</div>
+<blockquote>
+<p>A VM not based on whonix-ws normally won’t utilize SocksPorts; whonix-gw will treat all traffic as it would with TransPort traffic from whonix-gw, i.e. it will as use the same circuit (while the traffic of each VM as a whole is isolated).</p>
+</blockquote>
+</aside>
+<p>Yes. (Because of Tor’s <code>IsolateClientAddr</code>.)</p>
+<aside class="quote" data-post="1" data-topic="3944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/u/278dde/40.png" class="avatar"> ubestemt:</div>
+<blockquote>
+<p>Now how would isolation by SocksPort need to be implemented for VMs not based on whonix-ws? Do they communicate with whonix-gw in the same way as whonix-ws? Would configuring an application to use a SocksPort be enough?</p>
+</blockquote>
+</aside>
+<p>Yes.</p>
+<aside class="quote" data-post="1" data-topic="3944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/u/278dde/40.png" class="avatar"> ubestemt:</div>
+<blockquote>
+<p>Does whonix-gw treat all non-proxied traffic as TransPort traffic and SocksPort traffic as, well, that?</p>
+</blockquote>
+</aside>
+<p>Traffic from Non-Qubes-Whonix-Workstation / Qubes whonix-ws based AppVMs not directed to a Tor SocksPort will use system default networking which will result in ending up in Tor’s <code>DnsPort</code> and <code>TransPort</code>.</p>
+<p>Qubes-Whonix whonix-ws TemplateVM traffic wise works like an AppVM. Applications configured to use a Tor <code>SocksPort</code> do so. Other traffic using system default networking ends up in Tor’s <code>DnsPort</code> and <code>TransPort</code>.</p>
+<p>Non-Qubes-Whonix-Gateway / Qubes sys-whonix by default has no system default networking. (But could be optionally enabled.)</p>
+<p>( <a href="https://www.whonix.org/wiki/Whonix-Gateways_Own_Traffic_Transparent_Proxy">https://www.whonix.org/wiki/Whonix-Gateways_Own_Traffic_Transparent_Proxy</a> )</p>
+<p>Does that answer your question?</p>
+<aside class="quote" data-post="1" data-topic="3944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/u/278dde/40.png" class="avatar"> ubestemt:</div>
+<blockquote>
+<p>I’m sure there’s is a clear answer to this somewhere in the wiki. However, I have been searching for it for quite some time without success. Is this documented anywhere?</p>
+</blockquote>
+</aside>
+<p>It might not be documented. Please feel free to add it.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944/2</link>
+        <pubDate>Sun, 28 May 2017 14:21:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3944-2</guid>
+        <source url="http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944.rss">How to isolate streams manually in a (non-Whonix) Qubes VM</source>
+      </item>
+      <item>
+        <title>How to isolate streams manually in a (non-Whonix) Qubes VM</title>
+        <dc:creator><![CDATA[ubestemt]]></dc:creator>
+        <description><![CDATA[
+            <p>Are the following assumptions correct?</p>
+<p>whonix-gw isolates traffic from whonix-ws by its SocksPort. This only works when software in whonix-ws is configured to use different SocksPorts (as outlined in the wiki: <a href="https://www.whonix.org/wiki/Stream_Isolation" rel="nofollow noopener">https://www.whonix.org/wiki/Stream_Isolation</a>).</p>
+<p>A VM not based on whonix-ws normally won’t utilize SocksPorts; whonix-gw will treat all traffic as it would with TransPort traffic from whonix-gw, i.e. it will as use the same circuit (while the traffic of each VM as a whole is isolated).</p>
+<p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/d/d51f1e7af1d29c09995cf7632231764aa1d1f801.jpg" data-download-href="//forums.whonix.org/uploads/default/d51f1e7af1d29c09995cf7632231764aa1d1f801" title="463px-Stream_isolation.1.0.jpg"><img src="//forums.whonix.org/uploads/default/original/2X/d/d51f1e7af1d29c09995cf7632231764aa1d1f801.jpg" width="386" height="500" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/d/d51f1e7af1d29c09995cf7632231764aa1d1f801_2_10x10.png"></a></div><p></p>
+<p>Now how would isolation by SocksPort need to be implemented for VMs not based on whonix-ws? Do they communicate with whonix-gw in the same way as whonix-ws? Would configuring an application to use a SocksPort be enough?</p>
+<p>Does whonix-gw treat all non-proxied traffic as TransPort traffic and SocksPort traffic as, well, that?</p>
+<p>I’m sure there’s is a clear answer to this somewhere in the wiki. However, I have been searching for it for quite some time without success. Is this documented anywhere?</p>
+          <p><a href="http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944/1</link>
+        <pubDate>Sun, 28 May 2017 12:28:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3944-1</guid>
+        <source url="http://forums.whonix.org/t/how-to-isolate-streams-manually-in-a-non-whonix-qubes-vm/3944.rss">How to isolate streams manually in a (non-Whonix) Qubes VM</source>
+      </item>
+  </channel>
+</rss>

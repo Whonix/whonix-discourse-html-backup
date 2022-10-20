@@ -1,0 +1,716 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix-13-Workstation VPN-Firewall</title>
+    <link>http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465</link>
+    <description>Instructions tested and working (with vpn-specific required modifications to openvpn.conf): https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#Setup_Tor_before_a_VPN_.28User_-.3E_Tor_-.3E_VPN_-.3E_Internet.29
+
+Fail-closed tests with:
+
+    WORKSTATION_FIREWALL=1
+    TUNNEL_FIREWALL_ENABLE=true
+
+    | TransPort | TUNNEL_FIREWALL_ALLOW_LOCAL_NET |
+    |  traffic  |      true      |     false      |
+    |___________|________________|________________|
+    |           |                |                |
+    |  VPN Up   |    allowed     |    allowed     |
+    |           |                |                |
+    |  VPN Down |    blocked     |    blocked     |
+    |___________|________________|________________|
+
+
+    | SocksPort | TUNNEL_FIREWALL_ALLOW_LOCAL_NET |
+    |  traffic  |      true      |     false      |
+    |___________|________________|________________|
+    |           |                |                |
+    |  VPN Up   |    allowed     |    blocked     |
+    |           |                |                |
+    |  VPN Down |    allowed     |    blocked     |
+    |___________|________________|________________|
+
+Working as expected (by me anyway).
+
+Notes:
+
+* Not sure why VPN_FIREWALL= is still in conf file. Would like confirmation that it is obsolete and replaced by TUNNEL_FIREWALL_ENABLE?
+* With all the changes to root filesystem, really need bind-directories functionality for this (in Qubes). (as noted in wiki) (Not interested in standalone vm&#39;s)
+* As a temporary workaround, would like to keep openvpn files in ~/openvpn/ and launch manually (not use systemd).
+With my limited linux knowledge, can&#39;t figure out why:
+
+    su tunnel
+    sudo openvpn openvpn.conf
+    =
+    ROUTE_GATEWAY 10.137.2.1
+    TUN/TAP device tun0 opened
+    
+works but
+
+    sudo -u tunnel openvpn openvpn.conf
+    =
+    ROUTE_GATEWAY 10.137.2.1
+    ERROR: Cannot ioctl TUNSETIFF tun: Operation not permitted (errno=1)
+    Exiting due to fatal error
+
+fails to create tun device.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 22 May 2016 18:19:49 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix-13-Workstation VPN-Firewall</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="7" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Still using VPN_FIREWALL two times.</p>
+</blockquote>
+</aside>
+<p>Haven’t uploaded new draft yet! Ok, now I see why git is useful - couple pulls and my head is spinning. I’ll move all my forum spam over there.</p>
+<p>All your points noted!</p>
+          <p><a href="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/8</link>
+        <pubDate>Sun, 22 May 2016 18:19:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2465-8</guid>
+        <source url="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465.rss">Whonix-13-Workstation VPN-Firewall</source>
+      </item>
+      <item>
+        <title>Whonix-13-Workstation VPN-Firewall</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="6" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>Updated draft.</p>
+</blockquote>
+</aside>
+<p>Still using <code>VPN_FIREWALL</code> two times.</p>
+<aside class="quote" data-post="6" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>VPN CredentialsThe riseup vpn example illustrates password authentication. Many vpn providers issue client keys with 600 permissions. User ‘tunnel’ can’t read. Best option is probably chown tunnel:tunnel client.keyor for embedded keys: chown tunnel:tunnel client.ovpn</p>
+</blockquote>
+</aside>
+<p>But the guide is using this already, no?<br>
+<code>sudo chown -R tunnel:tunnel /etc/openvpn</code><br>
+( <a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#Configuration_Folder_Permissions">https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#Configuration_Folder_Permissions</a> )</p>
+<aside class="quote" data-post="6" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>Auto-DNS Configuration</p>
+</blockquote>
+</aside>
+<p>The point, advantage of this would be that the user no longer needs to do manual DNS configuration?</p>
+<p>That would be nice. In that case we should add that script to the usability-misc package. (And with a different name to the vpn-firewall package [so these can still be co-installed].)</p>
+<aside class="quote" data-post="6" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>/etc/resolv.conf.qubes</p>
+</blockquote>
+</aside>
+<p>The file name should not be needlessly Qubes specific.</p>
+<aside class="quote" data-post="6" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>Initial setup requires:</p>
+</blockquote>
+</aside>
+<p>Maybe not. The whole  <code>/etc/openvpn/update-dns.sh</code> could get a sudoers exception. Then call the script as root so it can do all of that for the user.</p>
+<blockquote>
+<p>down update-dns.sh</p>
+</blockquote>
+<p>So it will be set back to original DNS settings when the VPN is shut down. Not necessarily bad. Can you please test if with original DNS settings (pointing to Whonix-Gateway)</p>
+<aside class="quote" data-post="6" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>/etc/dhclient.d/qubes-setup-dnat-to-ns.sh</p>
+</blockquote>
+</aside>
+<p>Please check if that file is executable beforehand.</p>
+<aside class="quote" data-post="6" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>EDIT: file permssions will be overwritten by updates <img src="//forums.whonix.org/images/emoji/twitter/frowning.png?v=5" title=":frowning:" class="emoji" alt=":frowning:"></p>
+</blockquote>
+</aside>
+<p>Which updates?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/7</link>
+        <pubDate>Sun, 22 May 2016 18:13:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2465-7</guid>
+        <source url="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465.rss">Whonix-13-Workstation VPN-Firewall</source>
+      </item>
+      <item>
+        <title>Whonix-13-Workstation VPN-Firewall</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="2" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>It is very hairy indeed to make openvpn run under a user account.</p>
+</blockquote>
+</aside>
+<p>Thanks. Just now learned what <code>sudo -u</code> actually means. <img src="//forums.whonix.org/images/emoji/twitter/confused.png?v=5" title=":confused:" class="emoji" alt=":confused:"> All working now.</p>
+<aside class="quote" data-post="5" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>The name VPN_FIREWALL is in Whonix 13 plain wrong.</p>
+</blockquote>
+</aside>
+<p>Updated draft.</p>
+<aside class="quote" data-post="5" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>TUNNEL_FIREWALL_ENABLE alone is sufficient.</p>
+</blockquote>
+</aside>
+<p>This is confusing, especially since instructions explicitly state to set WORKSTATION_FIREWALL=1. Easy fix:</p>
+<pre><code>## Setting TUNNEL_FIREWALL_ENABLE=true automatically enables WORKSTATION_FIREWALL=1 and
+## overrides any previous setting.
+</code></pre>
+<hr>
+<p>Anticipating issues that users may have with the instructions:</p>
+<p><strong>VPN Credentials</strong><br>
+The riseup vpn example illustrates password authentication. Many vpn providers issue client keys with 600 permissions. User ‘tunnel’ can’t read.<br>
+Best option is probably <code>chown tunnel:tunnel client.key</code><br>
+or for embedded keys: <code>chown tunnel:tunnel client.ovpn</code></p>
+<p><strong>Auto-DNS Configuration</strong><br>
+add to /etc/openvpn/openvpn.conf:</p>
+<pre><code>script-security 2
+up update-dns.sh
+down update-dns.sh
+</code></pre>
+<p>in konsole:</p>
+<pre><code>sudo touch /etc/resolv.conf.qubes
+sudo chown tunnel:tunnel /etc/resolv.conf.anondist
+sudo chown tunnel:tunnel /etc/resolv.conf.qubes
+</code></pre>
+<p>Slightly edited version of script circulated on qubes-users (credit: Olivier Médoc), which is itself based on update-resolv-conf.<br>
+add to /etc/openvpn/update-dns.sh:</p>
+<pre><code>#!/bin/bash
+
+## Modified version of vpn-setup.sh released on qubes-users mailing list. 
+## Credit: Olivier Médoc
+## Modified to work with Whonix 13 VPN Firewall
+
+## For use with VPNs running under Unprivileged User : tunnel
+## Initial setup requires:
+##   sudo touch /etc/resolv.conf.qubes
+##   sudo chown tunnel:tunnel /etc/resolv.conf
+##   sudo chown tunnel:tunnel /etc/resolv.conf.qubes
+
+## To call from openvpn configuration file
+##   script-security 2
+##   up update-dns.sh
+##   down update-dns.sh
+
+## Script will stop working if file permissions are reset/changed
+## Repeat setup procedure.
+
+case $script_type in
+
+up)
+        # Parses DHCP options from openvpn to update resolv.conf
+        # To use set as 'up' and 'down' script in your openvpn *.conf:
+        # up /etc/openvpn/update-resolv-conf
+        # down /etc/openvpn/update-resolv-conf
+        #
+        # Used snippets of resolvconf script by Thomas Hood &lt;jdthood@yahoo.co.uk&gt;
+        # and Chris Hanson
+        # Licensed under the GNU GPL.  See /usr/share/common-licenses/GPL.
+        # 07/2013 colin@daedrum.net Fixed intet name
+        # 05/2006 chlauber@bnc.ch
+        #
+        # Example envs set from openvpn:
+        # foreign_option_1='dhcp-option DNS 193.43.27.132'
+        # foreign_option_2='dhcp-option DNS 193.43.27.133'
+        # foreign_option_3='dhcp-option DOMAIN be.bnc.ch'
+        # foreign_option_4='dhcp-option DOMAIN-SEARCH bnc.local'
+
+        # Retrieve DNS related foreign DHCP variable
+        for optionname in ${!foreign_option_*} ; do
+                option="${!optionname}"
+                echo "Parsing DHCP option: $option"
+                part1=$(echo "$option" | cut -d " " -f 1)
+                if [ "$part1" == "dhcp-option" ] ; then
+                        part2=$(echo "$option" | cut -d " " -f 2)
+                        part3=$(echo "$option" | cut -d " " -f 3)
+                        if [ "$part2" == "DNS" ] ; then
+                                IF_DNS_NAMESERVERS="$IF_DNS_NAMESERVERS $part3"
+                        elif [[ "$part2" == "DOMAIN" || "$part2" == "DOMAIN-SEARCH" ]] ; then
+                                IF_DNS_SEARCH="$IF_DNS_SEARCH $part3"
+                        fi
+                fi
+        done
+
+        # Create new resolv.conf content
+        if [[ -n "$IF_DNS_SEARCH" || -n "$IF_DNS_NAMESERVERS" ]] ; then
+                # Backup resolv.conf
+                cp /etc/resolv.conf /etc/resolv.conf.qubes
+
+                # Clear resolv.conf
+                echo -n "" &gt; /etc/resolv.conf
+
+                if [ "$IF_DNS_SEARCH" ]; then
+                        R="search "
+                        for DS in $IF_DNS_SEARCH ; do
+                                R="${R} $DS"
+                        done
+                        echo "$R" &gt;&gt; /etc/resolv.conf
+                fi
+
+                for NS in $IF_DNS_NAMESERVERS ; do
+                        R="nameserver $NS"
+                        echo "$R" &gt;&gt; /etc/resolv.conf
+                done
+
+                # Reinit Qubes DNS nat rules
+                # Has no effect in Whonix 13. Safe to leave
+                /etc/dhclient.d/qubes-setup-dnat-to-ns.sh
+
+        fi
+        ;;
+down)
+
+        if [ -f /etc/resolv.conf.qubes ] ; then
+                # Restore resolv.conf
+                cp /etc/resolv.conf.qubes /etc/resolv.conf
+
+                # Reinit Qubes DNS nat rules
+                # Has no effect in Whonix 13. Safe to leave
+                /etc/dhclient.d/qubes-setup-dnat-to-ns.sh
+        fi
+        ;;
+esac
+</code></pre>
+<p>EDIT: file permssions will be overwritten by updates <img src="//forums.whonix.org/images/emoji/twitter/frowning.png?v=5" title=":frowning:" class="emoji" alt=":frowning:"></p>
+          <p><a href="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/6</link>
+        <pubDate>Fri, 20 May 2016 19:49:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2465-6</guid>
+        <source url="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465.rss">Whonix-13-Workstation VPN-Firewall</source>
+      </item>
+      <item>
+        <title>Whonix-13-Workstation VPN-Firewall</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="3" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>If there is no plan to permanently replace usage of VPN_FIREWALL with TUNNEL_FIREWALL_ENABLE, probably makes sense to keep TUNNEL_FIREWALL_ENABLE hidden. Advantages to using VPN_FIREWALL: 1) legacy benefits 2) consistency with gateway-vpn-firewall.</p>
+</blockquote>
+</aside>
+<p>The name VPN_FIREWALL is in Whonix 13 plain wrong. Limiting. It is a TUNNEL_FIREWALL. Works for any kind of tunneling software in similar ways.</p>
+<p>VPN_FIREWALL will stay a synonym for TUNNEL_FIREWALL_ENABLE for legacy reasons.</p>
+<aside class="quote" data-post="3" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>Also, for consistency, configurable booleans should all be 0/1 or all true/false…</p>
+</blockquote>
+</aside>
+<p>Ideally yes, but difficult to do for legacy reasons. Changing this could lead to unexpected results for users who upgrade.</p>
+<aside class="quote" data-post="3" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>VPN-Firewall can function with WORKSTATION_FIREWALL=0! This seems counterintuitive since VPN-Firewall is a feature / subset of the Workstation Firewall? And is behaving as if WORKSTATION_FIREWALL=1 anyway.</p>
+</blockquote>
+</aside>
+<p>Intuitions are different. I was more on the side of users assuming TUNNEL_FIREWALL_ENABLE alone is sufficient. And this way it fails closed.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/5</link>
+        <pubDate>Fri, 20 May 2016 14:59:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2465-5</guid>
+        <source url="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465.rss">Whonix-13-Workstation VPN-Firewall</source>
+      </item>
+      <item>
+        <title>Whonix-13-Workstation VPN-Firewall</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="2" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>The config file comments should be cleaned up for next release indeed.<br>
+Are you interested to send a git pull request improving that?</p>
+</blockquote>
+</aside>
+<pre><code>#########################################
+## VPN-Firewall Settings (WORKSTATION) ##
+#########################################
+
+## VPN-Firewall enforces more leak-resistant firewall rules while connected 
+## to VPNs. It also acts as a fail-closed mechanism should the VPN lose its
+## connection.
+##
+## ENABLE(1) to require all traffic to be tunneled through your VPN upon 
+## exiting the Tor network.
+##     user -&gt; tor -&gt; vpn -&gt; destination
+## Should the VPN lose its connection, all traffic will be halted.
+## A 3rd Party VPN Provider is REQUIRED to enable this option.
+##
+## DISABLE(0) (Default) to route traffic through the VPN when possible.
+## Traffic will continue to flow through Tor even if the VPN connection
+## is unavailable.
+## 
+VPN_FIREWALL=0
+
+## VPN-Firewall OPTIONAL Settings to BYPASS VPN
+##   (These settings only take effect when VPN_FIREWALL is ENABLED above)
+##   WARNING: These settings can result in network traffic through Tor
+##            even when VPN connectivity is disabled! Use Caution!
+## 
+## Allow connections to LOCAL_NET (see Advanced Options below)
+## Many Whonix applications are pre-configured to access the Tor network
+## directly and ignore any user configured proxies, including VPN, Socks, etc.
+##     user -&gt; tor -&gt; destination
+## These include Tor Browser, curl, wget, git and others. They require
+## direct access to the Local Network to communicate.
+##
+## This setting is DISABLED(false) by Default meaning all pre-configured
+## applications will cease working while VPN-Firewall is enabled, unless 
+## they are manually re-configured.
+##
+## ENABLE(true) this setting if you wish for these applications to remain
+## functional regardless of the state of the VPN connection. WARNING: These
+## applications will continue to route traffic over Tor even when the
+## VPN is disconnected!
+##
+TUNNEL_FIREWALL_ALLOW_LOCAL_NET=false
+
+## Allow additional programs to BYPASS the VPN
+## DISABLED(false) by Default. Since these programs require direct connections 
+## to the Tor network, they will not function at all while VPN-Firewall 
+## is enabled.
+## ENABLE(true) this setting to allow these programs to access the Tor network
+## and continue to do so regardless of the status of the VPN.
+##     user -&gt; Tor -&gt; destination
+## 
+## Sdwdate user:
+TUNNEL_FIREWALL_ALLOW_SDWDATE_USER=false
+## Whonixcheck:
+TUNNEL_FIREWALL_ALLOW_WHONIXCHECK=false
+## Tor Browser Downloader
+TUNNEL_FIREWALL_ALLOW_TB_UPDATER=false
+
+#####################
+## ADVANCED OPTIONS
+## Defaults will work for most users. Only change if certain.
+
+## VPN Interfaces
+## OpenVPN: use tun0
+##
+#VPN_INTERFACE=tun0
+
+## Destinations you do not want routed through the VPN.
+## Qubes-Whonix Defaults:
+##
+#    LOCAL_NET="\
+#         127.0.0.0-127.0.0.255 \
+#         10.137.0.0-10.138.255.255 \
+    "
+
+## Non-Qubes-Whonix defaults:
+##
+#    LOCAL_NET="\
+#         127.0.0.0-127.0.0.255 \
+#         192.168.0.0-192.168.0.255 \
+#         192.168.1.0-192.168.1.255 \
+#         10.152.152.0-10.152.152.255 \
+#         10.0.2.2-10.0.2.255 \
+#   "</code></pre>
+          <p><a href="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/4</link>
+        <pubDate>Fri, 20 May 2016 06:14:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2465-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465.rss">Whonix-13-Workstation VPN-Firewall</source>
+      </item>
+      <item>
+        <title>Whonix-13-Workstation VPN-Firewall</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="2" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>I have changed /etc/whonix_firewall.d/50_user.conf to /rw/config/whonix_firewall.d/50_user.conf so at least that does not require bind-dirs.</p>
+<p>Please test and confirm it works.</p>
+</blockquote>
+</aside>
+<p>Works!</p>
+<aside class="quote" data-post="2" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>My motivation was to keep the old config variable name to avoid confusing existing users.</p>
+</blockquote>
+</aside>
+<p>If there is no plan to permanently replace usage of VPN_FIREWALL with TUNNEL_FIREWALL_ENABLE, probably makes sense to keep TUNNEL_FIREWALL_ENABLE hidden. Advantages to using VPN_FIREWALL: 1) legacy benefits 2) consistency with gateway-vpn-firewall.</p>
+<p>Also, for consistency, configurable booleans should all be 0/1 or all true/false…</p>
+<hr>
+<p><a href="https://github.com/Whonix/whonix-ws-firewall/blob/master/usr/bin/whonix_firewall#L28" class="onebox" target="_blank">https://github.com/Whonix/whonix-ws-firewall/blob/master/usr/bin/whonix_firewall#L28</a></p>
+<p>VPN-Firewall can function with WORKSTATION_FIREWALL=0! This seems counterintuitive since VPN-Firewall is a feature / subset of the Workstation Firewall? And is behaving as if WORKSTATION_FIREWALL=1 anyway.</p>
+<hr>
+<p>In both Gateway &amp; Workstation /usr/bin/whonix_firewall:</p>
+<p>When defining local network ranges, it’s written as:</p>
+<p>A: “xx.xx.xx.0-xx.xx.xx.24”</p>
+<p></p><aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonix-firewall/blob/master/usr/bin/whonix_firewall" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonix-firewall/blob/master/usr/bin/whonix_firewall" target="_blank" rel="nofollow noopener">Whonix/whonix-firewall/blob/master/usr/bin/whonix_firewall</a></h4>
+<pre><code class="lang-">#!/bin/bash
+
+## Copyright (C) 2017 - 2018 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+set -e
+
+if [ -f "/var/run/qubes/this-is-templatevm" ]; then
+   /usr/bin/whonix-workstation-firewall
+elif [ -f "/usr/share/anon-gw-base-files/gateway" ]; then
+   /usr/bin/whonix-gateway-firewall
+elif [ -f "/usr/share/anon-ws-base-files/workstation" ]; then
+   /usr/bin/whonix-workstation-firewall
+else
+   echo "ERROR: Neither file /usr/share/anon-gw-base-files/gateway nor file /usr/share/anon-ws-base-files/workstation exists! If this is a Whonix-Gateway, package anon-gw-base-files needs to be installed. If this is a Whonix-Workstation, package anon-ws-base-files needs to be installed." &gt;&amp;2
+   exit 1
+fi
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+<a href="https://github.com/Whonix/whonix-ws-firewall/blob/master/usr/bin/whonix_firewall#L148-L171" class="onebox" target="_blank">https://github.com/Whonix/whonix-ws-firewall/blob/master/usr/bin/whonix_firewall#L148-L171</a><p></p>
+<p>In Whonix 11 these same ranges were defined as:</p>
+<p>B: “xx.xx.xx.0/24”</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonix-firewall/blob/Whonix11/usr/bin/whonix_firewall" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonix-firewall/blob/Whonix11/usr/bin/whonix_firewall" target="_blank" rel="nofollow noopener">Whonix/whonix-firewall/blob/Whonix11/usr/bin/whonix_firewall</a></h4>
+<pre><code class="lang-">#!/bin/bash
+
+## Copyright (C) 2012 - 2014 Patrick Schleizer &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+###########################
+## debugging
+###########################
+
+#set -x
+
+###########################
+## error_handler
+###########################
+
+set -o pipefail
+
+error_handler() {
+  echo "##################################################"
+  echo "Whonix firewall script failed!"
+</code></pre>
+
+  This file has been truncated. <a href="https://github.com/Whonix/whonix-firewall/blob/Whonix11/usr/bin/whonix_firewall" target="_blank" rel="nofollow noopener">show original</a>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Since A != B, shouldn’t A be written as:</p>
+<p>A: “xx.xx.xx.0-xx.xx.xx.255” ?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/3</link>
+        <pubDate>Fri, 20 May 2016 06:11:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2465-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465.rss">Whonix-13-Workstation VPN-Firewall</source>
+      </item>
+      <item>
+        <title>Whonix-13-Workstation VPN-Firewall</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you a lot for testing this!</p>
+<aside class="quote" data-post="1" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>Not sure why VPN_FIREWALL= is still in conf file. Would like confirmation that it is obsolete and replaced by TUNNEL_FIREWALL_ENABLE?</p>
+</blockquote>
+</aside>
+<p>Yes, very much the same.</p>
+<ul>
+<li><a href="https://github.com/Whonix/whonix-ws-firewall/blob/d065fab590b4793791d6ee0424f40d6e6d2321ea/etc/whonix_firewall.d/30_default.conf#L30-L39">https://github.com/Whonix/whonix-ws-firewall/blob/d065fab590b4793791d6ee0424f40d6e6d2321ea/etc/whonix_firewall.d/30_default.conf#L30-L39</a></li>
+<li><a href="https://github.com/Whonix/whonix-ws-firewall/blob/d065fab590b4793791d6ee0424f40d6e6d2321ea/usr/bin/whonix_firewall#L24-L26">https://github.com/Whonix/whonix-ws-firewall/blob/d065fab590b4793791d6ee0424f40d6e6d2321ea/usr/bin/whonix_firewall#L24-L26</a></li>
+</ul>
+<p>The config file comments should be cleaned up for next release indeed. My motivation was to keep the old config variable name to avoid confusing existing users. [On the gateway, and then copy pasted this legacy to the workstation.] Are you interested to send a git pull request improving that?</p>
+<aside class="quote" data-post="1" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>With all the changes to root filesystem, really need bind-directories functionality for this (in Qubes). (as noted in wiki) (Not interested in standalone vm’s)</p>
+</blockquote>
+</aside>
+<p>Yes.</p>
+<p>I have changed /etc/whonix_firewall.d/50_user.conf to /rw/config/whonix_firewall.d/50_user.conf so at least that does not require bind-dirs.</p>
+<p>Please test and confirm it works.</p>
+<pre><code>sudo mv /etc/whonix_firewall.d/50_user.conf /rw/config/whonix_firewall.d/50_user.conf
+</code></pre>
+<aside class="quote" data-post="1" data-topic="2465">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>ERROR: Cannot ioctl TUNSETIFF tun: Operation not permitted (errno=1)</p>
+</blockquote>
+</aside>
+<p>It is very hairy indeed to make openvpn run under a user account.</p>
+<p>“You need to emulate <a href="https://github.com/Whonix/usability-misc/blob/master/lib/systemd/system/openvpn%40openvpn.service.d/50_unpriv.conf">https://github.com/Whonix/usability-misc/blob/master/lib/systemd/system/openvpn%40openvpn.service.d/50_unpriv.conf</a> then.”</p>
+<pre><code>sudo /usr/sbin/openvpn --rmtun --dev tun0
+sudo /usr/sbin/openvpn --mktun --dev tun0 --dev-type tun --user tunnel --group tunnel
+cd /etc/openvpn
+sudo -u tunnel openvpn openvpn.conf
+</code></pre>
+<hr>
+<p>off-topic, you might also be interested in:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/VPN-Firewall" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/357;"><img src="https://www.whonix.org/w/images/1/1e/Vpnfirewall-29940640.png" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/VPN-Firewall" target="_blank" rel="nofollow noopener">VPN-Firewall</a></h3>
+
+<p>Instructions on how to use VPN-Firewall. A Fail Closed Mechanism for VPNs. Prevent leaks when using VPNs. Force all connections through VPNs. Prevents...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/2</link>
+        <pubDate>Thu, 19 May 2016 13:53:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2465-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465.rss">Whonix-13-Workstation VPN-Firewall</source>
+      </item>
+      <item>
+        <title>Whonix-13-Workstation VPN-Firewall</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>Instructions tested and working (with vpn-specific required modifications to openvpn.conf): <a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#Setup_Tor_before_a_VPN_.28User_-.3E_Tor_-.3E_VPN_-.3E_Internet.29">https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#Setup_Tor_before_a_VPN_.28User_-.3E_Tor_-.3E_VPN_-.3E_Internet.29</a></p>
+<p>Fail-closed tests with:</p>
+<pre><code>WORKSTATION_FIREWALL=1
+TUNNEL_FIREWALL_ENABLE=true
+
+| TransPort | TUNNEL_FIREWALL_ALLOW_LOCAL_NET |
+|  traffic  |      true      |     false      |
+|___________|________________|________________|
+|           |                |                |
+|  VPN Up   |    allowed     |    allowed     |
+|           |                |                |
+|  VPN Down |    blocked     |    blocked     |
+|___________|________________|________________|
+
+
+| SocksPort | TUNNEL_FIREWALL_ALLOW_LOCAL_NET |
+|  traffic  |      true      |     false      |
+|___________|________________|________________|
+|           |                |                |
+|  VPN Up   |    allowed     |    blocked     |
+|           |                |                |
+|  VPN Down |    allowed     |    blocked     |
+|___________|________________|________________|
+</code></pre>
+<p>Working as expected (by me anyway).</p>
+<p>Notes:</p>
+<ul>
+<li>
+<p>Not sure why VPN_FIREWALL= is still in conf file. Would like confirmation that it is obsolete and replaced by TUNNEL_FIREWALL_ENABLE?</p>
+</li>
+<li>
+<p>With all the changes to root filesystem, really need bind-directories functionality for this (in Qubes). (as noted in wiki) (Not interested in standalone vm’s)</p>
+</li>
+<li>
+<p>As a temporary workaround, would like to keep openvpn files in ~/openvpn/ and launch manually (not use systemd).<br>
+With my limited linux knowledge, can’t figure out why:</p>
+<h1>su tunnel<br>
+sudo openvpn openvpn.conf</h1>
+<p>ROUTE_GATEWAY 10.137.2.1<br>
+TUN/TAP device tun0 opened</p>
+</li>
+</ul>
+<p>works but</p>
+<pre><code>sudo -u tunnel openvpn openvpn.conf
+=
+ROUTE_GATEWAY 10.137.2.1
+ERROR: Cannot ioctl TUNSETIFF tun: Operation not permitted (errno=1)
+Exiting due to fatal error
+</code></pre>
+<p>fails to create tun device.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/1</link>
+        <pubDate>Thu, 19 May 2016 06:17:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2465-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465.rss">Whonix-13-Workstation VPN-Firewall</source>
+      </item>
+  </channel>
+</rss>

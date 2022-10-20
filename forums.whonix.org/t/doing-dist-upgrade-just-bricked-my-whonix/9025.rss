@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Doing `dist-upgrade` just bricked my Whonix.</title>
+    <link>http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025</link>
+    <description>To upgrade in-place to the point release 15.0.0.8.9 I just did `apt update` and `dist-upgrade`, `reboot`, and it bricked my Whonix:
+
+**`Kernel Panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)`**
+
+In my case I was even more severely locked out because I had set my grub timeout to 0, and pressing shift (etc) to access grub didn&#39;t work.
+
+I managed to attach my Workstation&#39;s VDI as a second storage drive to another workstation VM, boot into the other VM, and after booting off that other VM&#39;s grub it strangely loaded my broken workstation as the actual linux system. I could then easily change its particular grub timeout to 5 again instead of mounting its file system externally and doing a more advanced manual grub edit.
+
+So with grub access restored, I booted back in using an older kernel version and did:
+
+`sudo dpkg --configure -a`
+
+which fixed it.
+
+I can now boot into the Whonix with normal newest kernel 4.19.0-8, and the problem is resolved.
+
+---
+
+But if this will happen to others in the course of normal system upgrading, people not as advanced will suddenly lose their Whonix! That is terrible for Whonix remaining accessible to people who really need it.
+
+As a possible clue in my case, I have had kernel updates fail at the end of updates for quite a while. (But if it&#39;s happening in my Whonix, isn&#39;t it happening in others?)
+
+People shouldn&#39;t be expected to backup their Whonix right before every dist-upgrade, just in case the upgrade bricks their Whonix. Unless `dist-upgrade` really is a major thing and people should only regularly perform `upgrade` without having unexpected concerns?
+
+Either way, this was really bad, so here I am reporting it. What can be done about it?</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 27 Oct 2020 10:35:00 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Doing `dist-upgrade` just bricked my Whonix.</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Output of <code>sudo dpkg --configure -a</code> and <code>sudo update-initramfs -u</code> are probably very, very similar besides minor differences.</p>
+<p>I doubt all 1.5MB are needed. Any pastbin would be ok. Also any file hoster would be ok. Check this:<br>
+<a href="https://www.whonix.org/wiki/Forum_Best_Practices#Uploading_Images_for_Support">https://www.whonix.org/wiki/Forum_Best_Practices#Uploading_Images_for_Support</a></p>
+<p>The broken script <code>/usr/share/initramfs-tools/hooks/live</code> is just 256 lines. It’s not that complex.</p>
+<p>The mentioned error messages:</p>
+<aside class="quote no-group" data-username="AnonymousUser" data-post="8" data-topic="9025">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ed8c4c/40.png" class="avatar"> AnonymousUser:</div>
+<blockquote>
+<pre><code class="lang-auto">Errors were encountered while processing:
+ initramfs-tools
+</code></pre>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-username="AnonymousUser" data-post="8" data-topic="9025">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ed8c4c/40.png" class="avatar"> AnonymousUser:</div>
+<blockquote>
+<p>live-boot: core filesystems devices utils udev blockdev dnsE: /usr/share/initramfs-tools/hooks/live failed with return 1.</p>
+</blockquote>
+</aside>
+<p>Interesting are just the last 1000 or 100 lines above these error messages. I.e. just the last 100 to 1000 lines of log would probably be sufficient. Which then could even be posted here in forums.</p>
+          <p><a href="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/11</link>
+        <pubDate>Tue, 27 Oct 2020 10:35:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9025-11</guid>
+        <source url="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025.rss">Doing `dist-upgrade` just bricked my Whonix.</source>
+      </item>
+      <item>
+        <title>Doing `dist-upgrade` just bricked my Whonix.</title>
+        <dc:creator><![CDATA[AnonymousUser]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> Patrick, and sorry for the long delay.</p>
+<p>I took the opportunity to upgrade my workstation again, and captured the xtrace output for those two commands as you’ve instructed. (Same errors occurred and same <code>dpkg --configure</code> solution needed as usual.)</p>
+<p>Text outputs of <code>sudo dpkg --configure -a</code> and <code>sudo update-initramfs -u</code> are 1.5MB each. What’s the best way to share it with you? ZIP file? (Probably too long for Pastebin?) Hope we can solve this one. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/10</link>
+        <pubDate>Tue, 27 Oct 2020 07:17:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9025-10</guid>
+        <source url="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025.rss">Doing `dist-upgrade` just bricked my Whonix.</source>
+      </item>
+      <item>
+        <title>Doing `dist-upgrade` just bricked my Whonix.</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Now we have something which can be investigated.</p>
+<aside class="quote no-group" data-username="AnonymousUser" data-post="8" data-topic="9025">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ed8c4c/40.png" class="avatar"> AnonymousUser:</div>
+<blockquote>
+<pre><code class="lang-auto">Errors were encountered while processing:
+ initramfs-tools
+</code></pre>
+</blockquote>
+</aside>
+<p>If you see this message or a similar message about any other <code>grub</code>, <code>initramfs</code> or <code>linux</code> related package there is a probably that the system will not boot after reboot.</p>
+<aside class="quote no-group" data-username="AnonymousUser" data-post="8" data-topic="9025">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ed8c4c/40.png" class="avatar"> AnonymousUser:</div>
+<blockquote>
+<p><code>live-boot: core filesystems devices utils udev blockdev dnsE: /usr/share/initramfs-tools/hooks/live failed with return 1.</code></p>
+</blockquote>
+</aside>
+<p>This needs to be debugged further. It can possibly be done both, before or after you have seen this error.</p>
+<ol>
+<li>Open /usr/share/initramfs-tools/hooks/live with root rights.</li>
+</ol>
+<p>.</p>
+<pre><code>sudoedit /usr/share/initramfs-tools/hooks/live
+</code></pre>
+<ol start="2">
+<li>Enable <code>xtrace</code> / <code>-x</code> (for sh script debugging).</li>
+</ol>
+<p>I.e. change the first line</p>
+<pre><code class="lang-auto">#!/bin/sh
+</code></pre>
+<p>by appending <code>-x</code>. So it looks like this.</p>
+<pre><code class="lang-auto">#!/bin/sh -x
+</code></pre>
+<p>(Btw this also works not only for <code>#!/bin/sh</code> shebang but also for <code>#!/bin/bash</code> shebang.)</p>
+<ol start="3">
+<li>
+<p>Save.</p>
+</li>
+<li>
+<p>Try to trigger this error again.</p>
+</li>
+</ol>
+<p>Command to dpkg finishing upgrades.</p>
+<p>First one should work but if not try second one. Running both commands should be safe either way. Just in case run both commands.</p>
+<pre><code>sudo dpkg --configure -a
+</code></pre>
+<p>Or initramfs regeneration.</p>
+<pre><code>sudo update-initramfs -u
+</code></pre>
+<ol start="5">
+<li>Post the output of these commands here.</li>
+</ol>
+          <p><a href="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/9</link>
+        <pubDate>Fri, 11 Sep 2020 09:47:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9025-9</guid>
+        <source url="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025.rss">Doing `dist-upgrade` just bricked my Whonix.</source>
+      </item>
+      <item>
+        <title>Doing `dist-upgrade` just bricked my Whonix.</title>
+        <dc:creator><![CDATA[AnonymousUser]]></dc:creator>
+        <description><![CDATA[
+            <p>Here is the info.</p>
+<p>For several times when last performing <code>sudo apt upgrade</code>, my Whonix has finished the command with this error output:</p>
+<pre><code class="lang-auto">Setting up initramfs-tools (0.133+deb10u1) ...
+update-initramfs: deferring update (trigger activated)
+Processing triggers for initramfs-tools (0.133+deb10u1) ...
+update-initramfs: Generating /boot/initrd.img-4.19.0-10-amd64
+cryptsetup: WARNING: The initramfs image may not contain cryptsetup binaries 
+    nor crypto modules. If that's on purpose, you may want to uninstall the 
+    'cryptsetup-initramfs' package in order to disable the cryptsetup initramfs 
+    integration and avoid this warning.
+live-boot: core filesystems devices utils udev blockdev dnsE: /usr/share/initramfs-tools/hooks/live failed with return 1.
+update-initramfs: failed for /boot/initrd.img-4.19.0-10-amd64 with 1.
+dpkg: error processing package initramfs-tools (--configure):
+ installed initramfs-tools package post-installation script subprocess returned error exit status 1
+Errors were encountered while processing:
+ initramfs-tools
+E: Sub-process /usr/bin/dpkg returned an error code (1)
+</code></pre>
+<p>Because it returns to the prompt, it’s easy to not notice that system upgrading didn’t actually succeed.</p>
+<p>If I then shut down the Workstation, it’s ‘bricked’, so to speak.</p>
+<p>On next boot, it stops at an all black with single cursor screen. It quickly flashes a few kernel errors about unicode.pf2.</p>
+<p>I do fairly normal things in my Whonix, just installing packages, not heavily modifying the system in a way that would reasonably ‘void warranty’ so to speak. I do have to apply my own fix to the GDebi policy bug, though.</p>
+<p>What would be causing this?</p>
+          <p><a href="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/8</link>
+        <pubDate>Fri, 11 Sep 2020 04:07:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9025-8</guid>
+        <source url="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025.rss">Doing `dist-upgrade` just bricked my Whonix.</source>
+      </item>
+      <item>
+        <title>Doing `dist-upgrade` just bricked my Whonix.</title>
+        <dc:creator><![CDATA[AnonymousUser]]></dc:creator>
+        <description><![CDATA[
+            <p>Yet again, this terrible bug has happened to me. I kept a backup of my broken VM before fixing it via the same exact method reported previously, and this time I’ll come back and share what the errors say so that hopefully it can be effectively troubleshooted.</p>
+          <p><a href="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/7</link>
+        <pubDate>Mon, 07 Sep 2020 11:18:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9025-7</guid>
+        <source url="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025.rss">Doing `dist-upgrade` just bricked my Whonix.</source>
+      </item>
+      <item>
+        <title>Doing `dist-upgrade` just bricked my Whonix.</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="AnonymousUser" data-post="5" data-topic="9025">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ed8c4c/40.png" class="avatar"> AnonymousUser:</div>
+<blockquote>
+<p>Any idea if it’s a common issue that’s commonly fixable?</p>
+</blockquote>
+</aside>
+<p>Not common. Might be fixable. Need to see it.</p>
+<aside class="quote no-group" data-username="AnonymousUser" data-post="5" data-topic="9025">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ed8c4c/40.png" class="avatar"> AnonymousUser:</div>
+<blockquote>
+<p>If it comes up again next time I’ll try to get the terminal output before I apply the <code>dpkg</code> fix.</p>
+</blockquote>
+</aside>
+<p>For sure needed.</p>
+          <p><a href="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/6</link>
+        <pubDate>Mon, 23 Mar 2020 10:24:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9025-6</guid>
+        <source url="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025.rss">Doing `dist-upgrade` just bricked my Whonix.</source>
+      </item>
+      <item>
+        <title>Doing `dist-upgrade` just bricked my Whonix.</title>
+        <dc:creator><![CDATA[AnonymousUser]]></dc:creator>
+        <description><![CDATA[
+            <p>In my in-place upgrade from 15.0.0.8.9 to 15.0.0.9.4, once again I had to do <code>sudo dpkg --configure -a</code> after <code>sudo apt upgrade</code>, in order to fix it. Any idea if it’s a common issue that’s commonly fixable? If I had not done that once again my Whonix would have been ‘bricked’ upon restart.</p>
+<p>I do customize my Whonix quite a lot but it’s really not hardcore stuff that I change. If it comes up again next time I’ll try to get the terminal output before I apply the <code>dpkg</code> fix.</p>
+          <p><a href="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/5</link>
+        <pubDate>Mon, 23 Mar 2020 08:57:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9025-5</guid>
+        <source url="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025.rss">Doing `dist-upgrade` just bricked my Whonix.</source>
+      </item>
+      <item>
+        <title>Doing `dist-upgrade` just bricked my Whonix.</title>
+        <dc:creator><![CDATA[AnonymousUser]]></dc:creator>
+        <description><![CDATA[
+            <p>OK, if it’s quite possibly an uncommon incident, that makes me more relieved. Thank you for the information.</p>
+          <p><a href="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/4</link>
+        <pubDate>Mon, 02 Mar 2020 04:08:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9025-4</guid>
+        <source url="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025.rss">Doing `dist-upgrade` just bricked my Whonix.</source>
+      </item>
+      <item>
+        <title>Doing `dist-upgrade` just bricked my Whonix.</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="AnonymousUser" data-post="1" data-topic="9025">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ed8c4c/40.png" class="avatar"> AnonymousUser:</div>
+<blockquote>
+<p>But if it’s happening in my Whonix, isn’t it happening in others?</p>
+</blockquote>
+</aside>
+<p>I’ve never had this happen to me when upgrading Whonix.</p>
+<p>I’ve only had stuff like this happen when messing with apparmor-profile-everything or hardened-kernel which isn’t used by ordinary users yet.</p>
+<p>Did you do a lot of configuration? Why exactly did your updates fail? Was there an error message?</p>
+<p>We can’t really deduce much from “there was an error”.</p>
+          <p><a href="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/3</link>
+        <pubDate>Sat, 29 Feb 2020 14:52:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9025-3</guid>
+        <source url="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025.rss">Doing `dist-upgrade` just bricked my Whonix.</source>
+      </item>
+      <item>
+        <title>Doing `dist-upgrade` just bricked my Whonix.</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="AnonymousUser" data-post="1" data-topic="9025">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ed8c4c/40.png" class="avatar"> AnonymousUser:</div>
+<blockquote>
+<p>But if this will happen to others in the course of normal system upgrading, people not as advanced will suddenly lose their Whonix!</p>
+</blockquote>
+</aside>
+<p>Obviously.</p>
+<aside class="quote no-group" data-username="AnonymousUser" data-post="1" data-topic="9025">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ed8c4c/40.png" class="avatar"> AnonymousUser:</div>
+<blockquote>
+<p>People shouldn’t be expected to backup their Whonix right before every dist-upgrade, just in case the upgrade bricks their Whonix.</p>
+</blockquote>
+</aside>
+<p>Obviously.</p>
+<aside class="quote no-group" data-username="AnonymousUser" data-post="1" data-topic="9025">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ed8c4c/40.png" class="avatar"> AnonymousUser:</div>
+<blockquote>
+<p>Unless <code>dist-upgrade</code> really is a major thing and people should only regularly perform <code>upgrade</code> without having unexpected concerns?</p>
+</blockquote>
+</aside>
+<p>Disagree. (Because the difference between dist-upgrade and upgrade is maybe different from what you might think.)</p>
+<aside class="quote no-group" data-username="AnonymousUser" data-post="1" data-topic="9025">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ed8c4c/40.png" class="avatar"> AnonymousUser:</div>
+<blockquote>
+<p>(But if it’s happening in my Whonix, isn’t it happening in others?)</p>
+</blockquote>
+</aside>
+<p>No reports of it happening by others.</p>
+<p>Potential causes for bugs which only affect few users:</p>
+<ul>
+<li>host hardware issues</li>
+<li>host operating system bugs</li>
+<li>virtualizer bugs</li>
+</ul>
+<p>See also:</p>
+<aside class="quote no-group" data-username="AnonymousUser" data-post="1" data-topic="9025">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ed8c4c/40.png" class="avatar"> AnonymousUser:</div>
+<blockquote>
+<p>What can be done about it?</p>
+</blockquote>
+</aside>
+<p>Theoretically: many things</p>
+<ul>
+<li><a href="https://www.whonix.org/wiki/Dev/Stateless">https://www.whonix.org/wiki/Dev/Stateless</a></li>
+<li><a href="https://www.whonix.org/wiki/Contribute">https://www.whonix.org/wiki/Contribute</a></li>
+<li>support only a limited amount of hardware (maybe just 1 notebook)</li>
+</ul>
+<p>Practically:</p>
+<ul>
+<li>probably nothing
+<ul>
+<li>see also: <a href="https://www.whonix.org/wiki/Linux_User_Experience_versus_Commercial_Operating_Systems">https://www.whonix.org/wiki/Linux_User_Experience_versus_Commercial_Operating_Systems</a>
+</li>
+</ul>
+</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/2</link>
+        <pubDate>Sat, 29 Feb 2020 04:33:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9025-2</guid>
+        <source url="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025.rss">Doing `dist-upgrade` just bricked my Whonix.</source>
+      </item>
+      <item>
+        <title>Doing `dist-upgrade` just bricked my Whonix.</title>
+        <dc:creator><![CDATA[AnonymousUser]]></dc:creator>
+        <description><![CDATA[
+            <p>To upgrade in-place to the point release 15.0.0.8.9 I just did <code>apt update</code> and <code>dist-upgrade</code>, <code>reboot</code>, and it bricked my Whonix:</p>
+<p><strong><code>Kernel Panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)</code></strong></p>
+<p>In my case I was even more severely locked out because I had set my grub timeout to 0, and pressing shift (etc) to access grub didn’t work.</p>
+<p>I managed to attach my Workstation’s VDI as a second storage drive to another workstation VM, boot into the other VM, and after booting off that other VM’s grub it strangely loaded my broken workstation as the actual linux system. I could then easily change its particular grub timeout to 5 again instead of mounting its file system externally and doing a more advanced manual grub edit.</p>
+<p>So with grub access restored, I booted back in using an older kernel version and did:</p>
+<p><code>sudo dpkg --configure -a</code></p>
+<p>which fixed it.</p>
+<p>I can now boot into the Whonix with normal newest kernel 4.19.0-8, and the problem is resolved.</p>
+<hr>
+<p>But if this will happen to others in the course of normal system upgrading, people not as advanced will suddenly lose their Whonix! That is terrible for Whonix remaining accessible to people who really need it.</p>
+<p>As a possible clue in my case, I have had kernel updates fail at the end of updates for quite a while. (But if it’s happening in my Whonix, isn’t it happening in others?)</p>
+<p>People shouldn’t be expected to backup their Whonix right before every dist-upgrade, just in case the upgrade bricks their Whonix. Unless <code>dist-upgrade</code> really is a major thing and people should only regularly perform <code>upgrade</code> without having unexpected concerns?</p>
+<p>Either way, this was really bad, so here I am reporting it. What can be done about it?</p>
+          <p><a href="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025/1</link>
+        <pubDate>Fri, 28 Feb 2020 23:39:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9025-1</guid>
+        <source url="http://forums.whonix.org/t/doing-dist-upgrade-just-bricked-my-whonix/9025.rss">Doing `dist-upgrade` just bricked my Whonix.</source>
+      </item>
+  </channel>
+</rss>

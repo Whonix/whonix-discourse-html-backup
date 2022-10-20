@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix amnesic?</title>
+    <link>http://forums.whonix.org/t/whonix-amnesic/1188</link>
+    <description>Hi, i  was  wondering  if  whonix  leaves  no trace  on the pc, in the  same  way as tails  do.
+I think that  due the fact  that  it s  run i  a virtual machine, it  will obviously leave traces.
+
+Edit by Patrick:
+- changed title</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 07 Jul 2015 17:47:51 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-amnesic/1188.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix amnesic?</title>
+        <dc:creator><![CDATA[anonymorphus]]></dc:creator>
+        <description><![CDATA[
+            <p>It is not possible. The main reason being the vm disk images must be stored somewhere. Storing these in an encrypted disk however is sufficient for me. That will be mounted to [font=courier]/mnt/vm[/font]</p>
+<p>However I have been toying with the idea of a “<a href="https://www.whonix.org/wiki/Dev/Build_Documentation/Physical_Isolation/8" data-bbcode="true" rel="nofollow noopener">physical isolated</a> + amnesic” virtualized solution. In short it would involve two computers, a gateway, and a virtual machine host, both would boot from a USB stick each.</p>
+<p><span class="bbcode-b">The Gateway</span>, would be a ramdisk. I’d looked at <a href="https://www.whonix.org/wiki/HardenedGentooTG" data-bbcode="true" rel="nofollow noopener">HardenedGentooTG</a> and considered merging that with something like <a href="https://gitweb.torproject.org/tor-ramdisk.git" data-bbcode="true" rel="nofollow noopener">tor-ramdisk</a>. I would have to upload my HiddenService keys each time I rebooted the gateway, (probably from an encrypted USB stick).</p>
+<p><span class="bbcode-b">The Workstation</span>, would also be a ramdisk. I was thinking of using a Gentoo Hardned <a href="https://wiki.gentoo.org/wiki/Custom_Initramfs" data-bbcode="true" rel="nofollow noopener">Custom Initramfs</a>. I could use some of the features from <a href="https://wiki.gentoo.org/wiki/Hardened/Toolchain" data-bbcode="true" rel="nofollow noopener">here</a>, eg SSP, BIND_NOW, RELRO, PIE. This is one of the downsides of using Debian as the host as it’s not easy to build with a hardened toolchain. You can’t control your USE flags either so things are built much larger than they need to be. Gentoo also supports <a href="https://wiki.gentoo.org/wiki/Project:Hardened_uClibc" data-bbcode="true" rel="nofollow noopener">Hardened uClibc</a> and <a href="https://wiki.gentoo.org/wiki/Project:Hardened_musl" data-bbcode="true" rel="nofollow noopener">Hardnend musl</a>. musl is the newest player, it aims to support only the <a href="http://pubs.opengroup.org/onlinepubs/9699919799/" data-bbcode="true" rel="nofollow noopener">ISO C99, IEEE 754, POSIX 2008</a> standard. Over the years glibc has let a lot of cruft and nonstandard functionality enter their implementation. More information about that can be found in the <a href="http://www.etalabs.net/musl/faq.html" data-bbcode="true" rel="nofollow noopener">FAQ</a> There’s a <a href="http://www.etalabs.net/compare_libcs.html" data-bbcode="true" rel="nofollow noopener">comparison</a> here of the size of the binaries each produces.</p>
+<p>This machine would ONLY have a very basic surface area, libvirtd kvm. I’d also use <a href="https://wiki.gentoo.org/wiki/SELinux/Tutorials/SELinux_Multi-Category_Security" data-bbcode="true" rel="nofollow noopener">sVirt (Secure Virtualization)</a>. This would be helpful at preventing things such as the recent <a href="http://maciej.lasyk.info/2015/May/13/selinux-svirt-vs-venom-vulnerability/" data-bbcode="true" rel="nofollow noopener">VENOM</a> vulnerability, also discussed <a href="https://securityblog.redhat.com/2015/05/13/venom-dont-get-bitten/" data-bbcode="true" rel="nofollow noopener">here</a>.</p>
+<p>The description mentioned <a href="https://fedoraproject.org/wiki/Features/SVirt_Mandatory_Access_Control" data-bbcode="true" rel="nofollow noopener">here</a> sounds like exactly what I am trying to achieve:</p>
+<blockquote>sVirt integrates SELinux with the Fedora virtualization stack to allow Mandatory Access Control (MAC) security be applied to guest virtual machines. Amongst other things, this prevents a security bug in the hypervisor from allowing guests to attack the host or one another.</blockquote>
+<p>This machine would boot, from ramdisk, with it’s own pre-compiled kernel for my hardware.</p>
+<p>It would include libvirtd, busybox, SELinux + sVirt. I would use <a href="https://wiki.gentoo.org/wiki/Hardened/Grsecurity2_Quickstart#RBAC" data-bbcode="true" rel="nofollow noopener">RBAC</a> as well. Part of the reason for using RBAC would be so I could create a <a href="https://en.wikibooks.org/wiki/Grsecurity/The_RBAC_System#Special_Roles" data-bbcode="true" rel="nofollow noopener">Special Role</a> I’d mount my root as read-only, but allow for [font=courier]/mnt/httpd[/font] (cryptsetup mounted disk) to be read-write so that nginx can operate. A read-only webserver isn’t very fun.</p>
+<p>As I’d be compiling my own kernel and individually going through the <a href="https://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options" data-bbcode="true" rel="nofollow noopener">Grsecurity and PaX Configuration Options</a>. While Whonix and TAILS are great for newbie users to get a secure platform, extra hardening does take effort and is very difficult to build into a one-size-fits-all product.</p>
+<p>Ultimately as a HiddenService operator is aiming at 100% uptime they need to think about what is in their stack and how it can be used against them. I cannot see how it is possible to get that kind of security without compiling your own kernel, and system. The fact is zero-days exist and simply depending on Debian maintainers to patch/know about these before they are in the wild is not a given.</p>
+<p>If you’re hosting a HiddenService you have to be prepared to have the machine physically secured too, such as a outer case that if opened cuts power. It would ideally be enclosed around the power socket and bolted to the wall, to thwart <a href="http://www.cru-inc.com/products/wiebetech/hotplug_field_kit/" data-bbcode="true" rel="nofollow noopener">things such as this hotplug field kit</a>. You could have a gyroscopic sensor attached to the case so if your adversary unbolt it, the power would be cut. Light sensors could be used as a secondary precaution. A nice idea for a little Arduino project.</p>
+<p>This machine would be hosting a Hidden Service, and I think using hardened kernel sources is a really good idea, besides removing all the unrelated things you simply do not need from the kernel.</p>
+<p>Some of the <a href="https://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options#Physical_Protections" data-bbcode="true" rel="nofollow noopener">physical protections</a> would be ideal at thwarting <a href="http://www.cru-inc.com/products/wiebetech/mouse_jiggler/" data-bbcode="true" rel="nofollow noopener">foreign USB devices</a> There was a discussion about that <a href="https://www.schneier.com/blog/archives/2008/02/hotplug_1.html" data-bbcode="true" rel="nofollow noopener">here</a> I think I should also look at TAILS’s <a href="https://tails.boum.org/contribute/design/memory_erasure" data-bbcode="true" rel="nofollow noopener">memory erasure</a> scripts and see if they can be ported to Gentoo.</p>
+<p>As I plan on hosting a Hidden Service (which has to store the webserver files on an encrypted disk) I was thinking of passing the httpd root in with something like <a href="http://www.linux-kvm.org/page/9p_virtio" data-bbcode="true" rel="nofollow noopener">9p_virtio</a>, that way if the guest Workstation VM was compromised the encryption keys could not be extracted from RAM, not unless there also existed a virtual machine vulnerability that allowed one to look at the host’s memory. Eg like <a href="http://www.darkreading.com/applications/hacking-tool-lets-a-vm-break-out-and-att/217701908" data-bbcode="true" rel="nofollow noopener">Cloudburst with CANVAS</a> that couldn’t be mitigated by any of the other hardening mentioned above.</p>
+<p>I’m thinking this could also be adapted to be a paranoid workstation. I could build a simply window manager <a href="http://gpo.zugaina.org/x11-wm/tinywm" data-bbcode="true" rel="nofollow noopener">tinywm</a> looks to be the smallest. Alsa etc into my host’s ramdisk, and then use a regular Whonix Workstation (with KDE), or maybe build a <a href="https://www.whonix.org/wiki/Dev/Build_Documentation/11_full#Terminal-Only_Builds_.28Optional.29" data-bbcode="true" rel="nofollow noopener">terminal only</a> build and use something sweet like <a href="https://packages.debian.org/jessie/i3" data-bbcode="true" rel="nofollow noopener">i3wm</a> because tiling window managers are superior <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=5" title=":wink:" class="emoji" alt=":wink:"></p>
+          <p><a href="http://forums.whonix.org/t/whonix-amnesic/1188/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-amnesic/1188/10</link>
+        <pubDate>Tue, 07 Jul 2015 17:47:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1188-10</guid>
+        <source url="http://forums.whonix.org/t/whonix-amnesic/1188.rss">Whonix amnesic?</source>
+      </item>
+      <item>
+        <title>Whonix amnesic?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Tor Browser deals with cookies as the Tor Browser wiki page says. No need for other cookie cleaners.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-amnesic/1188/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-amnesic/1188/9</link>
+        <pubDate>Tue, 07 Jul 2015 01:42:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1188-9</guid>
+        <source url="http://forums.whonix.org/t/whonix-amnesic/1188.rss">Whonix amnesic?</source>
+      </item>
+      <item>
+        <title>Whonix amnesic?</title>
+        <dc:creator><![CDATA[luishammish]]></dc:creator>
+        <description><![CDATA[
+            <p>patrick could  you  be more clear? I understand  that you  have  too many question too answer, but  whonix is  a beatiful sistem and also complicated, especially for the beginners…  For  example now  i don’t understand  why  you remind me  about tor broswer,  maybe  are you  tryng to tell me  that it is not necessary to run bleachbit because  tor  broswer does not  store cookies?<br>
+I don’t understand, really</p>
+          <p><a href="http://forums.whonix.org/t/whonix-amnesic/1188/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-amnesic/1188/8</link>
+        <pubDate>Tue, 07 Jul 2015 01:22:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1188-8</guid>
+        <source url="http://forums.whonix.org/t/whonix-amnesic/1188.rss">Whonix amnesic?</source>
+      </item>
+      <item>
+        <title>Whonix amnesic?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://www.whonix.org/wiki/Tor_Browser">https://www.whonix.org/wiki/Tor_Browser</a> will deal with this.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-amnesic/1188/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-amnesic/1188/7</link>
+        <pubDate>Mon, 06 Jul 2015 11:37:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1188-7</guid>
+        <source url="http://forums.whonix.org/t/whonix-amnesic/1188.rss">Whonix amnesic?</source>
+      </item>
+      <item>
+        <title>Whonix amnesic?</title>
+        <dc:creator><![CDATA[luishammish]]></dc:creator>
+        <description><![CDATA[
+            <p>greenwhonix and  patrick,  wich sofware should  we use on whonix to clean cookies? Bleachbit as  root?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-amnesic/1188/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-amnesic/1188/6</link>
+        <pubDate>Mon, 06 Jul 2015 03:33:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1188-6</guid>
+        <source url="http://forums.whonix.org/t/whonix-amnesic/1188.rss">Whonix amnesic?</source>
+      </item>
+      <item>
+        <title>Whonix amnesic?</title>
+        <dc:creator><![CDATA[Greenwhonix]]></dc:creator>
+        <description><![CDATA[
+            <p>Overhead from encryption isn’t that big. LUKS works fine even on old 32bit single core CPUs.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-amnesic/1188/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-amnesic/1188/5</link>
+        <pubDate>Sun, 05 Jul 2015 21:05:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1188-5</guid>
+        <source url="http://forums.whonix.org/t/whonix-amnesic/1188.rss">Whonix amnesic?</source>
+      </item>
+      <item>
+        <title>Whonix amnesic?</title>
+        <dc:creator><![CDATA[Abraxis]]></dc:creator>
+        <description><![CDATA[
+            <p>It’s not amnesic like Tails. Because of that I installed the whonix virtual box images inside a Veracrypt volume. I expected it to be slowed down by the encryption taking place, but no, it works fine!</p>
+          <p><a href="http://forums.whonix.org/t/whonix-amnesic/1188/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-amnesic/1188/4</link>
+        <pubDate>Sun, 05 Jul 2015 11:10:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1188-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-amnesic/1188.rss">Whonix amnesic?</source>
+      </item>
+      <item>
+        <title>Whonix amnesic?</title>
+        <dc:creator><![CDATA[Greenwhonix]]></dc:creator>
+        <description><![CDATA[
+            <p>Tails is a livecd that runs in RAM, Whonix is not.</p>
+<p>If you are concerned about hiding the content of your Whonix guests, I suggest running encrypted filesystems on host and storing the Whonix virtual machines there. This is not a silver bullet, yet it is an additional layer of privacy.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-amnesic/1188/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-amnesic/1188/3</link>
+        <pubDate>Fri, 03 Jul 2015 03:54:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1188-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-amnesic/1188.rss">Whonix amnesic?</source>
+      </item>
+      <item>
+        <title>Whonix amnesic?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>No, see:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Warning#Whonix_is_not_amnesic" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:379/211;"><img src="https://www.whonix.org/w/images/8/8c/MITM.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Warning#Whonix_is_not_amnesic" target="_blank" rel="nofollow noopener">Warning</a></h3>
+
+<p>Things you should know about Whonix and Anonymity in General to stay safe.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/whonix-amnesic/1188/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-amnesic/1188/2</link>
+        <pubDate>Thu, 02 Jul 2015 12:44:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1188-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-amnesic/1188.rss">Whonix amnesic?</source>
+      </item>
+      <item>
+        <title>Whonix amnesic?</title>
+        <dc:creator><![CDATA[luishammish]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi, i  was  wondering  if  whonix  leaves  no trace  on the pc, in the  same  way as tails  do.<br>
+I think that  due the fact  that  it s  run i  a virtual machine, it  will obviously leave traces.</p>
+<p>Edit by Patrick:</p>
+<ul>
+<li>changed title</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonix-amnesic/1188/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-amnesic/1188/1</link>
+        <pubDate>Thu, 02 Jul 2015 09:40:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1188-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-amnesic/1188.rss">Whonix amnesic?</source>
+      </item>
+  </channel>
+</rss>

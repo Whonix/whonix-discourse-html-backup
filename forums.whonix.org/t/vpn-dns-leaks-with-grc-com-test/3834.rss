@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>VPN DNS leaks with grc.com test</title>
+    <link>http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834</link>
+    <description>First of all, I would like to point out that is not exactly the first time that I setup a vpn. I use it from years. 
+Second I did all the online tests for vpn dns leaks that I know. All of them are good (absolutely no leaks) except this one. 
+This particular test:  https://www.grc.com/dns/ leaks 2 dns that are not from the vpn but looks like directly from the isp I use.
+I also installed the adrelanos vpn firewall and it looks like is working (if I kill openvpn everything goes down)
+I use of course openvpn to connect to vpn and also I&#39;m on linux so I use the scripts that I think everyone knows (those 3 lines with resolv-conf) to prevent leaks.
+I got 2 questions. Of course like many others I do vpn -&gt; whonix -&gt; the world.
+Is this leak only problematic in firefox? What can I do to prevent it? I installed the vpn firewall, I use the scripts. I don&#39;t know what to do next to be more safe.
+
+I highly suggest you on doing that test right now, to see if you have leaks or not.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 07 May 2017 23:28:42 +0000</lastBuildDate>
+    <category>General Tor and Anonymity Talk</category>
+    <atom:link href="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>VPN DNS leaks with grc.com test</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>VPN-Firewall isn’t tested on Ubuntu (as readme on <a href="https://github.com/adrelanos/VPN-Firewall">https://github.com/adrelanos/VPN-Firewall</a> says), so I am not surprised and cannot really support it.</p>
+<p>Ubuntu should be avoided anyhow. ( <a href="https://www.whonix.org/wiki/Dev/Operating_System#Ubuntu">https://www.whonix.org/wiki/Dev/Operating_System#Ubuntu</a> )</p>
+<p>I guess OpenVPN fails to write to that file due to missing write permissions. The following file might require an addition for Ubuntu support.</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/adrelanos/vpn-firewall/blob/master/usr/lib/tmpfiles.d/50_openvpn-unpriv.conf" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/adrelanos/vpn-firewall/blob/master/usr/lib/tmpfiles.d/50_openvpn-unpriv.conf" target="_blank" rel="nofollow noopener">adrelanos/vpn-firewall/blob/master/usr/lib/tmpfiles.d/50_openvpn-unpriv.conf</a></h4>
+<pre><code class="lang-conf">d       /run/openvpn    0755    tunnel    tunnel    -       -
+d       /run/resolvconf 0775    root      tunnel    -       -
+d       /run/resolvconf/interface         0775      root    tunnel    -    -
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/14</link>
+        <pubDate>Sun, 07 May 2017 23:28:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3834-14</guid>
+        <source url="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834.rss">VPN DNS leaks with grc.com test</source>
+      </item>
+      <item>
+        <title>VPN DNS leaks with grc.com test</title>
+        <dc:creator><![CDATA[japojoh]]></dc:creator>
+        <description><![CDATA[
+            <p>I did, however now if I repeat all the steps I get an error on the following command:</p>
+<pre><code>sudo service openvpn@openvpn start
+</code></pre>
+<blockquote>
+<p>Job for openvpn@openvpn.service failed. See ‘systemctl status openvpn@openvpn.service’ and ‘journalctl -xn’ for details.</p>
+</blockquote>
+<p>if i do:</p>
+<blockquote>
+<p>sudo service openvpn@openvpn status</p>
+</blockquote>
+<p>I get:</p>
+<blockquote>
+<p>openvpn@openvpn.service - OpenVPN connection to openvpn<br>
+Loaded: loaded (/lib/systemd/system/openvpn@openvpn.service; enabled)<br>
+Drop-In: /lib/systemd/system/openvpn@openvpn.service.d<br>
+└─50-unpriv.conf<br>
+Active: failed (Result: exit-code) since Mon 2017-05-08 02:21:16 CEST; 3min 37s ago<br>
+Process: 3980 ExecStartPre=/usr/bin/sudo /usr/sbin/openvpn --rmtun --dev tun0 (code=exited, status=1/FAILURE)</p>
+</blockquote>
+<blockquote>
+<p>May 08 02:21:16 computer sudo[3980]: tunnel : TTY=unknown ; PWD=/etc/openvp…n0<br>
+May 08 02:21:16 computer sudo[3980]: pam_unix(sudo:session): session opened…0)<br>
+May 08 02:21:16 computer sudo[3980]: Mon May  8 02:21:16 2017 ERROR: Cannot…6)<br>
+May 08 02:21:16 computer sudo[3980]: Mon May  8 02:21:16 2017 Exiting due t…or<br>
+May 08 02:21:16 computer sudo[3980]: pam_unix(sudo:session): session closed…ot<br>
+May 08 02:21:16 computer systemd[1]: openvpn@openvpn.service: control proce…=1<br>
+May 08 02:21:16 computer systemd[1]: Failed to start OpenVPN connection to …n.<br>
+May 08 02:21:16 computer systemd[1]: Unit openvpn@openvpn.service entered f…e.<br>
+Hint: Some lines were ellipsized, use -l to show in full.</p>
+</blockquote>
+<p>However if I manually delete the content of resolvfconf file in  /etc/resolvconf/run/interface and restart resolvconf I have zero leaks and everything works.</p>
+<p>But the problem is that every time I connect and disconnect again, automatically I get the leaks unless I edit manually those files everytime.</p>
+<p>the vpn firewall however i think is working, cause if I kill openvpn or turn off and on again my connection I cant connect at all. I have to flush manually netfilter everytime, connect, and then restart it.</p>
+<p>Im sorry if this reply is confusing, im doing my best</p>
+<p>Thanks again for the help</p>
+          <p><a href="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/13</link>
+        <pubDate>Sun, 07 May 2017 22:28:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3834-13</guid>
+        <source url="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834.rss">VPN DNS leaks with grc.com test</source>
+      </item>
+      <item>
+        <title>VPN DNS leaks with grc.com test</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Did you follow the full instructions on<br>
+<a href="https://www.whonix.org/wiki/VPN-Firewall">https://www.whonix.org/wiki/VPN-Firewall</a>? resolvconf is mentioned<br>
+various times. One of the most important ones:<br>
+<a href="https://www.whonix.org/wiki/VPN-Firewall#DNS_Configuration">https://www.whonix.org/wiki/VPN-Firewall#DNS_Configuration</a></p>
+          <p><a href="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/12</link>
+        <pubDate>Sat, 06 May 2017 11:32:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3834-12</guid>
+        <source url="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834.rss">VPN DNS leaks with grc.com test</source>
+      </item>
+      <item>
+        <title>VPN DNS leaks with grc.com test</title>
+        <dc:creator><![CDATA[japojoh]]></dc:creator>
+        <description><![CDATA[
+            <p>okay I confirm that if I remove opendns my ISP nameserver/dns shows up in resolv.conf,<br>
+I’m searching on google now how to fix this, If any of you have idea on how to do it that would be helpful</p>
+          <p><a href="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/11</link>
+        <pubDate>Sat, 06 May 2017 10:10:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3834-11</guid>
+        <source url="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834.rss">VPN DNS leaks with grc.com test</source>
+      </item>
+      <item>
+        <title>VPN DNS leaks with grc.com test</title>
+        <dc:creator><![CDATA[japojoh]]></dc:creator>
+        <description><![CDATA[
+            <p>Im normally not using it at all, but is either that or my isp address, so I thought it would be better</p>
+<p>In resolv.conf at the moment I see that opendns address+the one probably from the vpn (its a private ip without much info. probably related to my vpn?)</p>
+<p>Ill try to remove opendns config and reboot to see if its the same</p>
+          <p><a href="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/10</link>
+        <pubDate>Sat, 06 May 2017 10:01:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3834-10</guid>
+        <source url="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834.rss">VPN DNS leaks with grc.com test</source>
+      </item>
+      <item>
+        <title>VPN DNS leaks with grc.com test</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>5 posts were split to a new topic: <a href="http://forums.whonix.org/t/vpn-firewall-discussions-in-whonix-forums/3849">VPN-Firewall discussions in Whonix forums</a></p>
+          <p><a href="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/4</link>
+        <pubDate>Fri, 05 May 2017 11:55:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3834-4</guid>
+        <source url="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834.rss">VPN DNS leaks with grc.com test</source>
+      </item>
+      <item>
+        <title>VPN DNS leaks with grc.com test</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>What’s your <code>/etc/resolv.conf</code>?</p>
+<p>Why use OpenDNS? If you want all traffic to be tunneled through the VPN, and VPN-Firewall works with IPs, not hostnames, what would OpenDNS be good for?</p>
+          <p><a href="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/9</link>
+        <pubDate>Thu, 04 May 2017 23:25:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3834-9</guid>
+        <source url="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834.rss">VPN DNS leaks with grc.com test</source>
+      </item>
+      <item>
+        <title>VPN DNS leaks with grc.com test</title>
+        <dc:creator><![CDATA[japojoh]]></dc:creator>
+        <description><![CDATA[
+            <p>exactly I opened the topic in the anonymity section for this reason. I had leaks with Debian host + vpn-firewall and lubuntu without vpn firewall if that matters.<br>
+2 different vpn companies as well. It leaks the provider dns. I did all the test via firefox, everything is negative except that test on <a href="http://grc.com" rel="nofollow noopener">grc.com</a>, which successfully leaks the dns provider. Either my ISP or Opendns if I change them.<br>
+I’ll try to test for leaks with wireshark I think I found a tutorial. It would be nice to know if that test you people have leaks too.<br>
+Thanks for your replies btw!</p>
+          <p><a href="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/6</link>
+        <pubDate>Thu, 04 May 2017 19:05:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3834-6</guid>
+        <source url="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834.rss">VPN DNS leaks with grc.com test</source>
+      </item>
+      <item>
+        <title>VPN DNS leaks with grc.com test</title>
+        <dc:creator><![CDATA[japojoh]]></dc:creator>
+        <description><![CDATA[
+            <p>Exactly. Now, what I did is changing my dns to open dns in my wifi config (before this everywhting was set on automatic).<br>
+Now that test doesnt show up my isp dns but my vpn + opendns dns.<br>
+Every other test simply returns 1 dns, the one from the vpn.<br>
+I also tested this in another linux system, without vpn firewall, and with another vpn provider. Problem looks like is the same: with the other vpn it doesnt tell me directly my ISP name, but I can see several (5) dns leaks that point out in my country. Like above, the test on <a href="http://grc.com" rel="nofollow noopener">grc.com</a> is the only one that shows this result. All the others, doesnt show leaks at all</p>
+          <p><a href="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/3</link>
+        <pubDate>Wed, 03 May 2017 06:30:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3834-3</guid>
+        <source url="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834.rss">VPN DNS leaks with grc.com test</source>
+      </item>
+      <item>
+        <title>VPN DNS leaks with grc.com test</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Let’s see if I understand this right. You are using <a href="https://github.com/adrelanos/VPN-Firewall">https://github.com/adrelanos/VPN-Firewall</a> but the <a href="https://www.grc.com/dns/dns.htm">https://www.grc.com/dns/dns.htm</a> leak test can still figure out your ISP’s DNS server?</p>
+          <p><a href="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/2</link>
+        <pubDate>Mon, 01 May 2017 22:54:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3834-2</guid>
+        <source url="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834.rss">VPN DNS leaks with grc.com test</source>
+      </item>
+      <item>
+        <title>VPN DNS leaks with grc.com test</title>
+        <dc:creator><![CDATA[japojoh]]></dc:creator>
+        <description><![CDATA[
+            <p>First of all, I would like to point out that is not exactly the first time that I setup a vpn. I use it from years.<br>
+Second I did all the online tests for vpn dns leaks that I know. All of them are good (absolutely no leaks) except this one.<br>
+This particular test:  <a href="https://www.grc.com/dns/" rel="nofollow noopener">https://www.grc.com/dns/</a> leaks 2 dns that are not from the vpn but looks like directly from the isp I use.<br>
+I also installed the adrelanos vpn firewall and it looks like is working (if I kill openvpn everything goes down)<br>
+I use of course openvpn to connect to vpn and also I’m on linux so I use the scripts that I think everyone knows (those 3 lines with resolv-conf) to prevent leaks.<br>
+I got 2 questions. Of course like many others I do vpn -&gt; whonix -&gt; the world.<br>
+Is this leak only problematic in firefox? What can I do to prevent it? I installed the vpn firewall, I use the scripts. I don’t know what to do next to be more safe.</p>
+<p>I highly suggest you on doing that test right now, to see if you have leaks or not.</p>
+          <p><a href="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834/1</link>
+        <pubDate>Mon, 01 May 2017 21:29:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3834-1</guid>
+        <source url="http://forums.whonix.org/t/vpn-dns-leaks-with-grc-com-test/3834.rss">VPN DNS leaks with grc.com test</source>
+      </item>
+  </channel>
+</rss>

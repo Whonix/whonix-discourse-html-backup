@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>[Solved]Can&#39;t seem to get VPN functioning on Whonix Gateway</title>
+    <link>http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574</link>
+    <description>I have been wrestling with this for the past few days. 
+So, my host OS uses a VPN. 
+On that host I have a fully configured and functional KVM VM Whonix Gateway that I would like to install a VPN on. (It is better to install the VPN on the gateway rather than the Workstation correct? )
+I have followed the documentation strictly, mainly using [this](https://www.whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor#Firewall_Settings) as a guide/troubleshooter. I was able to set up this VPN on a different system(non Whonix) without issue. My .crt is updated, login info correct, firewall configured, and my config files seem spot on with what my VPN provider recommends, but alas there is something I am missing because whenever I try to start my VPN with:
+&quot;sudo service openvpn@vpnname start&quot;
+
+I get 
+&quot;write UDPv4: Operation not permitted (code=1)&quot;
+&quot;TLS Error: TLS key negotiation failed to occur within...ty&quot;
+&quot;TLS Error: TLS handshake failed&quot;
+
+Any help at all would be appreciated.
+Thanks in advance.</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 10 Jun 2016 03:19:05 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>[Solved]Can&#39;t seem to get VPN functioning on Whonix Gateway</title>
+        <dc:creator><![CDATA[Grey]]></dc:creator>
+        <description><![CDATA[
+            <p>Changed it to dev tun0 in the .conf because I have the VPN_FIREWALL enabled in 50_user.conf as well as VPN_INTERFACE set to tun0. Also ip-unpriv is now ip_unpriv because I am not using the Standalone VPN_FIREWALL. I am using the firewall preinstalled with Whonix. I am still getting the same error.</p>
+<p>EDIT* HOLD THE PHONE - It works, OMG it works! I just needed to do these above things and edit the remote IP in the conf. Thank you so much for your help entr0py.</p>
+          <p><a href="http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574/5</link>
+        <pubDate>Fri, 10 Jun 2016 03:07:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2574-5</guid>
+        <source url="http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574.rss">[Solved]Can&#39;t seem to get VPN functioning on Whonix Gateway</source>
+      </item>
+      <item>
+        <title>[Solved]Can&#39;t seem to get VPN functioning on Whonix Gateway</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="3" data-topic="2574">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/g/b782af/40.png" class="avatar"> Grey:</div>
+<blockquote>
+<p>Do I have to use tun instead of tap?</p>
+</blockquote>
+</aside>
+<p>If you are using VPN_FIREWALL,<br>
+then its <code>dev tun0</code><br>
+not <code>dev tun</code></p>
+          <p><a href="http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574/4</link>
+        <pubDate>Thu, 09 Jun 2016 17:43:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2574-4</guid>
+        <source url="http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574.rss">[Solved]Can&#39;t seem to get VPN functioning on Whonix Gateway</source>
+      </item>
+      <item>
+        <title>[Solved]Can&#39;t seem to get VPN functioning on Whonix Gateway</title>
+        <dc:creator><![CDATA[Grey]]></dc:creator>
+        <description><![CDATA[
+            <p>Ok that fix was able to get rid of the UDP code 1 error, but not the:<br>
+“TLS Error: TLS key negotiation failed to occur within…ty”<br>
+“TLS Error: TLS handshake failed”</p>
+<p>openvpn.conf:</p>
+<p>client<br>
+dev tun<br>
+proto udp<br>
+resolv-retry infinite<br>
+nobind<br>
+persist-key<br>
+persist-tun<br>
+ns-cert-type server</p>
+<p>user tunnel<br>
+iproute /usr/bin/ip-unpriv</p>
+<p>comp-lzo<br>
+verb 3<br>
+tun-mtu 1500<br>
+fragment 0<br>
+mssfix 1400<br>
+cipher AES-256-CBC<br>
+remote-random<br>
+remote xxx.xxx.xxx.xxx port<br>
+route-delay<br>
+reneg-sec 0<br>
+auth-user-pass /etc/openvpn/vpnname.login<br>
+ca /etc/openvpn/ca.crt</p>
+<p>Do I have to use tun instead of tap?</p>
+          <p><a href="http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574/3</link>
+        <pubDate>Thu, 09 Jun 2016 13:08:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2574-3</guid>
+        <source url="http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574.rss">[Solved]Can&#39;t seem to get VPN functioning on Whonix Gateway</source>
+      </item>
+      <item>
+        <title>[Solved]Can&#39;t seem to get VPN functioning on Whonix Gateway</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="2574">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/g/b782af/40.png" class="avatar"> Grey:</div>
+<blockquote>
+<p>It is better to install the VPN on the gateway rather than the Workstation correct?</p>
+</blockquote>
+</aside>
+<p>Completely different traffic flow. For:</p>
+<p>user -&gt; vpn -&gt; tor -&gt; internet: install on host or gateway<br>
+user -&gt; vpn1 -&gt; vpn2 -&gt; tor -&gt; internet: install on host <em>and</em> gateway<br>
+user -&gt; tor -&gt; vpn -&gt; internet: install on workstation</p>
+<aside class="quote" data-post="1" data-topic="2574">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/g/b782af/40.png" class="avatar"> Grey:</div>
+<blockquote>
+<p>sudo service openvpn@vpnname start</p>
+</blockquote>
+</aside>
+<p>should be <code>sudo service openvpn@openvpn start</code></p>
+          <p><a href="http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574/2</link>
+        <pubDate>Thu, 09 Jun 2016 03:15:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2574-2</guid>
+        <source url="http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574.rss">[Solved]Can&#39;t seem to get VPN functioning on Whonix Gateway</source>
+      </item>
+      <item>
+        <title>[Solved]Can&#39;t seem to get VPN functioning on Whonix Gateway</title>
+        <dc:creator><![CDATA[Grey]]></dc:creator>
+        <description><![CDATA[
+            <p>I have been wrestling with this for the past few days.<br>
+So, my host OS uses a VPN.<br>
+On that host I have a fully configured and functional KVM VM Whonix Gateway that I would like to install a VPN on. (It is better to install the VPN on the gateway rather than the Workstation correct? )<br>
+I have followed the documentation strictly, mainly using <a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor#Firewall_Settings" rel="nofollow noopener">this</a> as a guide/troubleshooter. I was able to set up this VPN on a different system(non Whonix) without issue. My .crt is updated, login info correct, firewall configured, and my config files seem spot on with what my VPN provider recommends, but alas there is something I am missing because whenever I try to start my VPN with:<br>
+“sudo service openvpn@vpnname start”</p>
+<p>I get<br>
+"write UDPv4: Operation not permitted (code=1)"<br>
+“TLS Error: TLS key negotiation failed to occur within…ty”<br>
+“TLS Error: TLS handshake failed”</p>
+<p>Any help at all would be appreciated.<br>
+Thanks in advance.</p>
+          <p><a href="http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574/1</link>
+        <pubDate>Thu, 09 Jun 2016 00:27:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2574-1</guid>
+        <source url="http://forums.whonix.org/t/solved-cant-seem-to-get-vpn-functioning-on-whonix-gateway/2574.rss">[Solved]Can&#39;t seem to get VPN functioning on Whonix Gateway</source>
+      </item>
+  </channel>
+</rss>

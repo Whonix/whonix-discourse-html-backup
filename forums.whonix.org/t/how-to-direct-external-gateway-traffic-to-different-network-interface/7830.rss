@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>How to direct external gateway traffic to different network interface?</title>
+    <link>http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830</link>
+    <description>Hi, 
+
+I am trying to make Whonix Gateway use a USB network adapter as an external network, instead of standard eth0 created by VirtualBox.
+
+I have enabled USB controller for the gateway VM and connected the device, so a new network interface appeared in the gateway VM: &quot;usb0&quot;. Now I need to configure gateway to use this interface as an external network, instead of &quot;eth0&quot;. How do I do that?
+
+I tried editing /etc/whonix_firewall.d/50_used.conf (almost a blind guess) -- did not work.
+
+Any help is much appreciated, thank you.</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 31 Jul 2019 10:08:03 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>How to direct external gateway traffic to different network interface?</title>
+        <dc:creator><![CDATA[kaktus]]></dc:creator>
+        <description><![CDATA[
+            <p>I have edited <code>/usr/lib/whonixcheck/check_network_interfaces.bsh</code>, commenting out the lines that check explicitly for <code>eth0</code> carrier.</p>
+<p>Now <code>whonixcheck</code> at the gateway works and even reports that I am connected to TOR! Yay! And I can see the network activity goes through USB. Now my setup seems to work.</p>
+<p>Thank you very much for help!</p>
+          <p><a href="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/10</link>
+        <pubDate>Wed, 31 Jul 2019 09:57:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7830-10</guid>
+        <source url="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830.rss">How to direct external gateway traffic to different network interface?</source>
+      </item>
+      <item>
+        <title>How to direct external gateway traffic to different network interface?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>kaktus via Whonix Forum:</p>
+<blockquote>
+<p>But now the system complains that <code>eth0</code> is down and does not connect to TOR.</p>
+</blockquote>
+<p>That is whonixcheck. To be found in the source code when grepping for<br>
+etih0. A test which hardcodes eth0. Not great, but also not a blocker to<br>
+achieve what you want since you could either change this in the script<br>
+or disable the test or even just ignore it. The error message from that<br>
+test result even comes with instructions how to disable that test.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/9</link>
+        <pubDate>Sun, 28 Jul 2019 16:39:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7830-9</guid>
+        <source url="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830.rss">How to direct external gateway traffic to different network interface?</source>
+      </item>
+      <item>
+        <title>How to direct external gateway traffic to different network interface?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Algernon via Whonix Forum:</p>
+<blockquote>
+<p>fatal: No url found for submodule path ‘packages/hardened_malloc’ in .gitmodules<br>
+<a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a><br>
+You can try to clone each submodule or wait for a fix or use the github search function at <a href="https://github.com/Whonix" rel="nofollow noopener">https://github.com/Whonix</a> (needs an account at github to see results in the source code)</p>
+</blockquote>
+<p>Works for me. Tested just now.</p>
+<p>git clone --jobs=4 --recursive <a href="https://github.com/Whonix/Whonix" rel="nofollow noopener">https://github.com/Whonix/Whonix</a></p>
+<p>Otherwise please open a separate thread.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/8</link>
+        <pubDate>Sun, 28 Jul 2019 16:37:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7830-8</guid>
+        <source url="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830.rss">How to direct external gateway traffic to different network interface?</source>
+      </item>
+      <item>
+        <title>How to direct external gateway traffic to different network interface?</title>
+        <dc:creator><![CDATA[Algernon]]></dc:creator>
+        <description><![CDATA[
+            <p>usb0 now gets an IP I guess?<br>
+You still need to change at least the user firewall config file. Or if this does not help maybe  the config file directly (i.e. 30_whonix_gateway_default.conf), but try  /etc/whonix_firewall.d/50_user.conf first.<br>
+Then restart the firewall: sudo whonix_firewall<br>
+Check the firewall rules with: sudo iptables -vnL<br>
+If it loaded succesfully it should show lots of entries.<br>
+There might be other files which require a change, however, I can’t (and you probably neither) grep  through the whole source code currently because git cloning fails with:<br>
+fatal: No url found for submodule path ‘packages/hardened_malloc’ in .gitmodules<br>
+<a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a><br>
+You can try to clone each submodule or wait for a fix or use the github search function at <a href="https://github.com/Whonix" rel="nofollow noopener">https://github.com/Whonix</a> (needs an account at github to see results in the source code)</p>
+          <p><a href="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/7</link>
+        <pubDate>Sun, 28 Jul 2019 10:37:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7830-7</guid>
+        <source url="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830.rss">How to direct external gateway traffic to different network interface?</source>
+      </item>
+      <item>
+        <title>How to direct external gateway traffic to different network interface?</title>
+        <dc:creator><![CDATA[kaktus]]></dc:creator>
+        <description><![CDATA[
+            <p>Ok, I have edited <code>/etc/network/interfaces.d/30_non-qubes-whonix</code></p>
+<p>Commented the following lines:</p>
+<pre><code>auto eth0
+iface eth0 inet static
+*... and all the static config here*
+</code></pre>
+<p>Added following:</p>
+<pre><code>allow-hotplug usb0
+iface usb0 inet dhcp
+</code></pre>
+<p>Rebooted.</p>
+<p>Now I can see my usb0 interface in <code>ifconfig</code> output – one step closer to the win.<br>
+But now the system complains that <code>eth0</code> is down and does not connect to TOR.<br>
+There must be something more to change…</p>
+          <p><a href="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/6</link>
+        <pubDate>Sun, 28 Jul 2019 01:24:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7830-6</guid>
+        <source url="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830.rss">How to direct external gateway traffic to different network interface?</source>
+      </item>
+      <item>
+        <title>How to direct external gateway traffic to different network interface?</title>
+        <dc:creator><![CDATA[kaktus]]></dc:creator>
+        <description><![CDATA[
+            <p>I searched the soure code at GitHub for “eth0”. The only seemingly relevant result is in ’ help-steps/grml-debootstrap’:</p>
+<pre><code>allow-hotplug eth0
+iface eth0 inet dhcp
+</code></pre>
+<p>Searching to live gateway system I found similar lines in <code>/etc/network/interfaces.d/30_non-qubes-whonix</code><br>
+This looks like network bootstrap configuration. I am going to try fiddling with it…</p>
+          <p><a href="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/5</link>
+        <pubDate>Sun, 28 Jul 2019 01:06:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7830-5</guid>
+        <source url="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830.rss">How to direct external gateway traffic to different network interface?</source>
+      </item>
+      <item>
+        <title>How to direct external gateway traffic to different network interface?</title>
+        <dc:creator><![CDATA[kaktus]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you for the reply.</p>
+<p>When I removed external network interface from the VM, the former ‘eth1’ became ‘eth0’, and the system complained that ‘eth1’ is down.</p>
+<p>Editing config files would probably work, the problem is: I do not know which files to edit. I suppose this must be something in TOR configuration, and it must be an easy change. Renaming network interfaces looks like an overkill.</p>
+<p>The “50_used.conf” file was initially empty. It is just an override for system firewall config. I added: <code>EXT_IF="usb0"</code> Did not help. I think it is just not the right place to change…</p>
+<p>When the original 2 network interfaces are on + I connect the usb one, then <code>ls /sys/class/net</code> shows me: <code>eth0 eth1 lo usb0</code>, but <code>ifconfig</code> does not show the usb interface at all. Maybe this is a clue?..</p>
+          <p><a href="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/4</link>
+        <pubDate>Sun, 28 Jul 2019 00:42:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7830-4</guid>
+        <source url="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830.rss">How to direct external gateway traffic to different network interface?</source>
+      </item>
+      <item>
+        <title>How to direct external gateway traffic to different network interface?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>grep Whonix source code for <code>eth0</code></p>
+<p><a href="https://www.whonix.org/wiki/Dev/git#grep_Whonix_source_code" rel="nofollow noopener">https://www.whonix.org/wiki/Dev/git#grep_Whonix_source_code</a></p>
+          <p><a href="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/3</link>
+        <pubDate>Sat, 27 Jul 2019 09:46:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7830-3</guid>
+        <source url="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830.rss">How to direct external gateway traffic to different network interface?</source>
+      </item>
+      <item>
+        <title>How to direct external gateway traffic to different network interface?</title>
+        <dc:creator><![CDATA[Algernon]]></dc:creator>
+        <description><![CDATA[
+            <p>Did you change anything else? Like removing the original network interface (eth0)?<br>
+How does /etc/whonix_firewall.d/50_user.conf  look like?<br>
+Output of ifconfig?<br>
+Make sure you have only two interfaces i.e. the USB ethernet adapter and the interface for the internal network. Remove the original external interface from Virtualbox.<br>
+Then check the interface names in Whonix. If the adapter still comes up as usb0 then eth1 is now probably eth0 (not sure about that) and networking won’t work. If editing the config file does not work then you can try to rename the interfaces as per <a href="https://superuser.com/questions/914646/renaming-network-interface-with-systemd" rel="nofollow noopener">https://superuser.com/questions/914646/renaming-network-interface-with-systemd</a><br>
+i.e.<br>
+create a file like <code>/etc/systemd/network/80-eth0.link</code> :</p>
+<pre><code class="lang-auto">[Match]
+MACAddress=mac-address-of-usb
+[Link]
+Name=eth0
+</code></pre>
+<p>and <code>/etc/systemd/network/81-eth1.link</code> :</p>
+<pre><code class="lang-auto">[Match]
+MACAddress=mac-address-eth1
+[Link]
+Name=eth1
+</code></pre>
+<p>run: update-initramfs -uk all<br>
+reboot.</p>
+<p>If it still does not work you can try it with udev rules as shown in the link.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/2</link>
+        <pubDate>Sat, 27 Jul 2019 08:39:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7830-2</guid>
+        <source url="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830.rss">How to direct external gateway traffic to different network interface?</source>
+      </item>
+      <item>
+        <title>How to direct external gateway traffic to different network interface?</title>
+        <dc:creator><![CDATA[kaktus]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi,</p>
+<p>I am trying to make Whonix Gateway use a USB network adapter as an external network, instead of standard eth0 created by VirtualBox.</p>
+<p>I have enabled USB controller for the gateway VM and connected the device, so a new network interface appeared in the gateway VM: “usb0”. Now I need to configure gateway to use this interface as an external network, instead of “eth0”. How do I do that?</p>
+<p>I tried editing /etc/whonix_firewall.d/50_used.conf (almost a blind guess) – did not work.</p>
+<p>Any help is much appreciated, thank you.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830/1</link>
+        <pubDate>Fri, 26 Jul 2019 00:45:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7830-1</guid>
+        <source url="http://forums.whonix.org/t/how-to-direct-external-gateway-traffic-to-different-network-interface/7830.rss">How to direct external gateway traffic to different network interface?</source>
+      </item>
+  </channel>
+</rss>

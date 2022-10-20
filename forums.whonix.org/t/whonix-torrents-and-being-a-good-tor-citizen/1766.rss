@@ -1,0 +1,1044 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>whonix, torrents, and being a good tor citizen</title>
+    <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766</link>
+    <description>&amp;#45; my memory of torrent ips, protocols, and ports is rusty.
+&amp;#45; torrenting within whonix seems a useful idea, taking advantage of all the goodness that whonix brings.
+&amp;#45; tor would rather people not torrent through it, for the network burden it brings on the nodes. Understandable.
+&amp;#45; tor doesn&#39;t so much not tunnel udp as whonix doesn&#39;t pass non-dns udp - to tor or otherwise.
+
+Help me think through the ips / protocols / ports in the chain here.
+
+Having loaded up ktorrent and fired it up on a ubuntu torrent, with default whonix, the torrent doesn&#39;t start. Understandable.
+
+I get that trackers can be contacted, and tcp willing peers connected to, except the list of peers comes back via udp, so of course ktorrent never knows of them to hook up with them (the gateway firewall not having passed the udp traffic).
+
+However, it occurs to me ... if I fire up a vpn (on the gateway), and set both the vpn&#39;s http and socks5 proxy in ktorrent, then I can set a gateway ip table rule to pass (and not through tor) all traffic (including udp) from Whonix-workstation to vpn (over tun0). i.e. A very tightly constrained rule specifically targeted for this one application&#39;s specific ip and port settings.
+
+Preserving almost all the goodness that is Whonix, except for traffic from this one application (due to specific ip/proxy settings within it).
+
+Am I thinking that through clearly?
+
+I suppose I&#39;ll have to diagram out the current flow to figure out just how it surgically change it. Such as how to except this traffic from being submitted to tor.
+
+&amp;#45; testing a ubuntu torrent download, the torrent does come down. (This is without vpn or iptables change.) So I expect the ktorrent proxy settings make the gateway willing to pass the (tcp?) proxy traffic - however, sadly, I expect all traffic is still indeed going through tor. iptables rules changes will be necessary to avoid that - and in the same spirit as whonix itself, it would be prudent to do so over vpn.
+
+Am I thinking things through clearly, here, and are there pointers to documentation laying out the ips, ports, and protocols in play, and their control points?</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 24 Mar 2016 01:20:01 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>Working notes … final.</p>
+<p>[quote]<strong>whonix, torrents, and being a good tor citizen</strong></p>
+<p>There are 2 issues:</p>
+<ol>
+<li>Identifying / corralling net traffic.</li>
+<li>Proxying (udp / socks5) / anonymizing such traffic.<br>
+…<br>
+So, <strong>for 2 - VPN</strong>. From a trusted provider.</li>
+</ol>
+<p><strong>For 1, part a</strong>, identifying particular traffic and constraining as desired, <a href="https://github.com/rAntOCauDgb/runfromiptcpudp" rel="nofollow noopener">runfromiptcpudp</a> as discussed.<br>
+[/quote]</p>
+<p>Concluding here with <strong>1, Solution part b</strong>: Permitting and appropriately routing the designated traffic.</p>
+<p><i>Note: Presented is <b>a</b> way of <a href="https://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/42">whonix, torrents, and being a good tor citizen</a>. Proof of concept. Only. Although the steps and details are correct, the specifics of implementing them are suitable only for individual experimentation and use. For general use or implementation, a more robust installation would be required. See <a href="https://forums.whonix.org/t/bolt-on-for-whonix-firewall-best-place-to-put-files/2222/18">Bolt on for whonix_firewall - best place to put files?</a> for such beginnings, and particularly <a href="https://www.whonix.org/w/index.php?title=Dev/Firewall_Refactoring" rel="nofollow noopener">Dev/Firewall Refactoring</a>.</i></p>
+<p>Environment: For the purposes of development / proof of concept, whonix_firewall was ‘cloned’ (and gutted) to whonix_firewall-post, and associated /etc/whonix_firewall-post.d directory clone of /etc/whonix_firewall.d created.<em>(Thank you Patrick!)</em> Specifics can be seen at <a href="https://github.com/rAntOCauDgb/whonix-torexceptedtraffic_proofofconcept" rel="nofollow noopener">whonix-torexceptedtraffic_proofofconcept</a> Only the summary / details are shown below.</p>
+<p>Assumption: Appropriate settings placed in a file in /etc/whonix_firewall.d, as per /etc/whonix_firewall/30_default, settings such as ‘50_user.conf’:<br>
+<code>VPN_FIREWALL=1<br>
+VPN_SERVERS="10.0.1.2"<br>
+VPN_INTERFACE=tun0<br>
+LOCAL_NET="<br>
+127.0.0.0-127.0.0.24 <br>
+192.168.2.1-192.168.2.1 <br>
+10.152.152.0-10.152.152.24 <br>
+10.0.2.2-10.0.2.24 <br>
+"</code></p>
+<p>On Whonix Gateway:</p>
+<p>Preparation:<br>
+(1) /usr/local/bin/whonix_firewall-post - essentially just the top part of whonix_firewall, the sourcing and executing of files within a designated .d directory.<br>
+(2) /etc/whonix_firewall-post.d/30_lastrules_to_envvars - essentially just the environment variables of whonix_firewall, <i>-and-</i> the storing of the last / dropping rules of each chain, so that iptables changes can be modularly implemented.</p>
+<ul>
+<li>Each .d file utilizes a lock file so it can’t run twice / double iptables rules.</li>
+</ul>
+<p>e.g.:<br>
+<code> # Delete old iptables INPUT last rule.<br>
+$iptables_cmd -D $IPT_FILTER_INPUT_LASTRULE</code></p>
+<p>&lt; insert appropriate iptables script lines for this module &gt;</p>
+<h1>Reapply old iptables INPUT last rule.</h1>
+<p>$iptables_cmd -A $IPT_FILTER_INPUT_LASTRULE<br>
+</p>
+<p>Note: This is NOT how whonix would implement this facility. This mechanism is only useful during the process of development / debugging / discerning correct steps. See <a href="https://forums.whonix.org/t/bolt-on-for-whonix-firewall-best-place-to-put-files/2222/18">Bolt on for whonix_firewall - best place to put files?</a> and/or <a href="https://www.whonix.org/w/index.php?title=Dev/Firewall_Refactoring" rel="nofollow noopener">Dev/Firewall Refactoring</a> for a better implementation mechanism.</p>
+<p>/etc/whonix_firewall-post.d/70_torexcept:<br>
+<code>iam=$(basename $BASH_SOURCE)<br>
+mylockfile=/run/lock/WFP_${iam}_run</code></p>
+<p>if [ -e “$mylockfile” ]; then<br>
+echo ; echo $iam already run, lockfile $mylockfile present. Returning without running.<br>
+return 0<br>
+fi</p>
+<p>echo ; echo Running $iam, setting lockfile ${mylockfile}.<br>
+touch $mylockfile</p>
+<h1>whonix_firewall permits multiple VPN servers to be specified, space separated.</h1>
+<h1>iptables, OTOH, requires the servers to be comma separated.</h1>
+<p>VPNIPS="${VPN_SERVERS// /,}"<br>
+echo -e “\nExtrapolating VPN IPs of ‘$VPNIPS’ from ‘$VPN_SERVERS’.\n”</p>
+<h1>For the moment, put in log entries … skipped for the purposes of this forum thread.</h1>
+<h1>Note that iptables -t nat INPUT, OUTPUT, and POSTROUTING, default to accept.</h1>
+<h1>- note that -t nat OUTPUT RETURNS if uid cleanet.</h1>
+<h1>Note: whonix_firewall INPUT rules:</h1>
+<h1>- drop all weird/erroneous things</h1>
+<h1>- accept all in from lo</h1>
+<h1>- accept all established</h1>
+<h1>- deny all icmp</h1>
+<h1>- allow all in from tun0</h1>
+<h1>- drop all (last rule)</h1>
+<p>set -v -x</p>
+<h1>----------------------------------------</h1>
+<h1>Delete current iptables INPUT last rule.</h1>
+<p>$iptables_cmd -D $IPT_FILTER_INPUT_LASTRULE</p>
+<h1>{Placeholder Line: Turns out no rules needed. Logging rules in ‘source’ file handy.}</h1>
+<h1>Reapply old iptables INPUT last rule.</h1>
+<p>$iptables_cmd -A $IPT_FILTER_INPUT_LASTRULE</p>
+<h1>---------------------------------------</h1>
+<h1>Note: whonix_firewall FORWARD REJECT all (last rule)</h1>
+<h1>---------------------------------------</h1>
+<h1>Delete current iptables FORWARD last rule.</h1>
+<p>$iptables_cmd -D $IPT_FILTER_FORWARD_LASTRULE</p>
+<p>$iptables_cmd -A FORWARD -i $INT_IF -o $VPN_INTERFACE -s $XCEPTIP -j ACCEPT<br>
+$iptables_cmd -A FORWARD -i $VPN_INTERFACE -o $INT_IF -d $XCEPTIP -j ACCEPT</p>
+<h1>Torrents want to talk to VPN server (presumably) to open ports for</h1>
+<h1>forwarding. (*1)</h1>
+<p>$iptables_cmd -A FORWARD -i $INT_IF -s $XCEPTIP -d $VPNIPS -j ACCEPT</p>
+<h1>Reapply old iptables FORWARD last rule.</h1>
+<p>$iptables_cmd -A $IPT_FILTER_FORWARD_LASTRULE</p>
+<h1>---------------------------------------</h1>
+<h1>Note: whonix_firewall OUTPUT rules:</h1>
+<h1>- reject all weird/erroneous things</h1>
+<h1>- accept all to tun0</h1>
+<h1>- accept all established</h1>
+<h1>- accept all LOCAL_NETS</h1>
+<h1>- accept all to vpn server ip</h1>
+<h1>- accept all from clearnet userid</h1>
+<h1>- reject all (last rule)</h1>
+<h1>---------------------------------------</h1>
+<h1>Delete current iptables OUTPUT last rule.</h1>
+<p>iptables -D $IPT_FILTER_OUTPUT_LASTRULE</p>
+<h1>{Placeholder Line: Turns out no rules needed. Logging rules in ‘source’ file handy.}</h1>
+<h1>Reapply old iptables FORWARD last rule.</h1>
+<p>$iptables_cmd -A $IPT_FILTER_OUTPUT_LASTRULE</p>
+<h1>---------------------------------------</h1>
+<h1>Note: whonix_firewall -t nat PREROUTING rules:</h1>
+<h1>- redir (incoming) eth1 tor/9xxx ports to self (tor) equivalents.</h1>
+<h1>- redir eth1 udp/dns to self (tor) :5300</h1>
+<h1>- redir eth1 tcp to self: 9040 (tor) (last rule)</h1>
+<h1>---------------------------------------</h1>
+<h1>Delete old iptables -t nat PREROUTING last rule.</h1>
+<p>$iptables_cmd -t nat -D $IPT_NAT_PREROUTING_LASTRULE</p>
+<p>$iptables_cmd -t nat -I PREROUTING -i $INT_IF -s $XCEPTIP -j ACCEPT</p>
+<h1>Reapply old iptables -t nat PREROUTING last rule.</h1>
+<p>$iptables_cmd -t nat -A $IPT_NAT_PREROUTING_LASTRULE</p>
+<h1>---------------------------------------</h1>
+<h1>Note: whonix_firewall -t nat INPUT rules: none.</h1>
+<h1>- Default ACCEPT, so won’t be in any way.</h1>
+<h1>Note: whonix_firewall -t nat OUTPUT rules: none.</h1>
+<h1>- Default ACCEPT, so won’t be in any way.</h1>
+<h1>Note: whonix_firewall -t nat POSTROUTING rules: none.</h1>
+<h1>- Default ACCEPT, so won’t be in any way.</h1>
+<h1>---------------------------------------</h1>
+<h1>Delete old iptables -t nat POSTOUTING last rule.</h1>
+<h1>- except … it doesn’t currently have any rules.</h1>
+<h1>$iptables_cmd -t nat -D $IPT_NAT_POSTROUTING_LASTRULE</h1>
+<p>iptables -t nat -A POSTROUTING -o $VPN_INTERFACE -s $XCEPTIP -j MASQUERADE</p>
+<h1>See (*1).</h1>
+<p>$iptables_cmd -t nat -A POSTROUTING -s $XCEPTIP -d $VPNIPS -j MASQUERADE</p>
+<h1>Reapply old iptables -t nat POSTROUTING last rule.</h1>
+<h1>$iptables_cmd -t nat -A $IPT_NAT_POSTROUTING_LASTRULE</h1>
+<h1>---------------------------------------</h1>
+<p>set +v +x<br>
+echo</p>
+<h1>Enable forwarding.</h1>
+<p>echo -n "/proc/sys/net/ipv4/ip_forward \(forwarding\) was: "<br>
+cat /proc/sys/net/ipv4/ip_forward<br>
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward<br>
+echo -n "/proc/sys/net/ipv4/ip_forward \(forwarding\) now: "<br>
+cat /proc/sys/net/ipv4/ip_forward</p>
+<p>return 0<br>
+</p>
+<p>To effect: $ sudo whonix_firewall-post<br>
+<br><br>
+Complete and more extensive details can be seen at <a href="https://github.com/rAntOCauDgb/whonix-torexceptedtraffic_proofofconcept" rel="nofollow noopener">whonix-torexceptedtraffic_proofofconcept</a></p>
+<p><i>fini</i><br>
+<br><br>
+<i>Comments, suggestions, welcome.</i></p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/43">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/43</link>
+        <pubDate>Thu, 24 Mar 2016 01:07:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-43</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>Working notes … continuing …</p>
+<p>[quote]<strong>whonix, torrents, and being a good tor citizen</strong></p>
+<p>There are 2 issues:</p>
+<ol>
+<li>Identifying / corralling net traffic.</li>
+<li>Proxying (udp / socks5) / anonymizing such traffic.<br>
+.<br>
+.<br>
+.<br>
+So, <strong>for 2 - VPN</strong>. From a trusted provider.</li>
+</ol>
+<p>Aside from using a VPN, the particulars of effecting non-tor traffic on whonix will be discussed another time. It will likely involve iptables rules, routing, and perhaps even policy based routing.<br>
+<br></p>
+<p><strong>For 1</strong>, the challenge of identifying particular traffic so it may be constrained as desired, outside of tor, yet within the vpn (else one wouldn’t be using whonix at all) …</p>
+<p><strong>Solution, part a</strong>: Create and use an additional interface, and associated IP address, and thus provide breadcrumbs by which the whonix gateway can identify, permit, and route, particular traffic, and only that particular traffic, directly to the VPN.</p>
+<p>One way to do this would be to create an additional virtualbox, internal network only, interface on both the whonix workstation, and gateway.</p>
+<p>However, I instead <em>propose</em> creating a virtual interface on workstation only. …</p>
+<p>{Creation of br0 …}[/quote]</p>
+<p>Continuing here with <strong>Solution, part b</strong>: Constraining a program / application’s IP traffic to a designated address …</p>
+<p>I have combined / expanded / ‘enhanced’ the individually incompletely effective <a href="http://0pointer.de/lennart/projects/fixsrcip/" rel="nofollow noopener">fixsrcip</a> and <a href="http://freecode.com/projects/force_bind" rel="nofollow noopener">force_bind</a> together, creating <a href="https://github.com/rAntOCauDgb/runfromiptcpudp" rel="nofollow noopener">runfromiptcpudp</a></p>
+<p>Usage: runfromiptcpudp {ip address} {program}<br>
+e.g., per prior post: runfromiptcpudp 192.168.2.1 qbittorrent</p>
+<p>Having pinned the program to an ip, traffic is corralled, and <em>part c, what to do with the now identified traffic</em>, can proceed.</p>
+<p>Enhancements include:<br>
+- exiting if the specified IP doesn’t exist on an interface (rather than proceeding anyways!).<br>
+- more verbosity / better syslog’ging whereby a user can figure out what all a program is doing / IPs being used.</p>
+<p>Degradation includes:<br>
+- fixsrcip is not IPv6 aware, while force_bind is. However, although the runfromiptcpudp combination doesn’t remove that awareness, it has not yet been extended to the fixsrcip base. Thus, until such experts apply their expertise to the code, IPv6 traffic is denied. (Which some may agree is no bad thing.)</p>
+<p>Consequences include:<br>
+- traffic that escapes a program is either denied, or gets handled and appropriately scrubbed by the current whonix facility. e.g. Despite being so pinned, ktorrent leaks traffic (being a KDE program) - which still gets tor’ified.<br>
+- local network broadcasts get muted. (Since they become bound to an IP, not 0.0.0.0).<br>
+- A program is independently network encapsulated, without the overhead of LXC, and traffic sysloggable. Providing, consequently, an independent trapping / logging mechanism for 3rd party programs.</p>
+<p>To make use of / install:<br>
+<code><br>
+$ mkdir ~/local/src; cd ~/local/src<br>
+$ git clone <a href="https://github.com/rAntOCauDgb/runfromiptcpudp.git" rel="nofollow noopener">https://github.com/rAntOCauDgb/runfromiptcpudp.git</a><br>
+$ ./INSTALL #(which merely calls make; make install.)<br>
+</code></p>
+<p>Having set up br0 as per prior message in this thread:</p>
+<p>runfromiptcpudp 192.168.2.1 {program}</p>
+<p>And traffic is corralled, as desired.<br>
+<br><br>
+Next up, <em>Solution, part c</em> will be necessary gateway iptables changes to make the whole work.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/42">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/42</link>
+        <pubDate>Mon, 14 Mar 2016 20:06:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-42</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>Working notes … continuing …</p>
+<p>[quote]<strong>whonix, torrents, and being a good tor citizen</strong></p>
+<p>There are 2 issues:</p>
+<ol>
+<li>Identifying / corralling net traffic.</li>
+<li>Proxying (udp / socks5) / anonymizing such traffic.<br>
+[/quote]</li>
+</ol>
+<p><strong>For 2</strong>: Internally. whonix already has several proxies in play, be it browser, e-mail, or generally. By definition, and desire, all go through tor. It is the point of using whonix. Yet not all programs have settings to set proxies, http, socks4|5, or otherwise, so there is no easy or universal way by which to except particular traffic beside tor rather than through it.</p>
+<p>Except, that is, for using a vpn, which is by definition a proxy, and routing all traffic through it. Yes, this is trusting that the vpn provider (truly) is anonymous, or sufficiently so. However, anonymity is -the- selling feature of many VPNs. OTOH … no way to prove a negative. It’s anonymous, until it isn’t, and by then it’s too late. Hopefully word will get out on providers that aren’t, and hopefully all concerned are paying attention when it does.</p>
+<p>But then, I suppose the possibility is no worse than the possibility of a compromised tor node or honey trap.<br>
+<br><br>
+So, <strong>for 2 - VPN</strong>. From a trusted provider.</p>
+<p>Aside from using a VPN, the particulars of effecting non-tor traffic on whonix will be discussed another time. It will likely involve iptables rules, routing, and perhaps even policy based routing.<br>
+<br></p>
+<p><strong>For 1</strong>, the challenge of identifying particular traffic so it may be constrained as desired, outside of tor, yet within the vpn (else one wouldn’t be using whonix at all) …</p>
+<p><strong>Solution, part a</strong>: Create and use an additional interface, and associated IP address, and thus provide breadcrumbs by which the whonix gateway can identify, permit, and route, particular traffic, and only that particular traffic, directly to the VPN.</p>
+<p>One way to do this would be to create an additional virtualbox, internal network only, interface on both the whonix workstation, and gateway.</p>
+<p>However, I instead <em>propose</em> creating a virtual interface on workstation only. Thus only users interested in this particular facility, and having manually installed it, are affected, and only when so running such designated programs. Impact is specific, leaving all other whonix safeguards in place, and in play.</p>
+<p>On workstation:</p>
+<p>First - # apt-get install bridge-utils</p>
+<p>Manually -<br>
+<code><br>
+brctl addbr br0<br>
+brctl addif br0 eth0<br>
+ip tuntap add dev tap0 mode tap<br>
+ifconfig tap0 192.168.2.1 up<br>
+brctl addif br0 tap0<br>
+</code></p>
+<p>Automatically:</p>
+<ul>
+<li>mv /etc/network/interfaces.d/30_non-qubes-whonix /etc/network</li>
+<li>this mv probably shouldn’t be needed / isn’t appropriate, but I haven’t gotten it to work by merely adding the tap0 and br0 bits to a separate file such as /etc/network/interfaces.d/50_user_add_whonix.</li>
+<li>append to /etc/network/interfaces:<br>
+<code><br>
+auto lo<br>
+iface lo inet loopback</code>
+</li>
+</ul>
+<p>iface eth0 inet manual</p>
+<p>auto tap0<br>
+iface tap0 inet manual<br>
+pre-up ip tuntap add dev tap0 mode tap<br>
+pre-up ip addr add 192.168.2.1/24 dev tap0<br>
+up ip link set dev tap0 up</p>
+<p>auto br0<br>
+iface br0 inet static<br>
+bridge_ports eth0 tap0<br>
+address 10.152.152.11<br>
+netmask 255.255.192.0<br>
+gateway 10.152.152.10</p>
+<p><span class="hashtag">#ip</span> tuntap add dev tap0 mode tap<br>
+<span class="hashtag">#ifconfig</span> tap0 192.168.1.1 up<br>
+<span class="hashtag">#brctl</span> addif br0 tap0<br>
+</p>
+<ul>
+<li>alternately, put the above in something like /etc/network/interfaces.d/50_user_add_whonix, but I haven’t tested that.</li>
+</ul>
+<p>Leaving a distinct ip address (192.168.2.1) / interface (tap0) upon which to set a designated program to use, and by which the whonix gateway can discern such traffic.</p>
+<p>e.g. Some torrent clients have a setting to designate the interface, or ip address, to use.</p>
+<p>On gateway:</p>
+<p><em>Pre-test</em>:<br>
+<code><br>
+ping 192.168.2.1 # - no response, expected.<br>
+</code></p>
+<p>Modify or create a file in /etc/whonix_firewall.d, such as 50_user_conf, creating or modifying a section to look like:<br>
+<code><br>
+## Destinations you don not want routed through the VPN.<br>
+## 10.0.2.2/24: VirtualBox DHCP<br>
+#LOCAL_NET=“127.0.0.0/8 10.152.152.0/24 10.0.2.2/24”<br>
+#LOCAL_NET="<br>
+#       127.0.0.0-127.0.0.24 <br>
+#       192.168.0.0-192.168.0.24 <br>
+#       192.168.1.0-192.168.1.24 <br>
+#       10.152.152.0-10.152.152.24 <br>
+#       10.0.2.2-10.0.2.24 <br>
+#"<br>
+LOCAL_NET="<br>
+127.0.0.0-127.0.0.24 <br>
+192.168.2.0-192.168.2.24 <br>
+10.152.152.0-10.152.152.24 <br>
+10.0.2.2-10.0.2.24 <br>
+"<br>
+</code></p>
+<p><em>Manually</em> -<br>
+<code><br>
+route add -net 192.168.2.0/24 dev eth1<br>
+</code></p>
+<p><em>Automatically</em> - edit /etc/network/interfaces.d/30_non-qubes-whonix:</p>
+<ul>
+<li>append a line to the ‘<em>iface eth inet static</em>’ section:<br>
+<code><br>
+&lt;tab&gt; up route add -net 192.168.2.0/24 gw 10.152.152.11<br>
+</code>
+</li>
+</ul>
+<p><em>Alternately</em>: Add ‘route add -net 192.168.2.0/24 gw 10.152.152.11’ to 50_user_conf above, rather than messing with files under /etc/network.</p>
+<p>Run “whonix_firewall” to manually effect the change, without rebooting.</p>
+<p><em>Test</em>:<br>
+ping 10.152.152.11 # - should work, as expected.<br>
+ping 192.168.2.1 # - should work, now.</p>
+<br>
+<p>Next up, <em>Solution, part b</em> combining the individually incompletely effective <a href="http://0pointer.de/lennart/projects/fixsrcip/" rel="nofollow noopener">fixsrcip</a> and <a href="http://freecode.com/projects/force_bind" rel="nofollow noopener">force_bind</a> together, to be more completely effective.<br>
+<br><br>
+And beyond that, <em>Solution, part c</em> will be necessary gateway iptables changes to make the whole work.<br>
+<br></p>
+<p>Suggestions/enhancements most certainly welcome. Especially for anything suggested that’s actually inadvertently rather ‘dumb’ -particularly, from a whonix community / purpose perspective. Especially anything that pertains to where best to place / plug in this stuff for other whonix users so interested, to find.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/41">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/41</link>
+        <pubDate>Wed, 02 Mar 2016 11:35:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-41</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="38" data-topic="1766">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/ecd19e/40.png" class="avatar"> halo9en:</div>
+<blockquote>
+<p>I’m curious if anyone has had success with these instructions; particularly the patching of whonix_firewall. I did not meet success. Wonder if it’s because it was for an older version of Whonix (and whonix_firewall)</p>
+</blockquote>
+</aside>
+<p>I suspect it’s not a version issue. There aren’t really any instructions, yet. Thus far it’s been merely topic explorative.</p>
+<p>If you note specifically how you did not meet success, perhaps we can help.</p>
+<p>I’ve put quite a bit of time in on this, and believe I have cobbled together a solution, but am still working on proving it out.</p>
+<p>Stay tuned, details to come.</p>
+<p>I don’t expect it will ever be part of mainstream whonix. And I have absolutely no idea yet as to how to go about formulating / depositing it as a whonix ‘addon’ that people can refer to and effect, if they wish.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/40">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/40</link>
+        <pubDate>Wed, 02 Mar 2016 03:59:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-40</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="37" data-topic="1766">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>I am sorry to say, but I think the whole “selective traffic VPN-only” feature is too geeky and benefits too few users to invest time and effort into it.</p>
+</blockquote>
+</aside>
+<p>Fair enough. But then, that’s why there are many hands.</p>
+<p>Whether or not you ‘participate’, you can provide value, without sinking too much time into anything, by being a resource / guiding towards productive (produceable?) results.</p>
+<p>e.g. The code bit above, but not specifically that code … guidance as to how to go about munging such into a whonix community acceptable resource, would be welcome.</p>
+<p>Which is more about being a shepherd to the community, than spending time on a particular feature deemed at a community level as being of limited use.</p>
+<p>However … this is also somewhat chicken and egg. I expect many have discarded whonix for lack of tor-excepted traffic / one-stop shopping. Having the ability to except traffic may well make whonix suitable for a larger audience. (No more use this for that, the other for the other, remember which you did what in. And why am I bothering with the vm / complexity of whonix, again?)</p>
+<p>[I guess “why tor browser is not enough, whonix matters to you” could be more prevalent.]</p>
+<p>In any case, I agree that such excepted traffic should be a bolt on, not a built in.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/39">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/39</link>
+        <pubDate>Wed, 02 Mar 2016 03:50:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-39</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[halo9en]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for this.</p>
+<p>I’m curious if anyone has had success with these instructions; particularly the patching of whonix_firewall. I did not meet success. Wonder if it’s because it was for an older version of Whonix (and whonix_firewall)</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/38">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/38</link>
+        <pubDate>Sat, 27 Feb 2016 03:30:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-38</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I am sorry to say, but I think the whole “selective traffic VPN-only” feature is too geeky and benefits too few users to invest time and effort into it.</p>
+<p>As per recent blog post:<br>
+<a href="https://forums.whonix.org/t/upcoming-usability-improvements-that-will-hurt-tls-downloads-abolishing-torrent-downloads/2099">upcoming usability improvements that will hurt, TLS downloads, abolishing torrent downloads</a></p>
+<p>Sorry to come up with this so late, but this thread partially contributed to me finally recognizing that while trying to suit everyone, I am loosing focus on the main stream work.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/37">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/37</link>
+        <pubDate>Sun, 14 Feb 2016 20:05:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-37</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="34" data-topic="1766">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>We don’t have any compiled code for now. Nor any policy for this.</p>
+</blockquote>
+</aside>
+<p>firejail testing fails for me at a ‘seamless user use’ (and works) level.</p>
+<p>Have come across <a href="http://0pointer.de/lennart/projects/fixsrcip/" rel="nofollow noopener">http://0pointer.de/lennart/projects/fixsrcip/</a> which also fails, and <a href="http://freecode.com/projects/force_bind" rel="nofollow noopener">http://freecode.com/projects/force_bind</a> (see source tar.gz link top right) - which looks more promising. (netstat shows ip bound, but no net traffic at moment - I’ve probably played too much / need a reboot.)</p>
+<p>It’s a single.c file, small, all of 113 lines long. Guts (whitespace cut):<br>
+[Accompanying LICENSE file notes GPL’ed.]<br>
+<code><br>
+int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)<br>
+{<br>
+int err;<br>
+struct sockaddr new;<br>
+struct sockaddr_in *sa4;<br>
+struct sockaddr_in6 *sa6;<br>
+void *p = NULL;<br>
+unsigned short *pport = NULL;<br>
+init();<br>
+if ((addr-&gt;sa_family != AF_INET) &amp;&amp; (addr-&gt;sa_family != AF_INET6)) {<br>
+syslog(LOG_INFO, “force_bind: unsupported family=%u!\n”,<br>
+addr-&gt;sa_family);<br>
+return old_bind(sockfd, addr, addrlen);<br>
+}<br>
+memcpy(&amp;new, addr, sizeof(struct sockaddr));<br>
+switch (new.sa_family) {<br>
+case AF_INET:<br>
+sa4 = (struct sockaddr_in *) &amp;new;<br>
+p = &amp;sa4-&gt;sin_addr;<br>
+pport = &amp;sa4-&gt;sin_port;<br>
+break;<br>
+case AF_INET6:<br>
+sa6 = (struct sockaddr_in6 *) &amp;new;<br>
+p = &amp;sa6-&gt;sin6_addr.s6_addr;<br>
+pport = &amp;sa6-&gt;sin6_port;<br>
+break;<br>
+}<br>
+if (force_address != NULL) {<br>
+err = inet_pton(new.sa_family, force_address, p);<br>
+if (err != 1) {<br>
+syslog(LOG_INFO, “force_bind: cannot convert [%s] (%d)!\n”,<br>
+force_address, err);<br>
+return old_bind(sockfd, addr, addrlen);<br>
+}<br>
+}<br>
+if (force_port != -1)<br>
+*pport = htons(force_port);<br>
+return old_bind(sockfd, &amp;new, addrlen);<br>
+}<br>
+</code></p>
+<p>Not advocating it, yet, further testing to do, but you can see why I asked about the acceptability of such files. Small, easily code reviewed, and not really ‘big enough’ for a ‘maintainer’ once instantiated.</p>
+<p>Probably not much different than a bash snippet, but it is code / needs compiling - and I have no familiarity with how projects manage such. Thus my question.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/36">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/36</link>
+        <pubDate>Sun, 14 Feb 2016 06:31:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-36</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="34" data-topic="1766">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Something super simple to answer “everything from the workstation is<br>
+always routed through Tor” becomes something less simple and more<br>
+insecure sounding “everything from the workstation is always routed<br>
+through Tor unless you install that package”.</p>
+</blockquote>
+</aside>
+<p>Agree, but then, that’s why it’s optional.</p>
+<p>However … whonix is already there. e.g. The enabling of VPN in whonix_firewall, so that bridge has already been crossed. In the sense of needing user intervention. (Given the mass of material already present about proxy/socks this way vs that way, before or after tor, the idea of ‘excepted tor’ traffic isn’t an onerous expansion.)</p>
+<p>Getting to this tor-excepted traffic facility will be similar, and one, similarly user chosen, step beyond current VPN enablement - probably a whonix_firewall.d post-whonix_firewall-50user_run type call.</p>
+<p>And some anondist equivalents. e.g. qbittorrent -&gt; qbittorrent.nontor -&gt; (sg vpnnet; qbittorrent.clearnet)</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/35">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/35</link>
+        <pubDate>Sun, 14 Feb 2016 06:16:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-35</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>We don’t have any compiled code for now. Nor any policy for this.</p>
+<p>The closest to such a policy is this one:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/Default_Application_Policy" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/362;"><img src="https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Dev/Default_Application_Policy" target="_blank" rel="nofollow noopener">Dev/Default Application Policy</a></h3>
+
+<p>Design Documentation - How to decide which apps come with Whonix?</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Whonix firejail discussion:</p>
+<aside class="quote" data-post="1" data-topic="1030">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar">
+    <a href="https://forums.whonix.org/t/firejail-seccomp-more-options-for-program-containment/1030">firejail / seccomp / More Options for Program Containment</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    Firejail: 
+
+<a href="https://l3net.wordpress.com/projects/firejail/" class="onebox" target="_blank">https://l3net.wordpress.com/projects/firejail/</a> 
+
+Guide for creating profiles: <a href="https://l3net.wordpress.com/2015/04/13/firejail-seccomp-guide">https://l3net.wordpress.com/2015/04/13/firejail-seccomp-guide</a> 
+
+Firejail is a SUID security sandbox program that reduces the risk of security breaches by restricting the running environment of untrusted applications using Linux namespaces and seccomp-bpf. It allows a process and all its descendants to have their own private view of the globally shared kernel resources, such as the network stack, process tab…
+  </blockquote>
+</aside>
+
+<p>Something super simple to answer “everything from the workstation is<br>
+always routed through Tor” becomes something less simple and more<br>
+insecure sounding “everything from the workstation is always routed<br>
+through Tor unless you install that package”.</p>
+<p>/cc <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a> since this involves compiled code, policy, firejail and<br>
+contributions.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/34">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/34</link>
+        <pubDate>Sat, 13 Feb 2016 17:36:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-34</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="32" data-topic="1766">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/rantocaudgb/40/135_1.png" class="avatar"> rAntOCauDgb:</div>
+<blockquote>
+<p>1) Identifying / corralling net traffic.</p>
+</blockquote>
+</aside>
+<p>Docker seems over the top, in terms of heft. Not much different than running another entire vm (within the ws vm, even). [But the idea of lightweight containers seems attractive. One comment I saw noted LXC as entire OS’ and docker as single application’able. I noted the idea of a docker-whonix in the forum/wiki somewhere. Don’t know that I saw the thought of a docker app within whonix. torbrowser, icedove, torchat, with zero post-run footprint, seems like it would appeal.]</p>
+<p><a href="http://superuser.com/questions/241178/how-to-use-different-network-interfaces-for-different-processes" rel="nofollow noopener">http://superuser.com/questions/241178/how-to-use-different-network-interfaces-for-different-processes</a> seems topical, however I gave up on making it work. Multiple ‘ip link’ commands needed, bridge-utils, and script complexity; must be root to create the interfaces.</p>
+<ul>
+<li>
+<p>it’s initial attractiveness, however, is that it is scripting - not another package to install, and not binary/source hosted on ‘strange’ servers.</p>
+</li>
+<li>
+<p>it is also limiting the containerization (and thus complexity and heft) to the network only, via network namespaces (ip netns). But brings bridging and other manual steps that I think would make the result unacceptable to whonix.</p>
+</li>
+</ul>
+<p>I have come across <a href="http://daniel-lange.com/archives/53-Binding-applications-to-a-specific-IP.html" rel="nofollow noopener">http://daniel-lange.com/archives/53-Binding-applications-to-a-specific-IP.html</a> , however, this is compiling downloaded code, as opposed to a repository. e.g. <a href="http://www.ryde.net/code/bind.c.txt" rel="nofollow noopener">http://www.ryde.net/code/bind.c.txt</a>, <a href="http://0pointer.de/lennart/projects/fixsrcip/" rel="nofollow noopener">http://0pointer.de/lennart/projects/fixsrcip/</a>, <a href="http://www.semicomplete.com/projects/liboverride/" rel="nofollow noopener">http://www.semicomplete.com/projects/liboverride/</a>, <a href="https://sourceforge.net/projects/netjail/files/netjail/1.0.0/" rel="nofollow noopener">https://sourceforge.net/projects/netjail/files/netjail/1.0.0/</a>, or <a href="http://wari.mckay.com/~rm/bindhack.c.txt" rel="nofollow noopener">http://wari.mckay.com/~rm/bindhack.c.txt</a>. In the first link, not even a page of code, in the last, perhaps two pages - most of it whitespace. Which is to say, easily code reviewed for unacceptable behaviour.</p>
+<p>What is the general ‘whonix’ attitude toward such code? Assume GPL’ed/FOSS’ed, and so on. With no repository, no updates (but ‘this’ is a solved problem). Would ‘whonix’ be willing to take in a copy of such code and incorporate it?</p>
+<ul>
+<li>not so much asking about this specific code as is even the very idea at all acceptable?</li>
+</ul>
+<p>To review (this aspect) - the goal is to be able to identify, and so segregate, traffic. Be it for further control, processing, or manglement. This seems easiest if the app could be forced to run under a different ip address (containerized). Thus ip leaks (despite proxy settings) are contained, and could be forwarded to a local socks proxy (e.g. dante, if it worked), which forwards to a gw relay (e.g. stone).</p>
+<ul>
+<li>not saying the additional processing is to be effected at the moment, or even optimal, merely that by isolating the traffic to its own ip, all such goodness is possible, when deemed desirable. [e.g. optimal - if dante worked, could easily be more efficient, for all I know, to forward the app to a rinet’ed port to dante running on the gw, as happens with tor now.]</li>
+</ul>
+<p>In poking about containerization, I got to <a href="https://www.flockport.com/alternatives-to-docker-and-lxc/" rel="nofollow noopener">https://www.flockport.com/alternatives-to-docker-and-lxc/</a> and encountered firejail. <a href="https://firejail.wordpress.com/" rel="nofollow noopener">https://firejail.wordpress.com/</a> , <a href="https://github.com/netblue30/firejail" rel="nofollow noopener">https://github.com/netblue30/firejail</a> Packages are downloadable at <a href="https://firejail.wordpress.com/download-2/" rel="nofollow noopener">https://firejail.wordpress.com/download-2/</a></p>
+<p>/etc/firejail contains parameter files, including:<br>
+Mathematica.profile<br>
+audacious.profile<br>
+bitlbee.profile<br>
+chromium-browser.profile<br>
+chromium.profile<br>
+clementine.profile<br>
+conkeror.profile<br>
+deadbeef.profile<br>
+deluge.profile<br>
+dnscrypt-proxy.profile<br>
+dropbox.profile<br>
+empathy.profile<br>
+evince.profile<br>
+fbreader.profile<br>
+filezilla.profile<br>
+firefox.profile<br>
+generic.profile<br>
+gnome-mplayer.profile<br>
+google-chrome-beta.profile<br>
+google-chrome-stable.profile<br>
+google-chrome-unstable.profile<br>
+google-chrome.profile<br>
+hexchat.profile<br>
+icecat.profile<br>
+icedove.profile<br>
+iceweasel.profile<br>
+kmail.profile<br>
+ktorrent.profile<br>
+login.users<br>
+mathematica.profile<br>
+midori.profile<br>
+mupen64plus.profile<br>
+<a href="http://nolocal.net" class="onebox" target="_blank" rel="nofollow noopener">nolocal.net</a><br>
+opera-beta.profile<br>
+opera.profile<br>
+palemoon.profile<br>
+parole.profile<br>
+pidgin.profile<br>
+qbittorrent.profile<br>
+quassel.profile<br>
+rhythmbox.profile<br>
+rtorrent.profile<br>
+seamonkey-bin.profile<br>
+seamonkey.profile<br>
+server.profile<br>
+skype.profile<br>
+spotify.profile<br>
+steam.profile<br>
+telegram.profile<br>
+thunderbird.profile<br>
+totem.profile<br>
+transmission-gtk.profile<br>
+transmission-qt.profile<br>
+uget-gtk.profile<br>
+unbound.profile<br>
+vlc.profile<br>
+weechat-curses.profile<br>
+weechat.profile<br>
+wine.profile<br>
+xchat.profile</p>
+<p>e.g. firejail qbittorrent</p>
+<ul>
+<li>seemingly presenting the ability to containerize / isolate / segregate most any app to the extent deemed prudent. e.g. memory limiting.</li>
+</ul>
+<p>Installation and use really was as K.I.S.S. as download, gdebi &lt;package&gt; ; firejail &lt;your favourite app&gt;</p>
+<p>A default profile exists, and --noprofile is possible.</p>
+<p>In this case a segregated network stack, and separate ip, is possible via:</p>
+<ul>
+<li>firejail --net=eth0 --ip=10.152.152.111 qbittorrent<br>
+– Note: I ran into problems of inaccessible files (in my non-default locations), until I commented out ‘noroot’ in the qbittorrent.profile. (Worst case in all of this is no worse than running the app natively. i.e. Without further 'whonix’ization.)</li>
+</ul>
+<p>Sadly, ktorrent would not run - complaints about lack of access to dbus. (I see the problem has been noted - presumably this will be fixed at some uknown, unpredictable, future time.)</p>
+<p>Curiously, there is a kmail profile, so dbus must not be getting its finger into each and every kde app.</p>
+<p>So:</p>
+<ul>
+<li>nailing down an app to run under a unique ip seems desirable. [iptables -A FORWARD -i eth1 -o tun0 -s 10.152.152.111 -j ACCEPT]</li>
+<li>what is the whonix project’s attitude towards rarer source code? e.g. Just sucking in the file / original author not themselves doing so (thus no implied promise of keeping it updated).</li>
+<li>is there value to containerization to the whonix project such that it would consider putting any time or energy into establishing the facility?</li>
+<li>if firejail at all whonix topical?</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/33">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/33</link>
+        <pubDate>Sat, 13 Feb 2016 11:54:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-33</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>Perhaps I’m thinking / going about this the wrong way.</p>
+<p>There are 2 issues:</p>
+<ol>
+<li>
+<p>Identifying / corralling net traffic.</p>
+</li>
+<li>
+<p>Proxying (udp / socks5) / anonymizing such traffic.</p>
+</li>
+<li>
+<p>Is inherently satisfied by the use of a trusted (openvpn) vpn provider.</p>
+</li>
+<li>
+<p>Docker? (Force all net traffic to a segregated ip that can then be identified and routed by iptables?)</p>
+</li>
+</ol>
+<p>e.g. <a href="https://blog.jessfraz.com/post/routing-traffic-through-tor-docker-container/" rel="nofollow noopener">https://blog.jessfraz.com/post/routing-traffic-through-tor-docker-container/</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/32">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/32</link>
+        <pubDate>Fri, 12 Feb 2016 05:24:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-32</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://www.giac.org/paper/gsec/2326/understanding-implementing-socks-server-guide-set-socks-environment/104018" rel="nofollow noopener">https://www.giac.org/paper/gsec/2326/understanding-implementing-socks-server-guide-set-socks-environment/104018</a> is a really nice explanatory document!</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/31">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/31</link>
+        <pubDate>Fri, 12 Feb 2016 04:31:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-31</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“rAntOCauDgb, post:26, topic:1766”]For example (a): several torrent clients will bind to a specific interface. Such a virtual interface, with its own IP, would provide an ip tables mechanism (by source address) to identify / segregate / separately route designated traffic.<br></p>
+<ul>
+<li>yet I have been unable to find a simple description to create such an interface. [Return to … material read several days prior, skipped at the time, and now can’t find again.] Various things like ‘ip tuntap add dev veth0 mode tap’ | ‘ip link set name veth0 dev dummy 0’ | ‘tunctl’ end up with a 2nd eth0 matching gw and routing falls apart.<br>
+[/quote]</li>
+</ul>
+<p>Journalling notes …</p>
+<p>stone didn’t work for me … but I now realize the proxy was brain dead, so I’ll have to revisit it.</p>
+<p>So, as I may have said earlier … turns out clients such as ktorrent and qbittorrent are leaky. Specifying a proxy, socks5 or otherwise, does not necessarily mean all traffic goes out that way. Be it to trackers, or udp. Let alone if the proxy is down or the interface doesn’t exist at start time. e.g. Set to use tun0, but openvpn not started at time of app start.</p>
+<p>So, it would seem that the desired solution would be something that encapsulates a program, forcing all net communications (perhaps with rules, e.g. dns) to go out as specified. e.g. (Dante’s) socksify, socks and socksd.</p>
+<p>However, as mentioned, turns out Dante won’t use authentication when going up stream. [Looking through the whonix wiki, it notes a dearth of free / open source socks5 proxies / relays - it doesn’t seem too likely that a paid vpn provider isn’t going to required authentication.] This is part of what I meant about the sadness of the industry … (e.g. Dante’s) web pages that promise intuitively obvious functionality … then excepting the important bits in the fine print.</p>
+<p>Alternately, instead of firing up a socksd on the ws, and possibly a socks5 relay on the gw to go out the openvpn tun0, one might consider per app invocation via dante’s ‘socksify {app}’ facility.</p>
+<p>However, ‘socksify ktorrent’ crashes withing seconds. Googling reveals dante just falls over at exception and silently crashes. ‘socksify bittorrent’ did stay up and pass traffic - except the traffic all goes out directly, not via the specified socks5. Evidently dante/socksd is not part of any solution.</p>
+<p>Next seems tun2socks, which seems to handle the magic mentioned above (‘Such a virtual interface, with its own IP …’, answering ‘I have been unable to find a simple description to create such an interface’) - however, as it doesn’t encapsulate a program, it creates a tun0 interface to bind programs to, it is arguable that this is no better than appropriate iptables rules on the gw - never mind as mentioned above that clients don’t necessarily pass ALL traffic over the configured proxy / socks5 / interface. (And I believe the same is true in ktorrent when a DSCP value is specified.) i.e. In the end, the whonix gw has to corral / guarantee no non-excepted traffic out non-tor. Partial solutions, ws or otherwise, merely add complexity without delivering certainty.</p>
+<p>tun2socks does appear to promise udp forwarding - <em>IF</em> the provided badvpn-udpgw (udp gateway) service is run on the ssh server. This seems to imply the vpn provider running badvpn-udpgw … not likely.</p>
+<p>OTOH, if someone knows … could badvpn-udpgw be run on gw, and something there simply relay such traffic to the running openvpn tun0 interface? If so, how? (I assume socat?)</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/30">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/30</link>
+        <pubDate>Fri, 12 Feb 2016 04:25:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-30</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>Agreed, but this still makes the solution too complex.</p>
+<p>Arguably, the whonix gw could then forward to the vpn gateway. Losing the vpn killswitch / whonix_firewall facility in the process. Not optimal. (Mind you, the openvpn config can effect the same via scripts / routing. I’ll post on that here at some point.)</p>
+<p>However … still back to identifying and corralling the particular traffic to be so routed. And if that could be done, then the need for the vpn gateway is negated. (i.e. a ‘bypasstor’ tor equivalent.) e.g. equivalent to tcp 9050 redirect now, to, say, tcp/udp 1080, on both ws and gw I expect. One capturing, the other relaying.)</p>
+<p>Equally arguable, would be a vpn client ws, also routing out the whonix gw as the whonix ws does. i.e. iptables identifiable source ip. I guess something like qemu would be equally topical.</p>
+<p>It’s already irritating enough, and necessarily so, to have to run 2 vms. Expanding that to 3 or 4 seems excessive. ‘There oughta be a (simpler) law (way)!’</p>
+<p>The beauty of whonix is K.I.S.S. and one stop shopping. The user shouldn’t have to remember to do activity a on vm a, and activity b on vm b. Especially as torrent as a file distribution facility seems likely to only grow.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/29">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/29</link>
+        <pubDate>Fri, 12 Feb 2016 04:08:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-29</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Another option might be to not tamper with Whonix-Gateway at all. And<br>
+instead adding a VPN-Gateway. To the same internal network. Then the<br>
+Whonix-Workstation could be configured to by default use Whonix-Gateway<br>
+and selectively the VPN-Gateway for specific stuff.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/28">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/28</link>
+        <pubDate>Thu, 11 Feb 2016 18:05:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-28</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>Well … nix danted (socksd) … <a href="https://www.inet.no/dante/doc/1.4.x/config/chaining.html" rel="nofollow noopener">https://www.inet.no/dante/doc/1.4.x/config/chaining.html</a> … “Forwarding of UDP is currently not supported by Dante.” Let alone … “Using authentication between two SOCKS servers is possible, but not currently supported.”</p>
+<p>SS5?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/27">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/27</link>
+        <pubDate>Thu, 11 Feb 2016 18:00:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-27</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="25" data-topic="1766" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>ip forwarding is not enabled because for the current Whonix design it’s not required at all. If you need it for your setup however is a different question.</p>
+</blockquote>
+</aside>
+<p>The answer to which I’m trying to figure out.</p>
+<p>Thus far, it feels like the answer is ‘yes’. I’m guessing here, but … I expect a fair bit of the reason for torrent / udp success is udp nat hole punching. With the dearth of sock5 udp capable relays, forwarding seems appropriate.</p>
+<p>However … forwarding was turned off, presumably for good reason. [Yes, I caught your note - essentially, forwarding is turned off by default in Linux, ws didn’t need it, so the default was left unchanged.] But who knows what else will leak through, inadvertently, if forwarding enabled. Yet, can’t prove a negative. e.g. Scrubbing proxies like privoxy exist for a reason. Comments that reduce the size of that negative haystack would be useful.</p>
+<aside class="quote">
+<blockquote>
+<p> If you find a way to make a non-Whonix VPN-Workstation work behind a non-Whonix VPN-Gateway however that would be good. However, not a blocker.</p>
+</blockquote>
+</aside>
+<p>Currently using a debian ws default gatewayed to an openwrt box with vpn running as a non/Whonix sanity check. Thus far any discrepancies have turned out to be non-Whonix related. e.g. Proxy not working … 2 days later happened to check non-Whonix to find it also not working. (What a supreme time waster that was.)</p>
+<aside class="quote">
+<blockquote>
+<p>whonixcheck is the least of your worries. It can easily be configured to skip certain tests. See its config file.  Such a config snippet could be easily deployed as part of an optional package.</p>
+</blockquote>
+</aside>
+<p>Thanks for the config snippet thought. Will bear that in mind. e.g. It’s feeling like whonix_firewall calling a post-run script is going to be needed. Additional iptables rules are going to be required.</p>
+<p>whonixcheck is not the least of my worries, by any means. One of the things I have noticed / been sensitive to … whonix encapsulates a great deal of complexity for the non-technical end user. whonixcheck provides a very nice pass/fail as to something is wrong.</p>
+<p>Thus the patch to note the undesired package to the user, even if it’s a duplicate message in the mean time, so the user can actually do something about it.</p>
+<p>And also, thus, BTW, … updating the warning that ip forwarding is enabled to be in bold, red, would be useful.</p>
+<p>Anywho, so part of the challenge here is to simplify things so that whonixcheck can do pass/fail/warn type things. Which is to say, as I work through this … I have to keep in mind to K.I.S.S. so the ultimate end user has easy implementation and pass/fail whonixcheck detection.</p>
+<p>[quote]JonDonym does not have a Trans- or DnsPort and yet you can use JondoNym<br>
+with transparent proxying. See:<br>
+<a href="https://anonymous-proxy-servers.net/en/help/transocks.html%5B/quote%5D" rel="nofollow noopener">https://anonymous-proxy-servers.net/en/help/transocks.html[/quote]</a></p>
+<p>So much complexity in all this. I’ve read so much, and so much of it is a blur. So much only half understood, and left behind as a result. Then, days later, if I happen to come across it again, more of it gels.</p>
+<p>One thing I can say is … this all shouldn’t be this hard. My industry (‘computing’) is self-inflicting its own pain, disserving its customers. &lt;sigh&gt;</p>
+<p>For example (a): several torrent clients will bind to a specific interface. Such a virtual interface, with its own IP, would provide an ip tables mechanism (by source address) to identify / segregate / separately route designated traffic.</p>
+<p>- yet I have been unable to find a simple description to create such an interface. [Return to … material read several days prior, skipped at the time, and now can’t find again.] Various things like ‘ip tuntap add dev veth0 mode tap’ | ‘ip link set name veth0 dev dummy 0’ | ‘tunctl’ end up with a 2nd eth0 matching gw and routing falls apart.</p>
+<p>- never mind such would be technical steps for a non-technical ws user to execute.</p>
+<p>For example (b): Then I find that such interface bound clients don’t always use that interface. e.g. udp bypassing socks5 settings. Never mind if the interface isn’t up (triggering defaults to all interfaces), or the app has no interface or proxy configuration settings.</p>
+<p>[quote] Is there some software to interface with a VPN server through a socks or<br>
+http proxy port interface? I.e. a software opening a local socks proxy<br>
+port, accepting connections there and then creating a connection to the<br>
+VPN server. If the gateway would just provide other socks ports that<br>
+result in different network paths that would seem like a better design.[/quote]</p>
+<p>IIUC, in essence, the VPN, or OpenVPN, bundles within itself the ‘proxying’ capabilities. It has to - by very definition and point of a VPN. ‘proxying’ here, is essentially, forwarding on your behalf (aka NAT) - the very definition of proxying. Forwarding == relay … and we’re back to enabling ip forwarding. &lt;sigh&gt;</p>
+<p>Thus, if such traffic could be corralled, all that should really be needed is a relay. This, then, is the basic problem: how to corral / identify appropriate traffic. e.g. As currently set, whonix permits the traffic it can, and roadblocks all other traffic. This is a wonderful thing. Problem is, to specifically identify the now to be permitted traffic, only, so that the unexpected traffic still gets roadblocked by native whonix.</p>
+<p>My expected solution, thus far, is to <i>also</i> specify a socks5 proxy in the client app - thus providing a mechanism to identify / corral / route excepted traffic. [Return to above … turns out even setting an interface / socks / proxy, an app doesn’t <i>always</i> use it. &lt;sigh&gt;]</p>
+<p>There are OpenVPN config settings for proxies / socks to use, but these are under hood fiddly bits I expect to be beyond the average target user of whonix. (It’s hard enough to discern which vpn providers also provide socks5 services, to add discerning that such provide an openvpn config file with such settings embedded, is too much.)</p>
+<p>Even as it stands now, additional openvpn config settings are necessary to yank default gateways (providing a vpn kill switch) [yes, I know in theory a kill switch is inherent to whonix]. It’s not just ‘apt-get install openvpn’ ‘download vpn provider’s .conf file’ and ‘get on with your day’. If the vpn falls over, no gateway should be present until a user intervenes.</p>
+<aside class="quote">
+<blockquote>
+<p>Not exactly tun2socks or redsocks. (But good to know something like this exists.)</p>
+</blockquote>
+</aside>
+<p>From what I can tell tun2socks doesn’t udp.</p>
+<p>Briefly looked at redsocks, but too goofy for words. i.e. This should all be simpler, having to change the group nixes all the base user understanding of groups and permissions … there must be a better way.</p>
+<p>It has been obvious that the correct way to do this all is to provide a tor equivalent alternate channel. Effecting that has just been a whole 'nuther story.</p>
+<p>Seems like dante provided ‘socksify application’ is the next possibility to check out. (See: dearth of udp capable socks5 functionality.)</p>
+<p>Which will have to be on ws, and leaves me puzzled as to how to ferret out such on gw to mangle appropriately. Seems like dante will need to run on both, and be transparent on one or the other. (Which should allow a dst=1080 redir 9050 alternate to the already in place whonix equivalent.)</p>
+<p>Don’t know of such a relay, but if found, perhaps ip forwarding could then be turned off.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/26">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/26</link>
+        <pubDate>Thu, 11 Feb 2016 08:11:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-26</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>ip forwarding is not enabled because for the current Whonix design it’s<br>
+not required at all. If you need it for your setup however is a<br>
+different question. If you find a way to make a non-Whonix<br>
+VPN-Workstation work behind a non-Whonix VPN-Gateway however that would<br>
+be good. However, not a blocker.</p>
+<p>whonixcheck is the least of your worries. It can easily be configured to<br>
+skip certain tests. See its config file. Such a config snippet could be<br>
+easily deployed as part of an optional package.</p>
+<p>JonDonym does not have a Trans- or DnsPort and yet you can use JondoNym<br>
+with transparent proxying. See:<br>
+<a href="https://anonymous-proxy-servers.net/en/help/transocks.html">https://anonymous-proxy-servers.net/en/help/transocks.html</a></p>
+<p>Is there some software to interface with a VPN server through a socks or<br>
+http proxy port interface? I.e. a software opening a local socks proxy<br>
+port, accepting connections there and then creating a connection to the<br>
+VPN server. If the gateway would just provide other socks ports that<br>
+result in different network paths that would seem like a better design.</p>
+<p>Not exactly tun2socks or redsocks. (But good to know something like this<br>
+exists.)</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/25">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/25</link>
+        <pubDate>Tue, 09 Feb 2016 21:15:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-25</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>Interesting, all. Thank you!</p>
+<p>Seems tinyproxy is http/s only, no udp. But demonstrates a viable path of the concept.</p>
+<p>Have also come across ‘stone’ (socat light?) <a href="http://manpages.ubuntu.com/manpages/dapper/man1/stone.1.html" rel="nofollow noopener">http://manpages.ubuntu.com/manpages/dapper/man1/stone.1.html</a> which is also in the repos. “p stone  - TCP/IP packet repeater in the application layer” Came across it while googling upd proxy (or something), which is to say, apparently udp capable.</p>
+<p>I’m getting the sense that something ‘invasive’ (additional package/sw) on the gw is unavoidable. Drats. (i.e. Wanting to preserve all the goodness that has gone into gw design.) It is also feeling perhaps not unreasonable to enable forwarding - the iptables rules currently present seem rather nicely tight. However … it was not enabled for a reason, and I’d not like to casually break it that way. whonixcheck will evidently whine, at the least. (Not inappropriately so, just that such will alarm most users.)</p>
+<p>It has occurred to me to vpn on the ws itself, however all such traffic will be torified, and the point of the thread is to be a good tor citizen and not torrent over tor.</p>
+<p>It’s also occurred to me that udp ain’t gonna work noway, nohow. Any gw mechanism will need to nat the traffic, and so probably won’t know where to send any incoming responses. i.e. Only full on forwarding is going to do it, and that’s turned off. Which takes me back to enabling forwarding, in a similarly rigorous manner to what is already present.</p>
+<p>None of this seems optimal. Perplexing. From a majority of users perspective, it seems like it oughta be easier / there oughta be a way. That it isn’t isn’t a deficiency of whonix, merely, it is what it is.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/24">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/24</link>
+        <pubDate>Wed, 03 Feb 2016 18:36:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-24</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>The Qubes Updates Proxy implementation uses interception for magic IP addresses. Qubes TemplateVMs upgrade through their ProxyVM. In case of let’s say a Debian template, the ProxyVM usually is sys-firewall and in case of whonix-gw template the ProxyVM is usually sys-whonix. So the firewall rules of sys-firewall and sys-whonix intercept traffic for <code>10.137.255.154</code> and redirect it to <code>tinyproxy</code>. On sys-whonix, <code>tinyproxy</code> runs as user <code>tinyproxy</code> and that user’s traffic is redirected to to Tor’s TransPort / DnsPort.</p>
+<ul>
+<li><a href="https://www.qubes-os.org/doc/software-update-vm/#tocAnchor-1-1-7">https://www.qubes-os.org/doc/software-update-vm/#tocAnchor-1-1-7</a></li>
+<li><a href="https://github.com/Whonix/whonix-gw-firewall/blob/f0d7020b6d3511d781cb072b88d5a28b6657c5b9/usr/bin/whonix_firewall#L283-L289">https://github.com/Whonix/whonix-gw-firewall/blob/f0d7020b6d3511d781cb072b88d5a28b6657c5b9/usr/bin/whonix_firewall#L283-L289</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/23</link>
+        <pubDate>Wed, 03 Feb 2016 11:32:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-23</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Related [a “connect to other anonymity network than Tor directly” modification for Whonix-Gateway], FYI:</p>
+<p>killyourtv managed to set up an <a href="https://www.whonix.org/wiki/Dev/Inspiration#I2PBOX">I2PBOX</a>. I.e. installing I2P<br>
+on the gateway and accessing it from the workstation. So users would be<br>
+using I2P directly rather than tunneling I2P through Tor.</p>
+<p>I2PBOX - user -&gt; i2p -&gt; destination</p>
+<p>[ without i2p over Tor (user -&gt; Tor -&gt; i2p -&gt; destination) ]</p>
+<ul>
+<li><a href="https://www.whonix.org/pipermail/whonix-devel/2016-January/000501.html">https://www.whonix.org/pipermail/whonix-devel/2016-January/000501.html</a></li>
+<li><a href="http://killyourtv.i2p/howtos/whonix/">http://killyourtv.i2p/howtos/whonix/</a></li>
+<li><a href="http://killyourtv.i2p.re/howtos/whonix/">http://killyourtv.i2p.re/howtos/whonix/</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/22</link>
+        <pubDate>Wed, 03 Feb 2016 11:23:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-22</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <p>Haven’t lost sight of this, but been sidetracked for a while.</p>
+<p>Notes to date:</p>
+<ul>
+<li>qbittorrent has socks5 settings but they don’t work. They do with ktorrent. At least for my vpn provider. Tested on a  kubuntu 14.04 vm, going out via default gw to an openwrt with openvpn connection.</li>
+<li>have seen note that despite socks5 setting, ktorrent does not use it for udp.</li>
+<li>
+<ul>
+<li>this seems born out by netstat / wireshark. I see udp trying to go out directly, not via socks5. (Which seems bizarre, as the whole point of wanting socks5 is to tunnel udp, not just tcp.)</li>
+</ul>
+</li>
+<li>curiously, I see no udp traffic reach gw for forwarding (*). Socks5 encapsulates udp within tcp?</li>
+</ul>
+<p>'* I very much do not want to enable forwarding on gw, seems much the whole point / safeguard of whonix, having forwarding off.</p>
+<p>Puzzled as to how best to proxy / forward these ‘excepted’ packets, though. rinet, socat, dante, mod_proxy, or squid, seem to be candidates, but it seems prudent to be the least whonix invasive possible.</p>
+<p>e.g. It feels like a socks5 proxy on gw, since vpn is set up there / whonix is ‘invaded’ anyways, seems appropriate, but seems problematic to corral / identify which ws traffic so qualifies. i.e. with a known src/dst ip and dst port, candidate traffic is qualified. Without such, no way for gw to know which to treat regularly and which to except.</p>
+<p>A model seems to be to watch the 9050 treatment, where I guess tor is tracking and doing the de/nat’ting, but not sure rinet has such capabilities.</p>
+<p>Thoughts welcome.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/21</link>
+        <pubDate>Wed, 03 Feb 2016 01:42:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-21</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="18" data-topic="1766">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>I was just thinking ahead.</p>
+<p>Yes, because from there, with (1)… That means, once (1) is implemented… A VPN-only gateway for everything as opposed to selective would not be far away in development.</p>
+<p>Nevermind that. It’s not important for implementing this proposal.</p>
+</blockquote>
+</aside>
+<p>Ah! No, please do think ahead - it’s part of why I asked for comment.</p>
+<p>I take your point, I think - if an interface, then all sorts of interoperability and flexibility comes along for the ride. e.g. Suppose VPNBOX were indeed another vm (connected by interface) - then it’s all routing. All -gateway needs to know is ‘this traffic’ ‘that way’. Conversely ‘from here’, let it go out clearnet. What the VPNBOX does internally is its business - complexity stays out of whonix.</p>
+<p>Easy to add functionality / network capability, easy to remove, easy to constrain, and thus easy to prove ( security / isolation /whatever ).</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/20</link>
+        <pubDate>Fri, 18 Dec 2015 13:36:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-20</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+      <item>
+        <title>whonix, torrents, and being a good tor citizen</title>
+        <dc:creator><![CDATA[rAntOCauDgb]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="17" data-topic="1766">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>App can be set to only use the designated interface - here, tun0.</p>
+<p>How can you configure an app to use a specific interface? Is this like configuring proxy settings? Very few applications support this, right?</p>
+</blockquote>
+</aside>
+<p>Yes. Set same place as proxy settings.</p>
+<p>apt-get install ktorrent - settings / configure ktorrent / network / network interface - all | lo | eth0</p>
+<p>apt-get install qbittorrent - tools / options / advanced / network interface (requires restart) - any interface | eth0</p>
+<p>Can’t say I see such all that often. Also can’t remember to be able to say where all I do see it. Idea does make some sense, for many things, I suppose.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766/19</link>
+        <pubDate>Fri, 18 Dec 2015 13:29:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1766-19</guid>
+        <source url="http://forums.whonix.org/t/whonix-torrents-and-being-a-good-tor-citizen/1766.rss">whonix, torrents, and being a good tor citizen</source>
+      </item>
+  </channel>
+</rss>

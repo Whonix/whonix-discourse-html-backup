@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</title>
+    <link>http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083</link>
+    <description>Using a setup very similar to Whonix, a VM tor middlebox only has access to the internet using a USB device.  Thus the middlebox retains exclusive access to the USB device and also has a compiled driver.  The Host does not have the USB device driver nor anything else that would permit it to connect to the internet.  
+
+A second VM runs the Tor Browser (or other tor software as required).  
+
+A private virtual network (no gateway, no dhcp) connects the desired online VMs and they cannot communicate with the host nor the clear internet except using the tor socks proxy via the middlebox.  
+
+The problem is that tor cannot chain through tor except as a bridge, and when doing so as a bridge, the effective tor circuit length is reduced from three to two nodes because one of the hops is virtual within the same computer between the two VMs.
+
+The other option is to expose a socks proxy on the middlebox that gives access to the clear internet.  Thus the Tor Browser or other private VMs with tor can make a full three node tor circuit.  Obviously, the opening to the clear internet is a huge weakness.
+
+Ideally, the only way out of the private network should be via the tor on the middlebox.  We could call it a &quot;Tor Bridge Middlebox&quot;.
+
+The third way is to hack tor-over-tor or compile the tor code with a change for a four node circuit.  Tor-over-tor is not recommended since it would end up being a 5 node circuit which is shown to be worse than 3.  Another hack would be tor-over-tor and faking two additional hops on the virtual private network to get a final 3 real node tor circuit, which would be wasteful.
+
+I haven&#39;t found anything related to this yet, except for tor project proposals for &quot;Bridge Guards&quot; in the context of &quot;Bridge Enumeration&quot;, thus I feel that the Whonix project would be best placed to understand the importance of such a setup.
+
+Has there been any discussion of this yet?  Any solutions that I missed?  (eg corridor is not).  I have this all working except I am stuck with either sock5 clearnet proxy on the middlebox or a two-node tor circuit.
+
+I have also posted issue 40093 on the Tor Project for this, please refer to it for more tor specific details.  This Whonix current issue has more VM specific information.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 23 Aug 2020 13:06:41 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</title>
+        <dc:creator><![CDATA[tubby-tor]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> Additionally, you are correct in your previous response that the above design I proposed of the “Tor Bridge Middlebox” could give the isolated VM the identifying IP address since the isolated VM would know all the IP addresses of all the nodes in the circuit, including the bridge out.  Thus, the “Tor Bridge Middlebox” clearnet IP would have to be hidden, only providing the internal network IP to the requesting tor client in the isolated VM.  As you mention, this further complicates the tor software and would have very low usage and thus is high risk for software bugs and unforeseen consequences and risks.</p>
+<p>Thus, the only option I see remaining is tor-over-tor.  I would like to make a precision to tor-over-tor that I haven’t seen elsewhere.</p>
+<p>There are two general types of tor-over-tor.</p>
+<p>More specifically a tor-to-tor, which is of course very dangerous because the true traffic would come out of the first three-hop tor circuit through a tor exit node to then go back into the tor network trough another server (possibly controlled or related to the origin, or even worse, the originating computer) to then be sent over the tor network again.</p>
+<p>The second is a tor-wrapped-tor (or tor-in-tor) where the second three node tor circuit is going through the first three node tor circuit.  Thus, the first exit node only sees a connection back to the tor network and the contents seen by the first exit node is triple encrypted by the second tor circuit.</p>
+<p>If the assumption is that the isolated VM could be compromised, then origin based correlation attacks would already be possible, thus I don’t see how a tor-wrapped-tor would increase any risks. But I will have to further think about this and test it.</p>
+<p>Thank you <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> and <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a> for your insightful responses.</p>
+          <p><a href="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/11</link>
+        <pubDate>Sun, 23 Aug 2020 13:06:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10083-11</guid>
+        <source url="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083.rss">Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</source>
+      </item>
+      <item>
+        <title>Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="tubby-tor" data-post="9" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/9de0a6/40.png" class="avatar"> tubby-tor:</div>
+<blockquote>
+<p>Are there any discussion within Whonix somewhere in that direction?</p>
+</blockquote>
+</aside>
+<p>None.</p>
+          <p><a href="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/10</link>
+        <pubDate>Sun, 23 Aug 2020 04:46:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10083-10</guid>
+        <source url="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083.rss">Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</source>
+      </item>
+      <item>
+        <title>Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</title>
+        <dc:creator><![CDATA[tubby-tor]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> Thank you for those answers.   I completely agree, the strongest and key point is that more isolation (virutal, physical, etc) can protect against more risks.  That was missing from my previous discussions and it is always the best way to increase protection.</p>
+<p>What still bugs me is that even though tor always has to assume that everything is hostile, we can’t take advantage of that within private networks (Physical LAN or VM).  We even have to reduce functionalities such as dropping view circuit and NEWNYM from the Tor Browser.</p>
+<p>Additionally, I am still stuck if I want to sandbox a working tor.  Maybe the only final way will be tor-over-tor with additional mitigating functionalities against the tor-over-tor risks?</p>
+<p>For example (just one example), if I want to run a full standard Tor Browser, but sandbox it properly (even assuming as far as physical hardware), if it is doing tor-over-tor, all it knows is the exit node IP of the underlying cuircuit.  What remains is to obfuscate the first underlying tor circuit communications so that the second one can’t be correlated with the first one, even if the second circuit goes over one or more same nodes as the first.  Are there any discussion within Whonix somewhere in that direction?  or anything related to sandboxing a working tor by any other method within the Whonix landscape?</p>
+          <p><a href="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/9</link>
+        <pubDate>Fri, 21 Aug 2020 16:55:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10083-9</guid>
+        <source url="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083.rss">Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</source>
+      </item>
+      <item>
+        <title>Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group quote-modified" data-username="tubby-tor" data-post="7" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/9de0a6/40.png" class="avatar"> tubby-tor:</div>
+<blockquote>
+<aside class="quote no-group" data-username="Patrick" data-post="6" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Did you actually use Qubes-Whonix before</p>
+</blockquote>
+</aside>
+<p>My current discussion is in the context of a Whonix-KVM environment</p>
+</blockquote>
+</aside>
+<p>Then Example 1 is not applicable</p>
+<aside class="quote no-group" data-username="tubby-tor" data-post="7" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/9de0a6/40.png" class="avatar"> tubby-tor:</div>
+<blockquote>
+<p>For example, the Whonix-Gateway Anon Connection Wizard happily connected to my own tor socks5</p>
+</blockquote>
+</aside>
+<p>I see. Well, there’s a lot ways inventive users can do things recommended against. If users get such ideas I don’t think it’s worth complicating Whonix setup to prevent them from doing that. Certainly not something recommended in Whonix documentation or happening by accident.</p>
+<aside class="quote no-group" data-username="tubby-tor" data-post="7" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/9de0a6/40.png" class="avatar"> tubby-tor:</div>
+<blockquote>
+<p>which I thought Whonix protected against</p>
+</blockquote>
+</aside>
+<p>I wonder how that impression was created.</p>
+<p>Tor over Tor prevention is for applications running from inside the workstation but it’s not 100% guaranteed. (An application installed from outside Debian package sources might bundle it’s own Tor binary and run Tor on a non-standard port. That connection wouldn’t be prevented.)</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/anon-ws-disable-stacked-tor" target="_blank" title="06:10PM - 09 November 2019">Whonix – 9 Nov 19</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="20" height="20">
+
+<h3><a href="https://www.whonix.org/wiki/Dev/anon-ws-disable-stacked-tor" target="_blank">Dev/anon-ws-disable-stacked-tor - Whonix</a></h3>
+
+<p>Preventing Tor over Tor for Tor Browser, TorChat and others.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-username="tubby-tor" data-post="7" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/9de0a6/40.png" class="avatar"> tubby-tor:</div>
+<blockquote>
+<p>Additionally, I can compromise a second Whonix-Workstation sharing the same private network as another Whonix-Workstation at 10.152.152.11 and sniff it’s traffic going to the Whonix-Gateway</p>
+</blockquote>
+</aside>
+<p>A long standing issue for Non-Qubes-Whonix. Documented here:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Multiple_Whonix-Workstation" target="_blank" title="11:12AM - 19 June 2020">Whonix – 19 Jun 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:110/73;"><img src="https://www.whonix.org/w/images/0/01/Petunia-14052640.jpg" class="thumbnail" width="110" height="73"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Multiple_Whonix-Workstation" target="_blank">Multiple Whonix-Workstation ™</a></h3>
+
+<p>Compartmentalization. Better separation of different tasks and/or pseudonyms by using multiple Whonix-Workstation ™.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Connections_between_Whonix-Gateway_and_Whonix-Workstation" target="_blank" title="01:11AM - 20 June 2020">Whonix – 20 Jun 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:110/78;"><img src="https://www.whonix.org/w/images/9/95/Binary-503583640.jpg" class="thumbnail" width="110" height="78"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Connections_between_Whonix-Gateway_and_Whonix-Workstation" target="_blank">Connections between Whonix-Gateway ™ and Whonix-Workstation ™</a></h3>
+
+<p>Authenticated / Encrypted Connections between Whonix-Gateway ™ and Whonix-Workstation ™, ARP spoofing defense, SSH, OpenVPN, Using additional (isolated) network interfaces</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-username="tubby-tor" data-post="7" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/9de0a6/40.png" class="avatar"> tubby-tor:</div>
+<blockquote>
+<p>If we had tor on Whonix-Workstation 10.152.152.11 using the Whonix-Gateway 10.152.152.10 as a tor bridge out (see my previous posts) and tor built a three hop circuit starting from Whonix-Gateway 10.152.152.10</p>
+</blockquote>
+</aside>
+<p>Qubes and Qubes-Whonix do that. Each workstation VM is connected through it’s own <code>vif+</code> network. That would be nice to have but I wouldn’t know how to implement this due to virtualizer limitations. It would have to be scripted on the host. I.e. Whonix-Host first. Basically re-inventing Qubes.</p>
+<aside class="quote no-group" data-username="tubby-tor" data-post="7" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/9de0a6/40.png" class="avatar"> tubby-tor:</div>
+<blockquote>
+<p>Continuing from point 6, we could make the Tor Browser’s tor use the Whonix-Gateway tor as a bridge out.</p>
+</blockquote>
+</aside>
+<p>I don’t think it’s realistic / a good approach to fiddle with the application level (modify Tor). These known issues are network level issues and have to be fixed there.</p>
+<p>Let’s suppose Tor was running as of nowadays inside VM1, have to go through VM2 where corridor is running: That would still not survive VM1 compromise due to Tor’s ability to figure out it’s own real, external IP address through Tor control protocol command <code>getinfo address</code>.</p>
+          <p><a href="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/8</link>
+        <pubDate>Wed, 19 Aug 2020 07:50:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10083-8</guid>
+        <source url="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083.rss">Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</source>
+      </item>
+      <item>
+        <title>Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</title>
+        <dc:creator><![CDATA[tubby-tor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="6" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Did you actually use Qubes-Whonix before</p>
+</blockquote>
+</aside>
+<p>My current discussion is in the context of a Whonix-KVM environment that I am running sandboxed within my own environment to let me play with and break Whonix, in particular with respects to the tor setup.  For example, the Whonix-Gateway Anon Connection Wizard happily connected to my own tor socks5 proxy and thus the Whonix-Worstation Tor Browser was running in a tor-over-tor which I thought Whonix protected against (no problem, I am just playing).  Additionally, I can compromise a second Whonix-Workstation sharing the same private network as another Whonix-Workstation at 10.152.152.11 and sniff it’s traffic going to the Whonix-Gateway 10.152.152.10:9050 socks5 proxy because socks5 is not encrypted, thus the VM isolation is compromised and internet and tor usage can be exposed.   These are actually the types of compromises that I am trying to find better solutions for.  Eg: a VM gets compromised and starts probing the Whonix-Internal, sniffs network traffic, scans for socks5 addresses/ports, find clearnet exits (socks or other), find tor exits (socks or other), find tor control ports, or find other VM holes to bridge out of it’s VM cage, etc…</p>
+<p>Yes, Whonix can do anything and there are ways customize the setup to avoid this, but at the same time any distro can do anything with enough work.</p>
+<p>Whonix is very good, probably the best packaged distro for security, but there are always ways to improve things.  All of my points just above and in the previous posts are simply to try to communicate an interesting future path to leverage tor for Whonix and other similar setups.</p>
+<p>If we had tor on Whonix-Workstation 10.152.152.11 using the Whonix-Gateway 10.152.152.10 as a tor bridge out (see my previous posts) and tor built a three hop circuit starting from Whonix-Gateway 10.152.152.10 (assuming it goes out to clearnet), it becomes a better solution (eg. not sniffable, further Whonix-Gateway lockdown, isolating tor configuration )</p>
+<p>If this still doesn’t make sense, maybe this deduction will help:</p>
+<ol>
+<li>NEWNYM (new circuit) requires a tor control port</li>
+<li>It is not safe to expose a tor control port beyond the localhost</li>
+<li>The standard Tor Browser includes a new “New Tor Circuit for this Site” which requires a control port</li>
+<li>Because of point 2, Whonix-Workstation Tor Browser does not have a “New Tor Circuit for this Site” (point 3), it must be done on the Whonix-Gateway</li>
+<li>The Whonix-Workstation Tor Browser connects to the Whonix-Gateway using socks5 not-encrypted (problem, but fixable)</li>
+<li>If we want to use a standard Tor Browser in a Whonix-Workstation so that we can “New Tor Circuit for this Site” and to have everything tor encrypted before leaving the localhost, the Whonix-Workstation needs clearnet access for tor (not safe).  That is why Whonix does NOT have the standard Tor Browser.</li>
+<li>Continuing from point 6, we could make the Tor Browser’s tor use the Whonix-Gateway tor as a bridge out.   But Whonix does not because it would reduce the effective circuit hops to 2 instead of 3.</li>
+</ol>
+<p>Thus, of course, considering the current state of tor and available options provided by tor, the current Whonix setup is very good.  But it doesn’t mean that it could not be improved.  And the examples I am using are very specific with the hopes that it is a bit simpler and clearer, but the actual useful of such an approach is much larger.</p>
+<p>And, sorry in advance if none of this seems useful to Whonix, I will simply close the issue if there is no interest.</p>
+          <p><a href="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/7</link>
+        <pubDate>Wed, 19 Aug 2020 06:25:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10083-7</guid>
+        <source url="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083.rss">Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</source>
+      </item>
+      <item>
+        <title>Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>tubby-tor via Whonix Forum:</p>
+<blockquote>
+<p>Example 1: The Whonix warning about Tor Browser:<br>
+Ref: “Do not start Tor Browser in the <code>whonix-ws</code> TemplateVM or <code>whonix-ws-dvm</code> DisposableVM-TemplateVM! It is unexpected behavior and dangerous.”  " connections are established if Tor Browser is started in a DVM Template – this risks a compromise of the template and all DisposableVMs based upon it."<br>
+<a href="http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Tor_Browser/Advanced_Users#tor-launcher">http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Tor_Browser/Advanced_Users#tor-launcher</a><br>
+Ideally, the Whonix design should make this situation impossible and the design I proposed above protects against this.</p>
+</blockquote>
+<p>Seems like mixing different issues. Did you actually use Qubes-Whonix<br>
+before? That’s a usability issue. It’s already “impossible” unless user<br>
+manually overrides which can’t be by accident and would be a concision<br>
+decision and outside threat model.</p>
+<blockquote>
+<p>Example 3: Clearnet access.<br>
+In Whonix, both the Host and the Whonix-Gateway have clearnet access, however, it would be even better if only the Whonix-Gateway had clearnet access.  The Host could be offline and the Whonix-Gateway would be the only way out.</p>
+</blockquote>
+<p>That would be Whonix-Host.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Whonix-Host" target="_blank" title="09:34AM - 13 August 2020">Whonix – 13 Aug 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/426;"><img src="https://www.whonix.org/w/images/4/44/Whonixonly.jpg" class="thumbnail" width="640" height="426"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Whonix-Host" target="_blank">Whonix-Host Operating System Live ISO, Whonix-Host Installer</a></h3>
+
+<p>Upcoming Host Operating System (In Development)</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>
+<p>This of course means that there cannot be “Multiple Whonix-Gateway”</p>
+</blockquote>
+<p>Not necessarily. I just need a way to find on Whonix-Host to allow<br>
+network access to VM of type Whonix-Gateway and nothing else.</p>
+<blockquote>
+<p>Example 4: Whonix-Gateway configuration and torrc.<br>
+The current Whonix-Gateway setup and torrc has alot of settings and many are hardcoded and limited.</p>
+</blockquote>
+<p>Hardcoded torrc settings? No. You’re free to change any torrc settings.</p>
+<p>Either directly if you must due to technical limitation which would be a<br>
+bit non-ideal or by using a drop-in. For details on that see:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Configuration_Files" target="_blank" title="11:42PM - 19 June 2020">Whonix – 19 Jun 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/426;"><img src="https://www.whonix.org/w/images/3/3b/Five-elements-379106640.jpg" class="thumbnail" width="640" height="426"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Configuration_Files" target="_blank">Configuration Files - Whonix</a></h3>
+
+<p>Everything you should know about Configuration Drop-in Folders and Files.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Limited by what?</p>
+<blockquote>
+<p>I am certain that many members of the Whonix project have more than enough understanding of VMs and Tor to understand what I a proposing.</p>
+</blockquote>
+<p>No, I actually cannot follow much.</p>
+          <p><a href="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/6</link>
+        <pubDate>Tue, 18 Aug 2020 17:49:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10083-6</guid>
+        <source url="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083.rss">Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</source>
+      </item>
+      <item>
+        <title>Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</title>
+        <dc:creator><![CDATA[tubby-tor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="4" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Whonix does support connecting to bridges if that’s what you mean.</p>
+</blockquote>
+</aside>
+<aside class="quote no-group quote-modified" data-username="HulaHoop" data-post="4" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Hosting a bridge of any type would need…</p>
+</blockquote>
+</aside>
+<p>Unfortunately that is not what I mean.   This has nothing to do with Tor Bridges as they are commonly used at the moment.  The “Tor Bridge Middlebox” would only be a bridge OUT of the Whonix Internal Network (Hence the term MIDDLEBOX), however, I will further avoid the term Bridge to avoid confusion.   As previously mentioned, this is not about adding features to Whonix nor to make it more complicated, nor to support new scenarios, but to simplify and harden it within the context of what it already provides.   The actual tor feature required does not yet exist in the tor project and has yet to be developed by the tor project, but it would be a huge benefit for Whonix in particular, that is why I feel it is important that the Whonix project understand it and possibly add weight and justification to it being developed.</p>
+<p>I will try to explain from a different angle:</p>
+<p>Example 1: The Whonix warning about Tor Browser:<br>
+Ref: “Do not start Tor Browser in the <code>whonix-ws</code> TemplateVM or <code>whonix-ws-dvm</code> DisposableVM-TemplateVM! It is unexpected behavior and dangerous.”  " connections are established if Tor Browser is started in a DVM Template – this risks a compromise of the template and all DisposableVMs based upon it."<br>
+<a href="http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Tor_Browser/Advanced_Users#tor-launcher" class="onebox" target="_blank" rel="nofollow noopener">http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Tor_Browser/Advanced_Users#tor-launcher</a><br>
+Ideally, the Whonix design should make this situation impossible and the design I proposed above protects against this.</p>
+<p>Example 2: Multiple Whonix-Gateway<br>
+Multiple Whonix-Gateway are just a workaround and a symptom of the more general problem I am proposing to address.  Any single or multiple tor instances on the same IP and same ISP are essentially the same in terms tracking and identification.  Within the complete tor framework, there is no real reason to have multiple tor Whonix-Gateways at the same location.<br>
+<a href="http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Multiple_Whonix-Gateway" class="onebox" target="_blank" rel="nofollow noopener">http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Multiple_Whonix-Gateway</a></p>
+<p>Example 3: Clearnet access.<br>
+In Whonix, both the Host and the Whonix-Gateway have clearnet access, however, it would be even better if only the Whonix-Gateway had clearnet access.  The Host could be offline and the Whonix-Gateway would be the only way out.  This of course means that there cannot be “Multiple Whonix-Gateway” (Example 2 above.  Exception being multiple network hardware), but multiple Whonix VMs could have their own tor running (own /etc/tor/torrc) which would hop through the single and only Whonix-Gateway out using the existing tor architechture.<br>
+Ref: “All Whonix-Gateway ™ and Whonix-Workstation ™ traffic is tunneled through Tor. Host traffic [[95]]uses clearnet”<br>
+<a href="http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Comparison_with_Others" class="onebox" target="_blank" rel="nofollow noopener">http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Comparison_with_Others</a></p>
+<p>Example 4: Whonix-Gateway configuration and torrc.<br>
+The current Whonix-Gateway setup and torrc has alot of settings and many are hardcoded and limited.  What I am proposing  would permit the Whonix-Gateway to be much simpler, more flexible and hardened.<br>
+</p><aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/torrc.d/65_gateway.conf" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/torrc.d/65_gateway.conf" target="_blank" rel="nofollow noopener">Whonix/anon-gw-anonymizer-config/blob/master/etc/torrc.d/65_gateway.conf</a></h4>
+<pre><code class="lang-conf">## Do not edit this file!
+## Please create and add modifications to the following file instead:
+## /usr/local/etc/torrc.d/50_user.conf
+
+## Copyright (C) 2012 - 2020 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+## Please use "/usr/local/etc/torrc.d/50_user.conf" for your custom
+## configuration, which will override the defaults found here.
+## When this package is updated, this file may be overwritten.
+
+###################################
+# Authenticated Onion v3 Services #
+###################################
+
+## anon-gw-anonymizer-config.service /
+## /usr/lib/anon-gw-anonymizer-config/make-sure-torrc-exist
+## creates folder /var/lib/tor/authdir
+ClientOnionAuthDir /var/lib/tor/authdir
+
+</code></pre>
+
+  This file has been truncated. <a href="https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/torrc.d/65_gateway.conf" target="_blank" rel="nofollow noopener">show original</a>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>I am certain that many members of the Whonix project have more than enough understanding of VMs and Tor to understand what I a proposing.  It just that I have to find the best ways to communicate it to avoid confusion with existing terms and scenarios.</p>
+          <p><a href="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/5</link>
+        <pubDate>Tue, 18 Aug 2020 13:45:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10083-5</guid>
+        <source url="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083.rss">Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</source>
+      </item>
+      <item>
+        <title>Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="tubby-tor" data-post="3" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/9de0a6/40.png" class="avatar"> tubby-tor:</div>
+<blockquote>
+<p>The objective was that since Whonix uses a middlebox with tor and it attempts to protect against various identification attacks, it would greatly benefit from a tor Bridge Guard functionality (does not yet exist).</p>
+</blockquote>
+</aside>
+<p>Whonix does support connecting to bridges if that’s what you mean.</p>
+<p>As for configuring Whonix to host a bridge itself that is a different topic and more complex. It’s not as simple as just switching on bridge hosting and hen having your traffic mixed in with others’, We asked about it before:</p>
+<p>[1]</p>
+<blockquote>
+<ol start="3">
+<li>We’d like to clarify that we suspect this defense to be the helpful,<br>
+but it has not yet been conclusively shown to be so, and likely may not<br>
+be in DPI’d bridge and/or low-traffic situations. In fact, after some<br>
+discussion, we suspect that in most cases, other PT’s bridge traffic will<br>
+also be posible to remove from consideration, in ways beyond the simple<br>
+connection matching above. To really have a chance of other traffic<br>
+providing cover, client traffic needs to be mixed with concurrent<br>
+relayed Tor relay traffic, which may require a relatively high speed<br>
+main network relay to happen frequently enough to help.</li>
+</ol>
+</blockquote>
+<p>Hosting a bridge of any type would need port forwarding  which isn’t easily done for VM connections since the GW is behind NAT.</p>
+<p>If you can find and point to a good set of documentation for it and find the info needed for KVM VM port forwarding then we can add this is an advanced guide to the wiki (assuming you tried it successfully first).</p>
+<p>Related info:</p>
+<p>[1] <a href="https://lists.torproject.org/pipermail/tor-dev/2020-January/014127.html">https://lists.torproject.org/pipermail/tor-dev/2020-January/014127.html</a></p>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> I want to add this reference and related commentary to the wiki. Where can I discuss relays/bridges for cover traffic?</p>
+          <p><a href="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/4</link>
+        <pubDate>Fri, 14 Aug 2020 12:20:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10083-4</guid>
+        <source url="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083.rss">Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</source>
+      </item>
+      <item>
+        <title>Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</title>
+        <dc:creator><![CDATA[tubby-tor]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you for your response <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a>, however, maybe I put too much context.  I am not looking for support or inclusion of the exact VM setup into Whonix.</p>
+<p>The objective was that since Whonix uses a middlebox with tor and it attempts to protect against various identification attacks, it would greatly benefit from a tor Bridge Guard functionality (does not yet exist).</p>
+<p>The most concrete example is the current Whonix Tor Browser design.  Is it very complex and certainly alot of work to maintain.  If tor supported Bridge Guards, then Whonix could simply run the standard Tor Browser in a VM and set it to connect to the Whonix Gateway tor in bridge mode.</p>
+<p>In Whonix Gateway:</p>
+<pre><code class="lang-auto">/etc/tor/torrc
+...
+ORPort 10.0.2.15:8050
+BridgeRelay 1
+PublishServerDescriptor 0
+BridgeRecordUsageByCountry 0
+BridgeDistribution none
+AssumeReachable 1
+Exitpolicy reject *:*
+ExitRelay 0
+...
+</code></pre>
+<p>In Tor Browser Whonix Workstation (path just for example):</p>
+<pre><code class="lang-auto">.../tor-browser/Browser/TorBrowser/Data/Tor/torrc
+...
+Bridge 10.0.2.15:8050
+UseBridges 1
+...
+</code></pre>
+<p>That is just one example and would save the Whonix project alot of work, time and maintenance over the long term.  The problem at the moment, as I described in my issue, is that such a setup results in effectively only a two node tor circuit since one of the nodes is within the Whonix landscape since tor currently does not support any type of Bridge Guard nor other mechanism that determines that nodes of a circuit are virtual/internal/dummy.</p>
+<p>Even further than that, tor support for Bridge Guards would permit Whonix to significantly harden it’s network landscape by closing off absolutely all access to the clearnet except through the tor on Whonix Gateway.</p>
+<p>The only paths out of the Whonix environment would be:<br>
+Tor Bridge Mode at: <code>10.0.2.15:8050</code><br>
+Tor Socks5 at: <code>10.0.2.15:9050</code></p>
+<p>An additional advantage is that each tor instance bridging though the Whonix Gateway could now have it’s own tor settings.  Maybe one VM with Tor Browser only exits through a specific country, maybe other opens the control port for specific use.</p>
+<p>Derived from the above, another advantage is that the Whonix Gateway tor could now be forbidden to expose a Control Port and only only tor instances bridging out through the Whonix Gateway tor would expose a control port only within the specific VM of interest.  Thus all higher risk tor settings would be isolated to specific VMs and would not affect the Whonix Gateway, nor any other VM nor the Host.</p>
+          <p><a href="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/3</link>
+        <pubDate>Fri, 14 Aug 2020 00:51:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10083-3</guid>
+        <source url="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083.rss">Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</source>
+      </item>
+      <item>
+        <title>Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="tubby-tor" data-post="1" data-topic="10083">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/9de0a6/40.png" class="avatar"> tubby-tor:</div>
+<blockquote>
+<p>Using a setup very similar to Whonix, a VM tor middlebox only has access to the internet using a USB device. Thus the middlebox retains exclusive access to the USB device and also has a compiled driver. The Host does not have the USB device driver nor anything else that would permit it to connect to the internet.</p>
+</blockquote>
+</aside>
+<p>Whonix can be built for the RPi so it is a matter of rolling it up and doing custom setups you describe though it is unlikely we have the time or resources to maintain them unless there is a paid support request.</p>
+          <p><a href="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/2</link>
+        <pubDate>Tue, 11 Aug 2020 19:17:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10083-2</guid>
+        <source url="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083.rss">Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</source>
+      </item>
+      <item>
+        <title>Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</title>
+        <dc:creator><![CDATA[tubby-tor]]></dc:creator>
+        <description><![CDATA[
+            <p>Using a setup very similar to Whonix, a VM tor middlebox only has access to the internet using a USB device.  Thus the middlebox retains exclusive access to the USB device and also has a compiled driver.  The Host does not have the USB device driver nor anything else that would permit it to connect to the internet.</p>
+<p>A second VM runs the Tor Browser (or other tor software as required).</p>
+<p>A private virtual network (no gateway, no dhcp) connects the desired online VMs and they cannot communicate with the host nor the clear internet except using the tor socks proxy via the middlebox.</p>
+<p>The problem is that tor cannot chain through tor except as a bridge, and when doing so as a bridge, the effective tor circuit length is reduced from three to two nodes because one of the hops is virtual within the same computer between the two VMs.</p>
+<p>The other option is to expose a socks proxy on the middlebox that gives access to the clear internet.  Thus the Tor Browser or other private VMs with tor can make a full three node tor circuit.  Obviously, the opening to the clear internet is a huge weakness.</p>
+<p>Ideally, the only way out of the private network should be via the tor on the middlebox.  We could call it a “Tor Bridge Middlebox”.</p>
+<p>The third way is to hack tor-over-tor or compile the tor code with a change for a four node circuit.  Tor-over-tor is not recommended since it would end up being a 5 node circuit which is shown to be worse than 3.  Another hack would be tor-over-tor and faking two additional hops on the virtual private network to get a final 3 real node tor circuit, which would be wasteful.</p>
+<p>I haven’t found anything related to this yet, except for tor project proposals for “Bridge Guards” in the context of “Bridge Enumeration”, thus I feel that the Whonix project would be best placed to understand the importance of such a setup.</p>
+<p>Has there been any discussion of this yet?  Any solutions that I missed?  (eg corridor is not).  I have this all working except I am stuck with either sock5 clearnet proxy on the middlebox or a two-node tor circuit.</p>
+<p>I have also posted issue 40093 on the Tor Project for this, please refer to it for more tor specific details.  This Whonix current issue has more VM specific information.</p>
+          <p><a href="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083/1</link>
+        <pubDate>Mon, 10 Aug 2020 14:56:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10083-1</guid>
+        <source url="http://forums.whonix.org/t/hardened-tor-middlebox-design-tor-bridge-middlebox/10083.rss">Hardened tor middlebox design, &quot;Tor Bridge Middlebox&quot;</source>
+      </item>
+  </channel>
+</rss>

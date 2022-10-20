@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix Onion Service Load Balancing Guide</title>
+    <link>http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606</link>
+    <description>Hi,
+
+I was wondering if the Whonix team can create a tutorial or guide for load balancing a hidden service on multiple servers using Whonix. Vulnerable people like journalists are choosing Whonix to host onion services because of it&#39;s compartmentalized security design. These people try to implement the same load balancing the same techniques as on the clear net and will make mistakes which will not end well. I tried to implement load balancing using OnionBalance on Whonix but I found it very confusing and also might have introduced security vulnerabilities because there were no specific guides. A lot of people would appreciate it if this is created.
+
+Thanks.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 01 May 2022 17:23:56 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix Onion Service Load Balancing Guide</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="10" data-topic="9965">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img loading="lazy" alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/onionbalance-help/9965/10">OnionBalance help</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/support/5"><span class="badge-category-bg" style="background-color: #8C6238;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="User support for the Whonix operating system. (devs)">Support</span></a>
+  </div>
+  <blockquote>
+    On a second thought it is probably possible to combine OnionBalance with Whonix. I’ve managed to wrap my head around the upstream OnionBalance documentation. 
+Please see, try, test, leave feedback, edit if needed: 
+<a href="https://www.whonix.org/wiki/Onion_Services#OnionBalance">https://www.whonix.org/wiki/Onion_Services#OnionBalance</a> 
+It is still <a href="https://www.whonix.org/wiki/Untested">untested</a> at time of writing. Should that change, the notice will be removed from the wiki and a new post will be made here.
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606/5</link>
+        <pubDate>Sun, 01 May 2022 17:23:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12606-5</guid>
+        <source url="http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606.rss">Whonix Onion Service Load Balancing Guide</source>
+      </item>
+      <item>
+        <title>Whonix Onion Service Load Balancing Guide</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="LazyPenguin" data-post="3" data-topic="12606">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/d78d45/40.png" class="avatar"> LazyPenguin:</div>
+<blockquote>
+<p>What about having all the servers in the same location?</p>
+</blockquote>
+</aside>
+<p>Such a setup would create an unusually large amount of Tor traffic and connections to Tor relays.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606/4</link>
+        <pubDate>Fri, 29 Oct 2021 13:37:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12606-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606.rss">Whonix Onion Service Load Balancing Guide</source>
+      </item>
+      <item>
+        <title>Whonix Onion Service Load Balancing Guide</title>
+        <dc:creator><![CDATA[LazyPenguin]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi Patrick,</p>
+<p>What about having all the servers in the same location? Say for example we use OnionBalance to run the main front end instance using a Whonix gateway with it’s own workstation and  we run 2 seperate back end instances using individual Whonix gateways with their own respective workstations. The end user traffic will be redistributed in a round robin fashion to all the servers equally.</p>
+<p><strong>[1]:</strong> First the three backend instances (which are regular onion services) publish</p>
+<p>their descriptors to the Tor directory hashring.</p>
+<p><strong>[2]:</strong> Then Onionbalance fetches the descriptors of the backend instances from the hashring.</p>
+<p><strong>[3]:</strong> Onionbalance now extracts the introduction points out of the backend</p>
+<p>descriptors, and creates a new superdescriptor that includes a combination of all those introduction points. Then Onionbalance uploads the superdescriptor to the hashring.</p>
+<p><strong>[4]:</strong> Now the client, Alice, fetches the superdescriptor from the hashring</p>
+<p>by visiting the front end instance <code>dpkhemrbs3oiv2...onion</code>.</p>
+<p><strong>[5]:</strong> Alice picks an introduction point from the superdescriptor and</p>
+<p>introduces herself to it. Because the introduction points actually belong to the backend instances, Alice is actually talking to backend instance <span class="hashtag">#2</span>, effectively getting load-balanced.</p>
+<p>Doesn’t this mean we have implemented load balancing? Please refer to the onion balance website diagram for more info. I can’t add links for some reason.</p>
+<p>In this instance we don’t consider the Whonix gateway and workstation to be separate entities but as one like in Ubuntu. We perform load balancing similar to how it is implemented in like say on Ubuntu because all the changes are in the gateway none in the workstation. The only difference is that the gateway acts as the application server and the workstation acts as the database server compared to Ubuntu where both happen on the same system. A guide like the OP said would be helpful for a lot of people. This sounds easy in theory but implementation is going to be difficult.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606/3</link>
+        <pubDate>Fri, 29 Oct 2021 02:07:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12606-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606.rss">Whonix Onion Service Load Balancing Guide</source>
+      </item>
+      <item>
+        <title>Whonix Onion Service Load Balancing Guide</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>That would be great but not looking very likely because, see:<br>
+<a href="https://forums.whonix.org/t/onionbalance-help/9965/7" class="inline-onebox">OnionBalance help - #7 by Patrick</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606/2</link>
+        <pubDate>Sat, 23 Oct 2021 09:48:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12606-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606.rss">Whonix Onion Service Load Balancing Guide</source>
+      </item>
+      <item>
+        <title>Whonix Onion Service Load Balancing Guide</title>
+        <dc:creator><![CDATA[GiveAway]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi,</p>
+<p>I was wondering if the Whonix team can create a tutorial or guide for load balancing a hidden service on multiple servers using Whonix. Vulnerable people like journalists are choosing Whonix to host onion services because of it’s compartmentalized security design. These people try to implement the same load balancing the same techniques as on the clear net and will make mistakes which will not end well. I tried to implement load balancing using OnionBalance on Whonix but I found it very confusing and also might have introduced security vulnerabilities because there were no specific guides. A lot of people would appreciate it if this is created.</p>
+<p>Thanks.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606/1</link>
+        <pubDate>Wed, 20 Oct 2021 10:09:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12606-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-onion-service-load-balancing-guide/12606.rss">Whonix Onion Service Load Balancing Guide</source>
+      </item>
+  </channel>
+</rss>

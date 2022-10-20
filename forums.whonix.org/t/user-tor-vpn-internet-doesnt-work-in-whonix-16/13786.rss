@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>User &gt; Tor &gt; VPN &gt; Internet doesn&#39;t work in Whonix 16</title>
+    <link>http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786</link>
+    <description>In Whonix 15, with OpenVPN 2.4, it was easy to **Tor &gt; VPN &gt; Internet**, but since Whonix 16 (based on Debian Bullseye) has OpenVPN 2.5, iproute isn&#39;t available and lots of other changes, and as such Tor &gt; VPN &gt; Internet is not working as per documentation.
+
+I am making the changes in Whonix Workstation as per the docs.
+
+**The issues:**  
+
+**1)** In the openvpn config file iproute ( `iproute /usr/bin/ip_unpriv` ) no longer works in openvpn 2.5 and as such it throws off  
+```
+Options error: Unrecognized option or missing or extra parameter(s) in /etc/openvpn/openvpn.conf:26: iproute (2.5.1)
+Use --help for more information.
+```
+ when trying to connect. If iproute is commented out then
+
+ `ERROR: Cannot ioctl TUNSETIFF tun: Operation not permitted (errno=1)`  
+ 
+even if `dev tun0` is present in the config file.
+
+**2)** If OpenVPN is compiled with `--enable-iproute2`, then error 
+```
+RTNETLINK answers: File exists
+ERROR: Linux route add command failed: external program exited with error status: 2
+```
+**3)** If Whonix workstation Firewall is modified as per the docs i.e. 
+
+```
+WORKSTATION_FIREWALL=1
+TUNNEL_FIREWALL_ENABLE=true
+```
+then there is no internet connectivity in the workstation, even after reboot.
+
+I have verified the signatures and both the Gateway and Workstation VM are ok (uncorrupted).
+
+**System Specs:**
+Windows 7 (Host)
+Virtualbox VM ( Virtualbox Version 6.1.34)</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 24 Jun 2022 06:14:05 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>User &gt; Tor &gt; VPN &gt; Internet doesn&#39;t work in Whonix 16</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>That’s excellent progress!</p>
+<p>Using systemd and its capabilities seems the right approach.</p>
+<p>Could you please consider to <a href="https://www.whonix.org/wiki/Contribute#Documentation">Improve the Documentation / Edit the Whonix ™ Wiki</a>?</p>
+<aside class="quote no-group" data-username="nimocin" data-post="3" data-topic="13786">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/n/51bf81/40.png" class="avatar"> nimocin:</div>
+<blockquote>
+<p>I now have a binary that can be executed by any user, which I don’t really like.</p>
+</blockquote>
+</aside>
+<p>Which binary? The <code>sudo /sbin/capsh</code> command? Well, it still requires sudo. So not worsening the security model.</p>
+<aside class="quote no-group" data-username="nimocin" data-post="3" data-topic="13786">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/n/51bf81/40.png" class="avatar"> nimocin:</div>
+<blockquote>
+<p><code>ExecStartPre=/usr/bin/sudo --non-interactive</code></p>
+</blockquote>
+</aside>
+<p>I appreciate the <code>--non-interactive</code> as this makes potential issues in the future easier to debug.</p>
+<aside class="quote no-group" data-username="nimocin" data-post="3" data-topic="13786">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/n/51bf81/40.png" class="avatar"> nimocin:</div>
+<blockquote>
+<p><code>ExecStartPre=/usr/bin/sudo</code></p>
+</blockquote>
+</aside>
+<p>I don’t think systemd units should ever use sudo. <code>ExecStartPre</code> / <code>ExecStartPost</code> can if desired run as root while <code>ExecStart</code> does not and runs as a limited user.</p>
+<ul>
+<li>That is systemd config under <code>[Service]</code>:
+<ul>
+<li>
+<blockquote>
+<p><code>PermissionsStartOnly=true</code></p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>An alternative to this is:
+<ul>
+<li>
+<blockquote>
+<p><code>ExecStartPre=+</code></p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p><code>ExecStartPost=+</code></p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786/4</link>
+        <pubDate>Fri, 24 Jun 2022 06:14:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13786-4</guid>
+        <source url="http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786.rss">User &gt; Tor &gt; VPN &gt; Internet doesn&#39;t work in Whonix 16</source>
+      </item>
+      <item>
+        <title>User &gt; Tor &gt; VPN &gt; Internet doesn&#39;t work in Whonix 16</title>
+        <dc:creator><![CDATA[nimocin]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a></p>
+<p>The discussions on the iproute issue in these two threads:</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://bugs.archlinux.org/task/68480">
+  <header class="source">
+      <img src="https://bugs.archlinux.org/themes/ArchLinux/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://bugs.archlinux.org/task/68480" target="_blank" rel="noopener nofollow ugc">bugs.archlinux.org</a>
+  </header>
+
+  <article class="onebox-body">
+    
+
+<h3><a href="https://bugs.archlinux.org/task/68480" target="_blank" rel="noopener nofollow ugc">FS#68480 : [openvpn] running unprivileged with iproute no longer working</a></h3>
+
+  <p>Flyspray, a Bug Tracking System written in PHP.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p><a href="https://phabricator.vyos.net/T3805" class="onebox" target="_blank" rel="noopener nofollow ugc">https://phabricator.vyos.net/T3805</a></p>
+<p><strong>The workaround suggested was</strong></p>
+<blockquote>
+<p>Remove user &amp; group directives from <code>/etc/openvpn/openvpn.conf</code> and to add Ambient Capabilities and  <code>User=tunnel and Group=tunnel</code> to a separate <strong>.service</strong> file (which, in our case, would be <code>/lib/systemd/system/openvpn@openvpn.service.d/50_unpriv.conf</code>).</p>
+</blockquote>
+<p>So, I modified the <code>50_unpriv.conf</code> file as follows</p>
+<pre><code class="lang-auto">[Unit]
+ConditionPathExists=!/run/qubes/this-is-templatevm
+
+[Service]
+
+User=tunnel
+Group=tunnel
+SecureBits=keep-caps
+ExecStartPre=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --rmtun --dev tun0
+ExecStartPre=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --mktun --dev tun0 --dev-type tun --user tunnel --group tunnel
+AmbientCapabilities=CAP_IPC_LOCK CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW CAP_SETGID CAP_SETUID CAP_SYS_CHROOT CAP_DAC_OVERRIDE CAP_AUDIT_WRITE
+
+ExecStopPost=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --rmtun --dev tun0
+</code></pre>
+<p>I did a <code>**sudo systemctl daemon-reload**</code> and ran the debug process steps including <code>sudo -u tunnel openvpn /etc/openvpn/openvpn.conf</code>. But this didn’t work and gave the following error:</p>
+<pre><code>	2022-06-20 07:38:04 us=410798 net_iface_mtu_set: mtu 1500 for tun0
+	2022-06-20 07:38:04 us=410867 sitnl_send: rtnl: generic error (-1): Operation not permitted
+	2022-06-20 07:38:04 us=410936 Linux can't set mtu (1500) on tun0
+	2022-06-20 07:38:04 us=410985 Exiting due to fatal error
+</code></pre>
+<p><strong>The solution that worked for me:</strong></p>
+<p>I gave the Ambient Capability directly to the Openvpn executable with user=tunnel privileges, and nothing in the systemd service:</p>
+<pre><code>sudo /sbin/capsh --keep=1 --user='tunnel' --inh='cap_ipc_lock,cap_net_admin,cap_net_bind_service,cap_net_raw,cap_setgid,cap_setuid,cap_sys_chroot,cap_dac_override,cap_audit_write' --addamb='cap_ipc_lock,cap_net_admin,cap_net_bind_service,cap_net_raw,cap_setgid,cap_setuid,cap_sys_chroot,cap_dac_override,cap_audit_write' -- -c 'openvpn /etc/openvpn/openvpn.conf'
+</code></pre>
+<p>Refer: <a href="https://unix.stackexchange.com/questions/196483/how-do-i-use-capsh-i-am-trying-to-run-an-unprivileged-ping-with-minimal-capabi" class="inline-onebox" rel="noopener nofollow ugc">How do I use capsh: I am trying to run an unprivileged ping, with minimal capabilities - Unix &amp; Linux Stack Exchange</a></p>
+<p>I also checked out Openvpn process for capabilities related to <code>user=tunnel</code></p>
+<pre><code class="lang-auto">user@host:~$ sudo grep Cap /proc/23712/status
+	CapInh:	00000000200474c2
+	CapPrm:	00000000200474c2
+	CapEff:	00000000200474c2
+	CapBnd:	000001ffffffffff
+	CapAmb:	00000000200474c2
+user@host:~$ sudo capsh --decode=00000000200474c2
+0x00000000200474c2=cap_dac_override,cap_setgid,cap_setuid,cap_net_bind_service,cap_net_admin,cap_net_raw,cap_ipc_lock,cap_sys_chroot,cap_audit_write
+</code></pre>
+<p>This works! But I don’t want to use this route as this might not be the best way to go about it.I now have a binary that can be executed by any user, which I don’t really like.</p>
+<blockquote>
+<p>Why wasn’t <strong>systemd</strong> able to set the Ambient Capabilities  in case of <code>user=tunnel</code> whereas <strong>capsh</strong> was able to? How to make this work with systemd? Is this an issue of SELinux?</p>
+</blockquote>
+<p><strong>My working config file for OpenVPN:</strong> (without iproute and User directive)</p>
+<pre><code class="lang-auto">client
+dev tun0
+proto tcp
+
+remote X.X.X.X 443
+
+server-poll-timeout 20
+
+remote-random
+resolv-retry infinite
+nobind
+
+# The following setting is only needed for old OpenVPN clients compatibility. New clients
+# automatically negotiate the optimal cipher.
+cipher AES-256-CBC
+
+auth SHA512
+verb 4
+
+setenv CLIENT_CERT 0
+persist-key
+persist-tun
+
+reneg-sec 0
+
+remote-cert-tls server
+auth-user-pass /etc/openvpn/auth.txt
+pull
+
+script-security 2
+up "/etc/openvpn/update-resolv-conf script_type=up dev=tun0"
+down "/etc/openvpn/update-resolv-conf script_type=down dev=tun0"
+
+&lt;ca&gt;
+-----BEGIN CERTIFICATE-----
+
+---------------------------
+-----END CERTIFICATE-----
+&lt;/ca&gt;
+
+key-direction 1
+&lt;tls-auth&gt;
+# 2048 bit OpenVPN static key
+-----BEGIN OpenVPN Static key V1-----
+-----------------------------------
+-----END OpenVPN Static key V1-----
+&lt;/tls-auth&gt;
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786/3</link>
+        <pubDate>Thu, 23 Jun 2022 19:08:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13786-3</guid>
+        <source url="http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786.rss">User &gt; Tor &gt; VPN &gt; Internet doesn&#39;t work in Whonix 16</source>
+      </item>
+      <item>
+        <title>User &gt; Tor &gt; VPN &gt; Internet doesn&#39;t work in Whonix 16</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Debian dropped <code>--enable-iproute2</code> as suggested by upstream. Source:<br>
+<a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=976070" class="onebox" target="_blank" rel="noopener">https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=976070</a></p>
+<p>For potential approach to research / fix this, see:<br>
+<a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=976070#10" class="onebox" target="_blank" rel="noopener">https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=976070#10</a></p>
+<p>Maybe helpful search term:</p>
+<blockquote>
+<p>openvpn unprivileged Netlink</p>
+</blockquote>
+<p>The abstract thing to be found out is:</p>
+<blockquote>
+<p>How to run OpenVPN unprivileged using netlink?</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786/2</link>
+        <pubDate>Fri, 17 Jun 2022 09:44:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13786-2</guid>
+        <source url="http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786.rss">User &gt; Tor &gt; VPN &gt; Internet doesn&#39;t work in Whonix 16</source>
+      </item>
+      <item>
+        <title>User &gt; Tor &gt; VPN &gt; Internet doesn&#39;t work in Whonix 16</title>
+        <dc:creator><![CDATA[nimocin]]></dc:creator>
+        <description><![CDATA[
+            <p>In Whonix 15, with OpenVPN 2.4, it was easy to <strong>Tor &gt; VPN &gt; Internet</strong>, but since Whonix 16 (based on Debian Bullseye) has OpenVPN 2.5, iproute isn’t available and lots of other changes, and as such Tor &gt; VPN &gt; Internet is not working as per documentation.</p>
+<p>I am making the changes in Whonix Workstation as per the docs.</p>
+<p><strong>The issues:</strong></p>
+<p><strong>1)</strong> In the openvpn config file iproute ( <code>iproute /usr/bin/ip_unpriv</code> ) no longer works in openvpn 2.5 and as such it throws off</p>
+<pre><code class="lang-auto">Options error: Unrecognized option or missing or extra parameter(s) in /etc/openvpn/openvpn.conf:26: iproute (2.5.1)
+Use --help for more information.
+</code></pre>
+<p>when trying to connect. If iproute is commented out then</p>
+<p><code>ERROR: Cannot ioctl TUNSETIFF tun: Operation not permitted (errno=1)</code></p>
+<p>even if <code>dev tun0</code> is present in the config file.</p>
+<p><strong>2)</strong> If OpenVPN is compiled with <code>--enable-iproute2</code>, then error</p>
+<pre><code class="lang-auto">RTNETLINK answers: File exists
+ERROR: Linux route add command failed: external program exited with error status: 2
+</code></pre>
+<p><strong>3)</strong> If Whonix workstation Firewall is modified as per the docs i.e.</p>
+<pre><code class="lang-auto">WORKSTATION_FIREWALL=1
+TUNNEL_FIREWALL_ENABLE=true
+</code></pre>
+<p>then there is no internet connectivity in the workstation, even after reboot.</p>
+<p>I have verified the signatures and both the Gateway and Workstation VM are ok (uncorrupted).</p>
+<p><strong>System Specs:</strong><br>
+Windows 7 (Host)<br>
+Virtualbox VM ( Virtualbox Version 6.1.34)</p>
+          <p><a href="http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786/1</link>
+        <pubDate>Tue, 14 Jun 2022 19:12:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13786-1</guid>
+        <source url="http://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786.rss">User &gt; Tor &gt; VPN &gt; Internet doesn&#39;t work in Whonix 16</source>
+      </item>
+  </channel>
+</rss>

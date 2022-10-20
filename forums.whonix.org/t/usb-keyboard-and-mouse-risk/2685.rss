@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>USB Keyboard and Mouse Risk</title>
+    <link>http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685</link>
+    <description>Hi mods - I have searched both the Whonix and Qubes documentation regarding this issue - feel free to delete/re-direct as necessary if it is too general for this forum e.g. Qubes users forum. 
+
+It is understood that USB devices in general pose significant risks for Dom0 in Qubes - and thus Qubes-Whonix - see expert opinions here:
+
+http://blog.invisiblethings.org/2011/05/31/usb-security-challenges.html
+https://www.qubes-os.org/doc/usb/
+
+Joanna notes possible attacks coming from: malformed partition tables, malicious devices pretending to be keyboards/mice, sniffing/spoofing signals on the bus, and downloading of buggy/malicious drivers.
+
+The greatest risk from USB drives, removable media and attachments appears to be they can&#39;t (commonly?) be independently delegated to different VM domains when a user has a USB keyboard and/or mouse arrangement. 
+
+If I understand correctly, all USB controllers &#39;live&#39; in Dom0 and most often are: shared, or there is only one controller available, or none free to assign. Users have already reported locking themselves out of Qubes installations (no keyboard) by creating USB VMs in this scenario.
+
+So my question is, what are the real world security implications of using a &#39;dumb&#39; USB keyboard and/or mouse in a desktop arrangement regardless. That is: 
+
+* How dangerous is it if other USB devices are not attached e.g. removable drives, USB sticks, cameras etc? 
+* How easily can this arrangement be remotely (not locally) exploited?
+
+The Qubes architecture documents state that only PS/2 connected keyboards and mice (like those mostly found in laptops) are currently safe for proper isolation i.e. because they don&#39;t rely on USB-controllers found in Dom0.
+
+Is the only sensible suggestion that Qubes-Whonix desktop users migrate to  PS/2 ports (when available) for their keyboard and mouse? It is mostly still supported on modern hardware, despite the aging status of the six-pin protocol (1987).
+
+I wonder if this issue is sufficiently mitigated when full PVUSB functionality becomes available in Xen (4.7?). That, plus full GUI VM status will have Qubes-Whonix rocking. :wink: 
+
+Anyway, I&#39;m interested to hear your thoughts (a one-liner is fine if too off-topic).
+
+P.S. The documentation may benefit from basic instructions on installing the Selfrando-enabled Tor Browser in a Whonix template e.g. SHA256sums, PGP verification, creating a new menu entry etc. More testers for this outstanding new resource would be great and surely will appeal to the Whonix community in general.
+
+https://blog.torproject.org/category/tags/selfrando</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 11 Jul 2016 13:45:42 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>USB Keyboard and Mouse Risk</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks CooloutAC - will note above your good work-around. I got lucky with the USB controllers and ports myself.</p>
+          <p><a href="http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685/6</link>
+        <pubDate>Mon, 11 Jul 2016 13:45:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2685-6</guid>
+        <source url="http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685.rss">USB Keyboard and Mouse Risk</source>
+      </item>
+      <item>
+        <title>USB Keyboard and Mouse Risk</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi Patrick</p>
+<p>No problem. This solution may be of interest to other readers running Qubes-Whonix on a desktop computer (many I suspect).</p>
+<p>To remove the risk of the USB mouse and/or keyboard allowing a hacked AppVM to access dom0, this works:</p>
+<p><strong>STEPS</strong></p>
+<ul>
+<li>
+<p>Check your computer has PS/2 ports for keyboard and mouse (most do)<br>
+See: <a href="https://en.wikipedia.org/wiki/PS/2_port">https://en.wikipedia.org/wiki/PS/2_port</a></p>
+</li>
+<li>
+<p>In dom0, a) list the devices on your system with:</p>
+</li>
+</ul>
+<blockquote>
+<p>lspci</p>
+</blockquote>
+<p>and b) check which USB bus the device(s) are connected to:</p>
+<blockquote>
+<p>lsusb</p>
+</blockquote>
+<ul>
+<li>
+<p>Buy x1 or x2 $2 PS/2 to USB hardware adapter(s)</p>
+</li>
+<li>
+<p>Re-install Qubes with the USB mouse and/or keyboard plugged into the PS/2 adapter(s)*</p>
+</li>
+<li>
+<p>At the template creation step of the installer, select the creation of a ‘USB’ qube in addition to other desired templates (Whonix, sys-whonix etc.)</p>
+</li>
+<li>
+<p>Reboot</p>
+</li>
+<li>
+<p>Check the USB keyboard and/or mouse now do not have any existing USB connections by re-running:</p>
+</li>
+</ul>
+<blockquote>
+<p>lsusb</p>
+</blockquote>
+<ul>
+<li>Check all USB devices are now assigned to your sys-usb VM (VM settings -&gt; Devices)</li>
+</ul>
+<p>*Note: you can’t just use the physical adapters in a pre-existing Qubes 3.1 installation that already detected your USB mouse and/or keyboard when setting up the system the 1st time around - the risk to dom0 remains. Even if you try, it will typically only detect either the keyboard or mouse via the adapter and not both at the same time.</p>
+<p><em>Special case:</em> This matter is complicated if you only have one PS/2 port. In that case, you should use the USB keyboard in the PS/2 adapter, and use the mouse forward proxy (in the usbVM) for mouse use only. The system should be set to lock-screen after a short period so that it cannot be used maliciously (credit: CooloutAC).</p>
+<p><strong>CUSTOMIZED QUBES INSTALLATION</strong> <strong><em>(OPTIONAL)</em></strong></p>
+<p>Consider a customized installation of Qubes, instead of the auto set-up.**</p>
+<p>** This step allows you to remove any insecure dual boot arrangements you may have created e.g. Windows and other spyware.</p>
+<ul>
+<li>
+<p>Enter the custom installation page of the Qubes installer</p>
+</li>
+<li>
+<p>Delete all existing partitions</p>
+</li>
+<li>
+<p>Set the Qubes partition defaults:</p>
+</li>
+</ul>
+<blockquote>
+<p><strong><em>Boot partition -</em></strong> mount point: /boot, name: sda1, size: 500mb, type: standard partition, filesystem: ext4, do not check the ‘encrypted’ box</p>
+</blockquote>
+<blockquote>
+<p><strong><em>Root partition -</em></strong> mount point: /, name: sda2, size: (the rest of your drive minus 5-10gb for swap), type: LVM, file system: ext4, vol group: qubes_dom0, check the ‘encrypted’ box</p>
+</blockquote>
+<blockquote>
+<p><strong><em>Swap partition -</em></strong> name: swap, type: LVM, file system: swap, vol group: qubes_dom0, check the ‘encrypted’ box</p>
+</blockquote>
+<ul>
+<li>Reboot and cross fingers.</li>
+</ul>
+<p><strong>OUTCOME</strong></p>
+<p>If all has gone well, you have a working keyboard and/or mouse AND a pretty ‘USB’ appVM sitting on your Qubes-Whonix desktop.</p>
+<p><strong>If you have no dom0 assigned USB devices</strong>, you can now connect potentially dangerous USB devices - USB block devices, webcams etc - via the sys-usb VM without having dom0 hacked i.e since your USB controllers should be free of input and programmable devices.</p>
+<p>Note that single USB devices can be attached to any VM under Qubes 3.2</p>
+<p>See “Creating and Using a USB Qube” and “Finding the Right USB Controller” for further information:</p>
+<p></p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.qubes-os.org/attachment/icons/512x512/apps/qubes-logo-icon.png" class="site-icon" width="500" height="500">
+      <a href="https://www.qubes-os.org/doc/usb/" target="_blank" rel="nofollow noopener">Qubes OS</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/362;"><img src="https://www.qubes-os.org/attachment/icons/qubes-logo-icon-name-slogan-fb.png" class="thumbnail"></div>
+
+<h3><a href="https://www.qubes-os.org/doc/usb/" target="_blank" rel="nofollow noopener">Using and Managing USB Devices</a></h3>
+
+<p>Using and Managing USB Devices  How to attach USB drives  (Note: In the present context, the term “USB drive” denotes any USB mass storage device. In addition to smaller flash memory sticks, this i...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.qubes-os.org/attachment/icons/512x512/apps/qubes-logo-icon.png" class="site-icon" width="500" height="500">
+      <a href="https://www.qubes-os.org/doc/assigning-devices/#finding-the-right-usb-controller" target="_blank" rel="nofollow noopener">Qubes OS</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/362;"><img src="https://www.qubes-os.org/attachment/icons/qubes-logo-icon-name-slogan-fb.png" class="thumbnail"></div>
+
+<h3><a href="https://www.qubes-os.org/doc/assigning-devices/#finding-the-right-usb-controller" target="_blank" rel="nofollow noopener">Assigning Devices</a></h3>
+
+<p>Assigning Devices to VMs  Sometimes you may need to assign an entire PCI or PCI Express device directly to a qube. This is also known as PCI pass-through. The Qubes installer does this by default f...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685/3</link>
+        <pubDate>Sun, 10 Jul 2016 06:40:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2685-3</guid>
+        <source url="http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685.rss">USB Keyboard and Mouse Risk</source>
+      </item>
+      <item>
+        <title>USB Keyboard and Mouse Risk</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This belongs to Qubes support channels.</p>
+<p><a href="https://forums.whonix.org/t/what-to-post-in-this-qubes-whonix-forum-and-what-not">https://forums.whonix.org/t/what-to-post-in-this-qubes-whonix-forum-and-what-not</a></p>
+          <p><a href="http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685/2</link>
+        <pubDate>Sat, 02 Jul 2016 14:24:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2685-2</guid>
+        <source url="http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685.rss">USB Keyboard and Mouse Risk</source>
+      </item>
+      <item>
+        <title>USB Keyboard and Mouse Risk</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi mods - I have searched both the Whonix and Qubes documentation regarding this issue - feel free to delete/re-direct as necessary if it is too general for this forum e.g. Qubes users forum.</p>
+<p>It is understood that USB devices in general pose significant risks for Dom0 in Qubes - and thus Qubes-Whonix - see expert opinions here:</p>
+<p><a href="http://blog.invisiblethings.org/2011/05/31/usb-security-challenges.html" class="onebox" target="_blank">http://blog.invisiblethings.org/2011/05/31/usb-security-challenges.html</a><br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.qubes-os.org/attachment/icons/512x512/apps/qubes-logo-icon.png" class="site-icon" width="500" height="500">
+      <a href="https://www.qubes-os.org/doc/usb/" target="_blank" rel="nofollow noopener">Qubes OS</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/362;"><img src="https://www.qubes-os.org/attachment/icons/qubes-logo-icon-name-slogan-fb.png" class="thumbnail"></div>
+
+<h3><a href="https://www.qubes-os.org/doc/usb/" target="_blank" rel="nofollow noopener">Using and Managing USB Devices</a></h3>
+
+<p>Using and Managing USB Devices  How to attach USB drives  (Note: In the present context, the term “USB drive” denotes any USB mass storage device. In addition to smaller flash memory sticks, this i...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Joanna notes possible attacks coming from: malformed partition tables, malicious devices pretending to be keyboards/mice, sniffing/spoofing signals on the bus, and downloading of buggy/malicious drivers.</p>
+<p>The greatest risk from USB drives, removable media and attachments appears to be they can’t (commonly?) be independently delegated to different VM domains when a user has a USB keyboard and/or mouse arrangement.</p>
+<p>If I understand correctly, all USB controllers ‘live’ in Dom0 and most often are: shared, or there is only one controller available, or none free to assign. Users have already reported locking themselves out of Qubes installations (no keyboard) by creating USB VMs in this scenario.</p>
+<p>So my question is, what are the real world security implications of using a ‘dumb’ USB keyboard and/or mouse in a desktop arrangement regardless. That is:</p>
+<ul>
+<li>How dangerous is it if other USB devices are not attached e.g. removable drives, USB sticks, cameras etc?</li>
+<li>How easily can this arrangement be remotely (not locally) exploited?</li>
+</ul>
+<p>The Qubes architecture documents state that only PS/2 connected keyboards and mice (like those mostly found in laptops) are currently safe for proper isolation i.e. because they don’t rely on USB-controllers found in Dom0.</p>
+<p>Is the only sensible suggestion that Qubes-Whonix desktop users migrate to  PS/2 ports (when available) for their keyboard and mouse? It is mostly still supported on modern hardware, despite the aging status of the six-pin protocol (1987).</p>
+<p>I wonder if this issue is sufficiently mitigated when full PVUSB functionality becomes available in Xen (4.7?). That, plus full GUI VM status will have Qubes-Whonix rocking. <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=5" title=":wink:" class="emoji" alt=":wink:"></p>
+<p>Anyway, I’m interested to hear your thoughts (a one-liner is fine if too off-topic).</p>
+<p>P.S. The documentation may benefit from basic instructions on installing the Selfrando-enabled Tor Browser in a Whonix template e.g. SHA256sums, PGP verification, creating a new menu entry etc. More testers for this outstanding new resource would be great and surely will appeal to the Whonix community in general.</p>
+<p><a href="https://blog.torproject.org/category/tags/selfrando" class="onebox" target="_blank">https://blog.torproject.org/category/tags/selfrando</a></p>
+          <p><a href="http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685/1</link>
+        <pubDate>Fri, 01 Jul 2016 18:17:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2685-1</guid>
+        <source url="http://forums.whonix.org/t/usb-keyboard-and-mouse-risk/2685.rss">USB Keyboard and Mouse Risk</source>
+      </item>
+  </channel>
+</rss>

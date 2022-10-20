@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Kicksecure: half the CPUs are shut off - expected behaviour?</title>
+    <link>http://forums.whonix.org/t/kicksecure-half-the-cpus-are-shut-off-expected-behaviour/12166</link>
+    <description>Setup:
+Debian 10/11 + Kicksecure overlay
+
+
+
+Hi everyone
+
+
+After distromorphing, I noticed htop showed only 2 active cores, where beforehand were 4. This was the case with both Debian 10 and 11 + Kicksecure.
+
+
+I confirmed with:
+
+	cat /sys/devices/system/cpu/offline
+	=&gt; 1,3
+
+	cat /sys/devices/system/cpu/online
+	=&gt; 0,2
+
+	cat /sys/devices/system/cpu/possible
+	=&gt; 0-3
+
+	cat /sys/devices/system/cpu/present
+	=&gt; 0-3
+
+
+Documentation for these:
+
+&gt; offline: cpus that are not online because they have been
+&gt; HOTPLUGGED off or exceed the limit of cpus allowed by the
+&gt; kernel configuration (kernel_max above).
+&gt; 
+&gt; online: cpus that are online and being scheduled.
+&gt; 
+&gt; possible: cpus that have been allocated resources and can be
+&gt; brought online if they are present.
+&gt; 
+&gt; present: cpus that have been identified as being present in
+&gt; the system
+
+
+
+Though even if the cores are listed as possible and present, still only 2 of them are active at full workload.
+
+The most likely culprit appears to be security-misc. Is this intentional?
+
+If yes, what setting specifically causes this?
+I haven&#39;t found anything specifically mentioning this, and think it&#39;s a good idea to document it, in case someone wants to be able to look into the implications and judge if the security/anonymity-gain is worth, what appears to be, half the CPU performance.
+
+
+
+PS: Thank you for your groundbreaking work! And the Whonix-documentation is absolutely impressive and very insightful, the Whonix-Wikipedia article acknowledges that as well.</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 24 Aug 2021 18:10:12 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/kicksecure-half-the-cpus-are-shut-off-expected-behaviour/12166.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Kicksecure: half the CPUs are shut off - expected behaviour?</title>
+        <dc:creator><![CDATA[not]]></dc:creator>
+        <description><![CDATA[
+            <p>Your help is greatly appreciated!</p>
+<p>The cause was this line</p>
+<pre><code>## Force disable SMT as it has caused numerous CPU vulnerabilities.
+##
+##https://forums.whonix.org/t/should-all-kernel-patches-for-cpu-bugs-be-unconditionally-enabled-vs-performance-vs-applicability/7647/17
+GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX nosmt=force"
+</code></pre>
+<p>in</p>
+<p><code>/etc/default/grub.d/40_cpu_mitigations.cfg</code></p>
+<p>Commenting it out causes htop to recognize 4 cores again and the output of</p>
+<p><code>cat /sys/devices/system/cpu/online</code></p>
+<p>=&gt; 0-3</p>
+<p>and</p>
+<p><code>cat /sys/devices/system/cpu/offline</code></p>
+<p>being empty.</p>
+<p>Now after looking into the issue, if I were running an intel processor I would reapply it, as deactivating SMT seems indeed important, even if the performance loss is significant.</p>
+<p>The Whonix 15 changelog says:</p>
+<blockquote>
+<p>SMT is disabled as it can be used to exploit the MDS vulnerability.</p>
+</blockquote>
+<p>However the gain for AMD users seems not that much, especially considering the cost of, in this case, basically running a dual-core again.</p>
+<p>Kernel-org on the topic of MDS-mitigation:</p>
+<p>(I can’t link to it, probably because my account is too new)</p>
+<blockquote>
+<p>MDS - Microarchitectural Data Sampling</p>
+<p>Microarchitectural Data Sampling is a hardware vulnerability which allows unprivileged speculative access to data which is available in various CPU internal buffers.</p>
+<p>Affected processors</p>
+<p>This vulnerability affects a wide range of Intel processors. The vulnerability is not present on:</p>
+<p>Processors from AMD, Centaur and other non Intel vendors</p>
+<p>Older processor models, where the CPU family is &lt; 6</p>
+<p>Some Atoms (Bonnell, Saltwell, Goldmont, GoldmontPlus)</p>
+<p>Intel processors which have the ARCH_CAP_MDS_NO bit set in the IA32_ARCH_CAPABILITIES MSR.</p>
+</blockquote>
+<p>Running spectre-meltdown-checker prints for the SMT related entries:</p>
+<p><code>STATUS:  NOT VULNERABLE  (your CPU vendor reported your CPU model as not vulnerable)</code></p>
+<p>Now from that I conclude it seems reasonable for an AMD powered computer to not apply this quite costly setting.<br>
+Though am I missing any actual obvious mitigations or benefits for non-Intel processors?</p>
+<p>I know that Whonix goals are to make sure to be on the safe side, and that makes perfect sense, the linked thread in the config-file also gave good reasons, yet it seems reasonable to think about only applying this setting to Intel-CPUs, in case others have similar performance losses, as the benefit seems actually not really there, but all the costs. Though feel free to disagree.</p>
+<p>Edit:<br>
+I did some performance comparisons with the 7z benchmark which seems a good choice for real world data and it’s CPU focus:</p>
+<p><code>7z b</code></p>
+<p>The performance difference with that setting was indeed pretty close to 50%.</p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-half-the-cpus-are-shut-off-expected-behaviour/12166/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-half-the-cpus-are-shut-off-expected-behaviour/12166/3</link>
+        <pubDate>Tue, 24 Aug 2021 17:03:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12166-3</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-half-the-cpus-are-shut-off-expected-behaviour/12166.rss">Kicksecure: half the CPUs are shut off - expected behaviour?</source>
+      </item>
+      <item>
+        <title>Kicksecure: half the CPUs are shut off - expected behaviour?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you!</p>
+<p>No, not explicitly expected as far as I know. Maybe <a class="mention" href="http://forums.whonix.org/u/madaidan">@madaidan</a> has an idea?</p>
+<p>Check this documentation:<br>
+<a href="https://www.whonix.org/wiki/Tuning#Disable_CPU_Mitigations">Disable CPU Mitigations</a></p>
+<p>security-misc CPU hardening security settings have a performance penalty unfortunately but I didn’t benchmark how much. Other benchmark websites have run benchmarks for spectre etc.</p>
+<p>Otherwise… Quite likely something in folder <code>/etc/default/grub.d</code> causing this. See:</p>
+<aside class="onebox githubfolder">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="15" height="15">
+
+      <a href="https://github.com/Whonix/security-misc/tree/master/etc/default/grub.d" target="_blank" rel="noopener">github.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://opengraph.githubassets.com/b8810c9596b65e6973b5b921f2ddb477cb2dfee227581000f3428d0f6e0aacb6/Whonix/security-misc" class="thumbnail onebox-full-image" width="60" height="60">
+
+<h3><a href="https://github.com/Whonix/security-misc/tree/master/etc/default/grub.d" target="_blank" rel="noopener">security-misc/etc/default/grub.d at master · Whonix/security-misc</a></h3>
+
+  <p><a href="https://github.com/Whonix/security-misc/tree/master/etc/default/grub.d" target="_blank" rel="noopener">master/etc/default/grub.d</a></p>
+
+  <p><span class="label1">Kernel Hardening; Protect Linux User Accounts against Brute Force Attacks; Improve Entropy Collection; Strong Linux User Account Separation; Enhances Misc Security Settings - https://www.whonix.org...</span></p>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>for which files.</p>
+<p>If you like to test… Disable (out comment) or delete. Run:</p>
+<pre><code>sudo update-grub
+</code></pre>
+<p>And reboot.</p>
+<p>Otherwise similarly check folder <code>/etc/sysctl.d</code>.</p>
+<p>Let me know how that goes.</p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-half-the-cpus-are-shut-off-expected-behaviour/12166/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-half-the-cpus-are-shut-off-expected-behaviour/12166/2</link>
+        <pubDate>Tue, 24 Aug 2021 11:18:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12166-2</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-half-the-cpus-are-shut-off-expected-behaviour/12166.rss">Kicksecure: half the CPUs are shut off - expected behaviour?</source>
+      </item>
+      <item>
+        <title>Kicksecure: half the CPUs are shut off - expected behaviour?</title>
+        <dc:creator><![CDATA[not]]></dc:creator>
+        <description><![CDATA[
+            <p>Setup:<br>
+Debian 10/11 + Kicksecure overlay</p>
+<p>Hi everyone</p>
+<p>After distromorphing, I noticed htop showed only 2 active cores, where beforehand were 4. This was the case with both Debian 10 and 11 + Kicksecure.</p>
+<p>I confirmed with:</p>
+<pre><code>cat /sys/devices/system/cpu/offline
+=&gt; 1,3
+
+cat /sys/devices/system/cpu/online
+=&gt; 0,2
+
+cat /sys/devices/system/cpu/possible
+=&gt; 0-3
+
+cat /sys/devices/system/cpu/present
+=&gt; 0-3
+</code></pre>
+<p>Documentation for these:</p>
+<blockquote>
+<p>offline: cpus that are not online because they have been<br>
+HOTPLUGGED off or exceed the limit of cpus allowed by the<br>
+kernel configuration (kernel_max above).</p>
+<p>online: cpus that are online and being scheduled.</p>
+<p>possible: cpus that have been allocated resources and can be<br>
+brought online if they are present.</p>
+<p>present: cpus that have been identified as being present in<br>
+the system</p>
+</blockquote>
+<p>Though even if the cores are listed as possible and present, still only 2 of them are active at full workload.</p>
+<p>The most likely culprit appears to be security-misc. Is this intentional?</p>
+<p>If yes, what setting specifically causes this?<br>
+I haven’t found anything specifically mentioning this, and think it’s a good idea to document it, in case someone wants to be able to look into the implications and judge if the security/anonymity-gain is worth, what appears to be, half the CPU performance.</p>
+<p>PS: Thank you for your groundbreaking work! And the Whonix-documentation is absolutely impressive and very insightful, the Whonix-Wikipedia article acknowledges that as well.</p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-half-the-cpus-are-shut-off-expected-behaviour/12166/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-half-the-cpus-are-shut-off-expected-behaviour/12166/1</link>
+        <pubDate>Tue, 24 Aug 2021 10:45:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12166-1</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-half-the-cpus-are-shut-off-expected-behaviour/12166.rss">Kicksecure: half the CPUs are shut off - expected behaviour?</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Build for Cubietruck (armf) / physical isolation</title>
+    <link>http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573</link>
+    <description>Hello ! 
+
+I am trying to build whonix on a Cubietruck to allow my gateway to be physically isolated.
+It runs Wheezy armf.
+
+So far it has been easy, I had not to change a lot of things.
+The only file I edited was grml_packages, I had to delete grub-pc as the CB does not use grub.
+
+Anyway, here is the command I used to start the build : 
+[code]
+./whonix_build --terminal-only --no-default-applications --enable-whonix-apt-repository --whonix-apt-repository-distribution wheezy --minimal-report --skip-verifiable --skip-sanity-tests --tor-gateway --install-to-root --build &gt;&gt; log_build_whonix 2&gt;&amp;1
+[/code]
+ 
+
+The build starts, and continues well until I have a git error stating that my log file &#39;log_build_whonix &#39; has been modified, etc etc.. 
+That does not sound like a fatal error to me, so I decided to ignore it and continue.
+
+The building process continues..fine, until this error pops up : 
+[code]
+[...]
+&#39;
++ shopt -s globstar dotglob
++ touch -t 201308151102.35 ./debian
++ touch -t 201308151102.35 ./debian/ ./debian/changelog ./debian/compat ./debian/control ./debian/copyright ./debian/gain-root-command ./debian/rules ./debian/source ./debian/source/format ./debian/watch
++ shopt -u globstar dotglob
++ rm --force ../anon-apt-sources-list_0.5.orig.tar.gz
++ gzip -n
++ git archive --format=tar HEAD --prefix=anon-apt-sources-list-0.5/
++ ls -la ../anon-apt-sources-list_0.5.orig.tar.gz
+-rw-r--r-- 1 user user 19149 Oct  4 12:51 ../anon-apt-sources-list_0.5.orig.tar.gz
++ &#39;[&#39; &#39;--info --display-info --fail-on-warnings&#39; = &#39;&#39; &#39;]&#39;
++ debuild --no-lintian --rootcmd=/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command -sa -us -uc
+dpkg: warning: failed to open configuration file &#39;/root/.dpkg.cfg&#39; for reading: Permission denied
+ dpkg-buildpackage -r/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command -D -us -uc -sa
+dpkg-buildpackage: source package anon-apt-sources-list
+dpkg-buildpackage: source version 3:0.5-1
+dpkg-buildpackage: source changed by Patrick Schleizer &lt;adrelanos@riseup.net&gt;
+dpkg: warning: failed to open configuration file &#39;/root/.dpkg.cfg&#39; for reading: Permission denied
+ dpkg-source --before-build anon-apt-sources-list
+dpkg-buildpackage: host architecture armhf
+ /home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command debian/rules clean
+/usr/bin/faketime: 102: exec: fakeroot: not found
+dpkg-buildpackage: error: /home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command debian/rules clean gave error exit status 127
+debuild: fatal error at line 1357:
+dpkg-buildpackage -r/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command -D -us -uc -sa failed
+make: *** [deb-pkg] Error 25
+++ error_handler_general
+++ error_handler_shared
+++ last_exit_code=2
+++ last_bash_command=&#39;sudo -E -u &quot;$user_name&quot; make deb-pkg&#39;
+++ &#39;[&#39; test -o xtrace = 0 &#39;]&#39;
+++ set +x
+ERROR in pre detected!
+Please have a look above &quot;error_handler_general&quot;, note the command that failed, its output and last_exit_code.
+[...]
+[/code]
+Looks like an error from gain-root-command, but Im not sure what causes it. 
+
+
+NB: For the record, here is the git error : 
+[code]
++ true &#39;INFO: End of: /home/user/Whonix/help-steps/cleanup-files  No error detected. (benchmark: 00:02:29)&#39;
++ true &#39;./build-steps.d/1200_create-debian-packages INFO: Cleaned old packages. &#39;
++ check_for_uncommited_changes
++ trap error_handler_general ERR INT TERM
+++ git status --porcelain
++ &#39;[&#39; -n &#39; M log_build_whonix&#39; &#39;]&#39;
++ true &#39;./build-steps.d/1200_create-debian-packages ERROR: Git reports uncommitted changes! &#39;
++ true &#39;./build-steps.d/1200_create-debian-packages INFO: Running &quot;git status&quot; for your convenience. &#39;
++ git status
+# Not currently on any branch.
+# Changes not staged for commit:
+#   (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+#
+#	modified:   log_build_whonix
+#
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
++ true &#39;./build-steps.d/1200_create-debian-packages INFO: Running git &quot;clean -d --force --force --dry-run&quot; for your convenience. &#39;
++ git clean -d --force --force --dry-run
++ true &#39;./build-steps.d/1200_create-debian-packages You most likely like to run:
+    /home/user/Whonix/help-steps/cleanup-files
+or if you know what you are doing:
+    git clean -d --force --force
+    git reset --hard&#39;
++ error &#39;Uncommitted changes! See above!&#39;
+./build-steps.d/1200_create-debian-packages: line 131: error: command not found
+++ error_handler_general
+++ error_handler_shared
+++ last_exit_code=127
+++ last_bash_command=&#39;error &quot;Uncommitted changes! See above!&quot;&#39;
+++ &#39;[&#39; test -o xtrace = 0 &#39;]&#39;
+++ set +x
+ERROR in pre detected!
+Please have a look above &quot;error_handler_general&quot;, note the command that failed, its output and last_exit_code.
+- Please enter c and press enter to ignore the error and continue building. (Recommended against!)
+- Please press s and enter to open an chroot interactive shell.
+- Please press enter to cleanup and exit. ++ &#39;[&#39; false = true &#39;]&#39;
++++ caller
+++ last_caller=&#39;128 pre&#39;
+++ last_script=pre
+++ error_handler_exit
+++ &#39;[&#39; false = true &#39;]&#39;
+++ abort_or_continue=Aborted
+++ rm --force /etc/apt/sources.list.d/whonix_temp.list
+++ rm --force /var/run/package_manager_lock
+++ true &#39;
+############################################################
+ERROR in pre detected! Aborted!
+(benchmark: 00:02:33)
+BASH_COMMAND: error &quot;Uncommitted changes! See above!&quot;
+last_exit_code: 127
+caller: 128 pre
+ERROR in pre! Aborted!
+############################################################
+[/code]
+
+
+Any help would be much appreciated.
+Thanks !
+
+Edit: I am building Whonix 9</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 25 Jan 2015 23:45:17 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Build for Cubietruck (armf) / physical isolation</title>
+        <dc:creator><![CDATA[k2atombr0]]></dc:creator>
+        <description><![CDATA[
+            <p>Can anyone report any progress with building for armhf?</p>
+<p>I am struggling greatly in building a bare metal whonix gateway on the Beaglebone Black.</p>
+<p>Any advice, success stories?</p>
+          <p><a href="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/11</link>
+        <pubDate>Sun, 25 Jan 2015 23:45:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-573-11</guid>
+        <source url="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573.rss">Build for Cubietruck (armf) / physical isolation</source>
+      </item>
+      <item>
+        <title>Build for Cubietruck (armf) / physical isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This commit might help porting to other platforms:<br>
+</p><aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/Whonix/commit/8ea6278baf7b12457fd40f8f178285f35592698f" target="_blank">github.com/Whonix/Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/Whonix/commit/8ea6278baf7b12457fd40f8f178285f35592698f" target="_blank">added other architectures to reprepro config files to ease ports to other platforms</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2014-12-18" data-time="07:02:43" data-timezone="UTC">07:02AM - 18 Dec 14 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 2 files with 5 additions and 5 deletions">
+        <a href="https://github.com/Whonix/Whonix/commit/8ea6278baf7b12457fd40f8f178285f35592698f" target="_blank">
+          <span class="added">+5</span>
+          <span class="removed">-5</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>(reprepro does not support “Architecture: all”, but now the same platforms as Debian supports should work for local package build and install.)</p>
+<p>You <span class="bbcode-u">might</span> be able to git cherry-pick it.</p>
+<pre><code class="lang-auto">git cherry-pick 8ea6278baf7b12457fd40f8f178285f35592698f</code></pre>
+          <p><a href="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/10</link>
+        <pubDate>Thu, 18 Dec 2014 07:08:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-573-10</guid>
+        <source url="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573.rss">Build for Cubietruck (armf) / physical isolation</source>
+      </item>
+      <item>
+        <title>Build for Cubietruck (armf) / physical isolation</title>
+        <dc:creator><![CDATA[tomek]]></dc:creator>
+        <description><![CDATA[
+            <p>Hey, I’m currently building whonix-gateway 9.4 (physical isolation) on an armhf virtual machine, fresh debian install. This is going to take a while, it runs on QEMU. So far I encountered a single error regarding the <span class="bbcode-b">grub-pc</span> package, which is normal because this package don’t exist for arm platforms. I chose to ignore this error and to continue the build, to see how far it can go.</p>
+<p>ARM single-board computers could indeed be the perfect platform for physical isolation of the gateway. x64 SBC are expensives, and you can find ARM SBC starting at 35$ (Rpi, ODROID-C1).</p>
+          <p><a href="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/9</link>
+        <pubDate>Wed, 17 Dec 2014 09:09:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-573-9</guid>
+        <source url="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573.rss">Build for Cubietruck (armf) / physical isolation</source>
+      </item>
+      <item>
+        <title>Build for Cubietruck (armf) / physical isolation</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><span class="bbcode-b">benjy</span> if you do get an arm build working please document any extra steps or differences from the current guide so we can add it to the wiki.</p>
+<p>If you would be willing to test and maintain instructions for arm that would be great, that could really make efficient, low cost hidden services accessible to everyone.</p>
+          <p><a href="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/8</link>
+        <pubDate>Sat, 04 Oct 2014 20:06:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-573-8</guid>
+        <source url="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573.rss">Build for Cubietruck (armf) / physical isolation</source>
+      </item>
+      <item>
+        <title>Build for Cubietruck (armf) / physical isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>There will be lots of build dependencies not installed if the build-steps.d/1100_prepare-build-machine build step does not get run.</p>
+          <p><a href="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/7</link>
+        <pubDate>Sat, 04 Oct 2014 19:28:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-573-7</guid>
+        <source url="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573.rss">Build for Cubietruck (armf) / physical isolation</source>
+      </item>
+      <item>
+        <title>Build for Cubietruck (armf) / physical isolation</title>
+        <dc:creator><![CDATA[benjy]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Yeah, but from which page / chapter exactly did you read it?
+On https://www.whonix.org/wiki/Dev/Build_Documentation/Physical_Isolation#Run_Build_Script it suggests
+[code]sudo ./whonix_build --tor-gateway --install-to-root --build &gt;&gt; ~/log-phyiso 2&gt;&amp;1[/code]</blockquote>
+Yup,  was missing the ~/ part, now building with it out of Whonix/
+<aside class="quote" data-post="5" data-topic="573">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>fakeroot is not installed for some reason. It should have been installed during the build-steps.d/1100_prepare-build-machine build step. So I need to that the log including that to figure out why it didn’t work.</p>
+</blockquote>
+</aside>
+<p>Yeah, I just came to this too. (Damn I should’ve read more before posting…)<br>
+I did install it manually anyway, running a build now.</p>
+<p>I’ll keep the thread updated.</p>
+<p>Edit: Lintian was not intalled neither.</p>
+          <p><a href="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/6</link>
+        <pubDate>Sat, 04 Oct 2014 16:37:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-573-6</guid>
+        <source url="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573.rss">Build for Cubietruck (armf) / physical isolation</source>
+      </item>
+      <item>
+        <title>Build for Cubietruck (armf) / physical isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>It is the log created by whonix_build, aka:
+./whonix_build [...] --install-to-root --build &gt;&gt; log_build_whonix 2&gt;&amp;1</blockquote>
+Yeah, but from which page / chapter exactly did you read it?
+<p>On <a href="https://www.whonix.org/wiki/Dev/Build_Documentation/Physical_Isolation#Run_Build_Script">https://www.whonix.org/wiki/Dev/Build_Documentation/Physical_Isolation#Run_Build_Script</a> it suggests</p>
+<pre><code class="lang-auto"></code></pre>
+<p>Note, that</p>
+<pre><code class="lang-auto"></code></pre>
+<p>will work. While</p>
+<pre><code class="lang-auto"></code></pre>
+<p>won’t work.</p>
+<p>Because the former creates the while in your home folder while the latter creates the log in Whonix source folder, which won’t work.</p>
+<p>[hr]</p>
+<p>fakeroot is not installed for some reason. It should have been installed during the build-steps.d/1100_prepare-build-machine build step. So I need to that the log including that to figure out why it didn’t work.</p>
+          <p><a href="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/5</link>
+        <pubDate>Sat, 04 Oct 2014 16:23:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-573-5</guid>
+        <source url="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573.rss">Build for Cubietruck (armf) / physical isolation</source>
+      </item>
+      <item>
+        <title>Build for Cubietruck (armf) / physical isolation</title>
+        <dc:creator><![CDATA[benjy]]></dc:creator>
+        <description><![CDATA[
+            <p>Edit : Got the exact same error as above :</p>
+<p>[code]<br>
+[…]<br>
+’</p>
+<ul>
+<li>shopt -s globstar dotglob</li>
+<li>touch -t 201308151102.35 ./debian</li>
+<li>touch -t 201308151102.35 ./debian/ ./debian/changelog ./debian/compat ./debian/control ./debian/copyright ./debian/gain-root-command ./debian/rules ./debian/source ./debian/source/format ./debian/watch</li>
+<li>shopt -u globstar dotglob</li>
+<li>rm --force …/anon-apt-sources-list_0.5.orig.tar.gz</li>
+<li>gzip -n</li>
+<li>git archive --format=tar HEAD --prefix=anon-apt-sources-list-0.5/</li>
+<li>ls -la …/anon-apt-sources-list_0.5.orig.tar.gz<br>
+-rw-r–r-- 1 user user 19149 Oct  4 12:51 …/anon-apt-sources-list_0.5.orig.tar.gz</li>
+<li>‘[’ ‘–info --display-info --fail-on-warnings’ = ‘’ ‘]’</li>
+<li>debuild --no-lintian --rootcmd=/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command -sa -us -uc<br>
+dpkg: warning: failed to open configuration file ‘/root/.dpkg.cfg’ for reading: Permission denied<br>
+dpkg-buildpackage -r/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command -D -us -uc -sa<br>
+dpkg-buildpackage: source package anon-apt-sources-list<br>
+dpkg-buildpackage: source version 3:0.5-1<br>
+dpkg-buildpackage: source changed by Patrick Schleizer <a href="mailto:adrelanos@riseup.net">adrelanos@riseup.net</a><br>
+dpkg: warning: failed to open configuration file ‘/root/.dpkg.cfg’ for reading: Permission denied<br>
+dpkg-source --before-build anon-apt-sources-list<br>
+dpkg-buildpackage: host architecture armhf<br>
+/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command debian/rules clean<br>
+/usr/bin/faketime: 102: exec: fakeroot: not found<br>
+dpkg-buildpackage: error: /home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command debian/rules clean gave error exit status 127<br>
+debuild: fatal error at line 1357:<br>
+dpkg-buildpackage -r/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command -D -us -uc -sa failed<br>
+make: *** [deb-pkg] Error 25<br>
+++ error_handler_general<br>
+++ error_handler_shared<br>
+++ last_exit_code=2<br>
+++ last_bash_command=‘sudo -E -u “$user_name” make deb-pkg’<br>
+++ ‘[’ test -o xtrace = 0 ‘]’<br>
+++ set +x<br>
+ERROR in pre detected!<br>
+Please have a look above “error_handler_general”, note the command that failed, its output and last_exit_code.<br>
+[…][/code]</li>
+</ul>
+<p>Edit: Fakeroot wasn’t installed, so, I did install it.<br>
+Running a build now.</p>
+          <p><a href="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/4</link>
+        <pubDate>Sat, 04 Oct 2014 13:29:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-573-4</guid>
+        <source url="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573.rss">Build for Cubietruck (armf) / physical isolation</source>
+      </item>
+      <item>
+        <title>Build for Cubietruck (armf) / physical isolation</title>
+        <dc:creator><![CDATA[benjy]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="2" data-topic="573">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>armf is an unsupported platform. Not tested and not succeeded by anyone ever to my knowledge. Needs a maintainer / porter.</p>
+</blockquote>
+</aside>
+<p>Yes I know, but It looks like there is not a lot to do to support it since wheezy is available.<br>
+And that this kind of SoC (read PI and the others) may be the perfect host for an isolated gateway. (Cheap, reliable, open hardware,…)</p>
+<aside class="quote">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Where you got that “log_build_whonix” file name from?</p>
+</blockquote>
+</aside>
+<p>It is the log created by whonix_build, aka:<br>
+./whonix_build […] --install-to-root --build &gt;&gt; log_build_whonix 2&gt;&amp;1</p>
+<p>[quote=“Patrick”]When you create a build log, don’t put it into the Whonix source folder. Put it into ~/ or so.</p>
+<p>Just delete that file for now so you can restart the build.[/quote]</p>
+<p>I will but I highly doubt the current error is related. I though you would see what’s causing the error in there :<br>
+(Well, looks like gain-root-command is in fault, but I don’t know exactly why…)</p>
+<p>[code]<br>
+[…]<br>
+’</p>
+<ul>
+<li>shopt -s globstar dotglob</li>
+<li>touch -t 201308151102.35 ./debian</li>
+<li>touch -t 201308151102.35 ./debian/ ./debian/changelog ./debian/compat ./debian/control ./debian/copyright ./debian/gain-root-command ./debian/rules ./debian/source ./debian/source/format ./debian/watch</li>
+<li>shopt -u globstar dotglob</li>
+<li>rm --force …/anon-apt-sources-list_0.5.orig.tar.gz</li>
+<li>gzip -n</li>
+<li>git archive --format=tar HEAD --prefix=anon-apt-sources-list-0.5/</li>
+<li>ls -la …/anon-apt-sources-list_0.5.orig.tar.gz<br>
+-rw-r–r-- 1 user user 19149 Oct  4 12:51 …/anon-apt-sources-list_0.5.orig.tar.gz</li>
+<li>‘[’ ‘–info --display-info --fail-on-warnings’ = ‘’ ‘]’</li>
+<li>debuild --no-lintian --rootcmd=/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command -sa -us -uc<br>
+dpkg: warning: failed to open configuration file ‘/root/.dpkg.cfg’ for reading: Permission denied<br>
+dpkg-buildpackage -r/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command -D -us -uc -sa<br>
+dpkg-buildpackage: source package anon-apt-sources-list<br>
+dpkg-buildpackage: source version 3:0.5-1<br>
+dpkg-buildpackage: source changed by Patrick Schleizer <a href="mailto:adrelanos@riseup.net">adrelanos@riseup.net</a><br>
+dpkg: warning: failed to open configuration file ‘/root/.dpkg.cfg’ for reading: Permission denied<br>
+dpkg-source --before-build anon-apt-sources-list<br>
+dpkg-buildpackage: host architecture armhf<br>
+/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command debian/rules clean<br>
+/usr/bin/faketime: 102: exec: fakeroot: not found<br>
+dpkg-buildpackage: error: /home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command debian/rules clean gave error exit status 127<br>
+debuild: fatal error at line 1357:<br>
+dpkg-buildpackage -r/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command -D -us -uc -sa failed<br>
+make: *** [deb-pkg] Error 25<br>
+++ error_handler_general<br>
+++ error_handler_shared<br>
+++ last_exit_code=2<br>
+++ last_bash_command=‘sudo -E -u “$user_name” make deb-pkg’<br>
+++ ‘[’ test -o xtrace = 0 ‘]’<br>
+++ set +x<br>
+ERROR in pre detected!<br>
+Please have a look above “error_handler_general”, note the command that failed, its output and last_exit_code.<br>
+[…][/code]</li>
+</ul>
+<p>Thanks Patrick.</p>
+<p>Edit : Trying again, will post my results.</p>
+          <p><a href="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/3</link>
+        <pubDate>Sat, 04 Oct 2014 13:04:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-573-3</guid>
+        <source url="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573.rss">Build for Cubietruck (armf) / physical isolation</source>
+      </item>
+      <item>
+        <title>Build for Cubietruck (armf) / physical isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>armf is an unsupported platform. Not tested and not succeeded by anyone ever to my knowledge. Needs a maintainer / porter.</p>
+<p>Where you got that “log_build_whonix” file name from?</p>
+<p>When you create a build log, don’t put it into the Whonix source folder. Put it into ~/ or so.</p>
+<p>Just delete that file for now so you can restart the build.</p>
+          <p><a href="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/2</link>
+        <pubDate>Sat, 04 Oct 2014 12:31:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-573-2</guid>
+        <source url="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573.rss">Build for Cubietruck (armf) / physical isolation</source>
+      </item>
+      <item>
+        <title>Build for Cubietruck (armf) / physical isolation</title>
+        <dc:creator><![CDATA[benjy]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello !</p>
+<p>I am trying to build whonix on a Cubietruck to allow my gateway to be physically isolated.<br>
+It runs Wheezy armf.</p>
+<p>So far it has been easy, I had not to change a lot of things.<br>
+The only file I edited was grml_packages, I had to delete grub-pc as the CB does not use grub.</p>
+<p>Anyway, here is the command I used to start the build :</p>
+<pre><code class="lang-auto">./whonix_build --terminal-only --no-default-applications --enable-whonix-apt-repository --whonix-apt-repository-distribution wheezy --minimal-report --skip-verifiable --skip-sanity-tests --tor-gateway --install-to-root --build &gt;&gt; log_build_whonix 2&gt;&amp;1</code></pre>
+<p>The build starts, and continues well until I have a git error stating that my log file 'log_build_whonix ’ has been modified, etc etc…<br>
+That does not sound like a fatal error to me, so I decided to ignore it and continue.</p>
+<p>The building process continues…fine, until this error pops up :</p>
+<pre><code class="lang-auto">[...]
+'
++ shopt -s globstar dotglob
++ touch -t 201308151102.35 ./debian
++ touch -t 201308151102.35 ./debian/ ./debian/changelog ./debian/compat ./debian/control ./debian/copyright ./debian/gain-root-command ./debian/rules ./debian/source ./debian/source/format ./debian/watch
++ shopt -u globstar dotglob
++ rm --force ../anon-apt-sources-list_0.5.orig.tar.gz
++ gzip -n
++ git archive --format=tar HEAD --prefix=anon-apt-sources-list-0.5/
++ ls -la ../anon-apt-sources-list_0.5.orig.tar.gz
+-rw-r--r-- 1 user user 19149 Oct  4 12:51 ../anon-apt-sources-list_0.5.orig.tar.gz
++ '[' '--info --display-info --fail-on-warnings' = '' ']'
++ debuild --no-lintian --rootcmd=/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command -sa -us -uc
+dpkg: warning: failed to open configuration file '/root/.dpkg.cfg' for reading: Permission denied
+ dpkg-buildpackage -r/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command -D -us -uc -sa
+dpkg-buildpackage: source package anon-apt-sources-list
+dpkg-buildpackage: source version 3:0.5-1
+dpkg-buildpackage: source changed by Patrick Schleizer &lt;adrelanos@riseup.net&gt;
+dpkg: warning: failed to open configuration file '/root/.dpkg.cfg' for reading: Permission denied
+ dpkg-source --before-build anon-apt-sources-list
+dpkg-buildpackage: host architecture armhf
+ /home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command debian/rules clean
+/usr/bin/faketime: 102: exec: fakeroot: not found
+dpkg-buildpackage: error: /home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command debian/rules clean gave error exit status 127
+debuild: fatal error at line 1357:
+dpkg-buildpackage -r/home/user/Whonix/packages/anon-apt-sources-list/debian/gain-root-command -D -us -uc -sa failed
+make: *** [deb-pkg] Error 25
+++ error_handler_general
+++ error_handler_shared
+++ last_exit_code=2
+++ last_bash_command='sudo -E -u "$user_name" make deb-pkg'
+++ '[' test -o xtrace = 0 ']'
+++ set +x
+ERROR in pre detected!
+Please have a look above "error_handler_general", note the command that failed, its output and last_exit_code.
+[...]</code></pre>
+<p>Looks like an error from gain-root-command, but Im not sure what causes it.</p>
+<p>NB: For the record, here is the git error :</p>
+<pre><code class="lang-auto">+ true 'INFO: End of: /home/user/Whonix/help-steps/cleanup-files  No error detected. (benchmark: 00:02:29)'
++ true './build-steps.d/1200_create-debian-packages INFO: Cleaned old packages. '
++ check_for_uncommited_changes
++ trap error_handler_general ERR INT TERM
+++ git status --porcelain
++ '[' -n ' M log_build_whonix' ']'
++ true './build-steps.d/1200_create-debian-packages ERROR: Git reports uncommitted changes! '
++ true './build-steps.d/1200_create-debian-packages INFO: Running "git status" for your convenience. '
++ git status
+# Not currently on any branch.
+# Changes not staged for commit:
+#   (use "git add &lt;file&gt;..." to update what will be committed)
+#   (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)
+#
+#	modified:   log_build_whonix
+#
+no changes added to commit (use "git add" and/or "git commit -a")
++ true './build-steps.d/1200_create-debian-packages INFO: Running git "clean -d --force --force --dry-run" for your convenience. '
++ git clean -d --force --force --dry-run
++ true './build-steps.d/1200_create-debian-packages You most likely like to run:
+    /home/user/Whonix/help-steps/cleanup-files
+or if you know what you are doing:
+    git clean -d --force --force
+    git reset --hard'
++ error 'Uncommitted changes! See above!'
+./build-steps.d/1200_create-debian-packages: line 131: error: command not found
+++ error_handler_general
+++ error_handler_shared
+++ last_exit_code=127
+++ last_bash_command='error "Uncommitted changes! See above!"'
+++ '[' test -o xtrace = 0 ']'
+++ set +x
+ERROR in pre detected!
+Please have a look above "error_handler_general", note the command that failed, its output and last_exit_code.
+- Please enter c and press enter to ignore the error and continue building. (Recommended against!)
+- Please press s and enter to open an chroot interactive shell.
+- Please press enter to cleanup and exit. ++ '[' false = true ']'
++++ caller
+++ last_caller='128 pre'
+++ last_script=pre
+++ error_handler_exit
+++ '[' false = true ']'
+++ abort_or_continue=Aborted
+++ rm --force /etc/apt/sources.list.d/whonix_temp.list
+++ rm --force /var/run/package_manager_lock
+++ true '
+############################################################
+ERROR in pre detected! Aborted!
+(benchmark: 00:02:33)
+BASH_COMMAND: error "Uncommitted changes! See above!"
+last_exit_code: 127
+caller: 128 pre
+ERROR in pre! Aborted!
+############################################################</code></pre>
+<p>Any help would be much appreciated.<br>
+Thanks !</p>
+<p>Edit: I am building Whonix 9</p>
+          <p><a href="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573/1</link>
+        <pubDate>Sat, 04 Oct 2014 11:35:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-573-1</guid>
+        <source url="http://forums.whonix.org/t/build-for-cubietruck-armf-physical-isolation/573.rss">Build for Cubietruck (armf) / physical isolation</source>
+      </item>
+  </channel>
+</rss>

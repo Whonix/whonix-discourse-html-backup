@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Ubuntu -&gt; Debian</title>
+    <link>http://forums.whonix.org/t/ubuntu-debian/8909</link>
+    <description>Running Whonix as a guest OS on a Ubuntu host system I experienced some problems: 1) slow shutdown of Whonix and 2) no USB Passthrough. I also managed to break my host firewall stopping all network-traffic.
+I decided to start all over again using Debian Buster as host system (hint by Hulahoop). Do I fare any better now? 
+ad 1) still slow shutdown; I think it has nothing to do with Light Display Manager. Because (using CLI) I see again a stop job running but after the display manager already stopped.
+ad 2) still no USB passthrough. This one is funny. My USB storage devices do work on the host. Now I am running on Buster/Whonix. But no passthrough. Can forum members testify that this feature does work? 
+ad 3) for now I stopped fucking with my firewall. One comment: in the Whonix doc it is suggested to use GUFW denying all incoming traffic (except as result of already established connections). Just denying incoming traffic with gufw, will not stop all incoming packets. In the firewall there are still rules for INPUT that do allow protocol messages from ICMP and IGMP.</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 10 Feb 2020 07:41:29 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/ubuntu-debian/8909.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Ubuntu -&gt; Debian</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Not easy.</p>
+<ul>
+<li>It’s not even clear what the knobs are. First, <a href="https://forums.whonix.org/t/disk-usb-automount-in-kicksecure/8728/20" class="inline-onebox">Disk &amp; USB Automount in Kicksecure</a> isn’t even fully understood, needs to be fixed / documented as much as possible before thinking about simplification.</li>
+<li>Some (maybe related or unrelated) knobs aren’t set for reasons of USB security such as proc-hidepid.</li>
+<li>As it’s implemented currently, solution needs to be good enough to be deployed inside VMs and on the host as at the same time because we don’t have any security related packages which are only installed inside VMs only. These could be invented, yes, but we still don’t want auto mounting of USB on the host by default.</li>
+<li>Blacklisting USB (storage) kernel modules on the host could break booting from external USB HDD.</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/ubuntu-debian/8909/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ubuntu-debian/8909/10</link>
+        <pubDate>Mon, 10 Feb 2020 07:41:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8909-10</guid>
+        <source url="http://forums.whonix.org/t/ubuntu-debian/8909.rss">Ubuntu -&gt; Debian</source>
+      </item>
+      <item>
+        <title>Ubuntu -&gt; Debian</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Can we disable USB support using an alternative from this article?</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.cyberciti.biz/faq/wp-content/themes/cybercity/assets/images/icon/android-icon-192x192.png" class="site-icon" width="192" height="192">
+      <a href="https://www.cyberciti.biz/faq/linux-disable-modprobe-loading-of-usb-storage-driver/" target="_blank" title="02:57PM - 16 March 2009">nixCraft – 16 Mar 09</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:599/202;"><img src="https://www.cyberciti.biz/media/new/faq/2009/03/Howto-disable-USB-storage-devices.jpg" class="thumbnail" width="599" height="202"></div>
+
+<h3><a href="https://www.cyberciti.biz/faq/linux-disable-modprobe-loading-of-usb-storage-driver/" target="_blank">Linux Disable USB Devices (Disable loading of USB Storage Driver) - nixCraft</a></h3>
+
+<p>In our research lab I'd like to disable all USB devices connected to our HP Red Hat Linux based workstations. I'd like to disable USB flash or hard drives, which users can use with physical access to a system to quickly copy sensitive data from it....</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>The current technique is just a PITA and requires many knobs to reverse.</p>
+          <p><a href="http://forums.whonix.org/t/ubuntu-debian/8909/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ubuntu-debian/8909/9</link>
+        <pubDate>Sun, 09 Feb 2020 17:06:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8909-9</guid>
+        <source url="http://forums.whonix.org/t/ubuntu-debian/8909.rss">Ubuntu -&gt; Debian</source>
+      </item>
+      <item>
+        <title>Ubuntu -&gt; Debian</title>
+        <dc:creator><![CDATA[rk1]]></dc:creator>
+        <description><![CDATA[
+            <p>Finally succeeded in passing through my USB storage devices. The problem was not the usb redirection (the devices did vanish on the host already), but the fact they didn’t show in the guest. Using lsblk in the guest (whonix) I noticed that the usb device wasn’t mounted. As the usb was formatted with a ntfs filesystem, I had to install first package ntfs-3g, and then mount it with:<br>
+‘sudo mount -t ntfs-3g /dev/xyz  /media’.<br>
+And there it was, my long awaited for, precious little external usb drive. I also managed to passthrough a truecrypted usb disk. First mapping with tcplay:<br>
+‘sudo tcplay --map=truecrypt --device=/dev/xyz’<br>
+, being asked for passphrase, then lsblk showed a new unmounted entry: /sda/sda1/truecrypt. Fdisk - l called this drive: /dev/mapper/truecrypt. Then I mounted this one with:<br>
+‘sudo mount /dev/mapper/truecrypt  /media’<br>
+Now I may be plain stupid that I did not realize I had to mount my redirected devices. Still the Whonix wiki assumes quite uneducated users (I mean that most instructions are just dead simple: copy and paste). So there should have been additional mounting instructions.<br>
+Anyway, glad I got thus far.</p>
+          <p><a href="http://forums.whonix.org/t/ubuntu-debian/8909/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ubuntu-debian/8909/8</link>
+        <pubDate>Sun, 09 Feb 2020 15:50:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8909-8</guid>
+        <source url="http://forums.whonix.org/t/ubuntu-debian/8909.rss">Ubuntu -&gt; Debian</source>
+      </item>
+      <item>
+        <title>Ubuntu -&gt; Debian</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="5" data-topic="8909">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> what steps are needed to mount devcies so I can add them to the wiki.</p>
+</blockquote>
+</aside>
+<p>Might be non-trivial as per:</p>
+<aside class="quote quote-modified" data-post="1" data-topic="8728">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/letter_avatar_proxy/v4/letter/5/49beb7/40.png" class="avatar">
+    <a href="https://forums.whonix.org/t/disk-usb-automount-in-kicksecure/8728">Disk &amp; USB Automount in Kicksecure</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/kvm"><span class="badge-category-bg" style="background-color: #9EB83B;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Everything specific to Whonix KVM. (devs)">KVM</span></a>
+  </div>
+  <blockquote>
+    I installed debian 10 with netinst and installed without the graphical environment, then I installed kicksecure with xfce with the distro morphing method. I am changing from Linux Mint Debian Edition because I want a more secure host for daily things and to run KVM whonix in. 
+Sorry if this is really basic but when I plug in my USB or DISK it doesn’t automount, is this a security feature? How can I make my extra disk, USB and external drive automount? Am I missing a package, if so, what debian p…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/ubuntu-debian/8909/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ubuntu-debian/8909/7</link>
+        <pubDate>Sun, 09 Feb 2020 06:05:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8909-7</guid>
+        <source url="http://forums.whonix.org/t/ubuntu-debian/8909.rss">Ubuntu -&gt; Debian</source>
+      </item>
+      <item>
+        <title>Ubuntu -&gt; Debian</title>
+        <dc:creator><![CDATA[rk1]]></dc:creator>
+        <description><![CDATA[
+            <p>Ah, I might have missed that part about restart</p>
+          <p><a href="http://forums.whonix.org/t/ubuntu-debian/8909/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ubuntu-debian/8909/6</link>
+        <pubDate>Sat, 08 Feb 2020 22:11:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8909-6</guid>
+        <source url="http://forums.whonix.org/t/ubuntu-debian/8909.rss">Ubuntu -&gt; Debian</source>
+      </item>
+      <item>
+        <title>Ubuntu -&gt; Debian</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>The instructions for USB still work as expected. You need to close any libvirt/VM window open (that incldues the VMManger) after shutting down all running VMs for it to take effect, before restarting the VM</p>
+<p>The device I plugged in did not show on the host after this.</p>
+<hr>
+<p>When transitioning to xfce we disabled auto-mount in WHonix. <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> what steps are needed to mount devcies so I can add them to the wiki.</p>
+          <p><a href="http://forums.whonix.org/t/ubuntu-debian/8909/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ubuntu-debian/8909/5</link>
+        <pubDate>Sat, 08 Feb 2020 22:04:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8909-5</guid>
+        <source url="http://forums.whonix.org/t/ubuntu-debian/8909.rss">Ubuntu -&gt; Debian</source>
+      </item>
+      <item>
+        <title>Ubuntu -&gt; Debian</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="rk1" data-post="3" data-topic="8909">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/r/9f8e36/40.png" class="avatar"> rk1:</div>
+<blockquote>
+<p>I find the instructions somewhat unclear because I would expect the Sandboxing paragraph to appear before the Passthrough paragraph.</p>
+</blockquote>
+</aside>
+<p>Good point. Thanks for pointing it out, I went ahead and cleaned up the documentation.</p>
+<p>Will test and get back to you.</p>
+          <p><a href="http://forums.whonix.org/t/ubuntu-debian/8909/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ubuntu-debian/8909/4</link>
+        <pubDate>Sat, 08 Feb 2020 20:32:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8909-4</guid>
+        <source url="http://forums.whonix.org/t/ubuntu-debian/8909.rss">Ubuntu -&gt; Debian</source>
+      </item>
+      <item>
+        <title>Ubuntu -&gt; Debian</title>
+        <dc:creator><![CDATA[rk1]]></dc:creator>
+        <description><![CDATA[
+            <p>ad 1) Well, I figured that a VM or its manager cannot access kernel modules or IO functionality directly by itself. Thought would have to go through the intermediary of the host OS. Then it might have effect to change OS. But from your remark I guess I thought wrong.<br>
+ad 2) I think I did follow the wiki closely. I say ‘think’ because I find not all instructions clear. So first I followed the instructions in the paragraph about Sandboxing the USB, and then the instructions about the Passthrough. That is the right order, no? I find the instructions somewhat unclear because I would expect the Sandboxing paragraph to appear before the Passthrough paragraph. And I don’t understand how the instruction in Sandboxing is really sandboxing the USB. It is rather the opposite. We remove the default disabling of redirection by Debian.</p>
+          <p><a href="http://forums.whonix.org/t/ubuntu-debian/8909/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ubuntu-debian/8909/3</link>
+        <pubDate>Sat, 08 Feb 2020 15:03:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8909-3</guid>
+        <source url="http://forums.whonix.org/t/ubuntu-debian/8909.rss">Ubuntu -&gt; Debian</source>
+      </item>
+      <item>
+        <title>Ubuntu -&gt; Debian</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="rk1" data-post="1" data-topic="8909">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/r/9f8e36/40.png" class="avatar"> rk1:</div>
+<blockquote>
+<p>ad 1) still slow shutdown; I think it has nothing to do with Light Display Manager. Because (using CLI) I see again a stop job running but after the display manager already stopped.</p>
+</blockquote>
+</aside>
+<p>How do you expect a different host to fix something wrong in the guest stack?</p>
+<aside class="quote no-group" data-username="rk1" data-post="1" data-topic="8909">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/r/9f8e36/40.png" class="avatar"> rk1:</div>
+<blockquote>
+<p>ad 2) still no USB passthrough. This one is funny. My USB storage devices do work on the host. Now I am running on Buster/Whonix. But no passthrough. Can forum members testify that this feature does work?</p>
+</blockquote>
+</aside>
+<p>Have you followed the wiki instructions for it? see the KVM page.</p>
+<aside class="quote no-group" data-username="rk1" data-post="1" data-topic="8909">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/r/9f8e36/40.png" class="avatar"> rk1:</div>
+<blockquote>
+<p>ad 3) for now I stopped fucking with my firewall.</p>
+</blockquote>
+</aside>
+<p>Good. Too much fucking can break things.</p>
+          <p><a href="http://forums.whonix.org/t/ubuntu-debian/8909/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ubuntu-debian/8909/2</link>
+        <pubDate>Fri, 07 Feb 2020 21:09:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8909-2</guid>
+        <source url="http://forums.whonix.org/t/ubuntu-debian/8909.rss">Ubuntu -&gt; Debian</source>
+      </item>
+      <item>
+        <title>Ubuntu -&gt; Debian</title>
+        <dc:creator><![CDATA[rk1]]></dc:creator>
+        <description><![CDATA[
+            <p>Running Whonix as a guest OS on a Ubuntu host system I experienced some problems: 1) slow shutdown of Whonix and 2) no USB Passthrough. I also managed to break my host firewall stopping all network-traffic.<br>
+I decided to start all over again using Debian Buster as host system (hint by Hulahoop). Do I fare any better now?<br>
+ad 1) still slow shutdown; I think it has nothing to do with Light Display Manager. Because (using CLI) I see again a stop job running but after the display manager already stopped.<br>
+ad 2) still no USB passthrough. This one is funny. My USB storage devices do work on the host. Now I am running on Buster/Whonix. But no passthrough. Can forum members testify that this feature does work?<br>
+ad 3) for now I stopped fucking with my firewall. One comment: in the Whonix doc it is suggested to use GUFW denying all incoming traffic (except as result of already established connections). Just denying incoming traffic with gufw, will not stop all incoming packets. In the firewall there are still rules for INPUT that do allow protocol messages from ICMP and IGMP.</p>
+          <p><a href="http://forums.whonix.org/t/ubuntu-debian/8909/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ubuntu-debian/8909/1</link>
+        <pubDate>Fri, 07 Feb 2020 11:44:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8909-1</guid>
+        <source url="http://forums.whonix.org/t/ubuntu-debian/8909.rss">Ubuntu -&gt; Debian</source>
+      </item>
+  </channel>
+</rss>

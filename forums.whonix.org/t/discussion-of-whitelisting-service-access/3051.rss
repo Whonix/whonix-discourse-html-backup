@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Discussion of whitelisting service access</title>
+    <link>http://forums.whonix.org/t/discussion-of-whitelisting-service-access/3051</link>
+    <description>So this feature sounds similar to an idea discussed before: whitelisting connections to specific onion addresses. I want to think through this idea and its benefits before opening a ticket because it may not be worth it.
+
+https://twitter.com/attractr/status/786301528952844288
+
+&gt; Now testing: Oz sandbox restricts app connections to .onion servers only. Useful for @coyproject, Ricochet. Maybe &quot;TLS Guard&quot; wrong name
+
+The feature description is unclear but if all onion addresses are allowed then an attacker can just setup a hidden service and connect to it.
+
+But lets assume some situations where specific addresses can be whitelisted and see if that feature is useful.
+
+(Note: Ricochet is used as an example. Its very securely coded in reality and confirmed so by an audit.)
+
+Threat models:
+
+1)
+
+* (No address connection restrictions): The container/VM starts off in a clean state and is dedicated to running say Ricochet to connect to some contacts only.
+
+* A contact is malicious and attacks the IM peer - is then able to extract information from the victim via itself (because it would be whitelisted).
+
+**Result:** This would happen under the restricted outbound traffic access model anyway.
+
+
+2) 
+
+* (With address restrictions): Ricochet is running in a shared VM with other programs running. 
+
+**Result:** No browsing would be possible in this VM. So no infection/exfiltration would happen but then that&#39;s the same as running a clean Ricochet VM with no restrictions and using it for that purpose only. Restrictions not useful here.
+
+
+3)
+
+* (No address restrictions) Apparmor/container/sandbox around Ricochet and TBB. TBB is exploited and can only read limited folders that do not include the IM program.
+
+**Result:** Limited effect of compromise but not due to network restrictions.
+
+
+4)
+
+* (Address restrictions) Ricochet dedicated VM. Trusted contacts but no Onion client authorization enabled. Hypothetical bug in Ricochet. Malicious HSDir sniffs address and then scans and exploits Ricochet.
+
+**Result:** I&#39;m actually unsure. This may be a situation where limiting outbound can stop data pilfering. Because its an Onion service anyone can connect so inbound access is still possible. Which could establish bidirectional communication. What I saw when testing was: if a HS with client authentication connected to a non authorized client - bidirectional communication became possible even without authorization becuase the HS initiated contact. This is different though because outbound rather than inbound is restricted.
+
+
+5)
+
+* Kiosk access. well this only works if users are dumb. With physical access to the machine - this can easily be circumvented.
+
+
+***
+
+Code of interest if we decide it worth it:
+
+https://github.com/rbif/transi2p</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 20 Oct 2016 17:47:31 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/discussion-of-whitelisting-service-access/3051.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Discussion of whitelisting service access</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Thought some more about 4th scenario. It seems like a situation where a user is bending backwards to get exploited then try to do damage control. Authenticated HS is the answer and would make this unnecessary.</p>
+<p>Will add this write-up to feature comparison.</p>
+          <p><a href="http://forums.whonix.org/t/discussion-of-whitelisting-service-access/3051/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/discussion-of-whitelisting-service-access/3051/2</link>
+        <pubDate>Thu, 20 Oct 2016 17:47:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3051-2</guid>
+        <source url="http://forums.whonix.org/t/discussion-of-whitelisting-service-access/3051.rss">Discussion of whitelisting service access</source>
+      </item>
+      <item>
+        <title>Discussion of whitelisting service access</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>So this feature sounds similar to an idea discussed before: whitelisting connections to specific onion addresses. I want to think through this idea and its benefits before opening a ticket because it may not be worth it.</p>
+<aside class="onebox twitterstatus">
+  <header class="source">
+      <a href="https://twitter.com/attractr/status/786301528952844288" target="_blank" rel="nofollow noopener">twitter.com</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://pbs.twimg.com/profile_images/482576837751480321/gwxOR5RK_400x400.jpeg" class="thumbnail onebox-avatar" width="400" height="400">
+<h4>
+  <a href="https://twitter.com/attractr/status/786301528952844288" target="_blank" rel="nofollow noopener">
+    David Mirza Ahmad (attractr)
+  </a>
+</h4>
+
+<div class="tweet">Now testing: Oz sandbox restricts app connections to .onion servers only. Useful for <a href="https://twitter.com/coyproject" target="_blank" rel="nofollow noopener">@coyproject</a>, Ricochet. Maybe "TLS Guard" wrong name.. <a href="https://t.co/NhIjJts6n7" target="_blank" rel="nofollow noopener">https://t.co/NhIjJts6n7</a><div class="tweet-images"><img class="tweet-image" src="https://pbs.twimg.com/media/CumAgf7WgAA0KtS.jpg" width="690" height="387"></div>
+</div>
+
+<div class="date">
+  <a href="https://twitter.com/attractr/status/786301528952844288" target="_blank" rel="nofollow noopener">2:24 PM - 12 Oct 2016</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>
+<p>Now testing: Oz sandbox restricts app connections to .onion servers only. Useful for <span class="mention">@coyproject</span>, Ricochet. Maybe “TLS Guard” wrong name</p>
+</blockquote>
+<p>The feature description is unclear but if all onion addresses are allowed then an attacker can just setup a hidden service and connect to it.</p>
+<p>But lets assume some situations where specific addresses can be whitelisted and see if that feature is useful.</p>
+<p>(Note: Ricochet is used as an example. Its very securely coded in reality and confirmed so by an audit.)</p>
+<p>Threat models:</p>
+<ol>
+<li>
+</li>
+</ol>
+<ul>
+<li>
+<p>(No address connection restrictions): The container/VM starts off in a clean state and is dedicated to running say Ricochet to connect to some contacts only.</p>
+</li>
+<li>
+<p>A contact is malicious and attacks the IM peer - is then able to extract information from the victim via itself (because it would be whitelisted).</p>
+</li>
+</ul>
+<p><strong>Result:</strong> This would happen under the restricted outbound traffic access model anyway.</p>
+<ol start="2">
+<li>
+</li>
+</ol>
+<ul>
+<li>(With address restrictions): Ricochet is running in a shared VM with other programs running.</li>
+</ul>
+<p><strong>Result:</strong> No browsing would be possible in this VM. So no infection/exfiltration would happen but then that’s the same as running a clean Ricochet VM with no restrictions and using it for that purpose only. Restrictions not useful here.</p>
+<ol start="3">
+<li>
+</li>
+</ol>
+<ul>
+<li>(No address restrictions) Apparmor/container/sandbox around Ricochet and TBB. TBB is exploited and can only read limited folders that do not include the IM program.</li>
+</ul>
+<p><strong>Result:</strong> Limited effect of compromise but not due to network restrictions.</p>
+<ol start="4">
+<li>
+</li>
+</ol>
+<ul>
+<li>(Address restrictions) Ricochet dedicated VM. Trusted contacts but no Onion client authorization enabled. Hypothetical bug in Ricochet. Malicious HSDir sniffs address and then scans and exploits Ricochet.</li>
+</ul>
+<p><strong>Result:</strong> I’m actually unsure. This may be a situation where limiting outbound can stop data pilfering. Because its an Onion service anyone can connect so inbound access is still possible. Which could establish bidirectional communication. What I saw when testing was: if a HS with client authentication connected to a non authorized client - bidirectional communication became possible even without authorization becuase the HS initiated contact. This is different though because outbound rather than inbound is restricted.</p>
+<ol start="5">
+<li>
+</li>
+</ol>
+<ul>
+<li>Kiosk access. well this only works if users are dumb. With physical access to the machine - this can easily be circumvented.</li>
+</ul>
+<hr>
+<p>Code of interest if we decide it worth it:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://assets-cdn.github.com/favicon.ico" class="site-icon" width="32" height="32">
+      <a href="https://github.com/rbif/transi2p" target="_blank" rel="nofollow noopener">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars2.githubusercontent.com/u/16748908?s=400&amp;v=4" class="thumbnail onebox-avatar" width="420" height="420">
+
+<h3><a href="https://github.com/rbif/transi2p" target="_blank" rel="nofollow noopener">rbif/transi2p</a></h3>
+
+<p>transi2p - Transparent proxying for I2P and forwarding other addresses to Tor or clearnet.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/discussion-of-whitelisting-service-access/3051/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/discussion-of-whitelisting-service-access/3051/1</link>
+        <pubDate>Sat, 15 Oct 2016 02:15:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3051-1</guid>
+        <source url="http://forums.whonix.org/t/discussion-of-whitelisting-service-access/3051.rss">Discussion of whitelisting service access</source>
+      </item>
+  </channel>
+</rss>

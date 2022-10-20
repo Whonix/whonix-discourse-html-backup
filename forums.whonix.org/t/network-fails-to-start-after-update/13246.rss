@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Network fails to start after update</title>
+    <link>http://forums.whonix.org/t/network-fails-to-start-after-update/13246</link>
+    <description>I&#39;m quite new to Qubes and Whonix, so please forgive my cluelessness.
+I&#39;ve recently (today) updated the whonix-ws-16 (I think - it might&#39;ve been the whonix-gw-16 too).
+I&#39;m not sure to which version, as I don&#39;t know how to determine the currently installed versions.
+Now everytime I start any Qube based on the Whonix-ws, I get legal information regarding Whonix, finishing with the info that a check will be run, which fails:
+
+    ERROR: check network interfaces Result: network     interface eth0 not up!
+    Recommendation:
+    Try to manually start Whonix networking. 
+    sudo systemctl restart networking 
+    Or reboot.
+
+    Debugging information:
+    Command sudo --non-interactive cat /sys/class/net/eth0/carrier failed.
+
+    If this error happens only during upgrading or is transient this error can be safely ignored. 
+    If you know what you are doing, feel free to disable this check. Create a file /etc/systemcheck.d/50_user.conf and add: 
+    systemcheck_skip_functions+=&quot; check_network_interfaces &quot;
+
+Also, when I try to start a Whonix template (either gw or ws), I get the following error:
+
+    ERROR: whonix_firewall failed to load! 
+
+    The whonix_firewall failed to load for some reason. This could be due to the firewall being mis-configured or race-condition. Try restarting the VM to see if this error persists. 
+
+    Failure file /run/anon-firewall/failed.status does not exist, ok. 
+
+    output of sudo systemctl status whonix-firewall: 
+
+    ######################################## 
+    ● whonix-firewall.service
+    Loaded: masked (Reason: Unit whonix-firewall.service is masked.)
+    Active: inactive (dead) 
+    ######################################## 
+
+    output of sudo journalctl --boot -u whonix-firewall: 
+
+    ######################################## 
+    -- Journal begins at Tue 2022-01-25 17:30:51 UTC, ends at Thu 2022-01-27 16:12:13 UTC. --
+    -- No entries -- 
+    ######################################## 
+
+    To see this for yourself... 
+    1. Open a terminal. (dom0 -&gt; Start Menu -&gt; Template: whonix-ws-16 -&gt; Terminal) 
+    2. Run. 
+    sudo systemctl status whonix-firewall
+
+    2. Also see. 
+    sudo journalctl --boot -u whonix-firewall | cat
+
+    3. Try to manually start Whonix firewall. 
+    sudo whonix_firewall
+    If you know what you are doing, feel free to disable this check. Create a file /etc/systemcheck.d/50_user.conf and add: 
+    systemcheck_skip_functions+=&quot; check_whonix_firewall_systemd_status &quot;
+
+The following happens when trying to apply the suggestions:
+
+* Manually start Whonix networking in WS-based Qube: 
+    user@host:~$ sudo systemctl restart networking
+    Failed to restart networking.service: Unit networking.service is masked.
+* Restarting / rebooting (anything): No difference
+* Try to manually start Whonix firewall in template:
+    user@host:~$ sudo whonix_firewall
+    sudo: whonix_firewall: command not found
+
+I&#39;m not sure if it&#39;s only me, but the error messages &amp; suggestions don&#39;t seem to be too helpful.
+How can I resolve this issue? Or where can I find more information?</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 30 Jan 2022 14:40:54 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/network-fails-to-start-after-update/13246.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Network fails to start after update</title>
+        <dc:creator><![CDATA[tog]]></dc:creator>
+        <description><![CDATA[
+            <p>You’re absolutely right!<br>
+In the <code>history.log</code> I saw that whilst accidently uninstalling <code>iptables</code> (that’s another story…) I also uninstalled a few whonix packages.</p>
+          <p><a href="http://forums.whonix.org/t/network-fails-to-start-after-update/13246/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/network-fails-to-start-after-update/13246/4</link>
+        <pubDate>Sun, 30 Jan 2022 14:40:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13246-4</guid>
+        <source url="http://forums.whonix.org/t/network-fails-to-start-after-update/13246.rss">Network fails to start after update</source>
+      </item>
+      <item>
+        <title>Network fails to start after update</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="tog" data-post="1" data-topic="13246">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/58f4c7/40.png" class="avatar"> tog:</div>
+<blockquote>
+<p>user@host:~$ sudo whonix_firewall</p>
+</blockquote>
+</aside>
+<p>Then the whonix-firewall package is no longer installed.</p>
+<p>guess: Since nobody else reported this issue… Some custom installed package caused on upgrade the Whonix meta package as well as whonix-firewall package and probably other packages to be removed.</p>
+<p>See:</p><aside class="onebox allowlistedgeneric" data-onebox-src="https://www.whonix.org/wiki/Debian_Packages">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/a/a4/Whonix-home-favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://www.whonix.org/wiki/Debian_Packages" target="_blank" rel="noopener" title="11:32PM - 22 December 2021">Whonix – 22 Dec 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:614/500;"><img src="https://www.whonix.org/w/images/a/aa/Box-158523640.png" class="thumbnail" width="614" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Debian_Packages" target="_blank" rel="noopener">Debian Packages</a></h3>
+
+  <p>Which Whonix ™ Debian packages are safe to remove? What is a meta package? What other packages do Whonix ™ meta packages install? Which packages should never be removed?</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>I suggest to re-install the template.</p>
+<p>To investigate the update log would be required. File: <code>/var/log/apt/history.log</code></p>
+          <p><a href="http://forums.whonix.org/t/network-fails-to-start-after-update/13246/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/network-fails-to-start-after-update/13246/3</link>
+        <pubDate>Sat, 29 Jan 2022 18:31:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13246-3</guid>
+        <source url="http://forums.whonix.org/t/network-fails-to-start-after-update/13246.rss">Network fails to start after update</source>
+      </item>
+      <item>
+        <title>Network fails to start after update</title>
+        <dc:creator><![CDATA[tog]]></dc:creator>
+        <description><![CDATA[
+            <p>In case it’s helpful (it at least seems to contain some version numbers): Here’s the output of a verbose systemcheck on the qube based on whonix-ws-16:</p>
+<pre><code>user@host:~$ sudo systemcheck --verbose
+[INFO] [systemcheck] EG | Whonix-Workstation | whonix-ws-16 TemplateBased AppVM | Thu 27 Jan 2022 08:26:46 PM UTCuser@host:~$ sudo systemcheck --verbose
+[INFO] [systemcheck] EG | Whonix-Workstation | whonix-ws-16 TemplateBased AppVM | Thu 27 Jan 2022 08:26:46 PM UTC
+[INFO] [systemcheck] Check sudo Result: OK
+[INFO] [systemcheck] Whonix build version: 3:8.1-1
+[INFO] [systemcheck] whonix-workstation-packages-dependencies-cli: 22.1-1
+[INFO] [systemcheck] derivative_major_release_version /etc/whonix_version: 16
+[INFO] [systemcheck] Whonix Support Status of this Major Version: Ok.
+[WARNING] [systemcheck] Hardened Malloc: Disabled.
+[INFO] [systemcheck] Spectre Meltdown Test: skipping since spectre_meltdown_check=false, ok.
+[INFO] [systemcheck] Package Manager Consistency Check Result: Output of command dpkg --audit was empty, ok.
+[INFO] [systemcheck] systemd journal check Result:
+warnings:
+########################################
+
+########################################
+
+failed:
+########################################
+Jan 27 20:11:00 host systemd[1]: apparmor.service: Failed with result 'exit-code'.
+Jan 27 20:11:00 host systemd[1]: Failed to start Load AppArmor profiles.
+Jan 27 20:11:00 host systemd-udevd[310]: eth0: Process '/usr/lib/qubes/setup-ip' failed with exit code 1.
+Jan 27 20:11:00 host systemd-udevd[310]: eth0: Process '/usr/lib/qubes/setup-ip' failed with exit code 1.
+Jan 27 20:13:28 host systemd[1]: qubes-sync-time.service: Failed with result 'exit-code'.
+########################################
+
+errors:
+########################################
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 00, disabling event (20190816/evgpe-841)
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 01, disabling event (20190816/evgpe-841)
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 03, disabling event (20190816/evgpe-841)
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 04, disabling event (20190816/evgpe-841)
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 05, disabling event (20190816/evgpe-841)
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 06, disabling event (20190816/evgpe-841)
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 07, disabling event (20190816/evgpe-841)
+Jan 27 20:11:00 host kernel: Error: Driver 'pcspkr' is already registered, aborting...
+Jan 27 20:13:21 host systemd-xdg-autostart-generator[633]: Not generating service for XDG autostart app-qubes\x2dwhonixsetup-autostart.service, error parsing Exec= line: No such file or directory
+########################################
+
+denied:
+########################################
+
+########################################
+
+ordering cycle:
+########################################
+
+########################################
+
+To see this for yourself...
+1. Open a terminal. (dom0 -&gt; Start Menu -&gt; ServiceVM: EG -&gt; Terminal)
+2. Run. sudo journalctl --boot | grep -i warn
+3. Run. sudo journalctl --boot | grep -i fail
+4. Run. sudo journalctl --boot | grep -i error
+5. Run. sudo journalctl --boot | grep -i denied
+6. Run. sudo journalctl --boot | grep -i "ordering cycle"
+
+If you know what you are doing, feel free to disable this check.
+Create a file /etc/systemcheck.d/50_user.conf and add:
+systemcheck_skip_functions+=" check_journal "
+[ERROR] [systemcheck] check network interfaces Result: network interface eth0 not up!
+
+Recommendation:
+Try to manually start Whonix networking.
+
+sudo systemctl restart networking
+
+Or reboot.
+
+Debugging information:
+Command sudo --non-interactive cat /sys/class/net/eth0/carrier failed.
+
+If this error happens only during upgrading or is transient this error can be safely ignored.
+
+If you know what you are doing, feel free to disable this check.
+Create a file /etc/systemcheck.d/50_user.conf and add:
+systemcheck_skip_functions+=" check_network_interfaces "
+
+[INFO] [systemcheck] Check sudo Result: OK
+[INFO] [systemcheck] Whonix build version: 3:8.1-1
+[INFO] [systemcheck] whonix-workstation-packages-dependencies-cli: 22.1-1
+[INFO] [systemcheck] derivative_major_release_version /etc/whonix_version: 16
+[INFO] [systemcheck] Whonix Support Status of this Major Version: Ok.
+[WARNING] [systemcheck] Hardened Malloc: Disabled.
+[INFO] [systemcheck] Spectre Meltdown Test: skipping since spectre_meltdown_check=false, ok.
+[INFO] [systemcheck] Package Manager Consistency Check Result: Output of command dpkg --audit was empty, ok.
+[INFO] [systemcheck] systemd journal check Result:
+warnings:
+########################################
+
+########################################
+
+failed:
+########################################
+Jan 27 20:11:00 host systemd[1]: apparmor.service: Failed with result 'exit-code'.
+Jan 27 20:11:00 host systemd[1]: Failed to start Load AppArmor profiles.
+Jan 27 20:11:00 host systemd-udevd[310]: eth0: Process '/usr/lib/qubes/setup-ip' failed with exit code 1.
+Jan 27 20:11:00 host systemd-udevd[310]: eth0: Process '/usr/lib/qubes/setup-ip' failed with exit code 1.
+Jan 27 20:13:28 host systemd[1]: qubes-sync-time.service: Failed with result 'exit-code'.
+########################################
+
+errors:
+########################################
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 00, disabling event (20190816/evgpe-841)
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 01, disabling event (20190816/evgpe-841)
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 03, disabling event (20190816/evgpe-841)
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 04, disabling event (20190816/evgpe-841)
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 05, disabling event (20190816/evgpe-841)
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 06, disabling event (20190816/evgpe-841)
+Jan 27 20:10:59 host kernel: ACPI Error: No handler or method for GPE 07, disabling event (20190816/evgpe-841)
+Jan 27 20:11:00 host kernel: Error: Driver 'pcspkr' is already registered, aborting...
+Jan 27 20:13:21 host systemd-xdg-autostart-generator[633]: Not generating service for XDG autostart app-qubes\x2dwhonixsetup-autostart.service, error parsing Exec= line: No such file or directory
+########################################
+
+denied:
+########################################
+
+########################################
+
+ordering cycle:
+########################################
+
+########################################
+
+To see this for yourself...
+1. Open a terminal. (dom0 -&gt; Start Menu -&gt; ServiceVM: EG -&gt; Terminal)
+2. Run. sudo journalctl --boot | grep -i warn
+3. Run. sudo journalctl --boot | grep -i fail
+4. Run. sudo journalctl --boot | grep -i error
+5. Run. sudo journalctl --boot | grep -i denied
+6. Run. sudo journalctl --boot | grep -i "ordering cycle"
+
+If you know what you are doing, feel free to disable this check.
+Create a file /etc/systemcheck.d/50_user.conf and add:
+systemcheck_skip_functions+=" check_journal "
+[ERROR] [systemcheck] check network interfaces Result: network interface eth0 not up!
+
+Recommendation:
+Try to manually start Whonix networking.
+
+sudo systemctl restart networking
+
+Or reboot.
+
+Debugging information:
+Command sudo --non-interactive cat /sys/class/net/eth0/carrier failed.
+
+If this error happens only during upgrading or is transient this error can be safely ignored.
+
+If you know what you are doing, feel free to disable this check.
+Create a file /etc/systemcheck.d/50_user.conf and add:
+systemcheck_skip_functions+=" check_network_interfaces "
+</code></pre>
+<p>Some more notes:</p>
+<ul>
+<li>I’ve done all the steps from the “Essential Connectivity Troubleshooting”, none helped.</li>
+<li>The network in another qube, which uses a whonix-gw-16 qube (e.g. sys-whonix) as network <em>does</em> work - so it’s clearly the workstation that has problems, isn’t it?</li>
+<li>
+<code>anon-info</code> gives the following:<br>
+user@host:~$ anon-info<br>
+INFO: /etc/apt/sources.list.d/torproject.list does not exist.<br>
+INFO: version of the ‘tor’ package: 0.4.6.9-1~d11.bullseye+1</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/network-fails-to-start-after-update/13246/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/network-fails-to-start-after-update/13246/2</link>
+        <pubDate>Thu, 27 Jan 2022 20:28:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13246-2</guid>
+        <source url="http://forums.whonix.org/t/network-fails-to-start-after-update/13246.rss">Network fails to start after update</source>
+      </item>
+      <item>
+        <title>Network fails to start after update</title>
+        <dc:creator><![CDATA[tog]]></dc:creator>
+        <description><![CDATA[
+            <p>I’m quite new to Qubes and Whonix, so please forgive my cluelessness.<br>
+I’ve recently (today) updated the whonix-ws-16 (I think - it might’ve been the whonix-gw-16 too).<br>
+I’m not sure to which version, as I don’t know how to determine the currently installed versions.<br>
+Now everytime I start any Qube based on the Whonix-ws, I get legal information regarding Whonix, finishing with the info that a check will be run, which fails:</p>
+<pre><code>ERROR: check network interfaces Result: network     interface eth0 not up!
+Recommendation:
+Try to manually start Whonix networking. 
+sudo systemctl restart networking 
+Or reboot.
+
+Debugging information:
+Command sudo --non-interactive cat /sys/class/net/eth0/carrier failed.
+
+If this error happens only during upgrading or is transient this error can be safely ignored. 
+If you know what you are doing, feel free to disable this check. Create a file /etc/systemcheck.d/50_user.conf and add: 
+systemcheck_skip_functions+=" check_network_interfaces "
+</code></pre>
+<p>Also, when I try to start a Whonix template (either gw or ws), I get the following error:</p>
+<pre><code>ERROR: whonix_firewall failed to load! 
+
+The whonix_firewall failed to load for some reason. This could be due to the firewall being mis-configured or race-condition. Try restarting the VM to see if this error persists. 
+
+Failure file /run/anon-firewall/failed.status does not exist, ok. 
+
+output of sudo systemctl status whonix-firewall: 
+
+######################################## 
+● whonix-firewall.service
+Loaded: masked (Reason: Unit whonix-firewall.service is masked.)
+Active: inactive (dead) 
+######################################## 
+
+output of sudo journalctl --boot -u whonix-firewall: 
+
+######################################## 
+-- Journal begins at Tue 2022-01-25 17:30:51 UTC, ends at Thu 2022-01-27 16:12:13 UTC. --
+-- No entries -- 
+######################################## 
+
+To see this for yourself... 
+1. Open a terminal. (dom0 -&gt; Start Menu -&gt; Template: whonix-ws-16 -&gt; Terminal) 
+2. Run. 
+sudo systemctl status whonix-firewall
+
+2. Also see. 
+sudo journalctl --boot -u whonix-firewall | cat
+
+3. Try to manually start Whonix firewall. 
+sudo whonix_firewall
+If you know what you are doing, feel free to disable this check. Create a file /etc/systemcheck.d/50_user.conf and add: 
+systemcheck_skip_functions+=" check_whonix_firewall_systemd_status "
+</code></pre>
+<p>The following happens when trying to apply the suggestions:</p>
+<ul>
+<li>Manually start Whonix networking in WS-based Qube:<br>
+user@host:~$ sudo systemctl restart networking<br>
+Failed to restart networking.service: Unit networking.service is masked.</li>
+<li>Restarting / rebooting (anything): No difference</li>
+<li>Try to manually start Whonix firewall in template:<br>
+user@host:~$ sudo whonix_firewall<br>
+sudo: whonix_firewall: command not found</li>
+</ul>
+<p>I’m not sure if it’s only me, but the error messages &amp; suggestions don’t seem to be too helpful.<br>
+How can I resolve this issue? Or where can I find more information?</p>
+          <p><a href="http://forums.whonix.org/t/network-fails-to-start-after-update/13246/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/network-fails-to-start-after-update/13246/1</link>
+        <pubDate>Thu, 27 Jan 2022 16:38:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13246-1</guid>
+        <source url="http://forums.whonix.org/t/network-fails-to-start-after-update/13246.rss">Network fails to start after update</source>
+      </item>
+  </channel>
+</rss>

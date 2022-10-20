@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Preserving changes to main config files across updates</title>
+    <link>http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180</link>
+    <description>@Patrick we&#39;ve succeeded in getting privoxy to work with I2P but we must modify the original config files directly since it  doesn&#39;t seem to support .d style configuration. Is this considered a showstopper or can we use a workaround with inotify so that when detecting any changes to the main privoxy config (say after a pkg update), it would trigger a command that copies over our custom config and restarts the daemon?</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 13 Jun 2018 06:34:00 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Preserving changes to main config files across updates</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>HulaHoop:</p>
+<blockquote>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> should I add .bit domains to privoxy for transparent redirection to zeronet?</p>
+</blockquote>
+<p>Ok. No strong opinion either way.</p>
+          <p><a href="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/9</link>
+        <pubDate>Wed, 13 Jun 2018 06:34:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5180-9</guid>
+        <source url="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180.rss">Preserving changes to main config files across updates</source>
+      </item>
+      <item>
+        <title>Preserving changes to main config files across updates</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Goldstein:</p>
+<blockquote>
+<aside class="quote" data-post="6" data-topic="5180">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>With socat or systemd-socket-proxyd we could only redirect all Tor Browser socks (or http?) connections to i2p?</p>
+</blockquote>
+</aside>
+<p>I’m not sure what you mean by that</p>
+</blockquote>
+<p>Could you use <code>socat</code> [1] to redirect the unix domain socket file<br>
+<code>/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9150.sock</code> [2] [3],<br>
+which Tor Browser is talking to by default in Whonix, to i2p?</p>
+<p>[1] (or <code>systemd-socket-proxyd</code> which is about the same - used in Whonix<br>
+14 instead of socat)<br>
+[2] <code>export TOR_SOCKS_IPC_PATH="/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9150.sock"</code><br>
+[3]<br>
+</p><aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/anon-ws-disable-stacked-tor/blob/master/usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh#L47" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/anon-ws-disable-stacked-tor/blob/master/usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh#L47" target="_blank" rel="nofollow noopener">Whonix/anon-ws-disable-stacked-tor/blob/master/usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh#L47</a></h4>
+<pre class="onebox"><code class="lang-sh"><ol class="start lines" start="37" style="counter-reset: li-counter 36 ;">
+<li>#export TOR_TRANSPROXY=1</li>
+<li>
+</li>
+<li>## Environment variable to configure Tor Browser to use a pre existing unix</li>
+<li>## domain socket file instead of creating its own one to avoid Tor over Tor and</li>
+<li>## to keep it being able to connect.</li>
+<li>## systemd-socket-proxyd is being used for creation of unix domain socket file</li>
+<li>## /var/run/anon-ws-disable-stacked-tor/127.0.0.1_9150.sock and forwarding it to</li>
+<li>## to Whonix-Gateway port 9150.</li>
+<li>## https://phabricator.whonix.org/T192</li>
+<li>## https://trac.torproject.org/projects/tor/ticket/20111#comment:5</li>
+<li class="selected">export TOR_SOCKS_IPC_PATH="/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9150.sock"</li>
+<li>export TOR_CONTROL_IPC_PATH="/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9151.sock"</li>
+<li>
+</li>
+<li>## environment variable to skip TorButton control port verification</li>
+<li>## https://trac.torproject.org/projects/tor/ticket/13079</li>
+<li>export TOR_SKIP_CONTROLPORTTEST=1</li>
+<li>
+</li>
+<li>## Environment variable to disable the "TorButton" -&gt;</li>
+<li>## "Open Network Settings..." menu item. It is not useful and confusing to have</li>
+<li>## on a workstation, because Tor must be configured on the Whonix-Gateway, which is</li>
+<li>## for security reasons forbidden from the Whonix-Gateway.</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+[4] environment variable already set in Whonix-Workstation by default<p></p>
+          <p><a href="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/8</link>
+        <pubDate>Thu, 10 May 2018 10:34:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5180-8</guid>
+        <source url="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180.rss">Preserving changes to main config files across updates</source>
+      </item>
+      <item>
+        <title>Preserving changes to main config files across updates</title>
+        <dc:creator><![CDATA[goldstein-otg]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="6" data-topic="5180">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>With socat or systemd-socket-proxyd we could only redirect all Tor Browser socks (or http?) connections to i2p?</p>
+</blockquote>
+</aside>
+<p>I’m not sure what you mean by that<br>
+We redirect (atm) .i2p (http) to 127.0.0.1:4444 and forward it with socat to the I2P Router on the Gateway.</p>
+<aside class="quote" data-post="6" data-topic="5180">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>You want to redirect .i2p only? You want to block clearnet in that browser?</p>
+</blockquote>
+</aside>
+<p>Yes, .i2p and (depending on the user .bit/zeronet)  and block all clearnet/tor traffic in that TBB</p>
+          <p><a href="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/7</link>
+        <pubDate>Tue, 08 May 2018 21:43:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5180-7</guid>
+        <source url="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180.rss">Preserving changes to main config files across updates</source>
+      </item>
+      <item>
+        <title>Preserving changes to main config files across updates</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="4" data-topic="5180">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/g/df705f/40.png" class="avatar"> goldstein-otg:</div>
+<blockquote>
+<p>Redirect .i2p to 127.0.0.1:4444</p>
+</blockquote>
+</aside>
+<p>With socat or systemd-socket-proxyd we could only redirect all Tor Browser socks (or http?) connections to i2p?</p>
+<p>You want to redirect .i2p only? You want to block clearnet in that browser?</p>
+          <p><a href="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/6</link>
+        <pubDate>Tue, 08 May 2018 19:41:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5180-6</guid>
+        <source url="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180.rss">Preserving changes to main config files across updates</source>
+      </item>
+      <item>
+        <title>Preserving changes to main config files across updates</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> should I add .bit domains to privoxy for transparent redirection to zeronet?</p>
+          <p><a href="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/5</link>
+        <pubDate>Tue, 08 May 2018 15:57:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5180-5</guid>
+        <source url="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180.rss">Preserving changes to main config files across updates</source>
+      </item>
+      <item>
+        <title>Preserving changes to main config files across updates</title>
+        <dc:creator><![CDATA[goldstein-otg]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="3" data-topic="5180">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>What’s the small summary for using privoxy?</p>
+</blockquote>
+</aside>
+<p>Redirect .i2p to 127.0.0.1:4444</p>
+          <p><a href="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/4</link>
+        <pubDate>Tue, 08 May 2018 09:23:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5180-4</guid>
+        <source url="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180.rss">Preserving changes to main config files across updates</source>
+      </item>
+      <item>
+        <title>Preserving changes to main config files across updates</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>What’s the small summary for using privoxy?</p>
+<p>Translate socks to http?</p>
+<p>Translate http to socks?</p>
+<p>Redirect localhost to Whonix-Gatway?</p>
+          <p><a href="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/3</link>
+        <pubDate>Tue, 08 May 2018 08:34:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5180-3</guid>
+        <source url="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180.rss">Preserving changes to main config files across updates</source>
+      </item>
+      <item>
+        <title>Preserving changes to main config files across updates</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>HulaHoop:</p>
+<blockquote>
+<p>Is this considered a showstopper</p>
+</blockquote>
+<p>No.</p>
+<blockquote>
+<p>can we use a workaround with inotify so that when detecting any<br>
+changes to the main privoxy config (say after a pkg update), it would<br>
+trigger a command that copies over our custom config and restarts the<br>
+daemon?</p>
+</blockquote>
+<p>Very unclean and absolutely not required.</p>
+<blockquote>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> we’ve succeeded in getting privoxy to work with I2P but we must modify the original config files directly since it  doesn’t seem to support .d style configuration.</p>
+</blockquote>
+<p>Use <code>config-package-dev</code> <code>displace</code>. Many examples in Whonix source code.</p>
+<pre><code class="lang-auto">  ~/Whonix $ myfind . | grep displace
++ exec find . -type f -not -iwholename '*.git*'
+...
+./packages/anon-gw-anonymizer-config/debian/anon-gw-anonymizer-config.displace
+./packages/anon-gw-anonymizer-config/debian/anon-gw-anonymizer-config.displace-extension
+...
+</code></pre>
+<p>The full instructions in very short:</p>
+          <p><a href="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/2</link>
+        <pubDate>Tue, 08 May 2018 08:21:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5180-2</guid>
+        <source url="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180.rss">Preserving changes to main config files across updates</source>
+      </item>
+      <item>
+        <title>Preserving changes to main config files across updates</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> we’ve succeeded in getting privoxy to work with I2P but we must modify the original config files directly since it  doesn’t seem to support .d style configuration. Is this considered a showstopper or can we use a workaround with inotify so that when detecting any changes to the main privoxy config (say after a pkg update), it would trigger a command that copies over our custom config and restarts the daemon?</p>
+          <p><a href="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180/1</link>
+        <pubDate>Tue, 08 May 2018 03:56:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5180-1</guid>
+        <source url="http://forums.whonix.org/t/preserving-changes-to-main-config-files-across-updates/5180.rss">Preserving changes to main config files across updates</source>
+      </item>
+  </channel>
+</rss>

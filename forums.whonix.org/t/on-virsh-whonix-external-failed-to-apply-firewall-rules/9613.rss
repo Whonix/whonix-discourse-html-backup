@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+    <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613</link>
+    <description>Following the guide:
+( the main KVM guide on this domain, newbie, can&#39;t yet post links )
+
+all appears to have gone well, up to:
+( that same main KVM guide on this domain )
+#Importing_Whonix_.E2.84.A2_VM_Templates
+
+More precisely, the first lines went fine:
+
+    virsh -c qemu:///system net-define Whonix_external_network-15.0.0.8.7.xml
+    virsh -c qemu:///system net-define Whonix_internal_network-15.0.0.8.7.xml
+    virsh -c qemu:///system net-autostart Whonix-External
+
+But I get the following error at:
+
+`virsh -c qemu:///system net-start Whonix-External`
+
+*error: Failed to start network Whonix-External*
+*error: internal error: Failed to apply firewall rules /usr/sbin/iptables -w --table filter --insert LIBVIRT_INP --in-interface virbr1 --protocol tcp --destination-port 67 --jump ACCEPT: iptables: No chain/target/match by that name.*
+
+In the /var/log/syslog, at the time that failing command is issued, I find:
+
+*2020-05-28T19:07:00.892332+00:00 thehost kernel: [11657.591323] virbr1: port 1(virbr1-nic) entered blocking state*
+*2020-05-28T19:07:00.892362+00:00 thehost kernel: [11657.591326] virbr1: port 1(virbr1-nic) entered disabled state*
+*2020-05-28T19:07:00.892366+00:00 thehost kernel: [11657.591586] device virbr1-nic entered promiscuous mode*
+*2020-05-28T19:07:01.106297+00:00 thehost kernel: [11657.805192] device virbr1-nic left promiscuous mode*
+*2020-05-28T19:07:01.106314+00:00 thehost kernel: [11657.805196] virbr1: port 1(virbr1-nic) entered disabled state*
+
+Of course, no virbr1 to be found:
+
+\# brctl show
+
+    bridge name     bridge id               STP enabled     interfaces
+    virbr0          8000.525400b0af6a       yes             virbr0-nic
+That&#39;s just the default libvirt&#39;s virbr0.
+
+Similarly, I couldn&#39;t start:
+
+`virsh -c qemu:///system net-start Whonix-Internal`
+
+Same error, just `&#39;s/virbr1/virbr2&#39;` . Also for the logs, which are same, except for` &#39;s/virbr1/virbr2&#39;` and time is some 10 minutes later.
+
+There are even scary suggestions what that might be:
+(lnewbie, can&#39;t yet post links, but it&#39;s on experts-exchange commercial domain )
+
+I sometimes do tcpdump&#39;ing, however, at the exact time of the failing command above, I wasn&#39;t capturing traffic. So...
+
+What could this be? How should I proceed here towards a solution?</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 03 Sep 2020 09:18:14 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="markolind" data-post="10" data-topic="9613">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/a8b319/40.png" class="avatar"> markolind:</div>
+<blockquote>
+<p>Blocking all local outbound non-Tor traffic with iptables<br>
+<a href="https://trac.torproject.org/projects/tor/wiki/doc/BlockingNonTorTraffic">https://trac.torproject.org/projects/tor/wiki/doc/BlockingNonTorTraffic </a></p>
+</blockquote>
+</aside>
+<p>Blocks based on user <code>debian-tor</code>. That won’t work in case of using VMs. How to run Tor in a VM and then allow only that VM (or only Tor traffic) (really Tor, not user debian-tor) on the host is yet to be invented as per:<br>
+<a href="https://forums.whonix.org/t/whonix-host-firewall/9151" class="inline-onebox">Whonix-Host Firewall</a></p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/15</link>
+        <pubDate>Thu, 03 Sep 2020 09:18:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-15</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[markolind]]></dc:creator>
+        <description><![CDATA[
+            <p>First, I apologize for the delay. Can only use the free time I have available.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="13" data-topic="9613">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Certainly not easy to basically invent Whonix-Host.</p>
+</blockquote>
+</aside>
+<p>I think I see what you mean.</p>
+<p>This is my problem: I want to understand what I will be using, your baby, this Whonix. And it is very demanding.</p>
+<p>I might have a laugh at myself in unclearly how distant future, when I finally install Whonix, who knows.</p>
+<p>However, the browsing system with Tor (and Vanguards, which I use on Debian Tor, and on TorBrowser as well) with UID-based Iptables is very safe.</p>
+<p>OTOH, the understanding of how Whonix Gateway does the netfiltering stuff is not within my easy grasp, given the complexity of Libvirt it installs in.</p>
+<p>Pls. have patience with such a slow adopter that I am. Time will tell more, and maybe good stuff will be. I hope and I wish.</p>
+<p>Thank you for you consideration.</p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/14</link>
+        <pubDate>Wed, 02 Sep 2020 20:10:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-14</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="markolind" data-post="12" data-topic="9613">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/a8b319/40.png" class="avatar"> markolind:</div>
+<blockquote>
+<p>And that means get a really good iptables setup for Whonix. Not easy, is it?</p>
+</blockquote>
+</aside>
+<p>Certainly not easy to basically invent Whonix-Host.</p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/13</link>
+        <pubDate>Wed, 02 Sep 2020 09:31:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-13</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[markolind]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="11" data-topic="9613">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Revert these firewall rules and try installing Whonix again.</p>
+</blockquote>
+</aside>
+<p>Thanks for looking this up.<br>
+But I know that it can’t work that way for Libvirt, actually I also wrote just that.<br>
+And I also wrote about having other obligations. And how I want to do it really right… And that means get a really good iptables setup for Whonix. Not easy, is it? So…</p>
+<p>Because also, looking at the state of Tor deployment, esp. for readers unaware of this:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://cdn-static-1.medium.com/_/fp/icons/favicon-rebrand-medium.3Y6xpZ-0FSdWDnPM3hSBIA.ico" class="site-icon" width="32" height="32">
+      <a href="https://medium.com/@nusenu/how-malicious-tor-relays-are-exploiting-users-in-2020-part-i-1097575c0cac" target="_blank" rel="nofollow noopener" title="03:47PM - 13 August 2020">Medium – 13 Aug 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/314;"><img src="https://miro.medium.com/max/1200/1*VKcsKQhphVxpqVEag2bYvw.png" class="thumbnail" width="690" height="314"></div>
+
+<h3><a href="https://medium.com/@nusenu/how-malicious-tor-relays-are-exploiting-users-in-2020-part-i-1097575c0cac" target="_blank" rel="nofollow noopener">How Malicious Tor Relays are Exploiting Users in 2020 (Part I)</a></h3>
+
+<p>&gt;23% of the Tor network’s exit capacity has been attacking Tor users</p>
+
+  <p><span class="label1">Reading time: 12 min read</span>
+    </p>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+which is actually a censored topic. And I can prove what I just wrote, to you <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a>, or <a class="mention" href="http://forums.whonix.org/u/tempest">@tempest</a> , or <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a>, if you wish.<br>
+There were other replies to:<br>
+[tor-talk] &gt;600 Tor relays without ContactInfo and similar properties<br>
+<a href="https://lists.torproject.org/pipermail/tor-talk/2020-August/045638.html" class="onebox" target="_blank" rel="nofollow noopener">https://lists.torproject.org/pipermail/tor-talk/2020-August/045638.html</a><br>
+and some, I can prove that, are still waiting for moderator’s approval, for days and days.<br>
+Given that, given how Vanguards is still undeployed[*], although it’s the real cure for many attacks on Tor… Three hops suffices for anonimity? Given the <span class="bbcode-b">nusenu</span>’s findings… C’mon!
+<p>So I want to do it right, I don’t mind how long I will research it, before I do it, in the free time I can dedicate to Whonix… I want real anonimity/psudonimity.</p>
+<p>Pls. also have a look at the other topic, that I’ll reply to you next, with some interesting finding, that you, and other advanced users can check.</p>
+<hr>
+<p>[*] The remarkable Tor dev Mike Perry is not anymore on the TorProject’s people list… And probably not financed for Vanguards development…</p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/12</link>
+        <pubDate>Tue, 01 Sep 2020 14:01:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-12</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="markolind" data-post="10" data-topic="9613">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/a8b319/40.png" class="avatar"> markolind:</div>
+<blockquote>
+<p>Blocking all local outbound non-Tor traffic with iptables<br>
+<a href="https://trac.torproject.org/projects/tor/wiki/doc/BlockingNonTorTraffic">https://trac.torproject.org/projects/tor/wiki/doc/BlockingNonTorTraffic </a></p>
+</blockquote>
+</aside>
+<p>You are making things needlessly complicated and interfering with the normal vanilla install of libvirt. Revert these firewall rules and try installing Whonix again. We have plans to properly block all non-tor traffic on the upcoming Whonix Host.</p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/11</link>
+        <pubDate>Tue, 01 Sep 2020 12:47:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-11</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[markolind]]></dc:creator>
+        <description><![CDATA[
+            <p>I want to get back to the topic of firewall rules that failed to apply for Whonix.<br>
+I want to explain what I was trying to achieve, and why it couldn’t work.<br>
+As I wrote a while ago, in the other topic, which I hope will be tollerated (it’s a little outside the “website” forum section scope):<br>
+<a href="http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/download-torbrowser-via-onion/10178" class="onebox" target="_blank" rel="nofollow noopener">http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/download-torbrowser-via-onion/10178</a><br>
+I now likely can install Whonix.</p>
+<p>So why I couldn’t previously? I had, way before, found this:</p>
+<p>Blocking all local outbound non-Tor traffic with iptables<br>
+<a href="https://trac.torproject.org/projects/tor/wiki/doc/BlockingNonTorTraffic" class="onebox" target="_blank" rel="nofollow noopener">https://trac.torproject.org/projects/tor/wiki/doc/BlockingNonTorTraffic</a></p>
+<p>which is instructions that truly use iptables in such way that nothing escapes from your machine, nor enters, other than Tor traffic, and only Tor traffic.</p>
+<p>That page is worth saving, because there have been some developments within TorProject, such as moving away from hidden services for a few important services such as that wiki and bug tracker, and such as also the downloading of the very torbrowser. That, it appears to me, is not anymore possible via hidden service, but only via clearnet (see the first link above for that)… So that page might also might disappear…</p>
+<p>And, for the lack of time to do the Whonix install the way I wish, with complete understanding, I kept, when I would find time, as I have other obligations, trying to install and run libvirt in such environment, where actually only Tor traffic is possible…</p>
+<p>Sure, that can’t happen… Libvirt, necessary for the KVM-flavor of Whonix install, needs freedom on the OUTPUT of iptables. Libvirt can’t be made to work if the only allowed user that can use OUTPUT is debian-tor, or tbb-tor (pls. see the linked page on the Tor wiki that’s going away)…</p>
+<p>Controling of my machine was easy with that iptables setup, the only attacks really were against the Tor network, not against my machine directly.</p>
+<p>And now I wonder which way to tread to get me a good iptables setup for Libvirt, which will be safe enough, but which will also allow Libvirt sufficient freedom, for the Whonix to work.</p>
+<p>That’s not a simple understanding that is needed, I bet you’ll agree.</p>
+<p>I really only wanted to explan that.</p>
+<p>Regards to all the readers, and esp. Whonix developers.</p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/10</link>
+        <pubDate>Mon, 31 Aug 2020 21:23:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-10</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>For mailer please open a separate thread.</p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/9</link>
+        <pubDate>Thu, 16 Jul 2020 09:56:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-9</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="markolind" data-post="7" data-topic="9613">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/a8b319/40.png" class="avatar"> markolind:</div>
+<blockquote>
+<p>And only once I opened<br>
+<a href="http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/">http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/</a><br>
+did my TorBrowser start showing it to me on the right to the address bar… (which is a TorBrowser issue, I’d expect).</p>
+</blockquote>
+</aside>
+<p>Maybe. I’m running TBB stable  and I see the “.onion available” in the address bar everytime I visit</p>
+<p>cc/ <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> about the mailer</p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/8</link>
+        <pubDate>Wed, 15 Jul 2020 13:02:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-8</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[markolind]]></dc:creator>
+        <description><![CDATA[
+            <p>And I thought it was Tor having difficulty getting through.<br>
+BTW, I didn’t know you have V3 onion service, until I stumbled on it skimming through the mail from you…<br>
+And only once I opened<br>
+<a href="http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/" class="onebox" target="_blank" rel="nofollow noopener">http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/</a><br>
+did my TorBrowser start showing it to me on the right to the address bar… (which is a TorBrowser issue, I’d expect).</p>
+<p>Still digressing, but back to the discourse issue. I also replied, two mails, to this topic:<br>
+<a href="http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/whonix-moving-from-github-to-gitlab/9676" class="onebox" target="_blank" rel="nofollow noopener">http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/whonix-moving-from-github-to-gitlab/9676</a><br>
+And I’ll don’t see them there. I’ll try and see if I can manually post them, and if it might in debugging discourse, I can privately show you the mails, because I did get back replies from <a href="http://whonix.org" rel="nofollow noopener">whonix.org</a>:</p>
+<blockquote>
+<p>Return-Path: <a href="mailto:discoursereplies+verp-8aff2237b185dbde4e9ec950b1c02d98@whonix.org">discoursereplies+verp-8aff2237b185dbde4e9ec950b1c02d98@whonix.org</a></p>
+</blockquote>
+<p>and</p>
+<blockquote>
+<p>Return-Path: <a href="mailto:discoursereplies+verp-22c4426dea458a0669e49f438d175beb@whonix.org">discoursereplies+verp-22c4426dea458a0669e49f438d175beb@whonix.org</a></p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/7</link>
+        <pubDate>Wed, 15 Jul 2020 06:11:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-7</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Great. Let me know. I think the remailer is not responding anymore because I got a delivery failure also.</p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/6</link>
+        <pubDate>Tue, 14 Jul 2020 20:24:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-6</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[markolind]]></dc:creator>
+        <description><![CDATA[
+            <p>I replied to you yesterday, via email, i.e. the discourse should have taken it here. But it seem not to have got through, as I do not see it here.</p>
+<p>Thanks! I’m looking into it!</p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/5</link>
+        <pubDate>Tue, 14 Jul 2020 15:58:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-5</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="markolind" data-post="1" data-topic="9613">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/a8b319/40.png" class="avatar"> markolind:</div>
+<blockquote>
+<p>internal error: Failed to apply firewall rules /usr/sbin/iptables -w --table filter --insert LIBVIRT_INP --in-interface virbr1 --protocol tcp --destination-port 67 --jump ACCEPT: iptables: No chain/target/match by that name.</p>
+</blockquote>
+</aside>
+<p>This error is related to a buggy libvirt version that has since been fixed. Either update to a newer version on your rolling distro or switch to one that is more stable.</p>
+<p><a href="https://www.redhat.com/archives/libvirt-users/2019-October/msg00024.html" class="onebox" target="_blank">https://www.redhat.com/archives/libvirt-users/2019-October/msg00024.html</a></p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/4</link>
+        <pubDate>Tue, 02 Jun 2020 13:30:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-4</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[markolind]]></dc:creator>
+        <description><![CDATA[
+            <p>This is the sorce (can’t post links yet, so pls. do <code>sed  's$_$/$g'</code> on the below and add http s //: ,witout blanks, at start, to get the link):</p>
+<p>www.experts-exchange.com_questions_28657027_What-is-promiscuous-mode-and-why-is-eth1-entering-it.html</p>
+<p>Such as:</p>
+<pre><code> echo www.experts-exchange.com_questions_28657027_What-is-promiscuous-mode-and-why-is-eth1-entering-it.html | sed  's$_$/$g'
+</code></pre>
+<p>and the start is the regular https and : and two slashes.</p>
+<p>Again, maybe not at all a Whonix issue --what normal reason can there be for the <strong>virbr1</strong> /  <strong>virbr2</strong> to cycle <em>blocking / promiscuos / disabled</em> states?-- but will appreciate opinion on this, and how to examine my system and in which way to test the network on this…</p>
+<p>Thanks!</p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/3</link>
+        <pubDate>Fri, 29 May 2020 06:33:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-3</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[markolind]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="markolind" data-post="1" data-topic="9613">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/a8b319/40.png" class="avatar"> markolind:</div>
+<blockquote>
+<p>There are even scary suggestions what that might be:<br>
+(lnewbie, can’t yet post links, but it’s on experts-exchange commercial domain )</p>
+</blockquote>
+</aside>
+<p>A mail server guy there posted that he had:</p>
+<pre><code class="lang-auto">Apr 15 00:21:40 mail kernel: [383546.156569] device eth1 entered promiscuous mode
+Apr 15 00:55:47 mail kernel: [385596.344128] device eth1 left promiscuous mode
+Apr 15 13:21:55 mail kernel: [430436.382364] device eth1 entered promiscuous mode
+Apr 15 13:26:27 mail kernel: [430709.031522] device eth1 left promiscuous mode
+</code></pre>
+<p>which is fairly similar to my issue. An expert there replied:</p>
+<blockquote>
+<p>Typically the card enters promiscuous mode when a traffic sniffer (tcpdump, snort, etc…) is being used.  It is almost impossible from the information we have to tell you exactly what is causing it.</p>
+<p>It looks like the name of your server is “mail” which leads me to believe it is a mail server of some sort.  There is no reason to have promiscuous mode for mail exchange.</p>
+<p>I do not want to scare you, but this can also be a sign of some unwanted folks on your system.  It wouldn’t be the first time I have seen a compromised system be used to “discover” what is around it.</p>
+</blockquote>
+<p>That’s pretty much all to be available over Tor on that com domain.</p>
+<p>It actually does look suspect to me.</p>
+<p>In which case this would not be an issue directly related to Whonix, but rather a network intrusion issue.</p>
+<p>In which case, still hope it’s not that bad scenario.</p>
+<p>I’ll appreciate any opinion, suggestion, ideas here: how should I proceed to examine my network here, and the inability of libvirt to create <strong>virbr1</strong> and <strong>virbr2</strong> without those devices <em>entering blocking state</em> and then going <em>promiscuos</em> and then <em>disabled.</em>…</p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/2</link>
+        <pubDate>Fri, 29 May 2020 06:29:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-2</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+      <item>
+        <title>On virsh... Whonix-External, Failed to apply firewall rules</title>
+        <dc:creator><![CDATA[markolind]]></dc:creator>
+        <description><![CDATA[
+            <p>Following the guide:<br>
+( the main KVM guide on this domain, newbie, can’t yet post links )</p>
+<p>all appears to have gone well, up to:<br>
+( that same main KVM guide on this domain )<br>
+<span class="hashtag">#Importing_Whonix_</span>.E2.84.A2_VM_Templates</p>
+<p>More precisely, the first lines went fine:</p>
+<pre><code>virsh -c qemu:///system net-define Whonix_external_network-15.0.0.8.7.xml
+virsh -c qemu:///system net-define Whonix_internal_network-15.0.0.8.7.xml
+virsh -c qemu:///system net-autostart Whonix-External
+</code></pre>
+<p>But I get the following error at:</p>
+<p><code>virsh -c qemu:///system net-start Whonix-External</code></p>
+<p><em>error: Failed to start network Whonix-External</em><br>
+<em>error: internal error: Failed to apply firewall rules /usr/sbin/iptables -w --table filter --insert LIBVIRT_INP --in-interface virbr1 --protocol tcp --destination-port 67 --jump ACCEPT: iptables: No chain/target/match by that name.</em></p>
+<p>In the /var/log/syslog, at the time that failing command is issued, I find:</p>
+<p><em>2020-05-28T19:07:00.892332+00:00 thehost kernel: [11657.591323] virbr1: port 1(virbr1-nic) entered blocking state</em><br>
+<em>2020-05-28T19:07:00.892362+00:00 thehost kernel: [11657.591326] virbr1: port 1(virbr1-nic) entered disabled state</em><br>
+<em>2020-05-28T19:07:00.892366+00:00 thehost kernel: [11657.591586] device virbr1-nic entered promiscuous mode</em><br>
+<em>2020-05-28T19:07:01.106297+00:00 thehost kernel: [11657.805192] device virbr1-nic left promiscuous mode</em><br>
+<em>2020-05-28T19:07:01.106314+00:00 thehost kernel: [11657.805196] virbr1: port 1(virbr1-nic) entered disabled state</em></p>
+<p>Of course, no virbr1 to be found:</p>
+<p># brctl show</p>
+<pre><code>bridge name     bridge id               STP enabled     interfaces
+virbr0          8000.525400b0af6a       yes             virbr0-nic
+</code></pre>
+<p>That’s just the default libvirt’s virbr0.</p>
+<p>Similarly, I couldn’t start:</p>
+<p><code>virsh -c qemu:///system net-start Whonix-Internal</code></p>
+<p>Same error, just <code>'s/virbr1/virbr2'</code> . Also for the logs, which are same, except for<code> 's/virbr1/virbr2'</code> and time is some 10 minutes later.</p>
+<p>There are even scary suggestions what that might be:<br>
+(lnewbie, can’t yet post links, but it’s on experts-exchange commercial domain )</p>
+<p>I sometimes do tcpdump’ing, however, at the exact time of the failing command above, I wasn’t capturing traffic. So…</p>
+<p>What could this be? How should I proceed here towards a solution?</p>
+          <p><a href="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613/1</link>
+        <pubDate>Thu, 28 May 2020 20:00:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9613-1</guid>
+        <source url="http://forums.whonix.org/t/on-virsh-whonix-external-failed-to-apply-firewall-rules/9613.rss">On virsh... Whonix-External, Failed to apply firewall rules</source>
+      </item>
+  </channel>
+</rss>

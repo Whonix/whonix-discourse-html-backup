@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Do NTP and TCP timestamps really leak your local time?</title>
+    <link>http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824</link>
+    <description>Whonix and many other people use this as a source when saying NTP leaks the local time:
+
+[RFC5905](https://www.ietf.org/rfc/rfc5905.txt):
+
+&gt; Origin Timestamp (org): Time at the client when the request departed for the server, in NTP timestamp format. 
+
+ But this says the time is in NTP timestamp format which is [epoch time](https://en.wikipedia.org/wiki/Network_Time_Protocol#Timestamps). Epoch time is universal and the same on all systems so this isn&#39;t a problem.
+
+The [kernel docs](https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt) say this about TCP timestamps:
+
+&gt; 1: Enable timestamps as defined in RFC1323 and use random offset for each connection rather than only using the current time.
+
+So, setting net.ipv4.tcp_timestamps to 1 wouldn&#39;t leak your local time as it uses a random one.
+
+Is there something I&#39;m missing here or are these really not leaking the local time?</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 24 Feb 2020 14:38:19 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Do NTP and TCP timestamps really leak your local time?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/sirus">@Sirus</a> Thanks for the awesome feedback.</p>
+<p><a class="mention" href="http://forums.whonix.org/u/madaidan">@madaidan</a> please relay that info back to Tails because they are about to revert this privacy preserving measure because of your ticket.</p>
+          <p><a href="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/11</link>
+        <pubDate>Mon, 24 Feb 2020 14:38:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7824-11</guid>
+        <source url="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824.rss">Do NTP and TCP timestamps really leak your local time?</source>
+      </item>
+      <item>
+        <title>Do NTP and TCP timestamps really leak your local time?</title>
+        <dc:creator><![CDATA[Sirus]]></dc:creator>
+        <description><![CDATA[
+            <p>Greetings,</p>
+<blockquote>
+<p>but Linux seems to prevent that by using a random offset.</p>
+</blockquote>
+<p>Please keep in mind that anonymity, the way it’s a concern in projects like Tor or Whonix, has not been and is not a concern for Linux kernel developers. You should be generally very careful when you interpret a patch or a code change as something that <em>reinforces</em> anonymity of the operating system because it’s usually not the case.</p>
+<p>That said, lets take another look at the aforementioned patch:</p>
+<blockquote>
+<p>Re-use of ISN generator also means timestamps are still monotonically<br>
+increasing for same connection quadruple, i.e. PAWS will still work.</p>
+</blockquote>
+<p>Adding a per-connection/per-socket offset won’t resolve the issue as we see it. Such a random number will make timestamps in different connections look probably very different but they still monotonically increase by including a timer value and hence they are related to each other within a <em>single</em> connection. And if this is what happens (which most probably is) it means that, whatever causes the timers of the system to count a little faster or slower - like CPU load - can be visible in the sequence of timestamps in one connection. Further, experience has shown, exposing any unnecessary piece of information about the internals of your environment - like a timestamp- can make tracking simpler.<br>
+A lot of TCP features have been added for improving efficiency and when it comes to using systems like Whonix and Tor network, users should first agree about losing the luxury of high speed internet before using these systems.<br>
+For this specific case, I can’t confidently say that enabling timestamps can be good or bad without reading the code to see how it’s been implemented and how it works exactly but I’m almost sure, based on their description and a quick look at their variables and the places they’re accessed (which can be a little different in newer versions), the random offset will not make changes in the oscillator frequency invisible in the timestamps. So the problem should still persist and I don’t recommend enabling TCP timestamps.</p>
+          <p><a href="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/10</link>
+        <pubDate>Sun, 23 Feb 2020 22:44:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7824-10</guid>
+        <source url="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824.rss">Do NTP and TCP timestamps really leak your local time?</source>
+      </item>
+      <item>
+        <title>Do NTP and TCP timestamps really leak your local time?</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="8" data-topic="7824">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>What do we gain from re-enabling timestamps?</p>
+</blockquote>
+</aside>
+<p>Round-trip time measurement and protection against wrapped sequence numbers.</p>
+<p><a href="https://tools.ietf.org/html/rfc1323" class="onebox" target="_blank">https://tools.ietf.org/html/rfc1323</a></p>
+          <p><a href="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/9</link>
+        <pubDate>Sun, 23 Feb 2020 01:29:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7824-9</guid>
+        <source url="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824.rss">Do NTP and TCP timestamps really leak your local time?</source>
+      </item>
+      <item>
+        <title>Do NTP and TCP timestamps really leak your local time?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>What do we gain from re-enabling timestamps? We haven’t had a single complaint about perf in the years since.</p>
+          <p><a href="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/8</link>
+        <pubDate>Sun, 23 Feb 2020 01:16:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7824-8</guid>
+        <source url="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824.rss">Do NTP and TCP timestamps really leak your local time?</source>
+      </item>
+      <item>
+        <title>Do NTP and TCP timestamps really leak your local time?</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>I’ve re-read the discussion that lead to <a href="https://redmine.tails.boum.org/code/issues/6579">#6579</a> and I agree we should do this.</p>
+<p>It would re-enable the “Round-Trip Time Measurement” TCP feature, which back then we thought was not needed in Tails because "the limiting factor for transmission speed is rarely the capacity of the user connection. In retrospect, I think this argument is quite weak: plenty of people on this planet have poor Internet connections that will be the limiting factor.</p>
+<p>Implementation wise, reverting <a href="https://redmine.tails.boum.org/code/projects/tails/repository/revisions/32f216d18d6f5b8a5d7c5db2c2c031fb6eda2f85">32f216d18d6f5b8a5d7c5db2c2c031fb6eda2f85</a> and <a href="https://redmine.tails.boum.org/code/projects/tails/repository/revisions/dd8cbeed76cfe922d6166aa0256b56215674a16e">dd8cbeed76cfe922d6166aa0256b56215674a16e</a> should do the job.</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/7</link>
+        <pubDate>Sat, 22 Feb 2020 18:02:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7824-7</guid>
+        <source url="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824.rss">Do NTP and TCP timestamps really leak your local time?</source>
+      </item>
+      <item>
+        <title>Do NTP and TCP timestamps really leak your local time?</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="madaidan" data-post="1" data-topic="7824">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Epoch time is universal and the same on all systems so this isn’t a problem.</p>
+</blockquote>
+</aside>
+<p>Epoch time isn’t actually the same on all systems. All systems follow the same <em>format</em>, but not at the exact same value hence it’s possible to track individual users with it.</p>
+<aside class="quote no-group" data-username="madaidan" data-post="4" data-topic="7824">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Maybe we should bring this to the Tails team and see what they have to say?</p>
+</blockquote>
+</aside>
+<p>I created an issue.</p>
+<p><a href="https://redmine.tails.boum.org/code/issues/17491" class="onebox" target="_blank">https://redmine.tails.boum.org/code/issues/17491</a></p>
+          <p><a href="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/6</link>
+        <pubDate>Fri, 21 Feb 2020 20:08:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7824-6</guid>
+        <source url="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824.rss">Do NTP and TCP timestamps really leak your local time?</source>
+      </item>
+      <item>
+        <title>Do NTP and TCP timestamps really leak your local time?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Sure, always feel free to start wider discussions across the ecosystem.<br>
+If it’s well researched like this, good might come out from it.</p>
+          <p><a href="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/5</link>
+        <pubDate>Sat, 27 Jul 2019 11:26:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7824-5</guid>
+        <source url="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824.rss">Do NTP and TCP timestamps really leak your local time?</source>
+      </item>
+      <item>
+        <title>Do NTP and TCP timestamps really leak your local time?</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>I found the commit that implemented the TCP timestamps random offset.</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/torvalds/linux/commit/95a22caee396cef0bb2ca8fafdd82966a49367bb" target="_blank" rel="nofollow noopener">github.com/torvalds/linux</a>
+  </header>
+  <article class="onebox-body">
+    
+<h4>
+  <a href="https://github.com/torvalds/linux/commit/95a22caee396cef0bb2ca8fafdd82966a49367bb" target="_blank" rel="nofollow noopener">tcp: randomize tcp timestamp offsets for each connection</a>
+</h4>
+
+  <pre class="message" style="white-space: normal;">jiffies based timestamps allow for easy inference of number of devices
+behind NAT translators and also makes tracking of hosts simpler.
+commit ceaa1fef65a7c2e...</pre>
+
+<div class="date">
+  by <a href="http://forums.whonix.org"></a>
+  on <a href="https://github.com/torvalds/linux/commit/95a22caee396cef0bb2ca8fafdd82966a49367bb" target="_blank" rel="nofollow noopener">10:32AM - 01 Dec 16 UTC</a>
+</div>
+
+<div class="github-commit-stats">
+  changed <strong>11 files</strong>
+  with <strong>35 additions</strong>
+  and <strong>20 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>This was in 2016 and that link to the mailing list is from 2013 as indicated by the URL so they wouldn’t have known about this.</p>
+<p>Maybe we should bring this to the Tails team and see what they have to say?</p>
+          <p><a href="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/4</link>
+        <pubDate>Wed, 24 Jul 2019 23:57:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7824-4</guid>
+        <source url="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824.rss">Do NTP and TCP timestamps really leak your local time?</source>
+      </item>
+      <item>
+        <title>Do NTP and TCP timestamps really leak your local time?</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>I know why NTP is a bad thing but I just want to know if it really does leak the local time.</p>
+<aside class="quote no-group" data-post="2" data-topic="7824">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>We have a lot of references explaining why it 's a bad thing.</p>
+</blockquote>
+</aside>
+<p>The only reference about it leaking the local time was the one I talked about in the post.</p>
+<aside class="quote no-group" data-post="2" data-topic="7824">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>for TCP timestamps see the reference also included in the page above:</p>
+<p><a href="https://mailman.boum.org/pipermail/tails-dev/2013-December/004520.html" rel="nofollow noopener">https://mailman.boum.org/pipermail/tails-dev/2013-December/004520.html</a></p>
+</blockquote>
+</aside>
+<p>I get a 404 with that link.</p>
+<p>I also know TCP timestamps by default do leak your local time but Linux seems to prevent that by using a random offset.</p>
+          <p><a href="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/3</link>
+        <pubDate>Wed, 24 Jul 2019 23:52:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7824-3</guid>
+        <source url="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824.rss">Do NTP and TCP timestamps really leak your local time?</source>
+      </item>
+      <item>
+        <title>Do NTP and TCP timestamps really leak your local time?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>NTP is not secure and besides it uses UDP (not functional over Tor) We have a lot of references explaining why it 's a bad thing.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Time_Attacks" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:82/57;"><img src="https://www.whonix.org/w/images/2/28/Clock-359985640.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Time_Attacks" target="_blank" rel="nofollow noopener">Time Attacks</a></h3>
+
+<p>Time Related Security Issues and Solutions</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>for TCP timestamps see the reference also included in the page above:</p>
+<p><a href="https://mailman.boum.org/pipermail/tails-dev/2013-December/004520.html" class="onebox" target="_blank" rel="nofollow noopener">https://mailman.boum.org/pipermail/tails-dev/2013-December/004520.html</a></p>
+          <p><a href="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/2</link>
+        <pubDate>Wed, 24 Jul 2019 23:36:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7824-2</guid>
+        <source url="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824.rss">Do NTP and TCP timestamps really leak your local time?</source>
+      </item>
+      <item>
+        <title>Do NTP and TCP timestamps really leak your local time?</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>Whonix and many other people use this as a source when saying NTP leaks the local time:</p>
+<p><a href="https://www.ietf.org/rfc/rfc5905.txt">RFC5905</a>:</p>
+<blockquote>
+<p>Origin Timestamp (org): Time at the client when the request departed for the server, in NTP timestamp format.</p>
+</blockquote>
+<p>But this says the time is in NTP timestamp format which is <a href="https://en.wikipedia.org/wiki/Network_Time_Protocol#Timestamps">epoch time</a>. Epoch time is universal and the same on all systems so this isn’t a problem.</p>
+<p>The <a href="https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt">kernel docs</a> say this about TCP timestamps:</p>
+<blockquote>
+<p>1: Enable timestamps as defined in RFC1323 and use random offset for each connection rather than only using the current time.</p>
+</blockquote>
+<p>So, setting net.ipv4.tcp_timestamps to 1 wouldn’t leak your local time as it uses a random one.</p>
+<p>Is there something I’m missing here or are these really not leaking the local time?</p>
+          <p><a href="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824/1</link>
+        <pubDate>Wed, 24 Jul 2019 19:33:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7824-1</guid>
+        <source url="http://forums.whonix.org/t/do-ntp-and-tcp-timestamps-really-leak-your-local-time/7824.rss">Do NTP and TCP timestamps really leak your local time?</source>
+      </item>
+  </channel>
+</rss>

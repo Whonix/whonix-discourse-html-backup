@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>How to use Tor HTTPTunnelPort in Whonix Workstation?</title>
+    <link>http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429</link>
+    <description>I&#39;ve read about HTTPTunnelPort in Stream isolation chapter. 
+This seems a good alternative for apps that don&#39;t support SOCKS natively - in addition to `torsocks`.
+
+So tried it out with `curl` as example (inside Workstation):
+```
+curl.anondist-orig \
+  -x http://$(qubesdb-read /qubes-gateway):9220 \
+  https://check.torproject.org
+# curl: (28) Failed to connect to 10.137.0.12 port 9220: 
+# Connection timed out
+```
+Port 9220 should be open HTTPTunnelPort according to `/usr/share/tor/tor-service-defaults-torrc.anondist` in the gateway.
+
+Whereas SOCKS works as usual:
+```
+curl.anondist-orig \
+  -x socks5h://$(qubesdb-read /qubes-gateway):9162 \
+  https://check.torproject.org
+```
+
+`curl` does support HTTPS CONNECT method. Is there something else to do?
+
+My environment is Qubes Whonix 16 with transparent proxying being disabled in gateway:
+```
+WORKSTATION_TRANSPARENT_TCP=0
+WORKSTATION_TRANSPARENT_DNS=0
+```</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 12 Aug 2022 08:15:51 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>How to use Tor HTTPTunnelPort in Whonix Workstation?</title>
+        <dc:creator><![CDATA[diet_f]]></dc:creator>
+        <description><![CDATA[
+            <h3>
+<a name="test-case-1-vanilla-tor-on-debian-1" class="anchor" href="http://forums.whonix.org#test-case-1-vanilla-tor-on-debian-1"></a>Test case 1: Vanilla Tor on Debian</h3>
+<pre><code class="lang-auto">sudo apt install --no-install-recommends tor
+</code></pre>
+<p>/etc/tor/torrc:</p>
+<pre><code class="lang-auto">SocksPort 9050 # Default: Bind to localhost:9050 for local connections.
+SocksPort 9100 IsolateDestAddr IsolateDestPort
+HTTPTunnelPort 9220 IsolateDestAddr IsolateDestPort
+HTTPTunnelPort 9230
+</code></pre>
+<p>All these commands work:</p>
+<pre><code class="lang-auto">curl -x socks5h://localhost:9050 https://check.torproject.org
+curl -x socks5h://localhost:9100 https://check.torproject.org
+curl -x http://localhost:9220 https://check.torproject.org
+curl -x http://localhost:9230 https://check.torproject.org
+</code></pre>
+<p>Verbose <code>curl</code> output:</p>
+<pre><code class="lang-auto">*   Trying ::1:9220...
+* connect to ::1 port 9220 failed: Connection refused
+*   Trying 127.0.0.1:9220...
+* Connected to localhost (127.0.0.1) port 9220 (#0)
+* allocate connect buffer!
+* Establish HTTP proxy tunnel to check.torproject.org:443
+&gt; CONNECT check.torproject.org:443 HTTP/1.1
+&gt; Host: check.torproject.org:443
+&gt; User-Agent: curl/7.74.0
+&gt; Proxy-Connection: Keep-Alive
+&gt; 
+&lt; HTTP/1.0 200 OK
+&lt; 
+* Proxy replied 200 to CONNECT request
+* CONNECT phase completed!
+...
+</code></pre>
+<h3>
+<a name="test-case-2-whonix-gateway-with-transparent-proxy-2" class="anchor" href="http://forums.whonix.org#test-case-2-whonix-gateway-with-transparent-proxy-2"></a>Test case 2: Whonix Gateway with transparent proxy</h3>
+<p>Install as usual.</p>
+<p>Works (from Workstation):</p>
+<pre><code class="lang-auto">curl.anondist-orig -x socks5h://$(qubesdb-read /qubes-gateway):9162 https://check.torproject.org
+</code></pre>
+<p>Fails:</p>
+<pre><code class="lang-auto">curl.anondist-orig -x http://$(qubesdb-read /qubes-gateway):9220 https://check.torproject.org
+curl.anondist-orig -x http://$(qubesdb-read /qubes-gateway):9190 https://check.torproject.org
+</code></pre>
+<blockquote>
+<p>curl: (56) Recv failure: Connection reset by peer</p>
+</blockquote>
+<p>Verbose <code>curl</code> output:</p>
+<pre><code class="lang-auto">*   Trying 10.137.0.160:9220...
+* Connected to 10.137.0.160 (10.137.0.160) port 9220 (#0)
+* allocate connect buffer!
+* Establish HTTP proxy tunnel to check.torproject.org:443
+&gt; CONNECT check.torproject.org:443 HTTP/1.1
+&gt; Host: check.torproject.org:443
+&gt; User-Agent: curl/7.74.0
+&gt; Proxy-Connection: Keep-Alive
+&gt; 
+* Proxy CONNECT aborted
+* CONNECT phase completed!
+* Closing connection 0
+curl: (56) Proxy CONNECT aborted
+</code></pre>
+<p>There is no further log in <code>journalctl</code>. Clearly, <code>curl</code> tried to use HTTP Connect method in the same way, but fails.</p>
+<p>I guess, next step would be to analyze network traffic with tcpdump or so?</p>
+          <p><a href="http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429/4</link>
+        <pubDate>Fri, 12 Aug 2022 08:15:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14429-4</guid>
+        <source url="http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429.rss">How to use Tor HTTPTunnelPort in Whonix Workstation?</source>
+      </item>
+      <item>
+        <title>How to use Tor HTTPTunnelPort in Whonix Workstation?</title>
+        <dc:creator><![CDATA[diet_f]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="14429">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Could you try please if Tor <code>HTTPTunnelPort</code> is currently functional outside of Whonix?</p>
+<p>Generic Bug Reproduction is most likely required here. See Tor Generic Bug Reproduction.</p>
+</blockquote>
+</aside>
+<p>Sure - I’ll try to reproduce on a vanilla qube with just Tor installed. Can’t say exactly, when I have time again for the setup.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429/3</link>
+        <pubDate>Wed, 10 Aug 2022 14:15:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14429-3</guid>
+        <source url="http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429.rss">How to use Tor HTTPTunnelPort in Whonix Workstation?</source>
+      </item>
+      <item>
+        <title>How to use Tor HTTPTunnelPort in Whonix Workstation?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Syntax seems correct.</p>
+<p>If Tor is stopped using the following command on Whonix-Gateway:</p>
+<pre><code>sudo systemctl stop tor
+</code></pre>
+<p>Then in Whonix-Workstation:</p>
+<pre><code>curl.anondist-orig --head http://$(qubesdb-read /qubes-gateway):9228
+</code></pre>
+<blockquote>
+<p>curl: (7) Failed to connect to 10.137.0.14 port 9228: Connection refused</p>
+</blockquote>
+<p>So let’s restart Tor in Whonix-Gateway.</p>
+<pre><code>sudo systemctl restart tor
+</code></pre>
+<p>Then try again in Whonix-Workstation:</p>
+<pre><code>curl.anondist-orig --head http://$(qubesdb-read /qubes-gateway):9228
+</code></pre>
+<blockquote>
+<p>curl: (56) Recv failure: Connection reset by peer</p>
+</blockquote>
+<p>Conclusion: Not a Whonix firewall issue. The port is reachable.</p>
+<p>I don’t know why it’s not working.</p>
+<p>Could you try please if Tor <code>HTTPTunnelPort</code> is currently functional outside of Whonix?</p>
+<p><a href="https://www.whonix.org/wiki/Reporting_Bugs#Generic_Bug_Reproduction">Generic Bug Reproduction</a> is most likely required here. See <a href="https://www.whonix.org/wiki/Tor#Tor_Generic_Bug_Reproduction">Tor Generic Bug Reproduction</a>.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429/2</link>
+        <pubDate>Wed, 10 Aug 2022 10:00:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14429-2</guid>
+        <source url="http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429.rss">How to use Tor HTTPTunnelPort in Whonix Workstation?</source>
+      </item>
+      <item>
+        <title>How to use Tor HTTPTunnelPort in Whonix Workstation?</title>
+        <dc:creator><![CDATA[diet_f]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve read about HTTPTunnelPort in Stream isolation chapter.<br>
+This seems a good alternative for apps that don’t support SOCKS natively - in addition to <code>torsocks</code>.</p>
+<p>So tried it out with <code>curl</code> as example (inside Workstation):</p>
+<pre><code class="lang-auto">curl.anondist-orig \
+  -x http://$(qubesdb-read /qubes-gateway):9220 \
+  https://check.torproject.org
+# curl: (28) Failed to connect to 10.137.0.12 port 9220: 
+# Connection timed out
+</code></pre>
+<p>Port 9220 should be open HTTPTunnelPort according to <code>/usr/share/tor/tor-service-defaults-torrc.anondist</code> in the gateway.</p>
+<p>Whereas SOCKS works as usual:</p>
+<pre><code class="lang-auto">curl.anondist-orig \
+  -x socks5h://$(qubesdb-read /qubes-gateway):9162 \
+  https://check.torproject.org
+</code></pre>
+<p><code>curl</code> does support HTTPS CONNECT method. Is there something else to do?</p>
+<p>My environment is Qubes Whonix 16 with transparent proxying being disabled in gateway:</p>
+<pre><code class="lang-auto">WORKSTATION_TRANSPARENT_TCP=0
+WORKSTATION_TRANSPARENT_DNS=0
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429/1</link>
+        <pubDate>Wed, 10 Aug 2022 07:38:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14429-1</guid>
+        <source url="http://forums.whonix.org/t/how-to-use-tor-httptunnelport-in-whonix-workstation/14429.rss">How to use Tor HTTPTunnelPort in Whonix Workstation?</source>
+      </item>
+  </channel>
+</rss>

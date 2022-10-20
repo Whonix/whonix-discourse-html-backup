@@ -1,0 +1,789 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Locking down your SSH Server and Client</title>
+    <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896</link>
+    <description>What options are their for locking down your Whonix ssh client.
+
+**Yubikey:** Not recommended since it could leak key material. Maybe 2fa without use of ssh key?
+
+[https://whonix.org/wiki/Dev/yubikey#YubiKey_Info](https://whonix.org/wiki/Dev/yubikey#YubiKey_Info)
+
+&gt; Yubikeys supports storing OpenPGP (GnuPG / gpg) keys, OpenSSH keys, but I wouldn&#39;t trust it. Another yubikey model had a PIN bypass bug. ( https://developers.yubico.com/ykneo-openpgp/SecurityAdvisory%202015-04-14.html )
+
+**Qubes split-ssh:** Hasn&#39;t been maintained for 2+ years. Has multiple forks but those people are unknown (to me).
+
+https://github.com/henn/qubes-app-split-ssh
+
+**ip/nf-tables:** on both firewall and client box. Maybe designate an interface on firewall for ssh only. Block everything else.
+
+**Small tweaks:** Change ssh to different port, strong password for key access etc...
+
+**Anythig else??**</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 22 May 2022 23:39:08 +0000</lastBuildDate>
+    <category>Website</category>
+    <atom:link href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[yodawins]]></dc:creator>
+        <description><![CDATA[
+            <p>After reading some man pages you might consider to add the following to <a href="https://www.kicksecure.com/wiki/SSH#Client_Configuration_File" class="inline-onebox" rel="noopener nofollow ugc">Secure Shell (SSH)</a> :</p>
+<p><a href="https://manpages.debian.org/bullseye/openssh-client/ssh_config.5.en.html#CheckHostIP" class="onebox" target="_blank" rel="noopener nofollow ugc">https://manpages.debian.org/bullseye/openssh-client/ssh_config.5.en.html#CheckHostIP</a><br>
+<a href="https://manpages.debian.org/bullseye/openssh-client/ssh_config.5.en.html#FingerprintHash" class="onebox" target="_blank" rel="noopener nofollow ugc">https://manpages.debian.org/bullseye/openssh-client/ssh_config.5.en.html#FingerprintHash</a><br>
+<a href="https://manpages.debian.org/bullseye/openssh-client/ssh_config.5.en.html#ForwardX11Trusted" class="onebox" target="_blank" rel="noopener nofollow ugc">https://manpages.debian.org/bullseye/openssh-client/ssh_config.5.en.html#ForwardX11Trusted</a><br>
+<a href="https://manpages.debian.org/bullseye/openssh-client/ssh_config.5.en.html#GatewayPorts" class="onebox" target="_blank" rel="noopener nofollow ugc">https://manpages.debian.org/bullseye/openssh-client/ssh_config.5.en.html#GatewayPorts</a><br>
+<a href="https://manpages.debian.org/bullseye/openssh-client/ssh_config.5.en.html#VerifyHostKeyDNS" class="onebox" target="_blank" rel="noopener nofollow ugc">https://manpages.debian.org/bullseye/openssh-client/ssh_config.5.en.html#VerifyHostKeyDNS</a></p>
+<p>CheckHostIP yes<br>
+FingerprintHash sha256 (the default)<br>
+ForwardX11Trusted no (upstream default, not in debian)<br>
+GatewayPorts no (the default)<br>
+VerifyHostKeyDNS ask (the default is no)</p>
+<p>I also found some interesting things here: <a href="https://infosec.mozilla.org/guidelines/openssh.html" class="inline-onebox" rel="noopener nofollow ugc">OpenSSH</a><br>
+for the sshd_config, especially:</p>
+<pre><code class="lang-auto"># Use kernel sandbox mechanisms where possible in unprivileged processes
+# Systrace on OpenBSD, Seccomp on Linux, seatbelt on MacOSX/Darwin, rlimit elsewhere.
+UsePrivilegeSeparation sandbox
+</code></pre>
+<p>Also  the LogLevel part.</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/18</link>
+        <pubDate>Sun, 22 May 2022 23:36:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-18</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>OpenSSH 8.5 released on (2021-03-03) with this update for pqcrypt</p>
+<p><a href="https://www.openssh.com/txt/release-8.5" class="onebox" target="_blank" rel="noopener nofollow ugc">https://www.openssh.com/txt/release-8.5</a></p>
+<blockquote>
+<ul>
+<li>ssh(1), sshd(8): update/replace the experimental post-quantum<br>
+hybrid key exchange method based on Streamlined NTRU Prime coupled with X25519.</li>
+</ul>
+<p>The previous <a href="mailto:sntrup4591761x25519-sha512@tinyssh.org">sntrup4591761x25519-sha512@tinyssh.org</a> method is replaced with <a href="mailto:sntrup761x25519-sha512@openssh.com">sntrup761x25519-sha512@openssh.com</a>.</p>
+<p>Per its designers, the sntrup4591761 algorithm was superseded almost two years ago by sntrup761.</p>
+<p>(note this both the updated method and the one that it replaced are disabled by default)</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/17</link>
+        <pubDate>Mon, 09 Aug 2021 20:51:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-17</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>Renewed KexAlgorithms keys in client and server from <a href="mailto:curve25519-sha256SSH@libssh.org">curve25519-sha256SSH@libssh.org</a> to curve25519-sha256SSH</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/SSH" target="_blank" rel="noopener nofollow ugc" title="02:09PM - 08 August 2021">Whonix – 8 Aug 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/359;"><img src="https://www.whonix.org/w/images/b/b3/SSH.jpg" class="thumbnail" width="640" height="359"></div>
+
+<h3><a href="https://www.whonix.org/wiki/SSH" target="_blank" rel="noopener nofollow ugc">Secure Shell (SSH)</a></h3>
+
+  <p>SSH Hardening Tips; Recommended Client and Server Settings for better Security</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Evidence: <a href="https://github.com/openssh/openssh-portable/blob/6116bd4ed354a71a733c8fd0f0467ce612f12911/kex.h#L63" rel="noopener nofollow ugc">Here</a></p>
+<p>and added to sshd/server “DebianBanner no” to remove debian version from ssh banner.</p>
+<p>Evidence: <a href="https://www.digitalocean.com/community/tutorials/how-to-harden-openssh-on-ubuntu-18-04" rel="noopener nofollow ugc">Here</a></p>
+<p>Thanks to Gabe from <a href="https://grapheneos.org/" rel="noopener nofollow ugc">grepheneos</a> for pointing that out.</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/16</link>
+        <pubDate>Sun, 08 Aug 2021 15:08:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-16</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>Side note might be added in post-quantum page or SSH or no where:</p>
+<p>OpenSSH version <a href="https://www.openssh.com/txt/release-8.0" rel="nofollow noopener">OpenSSH 8.0</a>/<a href="https://www.openssh.com/txt/release-8.0" rel="nofollow noopener">8.0p1</a> (2019-04-17) and above:</p>
+<blockquote>
+<ul>
+<li>ssh(1), sshd(8): Add experimental quantum-computing resistant<br>
+key exchange method, based on a combination of Streamlined NTRU<br>
+Prime 4591^761 and X25519.</li>
+</ul>
+</blockquote>
+<p>might be useful for the wiki or later reference.</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/15</link>
+        <pubDate>Thu, 07 May 2020 17:08:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-15</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="anontor" data-post="13" data-topic="7896">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> anontor:</div>
+<blockquote>
+<p>sudo dpkg-reconfigure openssh-server</p>
+</blockquote>
+</aside>
+<p>Shouldn’t be required unless you want to change keys.</p>
+<aside class="quote no-group" data-username="anontor" data-post="13" data-topic="7896">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> anontor:</div>
+<blockquote>
+<p>In other words will all the openssh-servers have the same keys or are they different by default for each machine?</p>
+</blockquote>
+</aside>
+<p>Generated locally. Should be different for each machine. Otherwise Debian would have a severe security issues.</p>
+<aside class="quote no-group" data-username="anontor" data-post="13" data-topic="7896">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> anontor:</div>
+<blockquote>
+<p>After running the command, I removed the rsa and ecdsa keys also.</p>
+</blockquote>
+</aside>
+<p>I was wondering if we should advice that but I guess server setting <code>HostKey /etc/ssh/ssh_host_ed25519_key</code> and client setting <code>IdentityFile ~/.ssh/id_ed25519</code> should be sufficient.</p>
+<aside class="quote no-group" data-username="anontor" data-post="12" data-topic="7896">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> anontor:</div>
+<blockquote>
+<p>I did have to create the “authorized_keys” and “known_hosts” files in ~/.ssh, but I had to do that on Ubuntu also.</p>
+</blockquote>
+</aside>
+<p>No surprise for me.</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/14</link>
+        <pubDate>Thu, 07 May 2020 15:15:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-14</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a><br>
+I just remembered this about the openssh-server: when I first installed it from Debian, I ran a sudo dpkg-reconfigure openssh-server in order to re-generate the included keys that come with the server in /etc/ssh. The regular install includes a rsa, ecdsa and ed25519 server keys. After running the command, I removed the rsa and ecdsa keys also. Is that command necessary for our purposes? In other words will all the openssh-servers have the same keys or are they different by default for each machine?</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/13</link>
+        <pubDate>Wed, 06 May 2020 22:58:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-13</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a><br>
+I think your proposal is very rational, and I like it. It keeps it secure and not confusing which is important, especially for someone who maybe does not know a lot about ssh.<br>
+I have a ssh_config file which I put together, here it is; see if you like it. The user can have this file in either /home/user/.ssh/config or if using it as a systemwide configuration with client and server on same machine /etc/ssh/ssh_config. The options are the same for either location. If both the openssh-client and openssh-server are going tot be included, then having it in /etc/ssh makes sense. If someone has a specific requirement, a config in /home/user/.ssh/config can be generated<br>
+Here is the systemwide /etc/ssh/ssh_config</p>
+<pre><code class="lang-auto">Host *
+ForwardAgent no
+AddressFamily inet
+IdentityFile ~/.ssh/id_ed25519
+IdentitiesOnly yes
+Port 22
+Protocol 2
+PubkeyAuthentication yes
+StrictHostKeyChecking ask
+HashKnownHosts yes
+User user
+Host host
+SendEnv LANG LC_*
+# Ciphers chacha2-=poly1305@openssh.com,aes256-gcm@openssh.com,aes256-ctr
+# MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-512,hmac-sha2-256-etm@openssh.com
+# KexAlgorithms curve25519-sha256@libssh.org,curve25519-sha256,ecdh-sha2-nistp521,ecdh-sha2-nistp384
+</code></pre>
+<p>That could be a reasonable config. The ciphers,macs.and kex are there so the user can see them, but commented to allow the client and server to negotiate their own (which would be the chacha20, hmac-sha2-512-etm, and curve25519 anyway especially since the packages are up to date)<br>
+I tested this file on Debian (virtual machine) and it worked. I did have to create the “authorized_keys” and “known_hosts” files in ~/.ssh, but I had to do that on Ubuntu also.</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/12</link>
+        <pubDate>Wed, 06 May 2020 22:45:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-12</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Server config: I made my way through all settings in the suggested server config as this seems more critical than client config.</p>
+<p>The layout for a config file with proverbially thousands of possible configuration options needs a plan. A design. It can be optimized for with different goals in mind. As an example, one conflicting goal would be brevity vs mentioning all configuration options from sshd_config man page.</p>
+<p>Mentioning all configuration options from sshd_config would be god for some purposes but make the config file harder to maintain as sshd / sshd_config man page evolves. I guess shipping a complete sshd config file mentioning all possibilities would be too much.</p>
+<p>Design proposal I came up with:</p>
+<ul>
+<li>brevity</li>
+<li>Defaults not mentioned in Debian default config file: don’t mention for brevity.</li>
+<li>Higher security settings such as ed25519 where not the default.</li>
+<li>Comments which document the reasoning behind changes.</li>
+</ul>
+<p>Commonly changed settings, usability enhancements (which worsen security) would be reasonable to mention too.</p>
+<aside class="quote no-group" data-username="anontor" data-post="10" data-topic="7896">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> anontor:</div>
+<blockquote>
+<p>My ForwardAgent option was set to yes instead of Debian’s default because I had the client and server on the same machine, using it as a Socks5 proxy for Tor.</p>
+</blockquote>
+</aside>
+<p>That’s alright. However, if <code>ForwardAgent</code> is default no and setting it to yes doesn’t increase security, then we shouldn’t enable it by default. (Unless it’s a usability argument then it could be considered in theory. Maybe not for <code>ForwardAgent</code> but for other settings.)</p>
+<aside class="quote no-group" data-username="anontor" data-post="10" data-topic="7896">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> anontor:</div>
+<blockquote>
+<p>If both parties are using the newest current openssh packages, then a lot of the options are not needed because the client and server will negotiate the highest security cipher, mac, and kex algorithm on their own. If, the two are not the same, that’s when a reasonable fallback is required with other options common to both.</p>
+</blockquote>
+</aside>
+<p>Right, however when one controls both the server and the client config (image you set up a new admin VM and a new remote server) then there’s no need to take any chances for cipher negotiation. Reason is, SSL/TLS cipher negotiation had some security issues in past. Therefore I thought for purpose of hardening, just assume/demand stable version of Debian adn pick the strongest available cipher.</p>
+<aside class="quote no-group" data-username="anontor" data-post="10" data-topic="7896">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> anontor:</div>
+<blockquote>
+<p>The ssh_config has to be put together by the user based on his/her needs.</p>
+</blockquote>
+</aside>
+<p>My goal is having something ready for copy/paste with strongest (reasonable) defaults. Compatible with Kicksecure and/or Whonix-Workstation.<br>
+(image you set up a new admin VM and a new remote server)</p>
+<p>“You have to read the config, make changes for your needs” usually results in a support nightmare of tons of users keeping lets say some comment in <code>( )</code> behind config keywords and then breaking their sshd server startup which could lock them out from their servers. If we wanted to go that route, better don’t offer any config for copy/paste but just suggestions which settings someone should tune in their sshd config file. That style however is accessible to fewer users.</p>
+<p>I was even considering to ship these configs by default with Kicksecure / Whonix if they matured but regressions that could cause seems high. Not cool to lockout someone from accessing their ssh remote server because package enforced strong ciphers. Fixable for ssh client config but a shock. For server config, a config update by package could lock out users from their servers.</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/11</link>
+        <pubDate>Wed, 06 May 2020 08:47:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-11</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a>,<br>
+In Debian Buster, the packages for openssh-client and openssh-server are from OpenBsd. The config that they ship is for /etc/ssh/sshd_config (the server) and it is just a list with everything commented out. It was quite outdated and incomplete.<br>
+The ssh_config has to be put together by the user based on his/her needs. To put it together, I looked in quite a few places: github, openssh’s website, stackoverflow, and in the man pages.<br>
+If both parties are using the newest current openssh packages, then a lot of the options are not needed because the client and server will negotiate the highest security cipher, mac, and kex algorithm on their own. If, the two are not the same, that’s when a reasonable fallback is required with other options common to both.<br>
+My ForwardAgent option was set to yes instead of Debian’s default because I had the client and server on the same machine, using it as a Socks5 proxy for Tor.<br>
+Here is the default openssh sshd_config:</p>
+<pre><code class="lang-auto">#	$OpenBSD: sshd_config,v 1.103 2018/04/09 20:41:22 tj Exp $
+
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+#Port 22
+#AddressFamily any
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+
+#HostKey /etc/ssh/ssh_host_rsa_key
+#HostKey /etc/ssh/ssh_host_ecdsa_key
+#HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Ciphers and keying
+#RekeyLimit default none
+
+# Logging
+#SyslogFacility AUTH
+#LogLevel INFO
+
+# Authentication:
+
+#LoginGraceTime 2m
+#PermitRootLogin prohibit-password
+#StrictModes yes
+#MaxAuthTries 6
+#MaxSessions 10
+
+#PubkeyAuthentication yes
+
+# Expect .ssh/authorized_keys2 to be disregarded by default in future.
+#AuthorizedKeysFile	.ssh/authorized_keys .ssh/authorized_keys2
+
+#AuthorizedPrincipalsFile none
+
+#AuthorizedKeysCommand none
+#AuthorizedKeysCommandUser nobody
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+#HostbasedAuthentication no
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# HostbasedAuthentication
+#IgnoreUserKnownHosts no
+# Don't read the user's ~/.rhosts and ~/.shosts files
+#IgnoreRhosts yes
+
+# To disable tunneled clear text passwords, change to no here!
+PasswordAuthentication no
+#PermitEmptyPasswords no
+
+# Change to yes to enable challenge-response passwords (beware issues with
+# some PAM modules and threads)
+ChallengeResponseAuthentication no
+
+# Kerberos options
+#KerberosAuthentication no
+#KerberosOrLocalPasswd yes
+#KerberosTicketCleanup yes
+#KerberosGetAFSToken no
+
+# GSSAPI options
+#GSSAPIAuthentication no
+#GSSAPICleanupCredentials yes
+#GSSAPIStrictAcceptorCheck yes
+#GSSAPIKeyExchange no
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+UsePAM yes
+
+#AllowAgentForwarding yes
+#AllowTcpForwarding yes
+#GatewayPorts no
+X11Forwarding yes
+#X11DisplayOffset 10
+#X11UseLocalhost yes
+#PermitTTY yes
+PrintMotd no
+#PrintLastLog yes
+#TCPKeepAlive yes
+#PermitUserEnvironment no
+#Compression delayed
+#ClientAliveInterval 0
+#ClientAliveCountMax 3
+#UseDNS no
+#PidFile /var/run/sshd.pid
+#MaxStartups 10:30:100
+#PermitTunnel no
+#ChrootDirectory none
+#VersionAddendum none
+
+# no default banner path
+#Banner none
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+# override default of no subsystems
+Subsystem	sftp	/usr/lib/openssh/sftp-server
+
+# Example of overriding settings on a per-user basis
+#Match User anoncvs
+#	X11Forwarding no
+#	AllowTcpForwarding no
+#	PermitTTY no
+#	ForceCommand cvs server
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/10</link>
+        <pubDate>Wed, 06 May 2020 01:45:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-10</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/SSH" target="_blank" title="12:17PM - 04 May 2020">Whonix – 4 May 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:120/67;"><img src="https://www.whonix.org/w/images/b/b3/SSH.jpg" class="thumbnail" width="120" height="67"></div>
+
+<h3><a href="https://www.whonix.org/wiki/SSH" target="_blank">Secure Shell (SSH)</a></h3>
+
+<p>Secure Shell (SSH): Recommended Client and Server Settings, SSH Hardening Tips</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>The formatting looks good now.</p>
+<p>Could you please compare Debian default <code>/etc/ssh/ssh_config</code> and <code>/etc/ssh/sshd_config</code> with wiki version?</p>
+<p>For example</p>
+<ul>
+<li>Debian default <code>ForwardAgent</code>: not set</li>
+<li>upstream default <code>ForwardAgent</code>: <code>no</code>
+</li>
+<li>Whonix wiki config <code>ForwardAgent</code>: <code>yes</code>
+</li>
+</ul>
+<p>Should only derivative from default config if we have a good reason for it which then needs to be documented with a comment above that option.</p>
+<hr>
+<p>Anyone: please also read about each option here</p>
+<ul>
+<li><a href="https://manpages.debian.org/buster/openssh-client/ssh_config.5.en.html">https://manpages.debian.org/buster/openssh-client/ssh_config.5.en.html</a></li>
+<li><a href="https://manpages.debian.org/buster/openssh-server/sshd_config.5.en.html">https://manpages.debian.org/buster/openssh-server/sshd_config.5.en.html</a></li>
+</ul>
+<p>for upstream defaults, recommendations, warnings, etc.</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/9</link>
+        <pubDate>Mon, 04 May 2020 13:40:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-9</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>I submitted an edit, but it went underneath the footnotes section by accident. Also, it numbered the options in the config files which obviously we don’t use in the real configs.<br>
+I wanted it to put the options like:<br>
+Protocol 2<br>
+but it put</p>
+<ol>
+<li>Protocol 2</li>
+</ol>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/8</link>
+        <pubDate>Mon, 04 May 2020 01:21:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-8</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Sure I could put that together; I’ll try to make it easier to follow (readable)</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/7</link>
+        <pubDate>Mon, 04 May 2020 00:07:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-7</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This could use some forum formatting using ``` for easier readability. And source.</p>
+<p>Do you think you could edit the wiki page <a href="https://www.whonix.org/wiki/Remote_Administration">https://www.whonix.org/wiki/Remote_Administration</a> and make this actionable instruction for ssh client users and ssh servers? I guess commented config files in wiki would be best.</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/6</link>
+        <pubDate>Sun, 03 May 2020 09:35:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-6</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Here are some good SSH defaults:</p>
+<p>/etc/ssh/ssh_config: (example with OpenSSH 7.9 Debian Buster)<br>
+Host *<br>
+ForwardAgent yes (depends on local environment circumstances)<br>
+AddressFamily inet<br>
+IdentityFile ~/.ssh/id_ed25519<br>
+IdentitiesOnly yes<br>
+Port 22<br>
+Protocol 2<br>
+ForwardX11 no<br>
+PubkeyAuthentication yes</p>
+<h2></h2>
+<p>StrictHostKeyChecking ask<br>
+VisualHostKey yes<br>
+HashKnownHosts yes<br>
+User user<br>
+Host host<br>
+SendEnv LANG LC_*</p>
+<h2>Strongest ciphers:</h2>
+<p>Ciphers <a href="mailto:chacha20-poly1305@openssh.com">chacha20-poly1305@openssh.com</a><a href="http://forums.whonix.org">,aes256-gcm@openssh.com</a>,aes256-ctr</p>
+<h2>Most secure MACs:</h2>
+<p>MACs <a href="mailto:hmac-sha2-512-etm@openssh.com">hmac-sha2-512-etm@openssh.com</a><a href="http://forums.whonix.org">,hmac-sha2-512,hmac-sha2-256-etm@openssh.com</a></p>
+<h2>Secure Kex algos:</h2>
+<p>KexAlgorithms <a href="mailto:curve25519-sha256@libssh.org">curve25519-sha256@libssh.org</a>,curve25519-sha256,ecdh-sha2-nistp521,ecdh-sha2-nistp384<br>
+Tunnel no<br>
+<span class="hashtag">#TunnelDevice</span> any:any<br>
+<span class="hashtag">#PermitLocalCommand</span> no<br>
+<span class="hashtag">#ProxyCommand</span> ssh -q -W %h:%p <a href="http://gateway.example.com" rel="nofollow noopener">gateway.example.com</a><br>
+End of file</p>
+<p>Now the server part /etc/ssh/sshd_config:<br>
+Protocol 2 (Protocol 1 is dangerously outdated!)<br>
+Port 22 (22 is standard, you can make it anything. On commandline, when connecting as client, use the “-p” option if not port 22)<br>
+AddressFamily inet (means only ipv4, no v6 allowed)<br>
+ListenAddress 0.0.0.0 -&gt; this is okay because of strict firewall/ AppArmor. For an onion-only server, you listen on 127.0.0.1<br>
+<span class="hashtag">#ListenAddress</span> :: (comment out if ipv6 is disabled via sysctl or iptables or both)<br>
+HostKey /etc/ssh/ssh_host_ed25519_key</p>
+<h2>Strongest ciphers:</h2>
+<p>Ciphers <a href="mailto:chacha20-poly1305@openssh.com">chacha20-poly1305@openssh.com</a><a href="http://forums.whonix.org">,aes256-gcm@openssh.com</a>,aes256-ctr</p>
+<h2>Most secure MACs:</h2>
+<p>MACs <a href="mailto:hmac-sha2-512-etm@openssh.com">hmac-sha2-512-etm@openssh.com</a><a href="http://forums.whonix.org">,hmac-sha2-512,hmac-sha2-256-etm@openssh.com</a></p>
+<h2>Secure Kex algos:</h2>
+<p>KexAlgorithms <a href="mailto:curve25519-sha256@libssh.org">curve25519-sha256@libssh.org</a>,curve25519-sha256,ecdh-sha2-nistp521,ecdh-sha2-nistp384</p>
+<h1>Logging (Optional- okay to leave commented out)</h1>
+<p><span class="hashtag">#SyslogFacility</span> AUTH<br>
+<span class="hashtag">#LogLevel</span> INFO (unless you need logging, leave commented out)<br>
+LoginGraceTime 2m (how long does the prompt stay if you have a passphrase to enter)<br>
+PermitRootLogin prohibit-password | no (safer to deny root obviously)<br>
+PasswordAuthentication no (use public keys ed25519 so no password authentication. A passphrase is optional for the key, but that is not part of this option. This option refers to old style password-only authentication (not secure))</p>
+<h2></h2>
+<p>StrictModes yes<br>
+MaxAuthTries 3 (number of allowed login attempts, if there is a passphrase associated with the key)<br>
+MaxSessions 4 (number of allowed sessions)<br>
+PubkeyAuthentication yes (always use public keys, not passwords)<br>
+UsePAM yes<br>
+<span class="hashtag">#AllowAgentForwarding</span> yes (circumstance specific. This refers to the ssh-agent. Useful when running a local instance and client/server exist on same machine)<br>
+<span class="hashtag">#AllowTcpForwarding</span> (be careful with this. Avoid forwarding if you can. If you do not forward tcp, leave this commented out)<br>
+TCPKeepAlive yes (dependent on connection and network. Sometimes useful, sometimes not. An okay default is to say “no” and if it turns out you need it, then do “yes.”)<br>
+X11Forwarding no<br>
+PrintMotd no<br>
+<span class="hashtag">#PrintLastLog</span> yes<br>
+<span class="hashtag">#UseLogin</span> no<br>
+<span class="hashtag">#PermitUserEnvironment</span> no<br>
+ClientAliveInterval (second amount to keep connection alive)<br>
+UseDNS no<br>
+AllowUsers user<br>
+<span class="hashtag">#Banner</span> /etc/issue.net<br>
+AcceptEnv LANG LC_*<br>
+<span class="hashtag">#Subsystem</span> sftp /usr/lib/openssh/sftp-server<br>
+GatewayPorts no<br>
+<span class="hashtag">#PermitTunnel</span> no<br>
+<span class="hashtag">#ChrootDirectory</span> none<br>
+End of File</p>
+<p>Some points:<br>
+There are more entries that you could add depending on your needs. The one above are the most important and will establish a functioning, and well guarded setup. Use ed25519 keys only. rsa,  and ecdsa are outdated. Use the ssh-keygen command to generate the keys<br>
+ssh-keygen -o -a  -t ed25519<br>
+Remember like this: OATmeal is good for Ed[25519]<br>
+the -o makes the key support openssh’s own keytype not .pem<br>
+the -a determines the rounds of kdf. More=better but don’t go crazy. Generally 75-100 is good. The more rounds, the longer authentication and login will take to finish.<br>
+the -t is “type of key”<br>
+You will be asked if ~/.ssh is okay for storing the keys. Say yes.<br>
+On permissions, sometimes it gets set on its own. If not, do this:<br>
+sudo chmod 0600 ~/.ssh/id_ed25519 &amp;&amp; sudo chmod 0644 ~/.ssh/id_ed25519.pub<br>
+Set the permission for the whole ~/.ssh folder to 0700<br>
+Create a file in ~/.ssh called authorized_keys and another one called known_hosts. Set permissions for both to 0644.<br>
+Sometimes you need to manually add your newly created private key to the ssh-agent.<br>
+ssh-add ~/.ssh/id_ed25519<br>
+The VisualHostKey yes entry in the ssh_config file makes it so when you login, openssh shows you a ascii generated picture of what the key looks like. In addition to all the other verifications, this is one last line of defense to alert you to a changed or wrong key.<br>
+Generally the newer OpenSSH’s will choose the strongest cipher, but the config files establish in what order they are parsed. Both sides need to have the same or compatible openssh versions.<br>
+Make specific firewall rules for your ssh activity too. Let’s say that you want to connect to a server at 123.45.678 and both your configs specify port 4675:<br>
+sudo iptables -A OUTPUT -p tcp -o [interface-name] -s [your client ssh ip] -d [ssh server ip] --dport 4675 --j ACCEPT<br>
+then to let them respond:<br>
+sudo iptables -A INPUT -p tcp -i [interface-name] -s [ssh server ip] -d [your client ip] --dport 4675 --j ACCEPT<br>
+This assumes a default-deny policy for INPUT and OUTPUT. If you have a default-allow for OUTPUT, then you must add this rule as the last rule in the OUTPUT chain:<br>
+sudo iptables -A OUTPUT --j DROP<br>
+This makes it so the outgoing rules you have are the only ones that allow traffic. Iptables parses in order, so when it does not see a rule matching a packet not on your list, it checks each one in the chain until it finds a match with the last rule and drops the packet.<br>
+That should set up your ssh. Some people also recommend re-generatinf the moduli file that comes in /etc/ssh. If you use the settings above, look at the kex algorithms. We are not using any diffie hellman group exchange kex algos to exchange keys, so you do not have to. The chosen kex algo is curve25519.</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/5</link>
+        <pubDate>Sat, 02 May 2020 22:59:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-5</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>page <a href="https://www.whonix.org/wiki/Onion_Services_Guides">https://www.whonix.org/wiki/Onion_Services_Guides</a></p>
+<blockquote>
+<p>SSH</p>
+</blockquote>
+<blockquote>
+<p>Secure Shell is the dominant protocol for secure remote login and system administration. It is a critical component of server and internet infrastructure.</p>
+</blockquote>
+<p>OK.</p>
+<blockquote>
+<p>Revelations from the Snowden documents and further analysis <a href="https://stribika.github.io/2015/01/04/secure-secure-shell.html">[1]</a> has uncovered weaknesses in some of the included cipher-suites, allowing abuses by resourceful nation-state adversaries.</p>
+</blockquote>
+<p>Ok interesting, but was this fixed upstream in SSH and/or does Debian nowadays ship in Debian buster secure defaults? Anything the user should do?</p>
+<p>Do you know any secure / hardened SSH config example?</p>
+<p>Please help improve <a href="https://www.whonix.org/wiki/SSH">https://www.whonix.org/wiki/SSH</a></p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/4</link>
+        <pubDate>Sat, 02 May 2020 14:33:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-4</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>I recommend using v3 onions (keeping the addresses secret to prevent unauthorized probing of SSH server). Also connecting to it from trsted VMs. This would take care of the need to protect the token  from malicious access while being straightforward.</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/3</link>
+        <pubDate>Thu, 15 Aug 2019 17:34:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-3</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>For reference:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Two-factor_authentication_2FA" target="_blank" title="08:20AM - 04 May 2020">Whonix – 4 May 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/448;"><img src="https://www.whonix.org/w/images/3/3d/2FA.jpg" class="thumbnail" width="640" height="448"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Two-factor_authentication_2FA" target="_blank">Two-factor Authentication (2FA)</a></h3>
+
+<p>Understanding Two-factor authentication 2FA. Avoiding to lock yourself out of online logins. Google Authenticator. TTOP, Time based One Time Password.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/SSH" target="_blank" title="12:17PM - 04 May 2020">Whonix – 4 May 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/359;"><img src="https://www.whonix.org/w/images/b/b3/SSH.jpg" class="thumbnail" width="640" height="359"></div>
+
+<h3><a href="https://www.whonix.org/wiki/SSH" target="_blank">Secure Shell (SSH)</a></h3>
+
+<p>Secure Shell (SSH): Recommended Client and Server Settings, SSH Hardening Tips</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>The value of 2FA is imo non-zero, low. Tried to flash that out for when it is useful and when not useful here: <a href="https://www.whonix.org/wiki/Two-factor_authentication_2FA">https://www.whonix.org/wiki/Two-factor_authentication_2FA</a></p>
+<p>I speculate if you’re creating such a threat here, you might be in the same group of users who don’t fall for attacks that would be protected by 2FA.</p>
+<aside class="quote no-group" data-username="0brand" data-post="1" data-topic="7896">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/0/ec9cab/40.png" class="avatar"> 0brand:</div>
+<blockquote>
+<p><strong>Yubikey:</strong> Not recommended since it could leak key material. Maybe 2fa without use of ssh key?</p>
+</blockquote>
+</aside>
+<p>Either that or any other kind of 2FA. Conindently today I was looking into all pam modules available from <a href="http://packages.debian.org">packages.debian.org</a>. In result, I created a list of promising candidates for use with 2FA. While I didn’t look closely at any of these at first sight these seem to use open standards, sane, libre, you name it.</p>
+<p><a href="https://www.whonix.org/wiki/Two-factor_authentication_2FA#Debian">https://www.whonix.org/wiki/Two-factor_authentication_2FA#Debian</a></p>
+<p>Nothing too special about yubikey here. Even a (separate) (dedicated) (old) phone(s) with TTOP (commonly known as “google authenticator” / AndOTP) could very likely be used for Linux PAM, which looks great. Basically any form of authentication modules can be stacked in any configuration for any way of authentication (virtual terminal (login), xscreensaver, sudo, su, lightdm, ssh). I.e. either</p>
+<ul>
+<li>password only,</li>
+<li>password or 2FA,</li>
+<li>password and 2FA</li>
+<li>password + TTOP + fingerprint</li>
+</ul>
+<p>What works locally for login, sudo and/or su should also work (locally for testing and) on remote for ssh.</p>
+<aside class="quote no-group" data-username="0brand" data-post="1" data-topic="7896">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/0/ec9cab/40.png" class="avatar"> 0brand:</div>
+<blockquote>
+<p><strong>Qubes split-ssh:</strong> Hasn’t been maintained for 2+ years. Has multiple forks but those people are unknown (to me).</p>
+</blockquote>
+</aside>
+<p>I see limited, non-zero value in split-gpg / split-ssh. It does not add much to security hardening rather limited damage control. A compromised VM cannot steal the key but use the key. In case of ssh, malware could take over an ssh session, install a backdoor on the server.<br>
+This would make more sense if that SSH key is used for different purposes such as from different VMs for different servers which are not all known at the same time by the same adversary.</p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/2</link>
+        <pubDate>Thu, 15 Aug 2019 06:22:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-2</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+      <item>
+        <title>Locking down your SSH Server and Client</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>What options are their for locking down your Whonix ssh client.</p>
+<p><strong>Yubikey:</strong> Not recommended since it could leak key material. Maybe 2fa without use of ssh key?</p>
+<p><a href="https://whonix.org/wiki/Dev/yubikey#YubiKey_Info">https://whonix.org/wiki/Dev/yubikey#YubiKey_Info</a></p>
+<blockquote>
+<p>Yubikeys supports storing OpenPGP (GnuPG / gpg) keys, OpenSSH keys, but I wouldn’t trust it. Another yubikey model had a PIN bypass bug. ( <a href="https://developers.yubico.com/ykneo-openpgp/SecurityAdvisory%202015-04-14.html">https://developers.yubico.com/ykneo-openpgp/SecurityAdvisory%202015-04-14.html</a> )</p>
+</blockquote>
+<p><strong>Qubes split-ssh:</strong> Hasn’t been maintained for 2+ years. Has multiple forks but those people are unknown (to me).</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="32" height="32">
+      <a href="https://github.com/henn/qubes-app-split-ssh" target="_blank">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars0.githubusercontent.com/u/1813729?s=400&amp;v=4" class="thumbnail onebox-avatar" width="128" height="128">
+
+<h3><a href="https://github.com/henn/qubes-app-split-ssh" target="_blank">henn/qubes-app-split-ssh</a></h3>
+
+<p>Split SSH implementation for QubesOS. Contribute to henn/qubes-app-split-ssh development by creating an account on GitHub.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p><strong>ip/nf-tables:</strong> on both firewall and client box. Maybe designate an interface on firewall for ssh only. Block everything else.</p>
+<p><strong>Small tweaks:</strong> Change ssh to different port, strong password for key access etc…</p>
+<p><strong>Anythig else??</strong></p>
+          <p><a href="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896/1</link>
+        <pubDate>Wed, 14 Aug 2019 17:38:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7896-1</guid>
+        <source url="http://forums.whonix.org/t/locking-down-your-ssh-server-and-client/7896.rss">Locking down your SSH Server and Client</source>
+      </item>
+  </channel>
+</rss>

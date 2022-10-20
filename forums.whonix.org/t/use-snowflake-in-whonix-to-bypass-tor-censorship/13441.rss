@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Use Snowflake in Whonix to Bypass Tor censorship</title>
+    <link>http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441</link>
+    <description>[Snowflake](https://snowflake.torproject.org/) is a new pluggable transport available in Tor Browser to defeat internet censorship. In this post, we introduce how to use it in Whonix.
+
+We use Qubes-Whonix as an example, and assume we have two template VMs: `whonix-ws-16` and `whonix-gw-16`; and one whonix-gateway VM `sys-whonix`. The general idea is the same for other platforms that run Whonix.
+
+## Get snowflake-client binary
+
+Since Whonix-gateway does not ship a Tor Browser Bundle by default, we get snowflake-client binary by transferring it from Whonix-workstation. In particular, there are two steps:
+
+1. First, execute the following command in `whonix-ws-16` to copy the snowflake-client binary to `whonix-gw-16`:
+
+```sh
+qvm-copy-to-vm whonix-gw-16 ~/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/snowflake-client
+```
+
+Note that it is okay from a security point of view for this action, because both Whonix-gateway and Whonix-workstation templates are trusted.
+
+2. Second, put the snowflake-client binary to `/usr/bin` in `whonix-gw-16`:
+
+```sh
+sudo install ~/QubesIncoming/whonix-ws-16/snowflake-client --owner debian-tor --group debian-tor --target-directory /usr/bin
+```
+
+## Configure Tor to use snowflake
+
+We need to tell Tor to use snowflake. In particular, we append the following three lines to the user torrc in `whonix-gw-16` with `sudo nano /usr/local/etc/torrc.d/50_user.conf`:
+
+```txt
+UseBridges 1
+ClientTransportPlugin snowflake exec /usr/bin/snowflake-client -url https://snowflake-broker.torproject.net.global.prod.fastly.net/ -front cdn.sstatic.net -ice stun:stun.l.google.com:19302,stun:stun.voip.blackberry.com:3478,stun:stun.altar.com.pl:3478,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.sonetel.net:3478,stun:stun.stunprotocol.org:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478
+Bridge snowflake 192.0.2.3:1
+```
+
+Don&#39;t get intimidated by the three lines above. The `UseBridges 1` and `Bridge snowflake 192.0.2.3:1` never change. And we can obtain an up-to-date second line by looking at the latest torrc shipped with Tor Browser Bunbdle. In particular, we can get the second line by executing the following command in `whonix-ws-16`:
+
+```sh
+grep &quot;ClientTransportPlugin snowflake&quot; ~/.tb/tor-browser/Browser/TorBrowser/Data/Tor/torrc-defaults
+```
+```txt
+ClientTransportPlugin snowflake exec ./TorBrowser/Tor/PluggableTransports/snowflake-client -url https://snowflake-broker.torproject.net.global.prod.fastly.net/ -front cdn.sstatic.net -ice stun:stun.l.google.com:19302,stun:stun.voip.blackberry.com:3478,stun:stun.altar.com.pl:3478,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.sonetel.net:3478,stun:stun.stunprotocol.org:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478
+```
+
+## Workaround DNS resolving in Whonix-gateway
+
+Snowflake-client needs to resolve the `-front` domain to IP, in order to the server; however, this DNS resolving will fail with [the default Whonix gateway DNS configuration](https://www.whonix.org/wiki/Whonix-Gateway_System_DNS).
+
+We thus workaround it by resolving the domain manually and then put it into `/etc/hosts` in `whonix-gw-16`. In the example above, we have `-front cdn.sstatic.net`. We thus resolve the domain `cdn.sstatic.net` manually in a machine that allows DNS resolving by:
+
+```sh
+dig +short cdn.sstatic.net
+```
+```txt
+151.101.193.69
+```
+
+Now, we append the following lines to the `/etc/hosts` in `whonix-gw-16` with `sudo nano /etc/hosts`:
+
+```txt
+151.101.193.69 cdn.sstatic.net
+```
+
+## Restart Tor
+
+Finally, we shutdown the template VM `whonix-gw-16` and start Whonix-gateway VM `sys-whonix`.
+
+In `sys-whonix`, we restart the Tor with:
+
+```sh
+sudo service tor@default restart
+```
+
+## Make sure Tor is using snowflake
+
+To check if Tor is indeed using snowflake, we use `nyx` or `onioncircuits`. We are connecting to the Tor network through snowflake if:
+
+1. In `nyx`, the guard node is a local address, like `192.168.0.1`;
+2. or in `onioncircuits`, the guard node IP is `Unknown`.
+
+## Other usages
+
+### Use AMP cache rendezvous for Snowflake
+
+wkrp stated in [a recent post](https://github.com/net4people/bbs/issues/109):
+
+&gt; by default in Tor Browser, Snowflake does rendezvous using a domain-fronted HTTPS request. Now there is an alternative (backup) to domain fronting rendezvous: AMP cache rendezvous. If one rendezvous method is blocked, there is a chance the other will work.
+
+In short, two steps are required to use AMP cache rendezvous:
+
+1. First, replace the second line in `/usr/local/etc/torrc.d/50_user.conf` with:
+
+```txt
+ClientTransportPlugin snowflake exec /usr/bin/snowflake-client -url https://snowflake-broker.torproject.net/ -ampcache https://cdn.ampproject.org/ -front www.google.com -ice stun:stun.l.google.com:19302,stun:stun.voip.blackberry.com:3478,stun:stun.altar.com.pl:3478,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.sonetel.net:3478,stun:stun.stunprotocol.org:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478
+```
+
+2. Second, note that the `-front` is now `www.google.com`. So we have to put the IP address of `www.google.com` to `/etc/hosts`:
+
+Still we resolve the IP manually with `dig +short www.google.com` and get `142.251.46.164`.
+
+We then append the following line with `sudo nano /etc/hosts`:
+
+```txt
+142.251.32.36 www.google.com
+```
+
+### Enable and view Snowflake log
+
+We can enable the snowflake log for bebugging purposes by appending `-log snowflake.log -log-to-state-dir` to the `ClientTransportPlugin snowflake...` line in `/usr/local/etc/torrc.d/50_user.conf`. The complete line looks like this:
+
+```txt
+ClientTransportPlugin snowflake exec /usr/bin/snowflake-client -url https://snowflake-broker.torproject.net.global.prod.fastly.net/ -front cdn.sstatic.net -ice stun:stun.l.google.com:19302,stun:stun.voip.blackberry.com:3478,stun:stun.altar.com.pl:3478,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.sonetel.net:3478,stun:stun.stunprotocol.org:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478 -log snowflake.log -log-to-state-dir
+```
+
+We can view the snowflake log with `sudo less /var/lib/tor/pt_state/snowflake.log`.
+
+Note that we can always find the Tor DataDirectory with the following command:
+
+```sh
+anon-verify -v | grep DataDirectory
+```
+```txt
+DataDirectory /var/lib/tor
+```</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 12 Mar 2022 20:22:36 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Use Snowflake in Whonix to Bypass Tor censorship</title>
+        <dc:creator><![CDATA[iry]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group quote-modified" data-username="Patrick" data-post="3" data-topic="13441">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Could you please check what needs modification under <a href="https://www.whonix.org/wiki/Bridges#Snowflake" class="inline-onebox">Configure (Private) (Obfuscated) Tor Bridges</a>?</p>
+</blockquote>
+</aside>
+<p>Thank you for pointing me to the Wiki section! I wasn’t aware of it.</p>
+<p>I have made the corresponding changes to the Wiki section. It now has the up-to-date instructions to use snowflake.</p>
+          <p><a href="http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441/4</link>
+        <pubDate>Sat, 12 Mar 2022 20:22:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13441-4</guid>
+        <source url="http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441.rss">Use Snowflake in Whonix to Bypass Tor censorship</source>
+      </item>
+      <item>
+        <title>Use Snowflake in Whonix to Bypass Tor censorship</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Could you please check what needs modification under <a href="https://www.whonix.org/wiki/Bridges#Snowflake">https://www.whonix.org/wiki/Bridges#Snowflake</a>?</p>
+<aside class="quote no-group" data-username="iry" data-post="1" data-topic="13441">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/i/c5a1d2/40.png" class="avatar"> iry:</div>
+<blockquote>
+<pre><code class="lang-auto">sudo install ~/QubesIncoming/whonix-ws-16/snowflake-client --owner debian-tor --group debian-tor --target-directory /usr/bin
+</code></pre>
+</blockquote>
+</aside>
+<p><code>--owner debian-tor --group debian-tor</code> shouldn’t be used. No need.</p>
+<p>The command already used in above link to documentation for copy and executable permission should be already perfect.</p>
+          <p><a href="http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441/3</link>
+        <pubDate>Sat, 12 Mar 2022 10:24:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13441-3</guid>
+        <source url="http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441.rss">Use Snowflake in Whonix to Bypass Tor censorship</source>
+      </item>
+      <item>
+        <title>Use Snowflake in Whonix to Bypass Tor censorship</title>
+        <dc:creator><![CDATA[iry]]></dc:creator>
+        <description><![CDATA[
+            <p>Development discussion on intergrating snowflake into Whonix:</p>
+<aside class="quote quote-modified" data-post="65" data-topic="5190">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img loading="lazy" alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/i/c5a1d2/40.png" class="avatar">
+    <a href="https://forums.whonix.org/t/replacing-meek-snowflake/5190/65">Replacing meek: Snowflake</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development/8"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of components looking for maintainer)">Development</span></a>
+  </div>
+  <blockquote>
+    I made a post on <a href="//forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441" class="inline-onebox">Use Snowflake in Whonix to Bypass Tor censorship</a> 
+Below are the three non-trivial tasks required to integrate snowflake into Whonix. I unfortunately do not have enough time to implement all of them. 
+
+Find an acceptable way to get snowflake binary into Whonix-gateway. Some options are:
+
+
+Transferring binary from whonix-workstation to whonix-gateway can be hacky. It is also not always secure because whonix-workstation is not always be trusted.
+Shipping TBB in whonix-gateway resul…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441/2</link>
+        <pubDate>Sat, 12 Mar 2022 02:10:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13441-2</guid>
+        <source url="http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441.rss">Use Snowflake in Whonix to Bypass Tor censorship</source>
+      </item>
+      <item>
+        <title>Use Snowflake in Whonix to Bypass Tor censorship</title>
+        <dc:creator><![CDATA[iry]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://snowflake.torproject.org/">Snowflake</a> is a new pluggable transport available in Tor Browser to defeat internet censorship. In this post, we introduce how to use it in Whonix.</p>
+<p>We use Qubes-Whonix as an example, and assume we have two template VMs: <code>whonix-ws-16</code> and <code>whonix-gw-16</code>; and one whonix-gateway VM <code>sys-whonix</code>. The general idea is the same for other platforms that run Whonix.</p>
+<h2>
+<a name="get-snowflake-client-binary-1" class="anchor" href="http://forums.whonix.org#get-snowflake-client-binary-1"></a>Get snowflake-client binary</h2>
+<p>Since Whonix-gateway does not ship a Tor Browser Bundle by default, we get snowflake-client binary by transferring it from Whonix-workstation. In particular, there are two steps:</p>
+<ol>
+<li>First, execute the following command in <code>whonix-ws-16</code> to copy the snowflake-client binary to <code>whonix-gw-16</code>:</li>
+</ol>
+<pre><code class="lang-auto">qvm-copy-to-vm whonix-gw-16 ~/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/snowflake-client
+</code></pre>
+<p>Note that it is okay from a security point of view for this action, because both Whonix-gateway and Whonix-workstation templates are trusted.</p>
+<ol start="2">
+<li>Second, put the snowflake-client binary to <code>/usr/bin</code> in <code>whonix-gw-16</code>:</li>
+</ol>
+<pre><code class="lang-auto">sudo install ~/QubesIncoming/whonix-ws-16/snowflake-client --owner debian-tor --group debian-tor --target-directory /usr/bin
+</code></pre>
+<h2>
+<a name="configure-tor-to-use-snowflake-2" class="anchor" href="http://forums.whonix.org#configure-tor-to-use-snowflake-2"></a>Configure Tor to use snowflake</h2>
+<p>We need to tell Tor to use snowflake. In particular, we append the following three lines to the user torrc in <code>whonix-gw-16</code> with <code>sudo nano /usr/local/etc/torrc.d/50_user.conf</code>:</p>
+<pre><code class="lang-auto">UseBridges 1
+ClientTransportPlugin snowflake exec /usr/bin/snowflake-client -url https://snowflake-broker.torproject.net.global.prod.fastly.net/ -front cdn.sstatic.net -ice stun:stun.l.google.com:19302,stun:stun.voip.blackberry.com:3478,stun:stun.altar.com.pl:3478,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.sonetel.net:3478,stun:stun.stunprotocol.org:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478
+Bridge snowflake 192.0.2.3:1
+</code></pre>
+<p>Don’t get intimidated by the three lines above. The <code>UseBridges 1</code> and <code>Bridge snowflake 192.0.2.3:1</code> never change. And we can obtain an up-to-date second line by looking at the latest torrc shipped with Tor Browser Bunbdle. In particular, we can get the second line by executing the following command in <code>whonix-ws-16</code>:</p>
+<pre><code class="lang-auto">grep "ClientTransportPlugin snowflake" ~/.tb/tor-browser/Browser/TorBrowser/Data/Tor/torrc-defaults
+</code></pre>
+<pre><code class="lang-auto">ClientTransportPlugin snowflake exec ./TorBrowser/Tor/PluggableTransports/snowflake-client -url https://snowflake-broker.torproject.net.global.prod.fastly.net/ -front cdn.sstatic.net -ice stun:stun.l.google.com:19302,stun:stun.voip.blackberry.com:3478,stun:stun.altar.com.pl:3478,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.sonetel.net:3478,stun:stun.stunprotocol.org:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478
+</code></pre>
+<h2>
+<a name="workaround-dns-resolving-in-whonix-gateway-3" class="anchor" href="http://forums.whonix.org#workaround-dns-resolving-in-whonix-gateway-3"></a>Workaround DNS resolving in Whonix-gateway</h2>
+<p>Snowflake-client needs to resolve the <code>-front</code> domain to IP, in order to the server; however, this DNS resolving will fail with <a href="https://www.whonix.org/wiki/Whonix-Gateway_System_DNS">the default Whonix gateway DNS configuration</a>.</p>
+<p>We thus workaround it by resolving the domain manually and then put it into <code>/etc/hosts</code> in <code>whonix-gw-16</code>. In the example above, we have <code>-front cdn.sstatic.net</code>. We thus resolve the domain <code>cdn.sstatic.net</code> manually in a machine that allows DNS resolving by:</p>
+<pre><code class="lang-auto">dig +short cdn.sstatic.net
+</code></pre>
+<pre><code class="lang-auto">151.101.193.69
+</code></pre>
+<p>Now, we append the following lines to the <code>/etc/hosts</code> in <code>whonix-gw-16</code> with <code>sudo nano /etc/hosts</code>:</p>
+<pre><code class="lang-auto">151.101.193.69 cdn.sstatic.net
+</code></pre>
+<h2>
+<a name="restart-tor-4" class="anchor" href="http://forums.whonix.org#restart-tor-4"></a>Restart Tor</h2>
+<p>Finally, we shutdown the template VM <code>whonix-gw-16</code> and start Whonix-gateway VM <code>sys-whonix</code>.</p>
+<p>In <code>sys-whonix</code>, we restart the Tor with:</p>
+<pre><code class="lang-auto">sudo service tor@default restart
+</code></pre>
+<h2>
+<a name="make-sure-tor-is-using-snowflake-5" class="anchor" href="http://forums.whonix.org#make-sure-tor-is-using-snowflake-5"></a>Make sure Tor is using snowflake</h2>
+<p>To check if Tor is indeed using snowflake, we use <code>nyx</code> or <code>onioncircuits</code>. We are connecting to the Tor network through snowflake if:</p>
+<ol>
+<li>In <code>nyx</code>, the guard node is a local address, like <code>192.168.0.1</code>;</li>
+<li>or in <code>onioncircuits</code>, the guard node IP is <code>Unknown</code>.</li>
+</ol>
+<h2>
+<a name="other-usages-6" class="anchor" href="http://forums.whonix.org#other-usages-6"></a>Other usages</h2>
+<h3>
+<a name="use-amp-cache-rendezvous-for-snowflake-7" class="anchor" href="http://forums.whonix.org#use-amp-cache-rendezvous-for-snowflake-7"></a>Use AMP cache rendezvous for Snowflake</h3>
+<p>wkrp stated in <a href="https://github.com/net4people/bbs/issues/109">a recent post</a>:</p>
+<blockquote>
+<p>by default in Tor Browser, Snowflake does rendezvous using a domain-fronted HTTPS request. Now there is an alternative (backup) to domain fronting rendezvous: AMP cache rendezvous. If one rendezvous method is blocked, there is a chance the other will work.</p>
+</blockquote>
+<p>In short, two steps are required to use AMP cache rendezvous:</p>
+<ol>
+<li>First, replace the second line in <code>/usr/local/etc/torrc.d/50_user.conf</code> with:</li>
+</ol>
+<pre><code class="lang-auto">ClientTransportPlugin snowflake exec /usr/bin/snowflake-client -url https://snowflake-broker.torproject.net/ -ampcache https://cdn.ampproject.org/ -front www.google.com -ice stun:stun.l.google.com:19302,stun:stun.voip.blackberry.com:3478,stun:stun.altar.com.pl:3478,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.sonetel.net:3478,stun:stun.stunprotocol.org:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478
+</code></pre>
+<ol start="2">
+<li>Second, note that the <code>-front</code> is now <code>www.google.com</code>. So we have to put the IP address of <code>www.google.com</code> to <code>/etc/hosts</code>:</li>
+</ol>
+<p>Still we resolve the IP manually with <code>dig +short www.google.com</code> and get <code>142.251.46.164</code>.</p>
+<p>We then append the following line with <code>sudo nano /etc/hosts</code>:</p>
+<pre><code class="lang-auto">142.251.32.36 www.google.com
+</code></pre>
+<h3>
+<a name="enable-and-view-snowflake-log-8" class="anchor" href="http://forums.whonix.org#enable-and-view-snowflake-log-8"></a>Enable and view Snowflake log</h3>
+<p>We can enable the snowflake log for bebugging purposes by appending <code>-log snowflake.log -log-to-state-dir</code> to the <code>ClientTransportPlugin snowflake...</code> line in <code>/usr/local/etc/torrc.d/50_user.conf</code>. The complete line looks like this:</p>
+<pre><code class="lang-auto">ClientTransportPlugin snowflake exec /usr/bin/snowflake-client -url https://snowflake-broker.torproject.net.global.prod.fastly.net/ -front cdn.sstatic.net -ice stun:stun.l.google.com:19302,stun:stun.voip.blackberry.com:3478,stun:stun.altar.com.pl:3478,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.sonetel.net:3478,stun:stun.stunprotocol.org:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478 -log snowflake.log -log-to-state-dir
+</code></pre>
+<p>We can view the snowflake log with <code>sudo less /var/lib/tor/pt_state/snowflake.log</code>.</p>
+<p>Note that we can always find the Tor DataDirectory with the following command:</p>
+<pre><code class="lang-auto">anon-verify -v | grep DataDirectory
+</code></pre>
+<pre><code class="lang-auto">DataDirectory /var/lib/tor
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441/1</link>
+        <pubDate>Sat, 12 Mar 2022 02:04:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13441-1</guid>
+        <source url="http://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441.rss">Use Snowflake in Whonix to Bypass Tor censorship</source>
+      </item>
+  </channel>
+</rss>

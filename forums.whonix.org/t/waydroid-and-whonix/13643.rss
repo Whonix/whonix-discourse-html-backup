@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Waydroid and whonix</title>
+    <link>http://forums.whonix.org/t/waydroid-and-whonix/13643</link>
+    <description>Hi
+I&#39;m trying to run Way-droid on Whonix but having some issues since dnsmasq is not giving dhcp to the lxc container. 
+
+Any help would be great, I think a guide on running android inside whonix would be a great addition to the wiki since many operations require phone apps. 
+
+These are the step i took so far 
+
+1. Adding the repo  
+```
+export DISTRO=&quot;bullseye&quot; &amp;&amp; \
+sudo scurl -Sf https://repo.waydro.id/waydroid.gpg --output /usr/share/keyrings/waydroid.gpg &amp;&amp; \
+echo &quot;deb [signed-by=/usr/share/keyrings/waydroid.gpg] tor+https://repo.waydro.id/ $DISTRO main&quot; &gt; ~/waydroid.list &amp;&amp; \
+sudo mv ~/waydroid.list /etc/apt/sources.list.d/waydroid.list &amp;&amp; \
+sudo apt update
+```
+
+
+2. Installing 
+
+`sudo apt install waydroid -y`
+
+3. Starting the init process and downloading images.
+
+`sudo waydroid init`
+
+
+4. Editing conf files for vm support 
+
+
+`nano /var/lib/waydroid/waydroid_base.prop`
+
+
+change these
+
+
+```
+ro.hardware.gralloc=default
+ro.hardware.egl=swiftshader
+```
+
+
+5. Start 
+
+`sudo systemctl start waydroid-container`
+
+or manually with 
+
+```
+
+sudo waydroid container start
+```
+
+
+6. Xfce is using x11 so we have to use a wayland compositor
+
+
+```
+sudo apt install weston
+setsid weston &amp;
+```
+
+7. Adjust the window size and then enter this in the terminal 
+
+`XDG_SESSION_TYPE=wayland waydroid show-full-ui`
+
+This should start android with a full ui
+
+
+Currently I I&#39;m not recieving dhcp from dnsmasq.
+
+I tried to restart the script installed at 
+
+`/usr/lib/waydroid/data/scripts/waydroid-net.sh` 
+
+the bridge interface is created but when I enter the console I do not receive any dhcp
+
+
+```
+sudo wayland shell
+ip a
+```</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 08 May 2022 11:11:44 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/waydroid-and-whonix/13643.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Waydroid and whonix</title>
+        <dc:creator><![CDATA[blackspider]]></dc:creator>
+        <description><![CDATA[
+            <p>Allowing UDP fixed the issue, I can now download apps from F-Droid after installing it with<code> sudo waydroid app install &lt;downloaded fdroid apk &gt;</code></p>
+          <p><a href="http://forums.whonix.org/t/waydroid-and-whonix/13643/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/waydroid-and-whonix/13643/3</link>
+        <pubDate>Sun, 08 May 2022 11:11:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13643-3</guid>
+        <source url="http://forums.whonix.org/t/waydroid-and-whonix/13643.rss">Waydroid and whonix</source>
+      </item>
+      <item>
+        <title>Waydroid and whonix</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="blackspider" data-post="1" data-topic="13643">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/b/74df32/40.png" class="avatar"> blackspider:</div>
+<blockquote>
+<p>I think a guide on running android inside whonix would be a great addition to the wiki since many operations require phone apps.</p>
+</blockquote>
+</aside>
+<p>That would be good.</p>
+<aside class="quote no-group" data-username="blackspider" data-post="1" data-topic="13643">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/b/74df32/40.png" class="avatar"> blackspider:</div>
+<blockquote>
+<p>Currently I im not recieving dhcp from dnsmasq.</p>
+</blockquote>
+</aside>
+<p>Just a guess: There’s no DHCP server installed in Whonix-Workstation. Therefore the container might not get an internal IP from DHCP.</p>
+<p>Another guess:<br>
+<a href="https://www.whonix.org/wiki/Whonix-Workstation_Firewall" class="inline-onebox">Whonix-Workstation Firewall - Whonix</a> might interfere. Try either:</p>
+<ul>
+<li><a href="https://www.whonix.org/wiki/Whonix-Workstation_Firewall#Allow_UDP">Allow UDP</a></li>
+<li>or <a href="https://www.whonix.org/wiki/Whonix-Workstation_Firewall#Permanently_Disable_Whonix-Workstation_%E2%84%A2_Firewall">Permanently Disable Whonix-Workstation ™ Firewall</a> - risks? See: <a href="https://gitlab.com/whonix/whonix-firewall/-/blob/master/man/whonix_firewall.8.ronn#L28" class="inline-onebox">man/whonix_firewall.8.ronn · master · Whonix / whonix-firewall · GitLab</a>
+</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/waydroid-and-whonix/13643/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/waydroid-and-whonix/13643/2</link>
+        <pubDate>Sun, 08 May 2022 10:52:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13643-2</guid>
+        <source url="http://forums.whonix.org/t/waydroid-and-whonix/13643.rss">Waydroid and whonix</source>
+      </item>
+      <item>
+        <title>Waydroid and whonix</title>
+        <dc:creator><![CDATA[blackspider]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi<br>
+I’m trying to run Way-droid on Whonix but having some issues since dnsmasq is not giving dhcp to the lxc container.</p>
+<p>Any help would be great, I think a guide on running android inside whonix would be a great addition to the wiki since many operations require phone apps.</p>
+<p>These are the step i took so far</p>
+<ol>
+<li>Adding the repo</li>
+</ol>
+<pre><code class="lang-auto">export DISTRO="bullseye" &amp;&amp; \
+sudo scurl -Sf https://repo.waydro.id/waydroid.gpg --output /usr/share/keyrings/waydroid.gpg &amp;&amp; \
+echo "deb [signed-by=/usr/share/keyrings/waydroid.gpg] tor+https://repo.waydro.id/ $DISTRO main" &gt; ~/waydroid.list &amp;&amp; \
+sudo mv ~/waydroid.list /etc/apt/sources.list.d/waydroid.list &amp;&amp; \
+sudo apt update
+</code></pre>
+<ol start="2">
+<li>Installing</li>
+</ol>
+<p><code>sudo apt install waydroid -y</code></p>
+<ol start="3">
+<li>Starting the init process and downloading images.</li>
+</ol>
+<p><code>sudo waydroid init</code></p>
+<ol start="4">
+<li>Editing conf files for vm support</li>
+</ol>
+<p><code>nano /var/lib/waydroid/waydroid_base.prop</code></p>
+<p>change these</p>
+<pre><code class="lang-auto">ro.hardware.gralloc=default
+ro.hardware.egl=swiftshader
+</code></pre>
+<ol start="5">
+<li>Start</li>
+</ol>
+<p><code>sudo systemctl start waydroid-container</code></p>
+<p>or manually with</p>
+<pre><code class="lang-auto">
+sudo waydroid container start
+</code></pre>
+<ol start="6">
+<li>Xfce is using x11 so we have to use a wayland compositor</li>
+</ol>
+<pre><code class="lang-auto">sudo apt install weston
+setsid weston &amp;
+</code></pre>
+<ol start="7">
+<li>Adjust the window size and then enter this in the terminal</li>
+</ol>
+<p><code>XDG_SESSION_TYPE=wayland waydroid show-full-ui</code></p>
+<p>This should start android with a full ui</p>
+<p>Currently I I’m not recieving dhcp from dnsmasq.</p>
+<p>I tried to restart the script installed at</p>
+<p><code>/usr/lib/waydroid/data/scripts/waydroid-net.sh</code></p>
+<p>the bridge interface is created but when I enter the console I do not receive any dhcp</p>
+<pre><code class="lang-auto">sudo wayland shell
+ip a
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/waydroid-and-whonix/13643/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/waydroid-and-whonix/13643/1</link>
+        <pubDate>Sun, 08 May 2022 10:22:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13643-1</guid>
+        <source url="http://forums.whonix.org/t/waydroid-and-whonix/13643.rss">Waydroid and whonix</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Onion-Grater deb package contains compressed 40_onionshare.yml</title>
+    <link>http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154</link>
+    <description>Is the latest onion-grater deb package, *10.1-1 all*, meant to contain **40_onionshare.yml.gz** in place of **40_onionshare.yml**? At the time of writing this, running `upgrade-nonroot` followed by `sudo onion-grater-add 40_onionshare` on a fresh KVM Whonix-Gateway (16.0.3.1 and 16.0.3.7) results in the following output: `ERROR: profile_file_source &#39;&#39; does not exist!` -- No errors are found in the upgrade log.
+
+Compressed file appears after `upgrade-nonroot` on Gateway VM:
+
+    user@host:~$ ls /usr/share/doc/onion-grater-merger/examples
+    40_bisq.yml      40_onion_authentication.yml  40_ricochet.yml  40_zeronet.yml
+    40_bitcoind.yml  40_onionshare.yml.gz        40_wahay.yml
+
+This is an even greater issue on my personal ISO (live-)build of Whonix-Host, which runs Whonix 16.0.3.1 KVM. The Workstation VM is upgraded up to January 03 and contains additional packages, scripts and configurations, including OnionShare; the Gateway VM is default, with no selections made in the connection Wizard, no system upgrades and no configuration changes, except for the addition of OnionShare to the onion-grater whitelist via `sudo onion-grater-add 40_onionshare`.
+
+You may  see where this is going. Every time I boot my Whonix-Host ISO, I upgrade and reboot the Gateway which, as of onion-grater version *10.1-1*, causes a failure to start the service and prevents the Workstation from reaching Tor&#39;s Control Port.
+
+Gateway journal:
+
+    user@host:~$ sudo journalctl -f -u onion-grater
+    Jan 05 host systemd[1]: Stopped Tor control port filter proxy.
+    Jan 05 host systemd[1]: Starting Tor control port filter proxy...
+    Jan 05 host onion-grater-merger[5010]: Traceback (most recent call last):
+    Jan 05 host onion-grater-merger[5010]:   File &quot;/usr/lib/onion-grater-merger&quot;, line 132, in &lt;module&gt;
+    Jan 05 host onion-grater-merger[5010]:     main()
+    Jan 05 host onion-grater-merger[5010]:   File &quot;/usr/lib/onion-grater-merger&quot;, line 87, in main
+    Jan 05 host onion-grater-merger[5010]:     with open(filter_file, &quot;rb&quot;) as fh:
+    Jan 05 host onion-grater-merger[5010]: FileNotFoundError: [Errno 2] No such file or directory: &#39;/usr/local/etc/onion-grater-merger.d/40_onionshare.yml&#39;
+    Jan 05 host systemd[1]: onion-grater.service: Control process exited, code=exited, status=1/FAILURE
+    Jan 05 host systemd[1]: onion-grater.service: Failed with result &#39;exit-code&#39;.
+    Jan 05 host systemd[1]: Failed to start Tor control port filter proxy.
+
+System-Check suggests that I either:
+A) Restart the onion-grater service
+B) Skip the &#39;check_control_port_filter_running&#39; function
+
+Option **A** obviously does not work and option **B** is undesired. I see no new mention of an appropriate method for adding OnionShare to the whitelist in the wiki, nor have I found mention of this compressed *yml* file in any changelog; neither in the GitLab or GitHub pages. Am I missing something?
+
+The only solution I&#39;ve found thus far is to decompress **40_onionshare.yml.gz** followed by restarting the onion-grater service. Is this safe? Is the current intention to have a *yml* file instead of a compressed *gz* file, or is there a new method for adding OnionShare to the whitelist?
+
+I&#39;ve spent way too many hours searching for an official reason/solution, and I can&#39;t wait to hear the answer was right in front of my eyeballs this whole time. (first post, hello!)</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 07 Jan 2022 10:35:12 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Onion-Grater deb package contains compressed 40_onionshare.yml</title>
+        <dc:creator><![CDATA[DaemonFuu]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="13154">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Why wouldn’t that be safe?</p>
+</blockquote>
+</aside>
+<p>I simply needed confirmation. Unknown intention and relying on assumption don’t always mix well.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="4" data-topic="13154" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Fix available in all Whonix repositories.</p>
+</blockquote>
+</aside>
+<p>Beautiful! Thank you, and additional thanks for the clarification regarding dh_compress.</p>
+          <p><a href="http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154/5</link>
+        <pubDate>Fri, 07 Jan 2022 10:35:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13154-5</guid>
+        <source url="http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154.rss">Onion-Grater deb package contains compressed 40_onionshare.yml</source>
+      </item>
+      <item>
+        <title>Onion-Grater deb package contains compressed 40_onionshare.yml</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Fix available in all Whonix repositories.</p>
+          <p><a href="http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154/4</link>
+        <pubDate>Thu, 06 Jan 2022 20:24:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13154-4</guid>
+        <source url="http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154.rss">Onion-Grater deb package contains compressed 40_onionshare.yml</source>
+      </item>
+      <item>
+        <title>Onion-Grater deb package contains compressed 40_onionshare.yml</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Due to the recently increased file size of the OnionShare onion-grater profile, Debian packaging (dh_compress) automatically compressed the file.</p>
+<p><a href="https://manpages.debian.org/bullseye/debhelper/dh_compress.1.en.html" class="onebox" target="_blank" rel="noopener">https://manpages.debian.org/bullseye/debhelper/dh_compress.1.en.html</a></p>
+<aside class="onebox githubcommit">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/onion-grater/commit/e36db8f769230959ea07ce44ede333aef00a39e5" target="_blank" rel="noopener">github.com/Whonix/onion-grater</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/onion-grater/commit/e36db8f769230959ea07ce44ede333aef00a39e5" target="_blank" rel="noopener">fix, prevent dh_compress from compressing the OnionShare onion-grater profile</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2022-01-06" data-time="20:12:12" data-timezone="UTC">08:12PM - 06 Jan 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+
+      <div class="lines" title="changed 1 files with 3 additions and 0 deletions">
+        <a href="https://github.com/Whonix/onion-grater/commit/e36db8f769230959ea07ce44ede333aef00a39e5" target="_blank" rel="noopener">
+          <span class="added">+3</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">
+Thanks to @DaemonFuu for the bug report!
+
+https://forums.whonix.org/t/onion-gra<span class="show-more-container"><a href="https://github.com/Whonix/onion-grater/commit/e36db8f769230959ea07ce44ede333aef00a39e5" target="_blank" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">ter-deb-package-contains-compressed-40-onionshare-yml/13154</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Will soon be fixed in all Whonix repositories.</p>
+          <p><a href="http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154/3</link>
+        <pubDate>Thu, 06 Jan 2022 20:16:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13154-3</guid>
+        <source url="http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154.rss">Onion-Grater deb package contains compressed 40_onionshare.yml</source>
+      </item>
+      <item>
+        <title>Onion-Grater deb package contains compressed 40_onionshare.yml</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="DaemonFuu" data-post="1" data-topic="13154">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/daemonfuu/40/2870_2.png" class="avatar"> DaemonFuu:</div>
+<blockquote>
+<p>The only solution I’ve found thus far is to decompress <strong>40_onionshare.yml.gz</strong> followed by restarting the onion-grater service. Is this safe?</p>
+</blockquote>
+</aside>
+<p>Why wouldn’t that be safe?</p>
+<aside class="quote no-group" data-username="DaemonFuu" data-post="1" data-topic="13154">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/daemonfuu/40/2870_2.png" class="avatar"> DaemonFuu:</div>
+<blockquote>
+<p>Is the current intention to have a <em>yml</em> file instead of a compressed <em>gz</em> file, or is there a new method for adding OnionShare to the whitelist?</p>
+</blockquote>
+</aside>
+<p>Having a compressed gz file is a packaging bug. I wonder why that is happening.</p>
+          <p><a href="http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154/2</link>
+        <pubDate>Thu, 06 Jan 2022 19:33:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13154-2</guid>
+        <source url="http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154.rss">Onion-Grater deb package contains compressed 40_onionshare.yml</source>
+      </item>
+      <item>
+        <title>Onion-Grater deb package contains compressed 40_onionshare.yml</title>
+        <dc:creator><![CDATA[DaemonFuu]]></dc:creator>
+        <description><![CDATA[
+            <p>Is the latest onion-grater deb package, <em>10.1-1 all</em>, meant to contain <strong>40_onionshare.yml.gz</strong> in place of <strong>40_onionshare.yml</strong>? At the time of writing this, running <code>upgrade-nonroot</code> followed by <code>sudo onion-grater-add 40_onionshare</code> on a fresh KVM Whonix-Gateway (16.0.3.1 and 16.0.3.7) results in the following output: <code>ERROR: profile_file_source '' does not exist!</code> – No errors are found in the upgrade log.</p>
+<p>Compressed file appears after <code>upgrade-nonroot</code> on Gateway VM:</p>
+<pre><code>user@host:~$ ls /usr/share/doc/onion-grater-merger/examples
+40_bisq.yml      40_onion_authentication.yml  40_ricochet.yml  40_zeronet.yml
+40_bitcoind.yml  40_onionshare.yml.gz        40_wahay.yml
+</code></pre>
+<p>This is an even greater issue on my personal ISO (live-)build of Whonix-Host, which runs Whonix 16.0.3.1 KVM. The Workstation VM is upgraded up to January 03 and contains additional packages, scripts and configurations, including OnionShare; the Gateway VM is default, with no selections made in the connection Wizard, no system upgrades and no configuration changes, except for the addition of OnionShare to the onion-grater whitelist via <code>sudo onion-grater-add 40_onionshare</code>.</p>
+<p>You may  see where this is going. Every time I boot my Whonix-Host ISO, I upgrade and reboot the Gateway which, as of onion-grater version <em>10.1-1</em>, causes a failure to start the service and prevents the Workstation from reaching Tor’s Control Port.</p>
+<p>Gateway journal:</p>
+<pre><code>user@host:~$ sudo journalctl -f -u onion-grater
+Jan 05 host systemd[1]: Stopped Tor control port filter proxy.
+Jan 05 host systemd[1]: Starting Tor control port filter proxy...
+Jan 05 host onion-grater-merger[5010]: Traceback (most recent call last):
+Jan 05 host onion-grater-merger[5010]:   File "/usr/lib/onion-grater-merger", line 132, in &lt;module&gt;
+Jan 05 host onion-grater-merger[5010]:     main()
+Jan 05 host onion-grater-merger[5010]:   File "/usr/lib/onion-grater-merger", line 87, in main
+Jan 05 host onion-grater-merger[5010]:     with open(filter_file, "rb") as fh:
+Jan 05 host onion-grater-merger[5010]: FileNotFoundError: [Errno 2] No such file or directory: '/usr/local/etc/onion-grater-merger.d/40_onionshare.yml'
+Jan 05 host systemd[1]: onion-grater.service: Control process exited, code=exited, status=1/FAILURE
+Jan 05 host systemd[1]: onion-grater.service: Failed with result 'exit-code'.
+Jan 05 host systemd[1]: Failed to start Tor control port filter proxy.
+</code></pre>
+<p>System-Check suggests that I either:<br>
+A) Restart the onion-grater service<br>
+B) Skip the ‘check_control_port_filter_running’ function</p>
+<p>Option <strong>A</strong> obviously does not work and option <strong>B</strong> is undesired. I see no new mention of an appropriate method for adding OnionShare to the whitelist in the wiki, nor have I found mention of this compressed <em>yml</em> file in any changelog; neither in the GitLab or GitHub pages. Am I missing something?</p>
+<p>The only solution I’ve found thus far is to decompress <strong>40_onionshare.yml.gz</strong> followed by restarting the onion-grater service. Is this safe? Is the current intention to have a <em>yml</em> file instead of a compressed <em>gz</em> file, or is there a new method for adding OnionShare to the whitelist?</p>
+<p>I’ve spent way too many hours searching for an official reason/solution, and I can’t wait to hear the answer was right in front of my eyeballs this whole time. (first post, hello!)</p>
+          <p><a href="http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154/1</link>
+        <pubDate>Thu, 06 Jan 2022 18:34:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13154-1</guid>
+        <source url="http://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154.rss">Onion-Grater deb package contains compressed 40_onionshare.yml</source>
+      </item>
+  </channel>
+</rss>

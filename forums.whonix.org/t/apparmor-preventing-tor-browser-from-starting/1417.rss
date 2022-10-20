@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Apparmor preventing Tor Browser from Starting</title>
+    <link>http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417</link>
+    <description>Using WHONIX+QUBES and running Whonix 11 and latest Qubes.
+
+I started this by manually removing all 16 apparmor profiles I found that were loaded from both the whonix workstation and gateway VMs. Then I did
+[code]sudo ap-get update
+sudo apt-get purge
+sudo apt-get autoremove[/code]
+
+afterwards I rebooted and I get the same thing.
+
+Now when I run
+[code]sudo aa-status[/code]
+I get:
+
+[code]user@host:~$ sudo aa-status
+apparmor module is loaded.
+4 profiles are loaded.
+4 profiles are in enforce mode.
+   /home/**/tor-browser_*/Browser/firefox
+   /home/**/tor-browser_*/{Browser/,}start-tor-browser
+   /usr/bin/pidgin
+   /usr/lib/virtualbox/VirtualBox
+0 profiles are in complain mode.
+0 processes have profiles defined.
+0 processes are in enforce mode.
+0 processes are in complain mode.
+0 processes are unconfined but have a profile defined.[/code]
+
+I cannot run any tor browser from any workstation have tried 3 so far. I also cannot remove:
+&lt;blockquote&gt;   /home/**/tor-browser_*/Browser/firefox
+   /home/**/tor-browser_*/{Browser/,}start-tor-browser&lt;/blockquote&gt;
+
+If I run:
+[code]sudo aa-disable    /home/**/tor-browser_*/Browser/firefox
+sudo aa-disable   /home/**/tor-browser_*/{Browser/,}start-tor-browser[/code]
+
+I get:
+
+[code]user@host:~$ sudo aa-disable    /home/**/tor-browser_*/{Browser/,}start-tor-browser
+Profile for /home/user/tor-browser_en-US/Browser/start-tor-browser not found, skipping
+/home/**/tor-browser_*/start-tor-browser does not exist, please double-check the path.[/code]
+
+What I originally wanted to do is disable and remove all apparmor profiles and then re-download / enable them again to see if that fixes the issue. Right now I am running the TOR Downloader to see if a freshly minted Tor Browser will work.</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 29 Sep 2015 01:29:29 +0000</lastBuildDate>
+    <category>AppArmor</category>
+    <atom:link href="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Apparmor preventing Tor Browser from Starting</title>
+        <dc:creator><![CDATA[thisperson]]></dc:creator>
+        <description><![CDATA[
+            <p>I’m seeing the exact same problem. After installing profiles for Tor browser I keep getting permission denied errors.</p>
+          <p><a href="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417/6</link>
+        <pubDate>Tue, 29 Sep 2015 01:29:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1417-6</guid>
+        <source url="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417.rss">Apparmor preventing Tor Browser from Starting</source>
+      </item>
+      <item>
+        <title>Apparmor preventing Tor Browser from Starting</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I am wondering if we should take this as suggestion to change the filename to something not using ‘*’.</p>
+          <p><a href="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417/5</link>
+        <pubDate>Fri, 18 Sep 2015 21:01:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1417-5</guid>
+        <source url="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417.rss">Apparmor preventing Tor Browser from Starting</source>
+      </item>
+      <item>
+        <title>Apparmor preventing Tor Browser from Starting</title>
+        <dc:creator><![CDATA[apparmor-woes]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you for the reply patrick! I alreaady fixed it. You are right the current repo is not ready!</p>
+<p>To fix it I got the latest commit for both firefox and start tor browser commits on github and i deleted the old file and recreated it using what’s on github that worked perfectly. I will post a workaround with better instructions in the mean time as it took an hour to figure it out. Might as well save others some time <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<p>Thank you so much for all the work you and the other contributors do!!</p>
+          <p><a href="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417/4</link>
+        <pubDate>Fri, 18 Sep 2015 20:53:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1417-4</guid>
+        <source url="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417.rss">Apparmor preventing Tor Browser from Starting</source>
+      </item>
+      <item>
+        <title>Apparmor preventing Tor Browser from Starting</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Redownload of torbrowser most likely won’t help.</p>
+<p>The shell expands *. Try using single quotes.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>I don’t think the profile in the repository is ready for Qubes yet. Maybe the latest version in git is. I try building the package and uploading the the repository sometime later today.</p>
+<p>In meanwhile you can try installing it from source code.<br>
+<a href="https://www.whonix.org/wiki/Dev/Build_Documentation/apparmor-profile-torbrowser" class="onebox" target="_blank">https://www.whonix.org/wiki/Dev/Build_Documentation/apparmor-profile-torbrowser</a></p>
+          <p><a href="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417/3</link>
+        <pubDate>Fri, 18 Sep 2015 20:50:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1417-3</guid>
+        <source url="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417.rss">Apparmor preventing Tor Browser from Starting</source>
+      </item>
+      <item>
+        <title>Apparmor preventing Tor Browser from Starting</title>
+        <dc:creator><![CDATA[apparmor-woes]]></dc:creator>
+        <description><![CDATA[
+            <p>DAMN!!! Even a freshly downloaded Tor Browser using Whonix’s Tor Downloader gives me the same issues. I have already disabled the stable and developers repositories and enabled the tester’s repository. What the hell can I be missing!?</p>
+          <p><a href="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417/2</link>
+        <pubDate>Fri, 18 Sep 2015 19:52:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1417-2</guid>
+        <source url="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417.rss">Apparmor preventing Tor Browser from Starting</source>
+      </item>
+      <item>
+        <title>Apparmor preventing Tor Browser from Starting</title>
+        <dc:creator><![CDATA[apparmor-woes]]></dc:creator>
+        <description><![CDATA[
+            <p>Using WHONIX+QUBES and running Whonix 11 and latest Qubes.</p>
+<p>I started this by manually removing all 16 apparmor profiles I found that were loaded from both the whonix workstation and gateway VMs. Then I did</p>
+<p><code>sudo ap-get update
+sudo apt-get purge
+sudo apt-get autoremove</code></p>
+<p>afterwards I rebooted and I get the same thing.</p>
+<p>Now when I run</p>
+<pre><code class="lang-auto"></code></pre>
+<p>I get:</p>
+<p><code>user@host:~$ sudo aa-status
+apparmor module is loaded.
+4 profiles are loaded.
+4 profiles are in enforce mode.
+   /home/**/tor-browser_*/Browser/firefox
+   /home/**/tor-browser_*/{Browser/,}start-tor-browser
+   /usr/bin/pidgin
+   /usr/lib/virtualbox/VirtualBox
+0 profiles are in complain mode.
+0 processes have profiles defined.
+0 processes are in enforce mode.
+0 processes are in complain mode.
+0 processes are unconfined but have a profile defined.</code></p>
+<p>I cannot run any tor browser from any workstation have tried 3 so far. I also cannot remove:</p>
+<blockquote>   /home/**/tor-browser_*/Browser/firefox
+   /home/**/tor-browser_*/{Browser/,}start-tor-browser</blockquote>
+<p>If I run:</p>
+<p><code>sudo aa-disable    /home/**/tor-browser_*/Browser/firefox
+sudo aa-disable   /home/**/tor-browser_*/{Browser/,}start-tor-browser</code></p>
+<p>I get:</p>
+<p><code>user@host:~$ sudo aa-disable    /home/**/tor-browser_*/{Browser/,}start-tor-browser
+Profile for /home/user/tor-browser_en-US/Browser/start-tor-browser not found, skipping
+/home/**/tor-browser_*/start-tor-browser does not exist, please double-check the path.</code></p>
+<p>What I originally wanted to do is disable and remove all apparmor profiles and then re-download / enable them again to see if that fixes the issue. Right now I am running the TOR Downloader to see if a freshly minted Tor Browser will work.</p>
+          <p><a href="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417/1</link>
+        <pubDate>Fri, 18 Sep 2015 19:49:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1417-1</guid>
+        <source url="http://forums.whonix.org/t/apparmor-preventing-tor-browser-from-starting/1417.rss">Apparmor preventing Tor Browser from Starting</source>
+      </item>
+  </channel>
+</rss>

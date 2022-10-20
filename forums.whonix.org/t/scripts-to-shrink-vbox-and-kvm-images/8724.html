@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>scripts to shrink vbox and kvm images - Development - Whonix Forum</title>
+    <meta name="description" content="i have played with a couple scripts in order to keep the virtual hd images in both virtualbox and kvm from ballooning out of control. the virtualbox script was included in the last short-lived version of the guide i work&amp;hellip;">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="8724.html" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../c/news/21.html">NEWS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;scripts to shrink vbox and kvm images&#39;" href="8724.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724" />
+<meta property="og:title" content="scripts to shrink vbox and kvm images" />
+<meta name="twitter:title" content="scripts to shrink vbox and kvm images" />
+<meta property="og:description" content="i have played with a couple scripts in order to keep the virtual hd images in both virtualbox and kvm from ballooning out of control. the virtualbox script was included in the last short-lived version of the guide i work on. the kvm script is still experimental. i’m posting both here if anyone would like to review or tweak. basically, they search a directory for hd images that have been modified in the past hour, and apply routines to reduce the size. both rely on “zerofree” in some respects. ho..." />
+<meta name="twitter:description" content="i have played with a couple scripts in order to keep the virtual hd images in both virtualbox and kvm from ballooning out of control. the virtualbox script was included in the last short-lived version of the guide i work on. the kvm script is still experimental. i’m posting both here if anyone would like to review or tweak. basically, they search a directory for hd images that have been modified in the past hour, and apply routines to reduce the size. both rely on “zerofree” in some respects. ho..." />
+<meta name="twitter:label1" value="Reading time" />
+<meta name="twitter:data1" value="26 mins 🕑" />
+<meta name="twitter:label2" value="Likes" />
+<meta name="twitter:data2" value="38 ❤" />
+<meta property="article:published_time" content="2020-01-04T05:27:39+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+        <link rel="next" href="87244658.html?page=2">
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../index.html">
+          <img src="../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="8724.html">scripts to shrink vbox and kvm images</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../c/development/8.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #25AAE2'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>Development</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tempest'><span itemprop='name'>tempest</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-04T05:27:39Z' class='post-time'>
+                January 4, 2020,  5:27am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-04T05:36:45Z'>
+          <span itemprop='position'>#1</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>i have played with a couple scripts in order to keep the virtual hd images in both virtualbox and kvm from ballooning out of control. the virtualbox script was included in the last short-lived version of the guide i work on. the kvm script is still experimental. i’m posting both here if anyone would like to review or tweak. basically, they search a directory for hd images that have been modified in the past hour, and apply routines to reduce the size. both rely on “zerofree” in some respects. however, the kvm script also has an option to use the qemu compression option. both scripts have resulted in the freeing of gigabytes of hard drive space on the host when used. feedback welcomed.</p>
+<p><strong>vbox script</strong></p>
+<p>this script requires a user to boot into recovery mode, mount the hd as readonly, and run zerofree on it first.</p>
+<p>from a terminal, type<br>
+<code>echo "alias vbcompact='find ~/VirtualBox\ VMs/ \ -type f -mtime -1 -size +10M -name *.vdi \ -exec vboxmanage modifymedium --compact {} t {} \;'" &gt;&gt; ~/.bashrc</code></p>
+<p>typing “vbcompact” later will search through the default virtualbox directory and attempt to compact any “vdi” file modified in the past hour.</p>
+<p><strong>kvm script</strong></p>
+<p>this script will also see advantages from booting into recovery mode, mounting the hds readonly, and running zerofree. however, qemu compression may negate that, but may take longer. i ran into a couple issues with snapshots not working here and there after this process, which i’m exploring.</p>
+<p>this one is a little more involved. it’s to be appended to a user’s .bashrc file.</p>
+<pre><code>function vmshrink() { list=$(sudo find /var/lib/libvirt/images/ -type f -mtime -1 -size +10M -name *.qcow2)
+	for f in $list
+	do
+	# ask if user wants to shrink image
+	read -e -p "Shrink $f? [y/N] " choice
+	if [[ "$choice" == [Yy]* ]]
+	   then
+	    #"yes" choice. show file size and move original to a back up file.
+	    ls -lh $f
+	    sudo mv $f $f.backup
+	    # ask if user wants to use qemu compression
+	    read -e -p "Do you want to enable disk compression on $f? [y/N] " choice2
+            if [[ "$choice2" == [Yy]* ]]
+              then 
+                #"yes" choice. apply qemu compression.
+		sudo qemu-img convert -O qcow2 -p -c $f.backup $f
+	      else
+	        #"no" choice. convert to remove space changed by zerofree only.
+		sudo qemu-img convert -O qcow2 -p $f.backup $f
+	    fi
+	    ls -lh $f
+	    # ask if user wants to delete the back up copy.
+	    read -e -p "Please run the vm to confirm it still works. If it works, you can remove the back up. Remove $f.backup? [y/N] " choice3
+		if [[ "$choice3" == [Yy]* ]]
+	          then
+		    #"yes" choice. delete backup
+		    sudo rm $f.backup
+		elif [[ "$choice3" != [Yy]* ]]
+		  then
+		    #"no" choice. ask if user wants to restore backup.
+		    read -e -p "Restore backup? [y/N] " choice4
+		    if [[ "$choice4" == [Yy]* ]]
+                       then
+			  #restore backup
+                          sudo mv $f.backup $f
+		fi
+	fi
+fi
+done }
+</code></pre>
+<p>the goal of both scripts was to make the process of shrinking hd images after a dist-upgrade a little simpler, rather than having to type the individual commands for each individual file.</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+          <meta itemprop='keywords' content=''>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-04T11:21:07Z' class='post-time'>
+                January 4, 2020, 11:21am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-04T11:21:07Z'>
+          <span itemprop='position'>#2</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Might be easier for some users to boot into live mode rather than<br>
+recovery mode:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="../../../external.html?link=https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="../../../external.html?link=https://www.whonix.org/wiki/Whonix_Live" target="_blank" title="12:32AM - 30 November 2019">Whonix – 30 Nov 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/381;"><img src="../../../external.html?link=https://www.whonix.org/w/images/b/bf/Live_boot.png" class="thumbnail"></div>
+
+<h3><a href="../../../external.html?link=https://www.whonix.org/wiki/Whonix_Live" target="_blank">Whonix Live</a></h3>
+
+<p>Whonix ™ Live Mode. Read-only mode. Make all writes go to non-persistent memory (RAM) instead of the hard disk. This is NOT an anti-forensics feature!</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>But without setting the disk to read-only, i.e. without this:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="../../../external.html?link=https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="../../../external.html?link=https://www.whonix.org/wiki/Whonix_Live/Read_Only_Mode_Hard_Drive" target="_blank" title="11:25AM - 07 November 2019">Whonix – 7 Nov 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/426;"><img src="../../../external.html?link=https://www.whonix.org/w/images/1/1c/Read-live23231.jpg" class="thumbnail"></div>
+
+<h3><a href="../../../external.html?link=https://www.whonix.org/wiki/Whonix_Live/Read_Only_Mode_Hard_Drive" target="_blank">Whonix Live/Read Only Mode Hard Drive</a></h3>
+
+<p>Set virtual machine (VM) hard drives to read only. Prevent write access to VM drives.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Since disk is mounted as read-only it should be possible to run zerofree<br>
+on it.</p>
+<p>We have documentation on how to in increase virtual disk size.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="../../../external.html?link=https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="../../../external.html?link=https://www.whonix.org/wiki/Grow_Virtual_Harddisk" target="_blank" title="04:56AM - 31 December 2019">Whonix – 31 Dec 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/480;"><img src="../../../external.html?link=https://www.whonix.org/w/images/6/6c/Blocks-968874640.jpg" class="thumbnail"></div>
+
+<h3><a href="../../../external.html?link=https://www.whonix.org/wiki/Grow_Virtual_Harddisk" target="_blank">Grow Virtual Harddisk</a></h3>
+
+<p>Get more disk space. Increase the size of a virtual disk. Expand virtual machine storage capacity. Possible with Qubes, [[Qubes-Whonix|Qubes-Whonix ™]], [[Non-Qubes-Whonix|Non-Qubes-Whonix ™]], Whonix ™ KVM and Whonix ™ VirtualBox.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>But we don’t have it for shrinking virtual disks?</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tempest'><span itemprop='name'>tempest</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-04T14:28:33Z' class='post-time'>
+                January 4, 2020,  2:28pm
+              </time>
+              <meta itemprop='dateModified' content='2020-01-04T17:49:02Z'>
+          <span itemprop='position'>#3</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group quote-modified" data-post="2" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Might be easier for some users to boot into live mode rather than<br>
+recovery mode:<br>
+But without setting the disk to read-only, i.e. without this:<br>
+Since disk is mounted as read-only it should be possible to run zerofree<br>
+on it.</p>
+</blockquote>
+</aside>
+<p>i tried that. unfortunately, i have not been able to get it to work. however, i did not pursue it too hard. when you boot into the whonix desktop outside of recovery mode as you describe, zerofree will not recognize the file system of /dev/sda1. if you try “sudo mount -o remount,ro /dev/sda1 /” you will get a “/ is busy” error.</p>
+<blockquote>
+<p>We have documentation on how to in increase virtual disk size.</p>
+<p><a href="../../../external.html?link=https://www.whonix.org/wiki/Grow_Virtual_Harddisk" rel="nofollow noopener">https://www.whonix.org/wiki/Grow_Virtual_Harddisk</a></p>
+<p>But we don’t have it for shrinking virtual disks?</p>
+</blockquote>
+<p>just so we are clear, this is not shrinking the max capacity of the disk. the actual allotted size for the disk is left untouched. what this does is remove otherwise garbage data that is still present in a sparse image. for example, after running “sudo apt-get-update-plus dist-upgrade &amp;&amp; sudo apt-get clean,” sometimes the data stored on the virtual disk will grow by 1-2 gigabytes. a fix for this implements the zerofree program.</p>
+<p>disable readonly flag in vbox or qemu-kvm.<br>
+boot in recovery mode.<br>
+type “mount -o remount,ro /dev/sda1 /”<br>
+type “zerofree -v /dev/sda1”<br>
+shutdown system.</p>
+<p>then, from the host, depending on the hypervisor, use the command in the scripts above. the processed disk images then tend to shrink down closer to the size they were before any additional software was installed, thus saving gigabytes of space.</p>
+<p>so, this does not actually shrink the capacity of the virtual drives. it just removes the data that causes them to balloon. i’ve found this method necessary on usb sticks, where disk space is much more limited, and on machines where i may have greater than 10 virtual machines installed at once.</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Algernon'><span itemprop='name'>Algernon</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-05T10:57:32Z' class='post-time'>
+                January 5, 2020, 10:57am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-05T10:57:32Z'>
+          <span itemprop='position'>#4</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>At least for KVM images there already is an official tool: <a href="../../../external.html?link=http://libguestfs.org/virt-sparsify.1.html" rel="nofollow noopener">http://libguestfs.org/virt-sparsify.1.html</a></p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tempest'><span itemprop='name'>tempest</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-05T11:12:33Z' class='post-time'>
+                January 5, 2020, 11:12am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-05T11:12:33Z'>
+          <span itemprop='position'>#5</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="4" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v4/letter/a/a183cd/40.png" class="avatar"> Algernon:</div>
+<blockquote>
+<p>At least for KVM images there already is an official tool: <a href="../../../external.html?link=http://libguestfs.org/virt-sparsify.1.html" rel="nofollow noopener">http://libguestfs.org/virt-sparsify.1.html</a></p>
+</blockquote>
+</aside>
+<p>will play with that. does it allow for test and restore of backup?</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Algernon'><span itemprop='name'>Algernon</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-05T11:15:23Z' class='post-time'>
+                January 5, 2020, 11:15am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-05T11:15:23Z'>
+          <span itemprop='position'>#6</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>It automatically creates a new disk and keeps the old one. You  can skip that with the --in-place option</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-05T11:23:52Z' class='post-time'>
+                January 5, 2020, 11:23am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-05T11:23:52Z'>
+          <span itemprop='position'>#7</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Might even work for VirtualBox! <img src="../../images/emoji/twitter/slight_smilec164.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<blockquote>
+<p>Supported and known-working output formats are: <code>raw</code> , <code>qcow2</code> , <strong><code>vdi</code></strong> .</p>
+</blockquote>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tempest'><span itemprop='name'>tempest</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-07T02:01:04Z' class='post-time'>
+                January 7, 2020,  2:01am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-07T02:01:04Z'>
+          <span itemprop='position'>#8</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="4" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v4/letter/a/a183cd/40.png" class="avatar"> Algernon:</div>
+<blockquote>
+<p>At least for KVM images there already is an official tool: <a href="../../../external.html?link=http://libguestfs.org/virt-sparsify.1.html" rel="nofollow noopener">http://libguestfs.org/virt-sparsify.1.html</a></p>
+</blockquote>
+</aside>
+<p>does virt-sparsify take care of zerofree runs? the libguestfs-tools package installs a ton of unneeded software on the host, including exim4 and some other email related tools.</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-07T02:25:11Z' class='post-time'>
+                January 7, 2020,  2:25am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-07T02:25:11Z'>
+          <span itemprop='position'>#9</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Does <code>sudo apt --no-install-recommends install libguestfs-tools</code> help<br>
+and install fewer packages?</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tempest'><span itemprop='name'>tempest</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-07T07:28:33Z' class='post-time'>
+                January 7, 2020,  7:28am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-07T07:28:33Z'>
+          <span itemprop='position'>#10</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="9" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Does <code>sudo apt --no-install-recommends install libguestfs-tools</code> help<br>
+and install fewer packages?</p>
+</blockquote>
+</aside>
+<p>ah. i’d over looked that since they weren’t appearing as '“suggested” packages. yes, the --no-install-recommends flag makes this  a lot more manageable and doesn’t install exim4. thanks.</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tempest'><span itemprop='name'>tempest</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-10T01:57:06Z' class='post-time'>
+                January 10, 2020,  1:57am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-10T01:57:06Z'>
+          <span itemprop='position'>#12</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>so, i’m running into a number of issues at this point and i am not sure where i made a mistake. in some instances, after a zerofree run on the image and then a convert with qemu-img, the virtual disk size almost doubles. the same is happening with virt-sparsify. running the “compression” flag with either reduces the size. but, i am not sure why that is needed. this is with kvm based images.</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick_mobile'><span itemprop='name'>Patrick_mobile</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-10T06:46:41Z' class='post-time'>
+                January 10, 2020,  6:46am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-10T06:46:41Z'>
+          <span itemprop='position'>#13</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>When run manually or by script? If by script, echo actually executed commands. Otherwise share which commands were run either for analysis / reproduction?</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tempest'><span itemprop='name'>tempest</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-13T14:11:46Z' class='post-time'>
+                January 13, 2020,  2:11pm
+              </time>
+              <meta itemprop='dateModified' content='2020-01-13T14:11:46Z'>
+          <span itemprop='position'>#14</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="13" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v4/letter/p/898d66/40.png" class="avatar"> Patrick_mobile:</div>
+<blockquote>
+<p>When run manually or by script? If by script, echo actually executed commands. Otherwise share which commands were run either for analysis / reproduction?</p>
+</blockquote>
+</aside>
+<p>it’s with both script or manual.  it’s occurring with both “qemu-img convert” and “virt-sparsify.” my guess, at the moment, is because these images may have had the “qemu-img convert --compress” option used at one point. i am going to experiment with it more. i have not yet been able to figure this one out.</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tempest'><span itemprop='name'>tempest</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-14T15:06:58Z' class='post-time'>
+                January 14, 2020,  3:06pm
+              </time>
+              <meta itemprop='dateModified' content='2020-01-14T15:06:58Z'>
+          <span itemprop='position'>#15</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>this was a false alarm. it looks like i had enabled “compression” on the test images at one point. thus, it appears that the increased file size after a “qemu-img convert” or “virt-sparisfy” copy method created a new image without compression enabled and, therefore, was larger.</p>
+<p>on a side note, aside from the potential performance hits, is anyone aware of any security issues when using a compressed image with kvm?</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tempest'><span itemprop='name'>tempest</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-20T01:21:20Z' class='post-time'>
+                January 20, 2020,  1:21am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-20T02:00:22Z'>
+          <span itemprop='position'>#16</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>so, here’s the experience i have had with virt-sparsify so far, which i think makes it less than ideal.</p>
+<p>pro: it’s a bit more user friendly because it requires less steps/commands. also, it does not require zerofree to be installed in whonix.</p>
+<p>con: it does major disk writes with zerofree. in a fresh test with a new whonix install, it filled up my hard drive space by writing about 80 gigs of zeros. the process did not crash out despite a warning. but, if i had 32 gigs of disk space, i do not know if this would be the case. it appears to write zeros for almost the full size of the whonix image, which is 100 gigs.</p>
+<p>the method i use which runs zerofree in the whonix images booted in recovery mode required about an additional 200 megabytes of space.  the final size of the whonix images, using either virt-sparsify or qemu-img was the same.</p>
+<p>thus, using virt-sparsify may not be an issue for people with disk space to spare. but, if one is using an external drive with 32-64 gigs of space, it may cause issues. plus, the amount of  disk writes simply are not needed.</p>
+<p>unless there is something i am missing, i think running zerofree in the whonix images booted in recovery mode, followed by steps for a “qemu-img convert” pass is less resource intensive and faster to get the same results. but, it does require more steps than virt-sparsify.</p>
+<p>i have a dirty script i created that exports the full path and filenames of all disk images installed for kvm that have been recently modified. so, it can be dumbed down and automated to a degree. it will work with either virt-sparisfy or qemu-img. if there’s a means to run a zerofree pass in the whonix images via the kvm terminal that can be scripted, this may be the ideal solution. i have not explored that yet.</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-20T11:22:03Z' class='post-time'>
+                January 20, 2020, 11:22am
+              </time>
+              <meta itemprop='dateModified' content='2020-01-20T11:22:03Z'>
+          <span itemprop='position'>#17</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>VirtualBox has guest control.</p>
+<aside class="onebox stackexchange">
+  <header class="source">
+      <a href="../../../external.html?link=https://serverfault.com/questions/469637/kvm-control-guest-from-host" target="_blank">serverfault.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="../../../external.html?link=https://serverfault.com/users/142105/marwan-alsabbagh" target="_blank">
+    <img alt="Marwan Alsabbagh" src="../../../external.html?link=https://www.gravatar.com/avatar/ce17126d6065d975c34973f3e55dc51b?s=128&amp;d=identicon&amp;r=PG" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="../../../external.html?link=https://serverfault.com/questions/469637/kvm-control-guest-from-host" target="_blank">KVM control guest from host</a>
+</h4>
+
+<div class="tags">
+  <strong>kvm-virtualization</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="../../../external.html?link=https://serverfault.com/users/142105/marwan-alsabbagh" target="_blank">
+    Marwan Alsabbagh
+  </a>
+  on <a href="../../../external.html?link=https://serverfault.com/questions/469637/kvm-control-guest-from-host" target="_blank">02:23PM - 16 Jan 13 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Is there something similar for KVM? <a class="mention" href="../../../external.html?link=https://forums.whonix.org/u/hulahoop">@HulaHoop</a></p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/HulaHoop'><span itemprop='name'>HulaHoop</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-20T14:18:19Z' class='post-time'>
+                January 20, 2020,  2:18pm
+              </time>
+              <meta itemprop='dateModified' content='2020-01-20T14:18:19Z'>
+          <span itemprop='position'>#18</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I imagine it’s possible to script commands that interact with the guest’s shell via the console interface.</p>
+<p>There are dedicated VM orchestration tools like ansible, puppet and vagrant, but they are overkill here because they define the settings of the VM environment, do migration and a bunch of other stuff.</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tempest'><span itemprop='name'>tempest</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-20T15:35:56Z' class='post-time'>
+                January 20, 2020,  3:35pm
+              </time>
+              <meta itemprop='dateModified' content='2020-01-20T15:35:56Z'>
+          <span itemprop='position'>#19</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="18" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>but they are overkill here</p>
+</blockquote>
+</aside>
+<p>that is my thought as well. to dumb it down completely, the script would need to control the vm from the start in order to boot in recovery mode. from a documentation perspective, it’s easier, and arguably more beneficial, to walk a reader through the manual process. but, if it’s possible without too much of a headache, it may be worth exploring if a vm deflator custom tool were to be considered for one of the various os projects here.</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tempest'><span itemprop='name'>tempest</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-20T20:44:53Z' class='post-time'>
+                January 20, 2020,  8:44pm
+              </time>
+              <meta itemprop='dateModified' content='2020-01-20T20:44:53Z'>
+          <span itemprop='position'>#20</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>here’s the dirty draft version of the kvm script so far. it’s a slightly modified version of the one posted earlier. this one exports the path and filenames of the virtual disks that aren’t running, checks if they have been modified in the past 24 hours, and then passes them to the remainder of the script for processing. i also tweaked it to allow for the potential of white spaces in directory names, since i can foresee some people leaving “converted” disk images in the “virtual machines” folder if they used something like virtualbox before. but, that may be overkill as well.</p>
+<pre><code>#!/bin/bash
+#
+# This script will search for installed virtual machines and attempt to reduce
+# their size.
+#
+ORIGINALIFS="$IFS"
+IFS=$'\n'
+# Get list of installed and inactive virtual disks and write to a variable.
+echo "You must shut down your virtual machines for the shrink process to work." 
+read -e -p "Please shut down your virtual machines and press [enter] to continue."
+tempvmlist=$(for i in $(sudo virsh list --name --inactive); do sudo virsh domblklist $i --details; done| grep / | awk -F" {2,}" '{print $4}' | sed -e 's|[[:space:]]|\ |g' )
+# Read from list of vms and filter files that have not been modified in the past 24 hours.
+tempvmlist2=$(for f in $tempvmlist; do sudo find $f -type f -mtime -1 -size +10M -name *.qcow2 | sed -e 's|[[:space:]]|\\ |g'; done )
+     for f in $tempvmlist2
+	do
+	# Ask if user wants to shrink the disk.
+	read -e -p "Shrink $f? [y/N] " choice
+	if [[ "$choice" == [Yy]* ]]
+	   # If yes, make a backup copy
+	   then
+	    sudo mv $f $f.backup
+	    # Ask if user wants to enable disk compression
+	    echo "Do you want to enable additional disk compression on" 
+	    echo "$f?"
+            read -e -p "This will take longer and may affect disk performance. [y/N] " choice2
+            if [[ "$choice2" == [Yy]* ]]
+	      # If yes, enable disk compression.
+              then 
+		sudo qemu-img convert -O qcow2 -p -c $f.backup $f
+	      else
+              # If no, begin standard sparisfy procedure.
+		sudo qemu-img convert -O qcow2 -p $f.backup $f
+	    fi
+	    # Show file sizes after virt-sparsify procedure is complete.
+	    echo Original file size = $(sudo du -h $f.backup |cut -f1)
+	    echo Shrunken file size = $(sudo du -h $f |cut -f1)
+	    # Prompt user to test their virtual disk by starting the corresponding cirtual machine. 
+            # Ask if the user wants to delete the backup file.
+	    echo "Start virt-manager to check if you can boot the virtual machine" 
+            echo "that uses the disk image entitled"
+            echo "$f." 
+	    echo "If you reach the desktop, it is probably safe to remove" 
+	    echo "$f.backup."
+	    read -e -p "Remove $f.backup? [y/N] " choice3
+		if [[ "$choice3" == [Yy]* ]]
+	          # If yes, delete the backup file.
+	 	  then
+		    sudo rm $f.backup
+		elif [[ "$choice3" != [Yy]* ]]
+		  # If no, ask user if they want to restore the backup.
+		  then
+		    read -e -p "Restore backup? [y/N] " choice4
+		    if [[ "$choice4" == [Yy]* ]]
+			# If yes, restore the backup file.
+                      	then
+                          sudo mv $f.backup $f
+		fi
+	fi
+fi
+done
+IFS="$ORIGINALIFS"</code></pre>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/HulaHoop'><span itemprop='name'>HulaHoop</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8724.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-01-20T21:57:15Z' class='post-time'>
+                January 20, 2020,  9:57pm
+              </time>
+              <meta itemprop='dateModified' content='2020-01-20T21:57:15Z'>
+          <span itemprop='position'>#21</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="15" data-topic="8724">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../user_avatar/forums.whonix.org/tempest/40/2451_2.jpg" class="avatar"> tempest:</div>
+<blockquote>
+<p>on a side note, aside from the potential performance hits, is anyone aware of any security issues when using a compressed image with kvm?</p>
+</blockquote>
+</aside>
+<p>Compressing/parsing anything that can have untrusted input on the host is not a good idea. I prefer the zerofree method in the guest to this.</p>
+        </div>
+
+        <meta itemprop='headline' content='scripts to shrink vbox and kvm images'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+
+    <div role='navigation' itemscope itemtype='http://schema.org/SiteNavigationElement' class="topic-body crawler-post">
+        <span itemprop='name'><b><a rel="next" itemprop="url" href="87244658.html?page=2">next page →</a></b></span>
+    </div>
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

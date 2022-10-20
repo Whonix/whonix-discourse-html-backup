@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>combining Tor with a VPN or proxy can make you less anonymous</title>
+    <link>http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755</link>
+    <description>&lt;small&gt;Originally published at: https://www.whonix.org/blog/combining-tor-vpn-proxy-can-make-less-anonymous&lt;/small&gt;&lt;br&gt;&lt;table class=&quot;metadata plainlinks ambox ambox-notice&quot;&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td class=&quot;mbox-image&quot;&gt;
+&lt;div style=&quot;width: 52px;&quot;&gt;&lt;a class=&quot;image&quot; href=&quot;/w/index.php?title=File:Ambox_warning_pn.svg.png&amp;amp;filetimestamp=20130717200816&amp;amp;&quot;&gt;&lt;img src=&quot;/w/images/thumb/f/f7/Ambox_warning_pn.svg.png/40px-Ambox_warning_pn.svg.png&quot; srcset=&quot;/w/images/thumb/f/f7/Ambox_warning_pn.svg.png/60px-Ambox_warning_pn.svg.png 1.5x, /w/images/thumb/f/f7/Ambox_warning_pn.svg.png/80px-Ambox_warning_pn.svg.png 2x&quot; alt=&quot;Warning&quot; width=&quot;40&quot; height=&quot;35&quot; /&gt;&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&quot;mbox-text&quot;&gt;&lt;span class=&quot;mbox-text-span&quot;&gt;Using a VPN, proxy or SSH can can negatively affect anonymity under some circumstances. &lt;sup id=&quot;cite_ref-1&quot; class=&quot;reference&quot;&gt;&lt;a href=&quot;https://lists.torproject.org/pipermail/tor-talk/2016-July/041757.html&quot;&gt;[1]&lt;/a&gt;&lt;/sup&gt; &lt;sup id=&quot;cite_ref-2&quot; class=&quot;reference&quot;&gt;&lt;a href=&quot;https://phabricator.whonix.org/T492&quot;&gt;[2]&lt;/a&gt;&lt;/sup&gt;
+To explain why that is, some background information is required so you can draw conclusions and take actions to avoid this risk. See below. &lt;/span&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+ 	&lt;li&gt;Tor avoids using more than one relay belonging to the same operator in the circuits it is building. Legitimate Tor relay operators adhere to Tor&#39;s relay operator practices of announcing which relays belong to them by declaring this in the Tor relay family setting. Tor also avoids using Tor relays that are within the same network by not using relays within the same /16 subnet. &lt;sup id=&quot;cite_ref-3&quot; class=&quot;reference&quot;&gt;&lt;a href=&quot;https://www.whonix.org/wiki/Tunnels/Introduction#cite_note-3&quot;&gt;[3]&lt;/a&gt;&lt;/sup&gt; Tor however does not take into account your real external IP nor destination IP addresses. &lt;sup id=&quot;cite_ref-4&quot; class=&quot;reference&quot;&gt;&lt;a href=&quot;https://lists.torproject.org/pipermail/tor-talk/2016-July/041753.html&quot;&gt;[4]&lt;/a&gt;&lt;/sup&gt; In essence, you must avoid using the same network/operator as your first and last Tor relays since this would open up &lt;a title=&quot;Warning&quot; href=&quot;/wiki/Warning#Confirmation_attacks&quot;&gt;end-to-end correlation attacks&lt;/a&gt;.&lt;/li&gt;
+ 	&lt;li&gt;Many tunnel providers use shared IP addresses which means that many users share the same external IP address. On one hand this is good since that is similar to Tor, where many users share the same Tor exit relays. On the other hand, this can in some situations lead to actually making you less safe.&lt;/li&gt;
+ 	&lt;li&gt;It is possible to host Tor relays [any... bridges, entry, middle or exit] behind VPNs or tunnel-links. For example, there are VPN providers that support VPN port forwarding. This is an interesting way to contribute to Tor while not exposing oneself to too much legal risk. Therefore, there can be situation, where a VPN or other tunnel-link and a Tor relays could be hosted by the same operator, in the same network or even on the same IP.&lt;/li&gt;
+ 	&lt;li&gt;In an economy with a deep labor division, ones are providing the service to host servers (VPS etc.). Others provide VPN and other tunnel-link services and rent such servers. It is common, that diverse customers run share the same IP address. This is another situation where a VPN or other tunnel-link and a Tor relays could be hosted by the same operator, in the same network or even on the same IP.&lt;/li&gt;
+ 	&lt;li&gt;By adding arbitrary tunnel-links to your connection chain, you could unknowingly use the same operator/network twice in your connection chain.
+&lt;ul&gt;
+ 	&lt;li&gt;scenario 1)
+&lt;ul&gt;
+ 	&lt;li&gt;a) User uses VPN IP A on the host, thereby using it as it&#39;s first relay.
+&lt;ul&gt;
+ 	&lt;li&gt;b) User&#39;s Tor client happens to pick a Tor exit relay running on VPN IP A.&lt;/li&gt;
+ 	&lt;li&gt;Conditions a and b match at the same time. The user is now using the same IP as first and last proxy.
+&lt;ul&gt;
+ 	&lt;li&gt;--&amp;gt; By using the VPN the user did not get more, but less secure.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+ 	&lt;li&gt;different scenario 2)
+&lt;ul&gt;
+ 	&lt;li&gt;a) User sets up a VPN inside Whonix-Workstation. Thereby that results in user -&amp;gt; Tor -&amp;gt; VPN -&amp;gt; internet. Using VPN IP A.&lt;/li&gt;
+ 	&lt;li&gt;b) A Tor entry guard is being hosted on VPN IP A.&lt;/li&gt;
+ 	&lt;li&gt;Conditions a and b match at the same time. The user is now using the same IP as first and last proxy.
+&lt;ul&gt;
+ 	&lt;li&gt;--&amp;gt; By using the VPN the user did not get more, but less secure.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+ 	&lt;li&gt;Choose your tunnel providers wisely.
+&lt;ul&gt;
+ 	&lt;li&gt;Find out in which physical and legal jurisdiction and network their servers are located.&lt;/li&gt;
+ 	&lt;li&gt;Perhaps avoid using VPN or SSH providers that support port forwarding.&lt;/li&gt;
+ 	&lt;li&gt;Perhaps use only tunnel-link providers that are assigning private - as in not shared with others - unique - IP addresses, however it is not clear if this does more harm than gain as noted above.&lt;/li&gt;
+ 	&lt;li&gt;Perhaps use tunnel-link providers that run their own servers rather than relying on shared infrastructure.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+ 	&lt;li&gt;Perhaps manually pick your Tor relay[s]. Specifically your entry guard[s] or &lt;a title=&quot;Bridges&quot; href=&quot;/wiki/Bridges&quot;&gt;bridge[s]&lt;/a&gt;).
+&lt;ul&gt;
+&lt;ul&gt;
+ 	&lt;li&gt;Tor documentation generally discourages tampering with Tor&#39;s routing algorithm by manually choosing your relays, but since you are trying to be more clever by extending your Tor chain despite all information about the difficulty of this endeavor, perhaps it would make sense to pick your entry guard manually.&lt;/li&gt;
+ 	&lt;li&gt;Using &lt;a title=&quot;Bridges&quot; href=&quot;/wiki/Bridges&quot;&gt;Bridges&lt;/a&gt; might be an alternative, but note the following quote. &quot;&lt;i&gt;Bridges are less reliable and tend to have lower performance than other entry points. If you live in a uncensored area, they are not necessarily more secure than entry guards.&lt;/i&gt; &lt;i&gt;Source: &lt;a class=&quot;external text&quot; href=&quot;https://lists.torproject.org/pipermail/tor-talk/2012-May/024378.html&quot; target=&quot;_blank&quot; rel=&quot;noreferrer noopener&quot;&gt;bridge vs non-bridge users anonymity&lt;/a&gt;.&lt;/i&gt;&quot;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+This is now documented here:
+&lt;a href=&quot;https://www.whonix.org/wiki/Tunnels/Introduction#Introduction&quot;&gt;https://www.whonix.org/wiki/Tunnels/Introduction#Introduction&lt;/a&gt;</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 05 May 2017 11:49:00 +0000</lastBuildDate>
+    <category>News</category>
+    <atom:link href="http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>combining Tor with a VPN or proxy can make you less anonymous</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>jasdkjsabd:</p>
+<blockquote>
+<p>Wouldn’t that be fixed if<br>
+a) the user chooses to always connect to a VPN that is in a specific country and<br>
+b) set the following options in torrc<br>
+<strong>ExcludeNodes</strong> {country_code_of_vpn}<br>
+<strong>StrictNodes</strong> 1</p>
+</blockquote>
+<p>I don’t know how well ExcludeNodes works. If it just works if the Tor<br>
+relay owner put its actual country into the config or if Tor somehow<br>
+auto detects the country. (Would not be surprising if it does not do the<br>
+latter.) Should be asked on the tor-talk mailing list since that is a<br>
+general Tor question.</p>
+<p>Using ExcludeNodes changes the default Tor routing algorithm to<br>
+something else. This is generally discouraged by The Tor Project since<br>
+you could stand out.</p>
+          <p><a href="http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755/4</link>
+        <pubDate>Fri, 05 May 2017 11:49:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2755-4</guid>
+        <source url="http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755.rss">combining Tor with a VPN or proxy can make you less anonymous</source>
+      </item>
+      <item>
+        <title>combining Tor with a VPN or proxy can make you less anonymous</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="2" data-topic="2755">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/j/958977/40.png" class="avatar"> jasdkjsabd:</div>
+<blockquote>
+<p>I really feel that I can trust my VPN provider more.<br>
+They have accepted bitcoin from day one.<br>
+Is in a country where the law does not force a VPN provider to log.<br>
+And so on…</p>
+</blockquote>
+</aside>
+<p>Don’t ever trust VPNs and here is why…</p>
+<p><strong>1)</strong> Not using a VPN or rolling your own is probably best. See here (and avoid the list of dodgy VPNs):</p>
+<p>[<a href="https://gist.github.com/kennwhite/1f3bc4d889b02b35d8aa">https://gist.github.com/kennwhite/1f3bc4d889b02b35d8aa</a>]</p>
+<blockquote>
+<p>Short version: I strongly do not recommend using any of these providers. You are, of course, free to use whatever you like. My TL;DR advice: Roll your own and use Algo or Streisand. For messaging &amp; voice, use Signal. For increasing anonymity, use Tor Browser for desktop, and Onion Browser for mobile.</p>
+</blockquote>
+<blockquote>
+<p>This mini-rant came on the heels of an interesting twitter discussion: <a href="https://twitter.com/kennwhite/status/591074055018582016">https://twitter.com/kennwhite/status/591074055018582016</a></p>
+</blockquote>
+<blockquote>
+<p>Again I strongly do not recommend using any of these providers.</p>
+</blockquote>
+<blockquote>
+<p>Provider / known “Secret” Key</p>
+</blockquote>
+<blockquote>
+<p>Astril / way2stars<br>
+EarthVPN / earthvpn<br>
+GFwVPN / gfwvpn<br>
+GoldenFrog / thisisourkey<br>
+IBVPN / ibVPNsharedPSK!<br>
+IPVanish / ipvanish<br>
+NordVPN  / nordvpn<br>
+PrivateInternetAccess (PIA) / mysafety<br>
+PureVPN / 12345678<br>
+SlickVPN / gogoVPN<br>
+TorGuard / torguard<br>
+TigerVPN / tigerVPN<br>
+UnblockVPN / xunblock4me<br>
+VPNReactor / VPNReactor</p>
+</blockquote>
+<blockquote>
+<p>Yes, I know. Many/most of these offer OpenVPN, or special clients for IPSec. But for all of the above, they are actively placing a significant portion of their user base (particularly those with older Androids and desktops) at risk by not using per-user PSKs. If your threat model is streaming BBC or helping your cousin geo-shift Hulu, go wild and plug into the Mad Max-esque Thunderdome commons and take your chances. If you’re a dissident in Tehran or Riyadh, be extremely cautious of any of these providers.</p>
+</blockquote>
+<p><strong>2)</strong> This is why you shouldn’t trust VPN providers in general and why the VPN bottleneck is asking to be pwned (it is a glorified proxy and simply a money spinner).</p>
+<p>Trust in them is misplaced (plus most of them are in “Fourteen Eyes” countries anyway):</p>
+<p>[<a href="https://gist.github.com/joepie91/5a9909939e6ce7d09e29">https://gist.github.com/joepie91/5a9909939e6ce7d09e29</a>]</p>
+<blockquote>
+<p><strong>Why not?</strong></p>
+</blockquote>
+<blockquote>
+<p>Because a VPN in this sense is just a glorified proxy. The VPN provider can see all your traffic, and do with it what they want - including logging.</p>
+</blockquote>
+<blockquote>
+<p><strong>But my provider doesn’t log!</strong></p>
+</blockquote>
+<blockquote>
+<p>There is no way for you to verify that, and of course this is what a malicious VPN provider would claim as well. In short: the only safe assumption is that every VPN provider logs.</p>
+</blockquote>
+<blockquote>
+<p>And remember that it is in a VPN provider’s best interest to log their users - it lets them deflect blame to the customer, if they ever were to get into legal trouble. The $10/month that you’re paying for your VPN service doesn’t even pay for the lawyer’s coffee, so expect them to hand you over.</p>
+</blockquote>
+<blockquote>
+<p><strong>But a provider would lose business if they did that!</strong></p>
+</blockquote>
+<blockquote>
+<p>I’ll believe that when HideMyAss goes out of business. They gave up their users years ago, and this was widely publicized. The reality is that most of their customers will either not care or not even be aware of it.</p>
+</blockquote>
+<blockquote>
+<p><strong>But I pay anonymously, using Bitcoin/PaysafeCard/Cash/drugs!</strong></p>
+</blockquote>
+<blockquote>
+<p>Doesn’t matter. You’re still connecting to their service from your own IP, and they can log that.</p>
+</blockquote>
+<blockquote>
+<p><strong>But I want more security!</strong></p>
+</blockquote>
+<blockquote>
+<p>VPNs don’t provide security. They are just a glorified proxy.</p>
+</blockquote>
+<blockquote>
+<p><strong>But I want more privacy!</strong></p>
+</blockquote>
+<blockquote>
+<p>VPNs don’t provide privacy, with a few exceptions (detailed below). They are just a proxy. If somebody wants to tap your connection, they can still do so - they just have to do so at a different point (ie. when your traffic leaves the VPN server).</p>
+</blockquote>
+<blockquote>
+<p><strong>But I want more encryption!</strong></p>
+</blockquote>
+<blockquote>
+<p>Use SSL/TLS and HTTPS (for centralized services), or end-to-end encryption (for social or P2P applications). VPNs can’t magically encrypt your traffic - it’s simply not technically possible. If the endpoint expects plaintext, there is nothing you can do about that.</p>
+</blockquote>
+<blockquote>
+<p>When using a VPN, the only encrypted part of the connection is from you to the VPN provider. From the VPN provider onwards, it is the same as it would have been without a VPN. And remember, the VPN provider can see and mess with all your traffic.</p>
+</blockquote>
+<blockquote>
+<p><strong>But I want to confuse trackers by sharing an IP address!</strong></p>
+</blockquote>
+<blockquote>
+<p>Your IP address is a largely irrelevant metric in modern tracking systems. Marketers have gotten wise to these kind of tactics, and combined with increased adoption of CGNAT and an ever-increasing amount of devices per household, it just isn’t a reliable data point anymore.</p>
+</blockquote>
+<blockquote>
+<p>Marketers will almost always use some kind of other metric to identify and distinguish you. That can be anything from a useragent to a fingerprinting profile. A VPN cannot prevent this.</p>
+</blockquote>
+<blockquote>
+<p>…</p>
+</blockquote>
+<blockquote>
+<p><strong>So why do VPN services exist? Surely they must serve some purpose?</strong></p>
+</blockquote>
+<blockquote>
+<p>Because it’s easy money. You just set up OpenVPN on a few servers, and essentially start reselling bandwidth with a markup. You can make every promise in the world, because nobody can verify them. You don’t even have to know what you’re doing, because again, nobody can verify what you say. It is 100% snake-oil.</p>
+</blockquote>
+<blockquote>
+<p>So yes, VPN services do serve a purpose - it’s just one that benefits the provider, not you.</p>
+</blockquote>
+<p><strong>3)</strong> Don’t exclude specific nodes in the Tor network - it goes against Tor Project advice and probably makes you less anonymous. Disregard this advice at your own peril.</p>
+<p><a href="http://kkkkkkkkkk63ava6.onion/wiki/DoNot#Prevent_Tor_over_Tor_Scenarios" class="onebox" target="_blank">http://kkkkkkkkkk63ava6.onion/wiki/DoNot#Prevent_Tor_over_Tor_Scenarios</a></p>
+<blockquote>
+<p>Users can manually choose an entry or exit point in the Tor network, [8] but the best security relies on leaving the route (path) selection to Tor. Overriding the choice of Tor entry and/or Tor exit relays can degrade anonymity in ways that are not well understood. Therefore, Tor over Tor configurations are strongly discouraged.</p>
+</blockquote>
+<p>See also:</p>
+<p><a href="https://www.torproject.org/docs/faq.html.en#ChooseEntryExit" class="onebox" target="_blank">https://www.torproject.org/docs/faq.html.en#ChooseEntryExit</a></p>
+          <p><a href="http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755/3</link>
+        <pubDate>Fri, 05 May 2017 11:43:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2755-3</guid>
+        <source url="http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755.rss">combining Tor with a VPN or proxy can make you less anonymous</source>
+      </item>
+      <item>
+        <title>combining Tor with a VPN or proxy can make you less anonymous</title>
+        <dc:creator><![CDATA[jasdkjsabd]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you for Whonix, really loving it!</p>
+<p>I have a question about the above problem.</p>
+<p>I really feel that I can trust my VPN provider more.<br>
+They have accepted bitcoin from day one.<br>
+Is in a country where the law does not force a VPN provider to log.<br>
+And so on…</p>
+<p>Yes I know I can not be sure but I choose to trust them more/instead of my ISP.</p>
+<p>This problem:</p>
+<blockquote>
+<p>Conditions a and b match at the same time. The user is now using the same IP as first and last proxy.</p>
+</blockquote>
+<p>Wouldn’t that be fixed if<br>
+a) the user chooses to always connect to a VPN that is in a specific country and<br>
+b) set the following options in torrc<br>
+<strong>ExcludeNodes</strong> {country_code_of_vpn}<br>
+<strong>StrictNodes</strong> 1</p>
+<p><strong>ExcludeNodes</strong><br>
+A list of identity fingerprints, country codes, and address patterns of nodes to avoid when building a circuit.</p>
+<p><strong>StrictNodes</strong><br>
+If StrictNodes is set to 1, Tor will treat solely the ExcludeNodes option as a requirement to follow for all the circuits you generate, even if doing so will break functionality for you</p>
+<p>thanks!</p>
+          <p><a href="http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755/2</link>
+        <pubDate>Fri, 05 May 2017 07:44:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2755-2</guid>
+        <source url="http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755.rss">combining Tor with a VPN or proxy can make you less anonymous</source>
+      </item>
+      <item>
+        <title>combining Tor with a VPN or proxy can make you less anonymous</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><small>Originally published at: <a href="https://www.whonix.org/blog/combining-tor-vpn-proxy-can-make-less-anonymous">https://www.whonix.org/blog/combining-tor-vpn-proxy-can-make-less-anonymous</a></small><br></p><table>
+<tbody>
+<tr>
+<td>
+<div><a href="http://forums.whonix.org/w/index.php?title=File:Ambox_warning_pn.svg.png&amp;filetimestamp=20130717200816&amp;"><img src="/w/images/thumb/f/f7/Ambox_warning_pn.svg.png/40px-Ambox_warning_pn.svg.png" alt="Warning" width="40" height="35"></a></div>
+</td>
+<td><span>Using a VPN, proxy or SSH can can negatively affect anonymity under some circumstances. <sup><a href="https://lists.torproject.org/pipermail/tor-talk/2016-July/041757.html">[1]</a></sup> <sup><a href="https://phabricator.whonix.org/T492">[2]</a></sup>
+To explain why that is, some background information is required so you can draw conclusions and take actions to avoid this risk. See below. </span></td>
+</tr>
+</tbody>
+</table>
+<ul>
+ 	<li>Tor avoids using more than one relay belonging to the same operator in the circuits it is building. Legitimate Tor relay operators adhere to Tor's relay operator practices of announcing which relays belong to them by declaring this in the Tor relay family setting. Tor also avoids using Tor relays that are within the same network by not using relays within the same /16 subnet. <sup><a href="https://www.whonix.org/wiki/Tunnels/Introduction#cite_note-3">[3]</a></sup> Tor however does not take into account your real external IP nor destination IP addresses. <sup><a href="https://lists.torproject.org/pipermail/tor-talk/2016-July/041753.html">[4]</a></sup> In essence, you must avoid using the same network/operator as your first and last Tor relays since this would open up <a title="Warning" href="http://forums.whonix.org/wiki/Warning#Confirmation_attacks">end-to-end correlation attacks</a>.</li>
+ 	<li>Many tunnel providers use shared IP addresses which means that many users share the same external IP address. On one hand this is good since that is similar to Tor, where many users share the same Tor exit relays. On the other hand, this can in some situations lead to actually making you less safe.</li>
+ 	<li>It is possible to host Tor relays [any... bridges, entry, middle or exit] behind VPNs or tunnel-links. For example, there are VPN providers that support VPN port forwarding. This is an interesting way to contribute to Tor while not exposing oneself to too much legal risk. Therefore, there can be situation, where a VPN or other tunnel-link and a Tor relays could be hosted by the same operator, in the same network or even on the same IP.</li>
+ 	<li>In an economy with a deep labor division, ones are providing the service to host servers (VPS etc.). Others provide VPN and other tunnel-link services and rent such servers. It is common, that diverse customers run share the same IP address. This is another situation where a VPN or other tunnel-link and a Tor relays could be hosted by the same operator, in the same network or even on the same IP.</li>
+ 	<li>By adding arbitrary tunnel-links to your connection chain, you could unknowingly use the same operator/network twice in your connection chain.
+<ul>
+ 	<li>scenario 1)
+<ul>
+ 	<li>a) User uses VPN IP A on the host, thereby using it as it's first relay.
+<ul>
+ 	<li>b) User's Tor client happens to pick a Tor exit relay running on VPN IP A.</li>
+ 	<li>Conditions a and b match at the same time. The user is now using the same IP as first and last proxy.
+<ul>
+ 	<li>--&gt; By using the VPN the user did not get more, but less secure.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+ 	<li>different scenario 2)
+<ul>
+ 	<li>a) User sets up a VPN inside Whonix-Workstation. Thereby that results in user -&gt; Tor -&gt; VPN -&gt; internet. Using VPN IP A.</li>
+ 	<li>b) A Tor entry guard is being hosted on VPN IP A.</li>
+ 	<li>Conditions a and b match at the same time. The user is now using the same IP as first and last proxy.
+<ul>
+ 	<li>--&gt; By using the VPN the user did not get more, but less secure.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+ 	<li>Choose your tunnel providers wisely.
+<ul>
+ 	<li>Find out in which physical and legal jurisdiction and network their servers are located.</li>
+ 	<li>Perhaps avoid using VPN or SSH providers that support port forwarding.</li>
+ 	<li>Perhaps use only tunnel-link providers that are assigning private - as in not shared with others - unique - IP addresses, however it is not clear if this does more harm than gain as noted above.</li>
+ 	<li>Perhaps use tunnel-link providers that run their own servers rather than relying on shared infrastructure.</li>
+</ul>
+</li>
+ 	<li>Perhaps manually pick your Tor relay[s]. Specifically your entry guard[s] or <a title="Bridges" href="http://forums.whonix.org/wiki/Bridges">bridge[s]</a>).
+<ul>
+<ul>
+ 	<li>Tor documentation generally discourages tampering with Tor's routing algorithm by manually choosing your relays, but since you are trying to be more clever by extending your Tor chain despite all information about the difficulty of this endeavor, perhaps it would make sense to pick your entry guard manually.</li>
+ 	<li>Using <a title="Bridges" href="http://forums.whonix.org/wiki/Bridges">Bridges</a> might be an alternative, but note the following quote. "<i>Bridges are less reliable and tend to have lower performance than other entry points. If you live in a uncensored area, they are not necessarily more secure than entry guards.</i> <i>Source: <a href="https://lists.torproject.org/pipermail/tor-talk/2012-May/024378.html" target="_blank">bridge vs non-bridge users anonymity</a>.</i>"</li>
+</ul>
+</ul>
+</li>
+</ul>
+This is now documented here:
+<a href="https://www.whonix.org/wiki/Tunnels/Introduction#Introduction">https://www.whonix.org/wiki/Tunnels/Introduction#Introduction</a>
+          <p><a href="http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755/1</link>
+        <pubDate>Mon, 18 Jul 2016 21:56:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2755-1</guid>
+        <source url="http://forums.whonix.org/t/combining-tor-with-a-vpn-or-proxy-can-make-you-less-anonymous/2755.rss">combining Tor with a VPN or proxy can make you less anonymous</source>
+      </item>
+  </channel>
+</rss>

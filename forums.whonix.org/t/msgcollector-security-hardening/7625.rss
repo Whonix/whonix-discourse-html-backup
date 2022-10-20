@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>msgcollector security hardening</title>
+    <link>http://forums.whonix.org/t/msgcollector-security-hardening/7625</link>
+    <description>https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgdispatcher_init
+
+No idea why `x` was included there.
+
+Could you try please if it still works when removing permission `x` there?
+
+----
+
+Would also be good to have confinement for:
+
+* https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgcollector
+* https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgdispatcher_dispatch_x
+* https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgdispatcher
+
+----
+
+Alternatively whole msgcollector could be radically rewritten and simplified but looks like quite some work.
+
+----
+
+//cc @madaidan</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 09 Sep 2019 10:13:45 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/msgcollector-security-hardening/7625.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>msgcollector security hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Another issue was reported here: <a href="https://forums.whonix.org/t/running-x-on-workstation-cli/8055" class="inline-onebox">Running X on Workstation-CLI</a></p>
+<p>When removing user <code>user</code> from group <code>sudo</code> then <a href="https://github.com/Whonix/msgcollector/blob/master/etc/sudoers.d/msgcollector" rel="nofollow noopener">https://github.com/Whonix/msgcollector/blob/master/etc/sudoers.d/msgcollector</a> will break.</p>
+<p>We could hardcode user <code>user</code> additionally in /etc/sudoers.d/msgcollector but it’s still a bad solution. I don’t see how msgcollector could compatible with multi user and without sudo exceptions.</p>
+<p>removing user <code>user</code> from group <code>sudo</code> is actually recommended here: <a href="https://www.whonix.org/wiki/Root#Prevent_Malware_from_Sniffing_the_Root_Password" rel="nofollow noopener">https://www.whonix.org/wiki/Root#Prevent_Malware_from_Sniffing_the_Root_Password</a></p>
+          <p><a href="http://forums.whonix.org/t/msgcollector-security-hardening/7625/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/msgcollector-security-hardening/7625/10</link>
+        <pubDate>Mon, 09 Sep 2019 10:13:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7625-10</guid>
+        <source url="http://forums.whonix.org/t/msgcollector-security-hardening/7625.rss">msgcollector security hardening</source>
+      </item>
+      <item>
+        <title>msgcollector security hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://github.com/Whonix/msgcollector" rel="nofollow noopener">https://github.com/Whonix/msgcollector</a> is still weird.</p>
+<p>whonixcheck runs under user <code>whonixcheck</code> for better hardening (linux user account separation). It’s auto started as a daemon:<br>
+<a href="https://github.com/Whonix/whonixcheck/blob/master/lib/systemd/system/whonixcheck.service" rel="nofollow noopener">https://github.com/Whonix/whonixcheck/blob/master/lib/systemd/system/whonixcheck.service</a></p>
+<p>Usually daemons don’t send GUI notifications.</p>
+<p>msgdispatcher (part of msgcollector package) is started by:</p>
+<ul>
+<li>
+<a href="https://github.com/Whonix/msgcollector/blob/master/etc/xdg/autostart/msgdispatcher.desktop" rel="nofollow noopener">https://github.com/Whonix/msgcollector/blob/master/etc/xdg/autostart/msgdispatcher.desktop</a> for X, and</li>
+<li>
+<a href="https://github.com/Whonix/msgcollector/blob/master/etc/profile.d/40_msgdispatcher.sh" rel="nofollow noopener">https://github.com/Whonix/msgcollector/blob/master/etc/profile.d/40_msgdispatcher.sh</a> for CLI</li>
+</ul>
+<p>msgdispatcher runs as user <code>user</code>.</p>
+<p>Ultimately for better hardening we wouldn’t want user <code>user</code> have access to information by whonixcheck (can include logs) without use of <code>sudo</code>.</p>
+<p>When whonixcheck runs it uses msgcollector which then creates files in /run/msgcollector/whonixcheck folder which msgdispatcher reads (inotifywait), processes (shows) and the deletes. In this weird setup user <code>user</code> (<code>msgdispatcher</code>) needs permission to delete files created by user <code>whonixcheck</code>.</p>
+<p>Dunno how to sort this out better.</p>
+<p>Leading to issue <a href="https://forums.whonix.org/t/msgdispatcher-bug-delete-wrapper/8034" class="inline-onebox">[msgdispatcher] bug: "$delete_wrapper"</a></p>
+<p>Considering to deprecate whonixcheck. Feature reduction:</p>
+<ul>
+<li>no more automated (not asked for) notifications for CLI users in tty1 (as per <a href="https://www.whonix.org/wiki/Desktop#Whonixcheck_Writing_to_tty1" rel="nofollow noopener">https://www.whonix.org/wiki/Desktop#Whonixcheck_Writing_to_tty1</a>)</li>
+<li>no more whonixcheck GUI popup</li>
+<li>whonixcheck would be a CLI only tool but thereby a lot simpler message notification system</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/msgcollector-security-hardening/7625/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/msgcollector-security-hardening/7625/9</link>
+        <pubDate>Mon, 09 Sep 2019 09:57:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7625-9</guid>
+        <source url="http://forums.whonix.org/t/msgcollector-security-hardening/7625.rss">msgcollector security hardening</source>
+      </item>
+      <item>
+        <title>msgcollector security hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/msgcollector/commit/e26b6393b3f8479a286e529049098e2f762d8f2d" target="_blank" rel="nofollow noopener">github.com/Whonix/msgcollector</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">
+    <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="https://github.com/Whonix/msgcollector/commit/e26b6393b3f8479a286e529049098e2f762d8f2d" target="_blank" rel="nofollow noopener">permission hardening</a>
+</h4>
+
+  <pre class="message" style="white-space: normal;">https://forums.whonix.org/t/msgcollector-security-hardening/7625</pre>
+
+<div class="date">
+  by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+  on <a href="https://github.com/Whonix/msgcollector/commit/e26b6393b3f8479a286e529049098e2f762d8f2d" target="_blank" rel="nofollow noopener">01:48PM - 06 Jul 19 UTC</a>
+</div>
+
+<div class="github-commit-stats">
+  changed <strong>8 files</strong>
+  with <strong>169 additions</strong>
+  and <strong>96 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/msgcollector-security-hardening/7625/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/msgcollector-security-hardening/7625/8</link>
+        <pubDate>Sat, 06 Jul 2019 13:48:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7625-8</guid>
+        <source url="http://forums.whonix.org/t/msgcollector-security-hardening/7625.rss">msgcollector security hardening</source>
+      </item>
+      <item>
+        <title>msgcollector security hardening</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>Ahh. That can be fixed by running <code>xhost +local:</code>. Or, if you only want to allow a single user to connect to the display, <code>xhost +SI:localuser:someuser</code>.</p>
+          <p><a href="http://forums.whonix.org/t/msgcollector-security-hardening/7625/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/msgcollector-security-hardening/7625/7</link>
+        <pubDate>Mon, 01 Jul 2019 15:41:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7625-7</guid>
+        <source url="http://forums.whonix.org/t/msgcollector-security-hardening/7625.rss">msgcollector security hardening</source>
+      </item>
+      <item>
+        <title>msgcollector security hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>User <code>someuser</code> cannot show a (<code>zenity</code>) popup for user <code>user</code>. At least when I experimented with that.</p>
+<p>If you like to experiment:</p>
+<ul>
+<li>Try login as user <code>someuser</code> (yet to be created).</li>
+<li>Yes, login. Virtual console or another X login session.</li>
+<li>
+<code>sudo -u someuser zenitycommand</code> is invalid (maybe because still same <code>.Xauthority</code> file).</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/msgcollector-security-hardening/7625/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/msgcollector-security-hardening/7625/6</link>
+        <pubDate>Mon, 01 Jul 2019 15:35:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7625-6</guid>
+        <source url="http://forums.whonix.org/t/msgcollector-security-hardening/7625.rss">msgcollector security hardening</source>
+      </item>
+      <item>
+        <title>msgcollector security hardening</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>We could create the <code>proc</code> group, mount /proc with <code>gid=proc</code>,  make msgdispatcher run as a different user and add that user to the <code>proc</code> group. This way, msgdispatcher won’t be effected by <code>hidepid=2</code> and we won’t need to mess with a sudoers exception.</p>
+<aside class="quote no-group" data-post="4" data-topic="7625">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>while msgdispatcher needs to run under user <code>user</code> to be able to show GUI messages.</p>
+</blockquote>
+</aside>
+<p>Why does it need to be run under that user? Can’t any user show GUI messages?</p>
+          <p><a href="http://forums.whonix.org/t/msgcollector-security-hardening/7625/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/msgcollector-security-hardening/7625/5</link>
+        <pubDate>Mon, 01 Jul 2019 15:27:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7625-5</guid>
+        <source url="http://forums.whonix.org/t/msgcollector-security-hardening/7625.rss">msgcollector security hardening</source>
+      </item>
+      <item>
+        <title>msgcollector security hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><code>hidepid=2</code> breaks msgcollector since it needs to check msgdispatcher if/already running. whonixcheck runs under user <code>whonixcheck</code> while msgdispatcher needs to run under user <code>user</code> to be able to show GUI messages. Adding a sudoers exception might be hard to get right without leaving a hole for running <code>ps -p</code> arbitrary.</p>
+<p>We can get rid of msgdispatcher by mostly deprecating GUI support of whonixcheck and tb-updater. These do not seem that much important anymore nowadays.</p>
+<p>On the graphical desktop when started from start menu: whonixcheck / tb-updater console version on manual run could be run inside a terminal emulator.</p>
+          <p><a href="http://forums.whonix.org/t/msgcollector-security-hardening/7625/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/msgcollector-security-hardening/7625/4</link>
+        <pubDate>Mon, 01 Jul 2019 15:22:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7625-4</guid>
+        <source url="http://forums.whonix.org/t/msgcollector-security-hardening/7625.rss">msgcollector security hardening</source>
+      </item>
+      <item>
+        <title>msgcollector security hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>The more I think about it it should be rewritten / radically simplified. The feature “notify CLI users who don’t start whonixcheck” abolished for the gain in simplicity and security.</p>
+          <p><a href="http://forums.whonix.org/t/msgcollector-security-hardening/7625/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/msgcollector-security-hardening/7625/3</link>
+        <pubDate>Thu, 27 Jun 2019 16:40:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7625-3</guid>
+        <source url="http://forums.whonix.org/t/msgcollector-security-hardening/7625.rss">msgcollector security hardening</source>
+      </item>
+      <item>
+        <title>msgcollector security hardening</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>msgcollector is started by whonixcheck so the systemd sandboxing for whonixcheck should also be applied to msgcollector (only if started with whonixcheck.service).</p>
+<p>I don’t know enough about msgcollector to create any confinement for it but it seems apparmor would be good to use for this.</p>
+          <p><a href="http://forums.whonix.org/t/msgcollector-security-hardening/7625/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/msgcollector-security-hardening/7625/2</link>
+        <pubDate>Thu, 27 Jun 2019 16:37:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7625-2</guid>
+        <source url="http://forums.whonix.org/t/msgcollector-security-hardening/7625.rss">msgcollector security hardening</source>
+      </item>
+      <item>
+        <title>msgcollector security hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgdispatcher_init" target="_blank">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgdispatcher_init" target="_blank">Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgdispatcher_init</a></h4>
+<pre><code class="lang-">#!/bin/bash
+
+## Copyright (C) 2012 - 2020 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+set -e
+
+umask ug=rw,o=r || exit 2
+
+DONE_FILE="/run/msgcollector/init_done"
+SIZE="10M"
+
+mkdir --parents /run/msgcollector || exit 3
+
+if [ ! -f "$DONE_FILE" ]; then
+    mount -t tmpfs -o size="$SIZE",nosuid,nodev,noexec none /run/msgcollector || exit 4
+else
+    mount -t tmpfs -o size="$SIZE",nosuid,nodev,noexec,remount none /run/msgcollector || exit 5
+fi
+
+</code></pre>
+
+  This file has been truncated. <a href="https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgdispatcher_init" target="_blank">show original</a>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>No idea why <code>x</code> was included there.</p>
+<p>Could you try please if it still works when removing permission <code>x</code> there?</p>
+<hr>
+<p>Would also be good to have confinement for:</p>
+<ul>
+<li><a href="https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgcollector">https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgcollector</a></li>
+<li><a href="https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgdispatcher_dispatch_x">https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgdispatcher_dispatch_x</a></li>
+<li><a href="https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgdispatcher">https://github.com/Whonix/msgcollector/blob/master/usr/lib/msgcollector/msgdispatcher</a></li>
+</ul>
+<hr>
+<p>Alternatively whole msgcollector could be radically rewritten and simplified but looks like quite some work.</p>
+<hr>
+<p>//cc <a class="mention" href="http://forums.whonix.org/u/madaidan">@madaidan</a></p>
+          <p><a href="http://forums.whonix.org/t/msgcollector-security-hardening/7625/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/msgcollector-security-hardening/7625/1</link>
+        <pubDate>Thu, 27 Jun 2019 16:31:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7625-1</guid>
+        <source url="http://forums.whonix.org/t/msgcollector-security-hardening/7625.rss">msgcollector security hardening</source>
+      </item>
+  </channel>
+</rss>

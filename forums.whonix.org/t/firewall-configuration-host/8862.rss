@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Firewall configuration host</title>
+    <link>http://forums.whonix.org/t/firewall-configuration-host/8862</link>
+    <description>Following Whonix instructions I set up a firewall on my Ubuntu host by just enabling gufw in its default configuration: deny incoming, allow outgoing. Simple enough. Today I issued the command: sudo iptables -L, to have a manual look at my firewall rules, this is the output for the chain INPUT:
+
+Chain INPUT (policy DROP)
+
+target     prot opt source               destination         
+ACCEPT     all  --  anywhere             anywhere            
+ACCEPT     all  --  255.255.255.255      anywhere            
+ACCEPT     all  --  192.168.0.0/16       192.168.0.0/16      
+ACCEPT     all  --  10.0.0.0/8           10.0.0.0/8          
+ACCEPT     all  --  172.16.0.0/12        172.16.0.0/12       
+ACCEPT     icmp --  anywhere             anywhere             icmp echo-request
+ACCEPT     all  --  anywhere             anywhere             state RELATED,ESTABLISHED
+ACCEPT     all  --  anywhere             anywhere            
+DROP       all  --  anywhere             anywhere            
+ufw-before-logging-input  all  --  anywhere             anywhere            
+ufw-before-input  all  --  anywhere             anywhere            
+ufw-after-input  all  --  anywhere             anywhere            
+ufw-after-logging-input  all  --  anywhere             anywhere            
+ufw-reject-input  all  --  anywhere             anywhere            
+ufw-track-input  all  --  anywhere             anywhere        
+
+As you can see the default policy is DROP, which is good and as expected by setting ufw&#39;s default (deny incoming). But then look at the rules for INPUT. As I understand the rules goes from specific to general. So if the default is to drop input, you put some specific rules in place to allow the incoming traffic you do want. Now what is the first &quot;specific&quot; rule on input:
+
+ACCEPT     all  --  anywhere             anywhere
+meaning: yes, accept all traffic coming from anywhere going to anywhere and do so for all protocols. So while my ufw policy is dead simple: drop all incoming traffic, that policy is defeated by the very first rule that comes before that: allow everything incoming.
+
+I asked the same question on https://askubuntu.com/questions/1206557/dont-understand-my-firewall-settings. Thus far I got this comment: &quot;A default install of Ubuntu Desktop has no exploitable open ports&quot;. I thought &quot;default install&quot;, and I was thinking of my VPN connection and my Whonix guest system. I issued the command sudo netstat -lntup, which gave me this output:
+
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 127.0.0.1:9050          0.0.0.0:*               LISTEN      1219/tor            
+tcp        0      0 127.0.0.1:3100          0.0.0.0:*               LISTEN      5283/openvpn        
+tcp        0      0 127.0.0.1:42685         0.0.0.0:*               LISTEN      3194/mono           
+tcp        0      0 10.0.2.2:53             0.0.0.0:*               LISTEN      1721/dnsmasq        
+tcp        0      0 192.168.122.1:53        0.0.0.0:*               LISTEN      1484/dnsmasq        
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      1138/systemd-resolv 
+tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      6357/cupsd          
+tcp6       0      0 ::1:631                 :::*                    LISTEN      6357/cupsd          
+udp        0      0 10.0.2.2:53             0.0.0.0:*                           1721/dnsmasq        
+udp        0      0 192.168.122.1:53        0.0.0.0:*                           1484/dnsmasq        
+udp        0      0 127.0.0.53:53           0.0.0.0:*                           1138/systemd-resolv 
+udp        0      0 0.0.0.0:67              0.0.0.0:*                           1484/dnsmasq        
+udp        0      0 0.0.0.0:68              0.0.0.0:*                           1142/dhclient       
+udp        0      0 0.0.0.0:631             0.0.0.0:*                           6358/cups-browsed   
+udp        0      0 0.0.0.0:41794           0.0.0.0:*                           820/avahi-daemon: r 
+udp        0      0 0.0.0.0:58320           0.0.0.0:*                           5283/openvpn        
+udp        0      0 224.0.0.251:5353        0.0.0.0:*                           6741/chrome --type= 
+udp        0      0 224.0.0.251:5353        0.0.0.0:*                           6741/chrome --type= 
+udp        0      0 224.0.0.251:5353        0.0.0.0:*                           6703/chrome         
+udp        0      0 224.0.0.251:5353        0.0.0.0:*                           6703/chrome         
+udp        0      0 224.0.0.251:5353        0.0.0.0:*                           6741/chrome --type= 
+udp        0      0 0.0.0.0:5353            0.0.0.0:*                           820/avahi-daemon: r 
+udp6       0      0 :::50178                :::*                                820/avahi-daemon: r 
+udp6       0      0 :::5353                 :::*                                820/avahi-daemon: r 
+
+Now the first listening process is tor, the second openvpn. And we have dnsmaq en cups. Now first off I don&#39;t understand the Whonix instruction to deny all incoming, if we have a tor process listening (if that tor process comes from Whonix). Second: is there a relation between these listeners and my firewall rules. But still first rule: &#39;accept all anywhere&#39;... would be too broadly defined. 
+
+I did a fresh install of Ubuntu just a couple of weeks back, and I never played with my firewall settings (except by enabling gufw in its default config) as I never understand much of networking.
+
+Can you shed some light here?</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 30 Jan 2020 00:00:09 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/firewall-configuration-host/8862.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Firewall configuration host</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>No problem, hope it helps; iptables is probably the best firewall solution as far as adaptability and simplicity as far as no unneeded baggage. You can be as broad or fine-grained as you want with the rules.<br>
+Let me know if you have any more questions</p>
+          <p><a href="http://forums.whonix.org/t/firewall-configuration-host/8862/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/firewall-configuration-host/8862/5</link>
+        <pubDate>Thu, 30 Jan 2020 00:00:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8862-5</guid>
+        <source url="http://forums.whonix.org/t/firewall-configuration-host/8862.rss">Firewall configuration host</source>
+      </item>
+      <item>
+        <title>Firewall configuration host</title>
+        <dc:creator><![CDATA[rk1]]></dc:creator>
+        <description><![CDATA[
+            <p>Well, I was just about to redo my iptables, so your answer comes right in time… You gave what looks like a pretty understandable and comprehensive answer, thanks for that.</p>
+          <p><a href="http://forums.whonix.org/t/firewall-configuration-host/8862/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/firewall-configuration-host/8862/4</link>
+        <pubDate>Wed, 29 Jan 2020 19:37:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8862-4</guid>
+        <source url="http://forums.whonix.org/t/firewall-configuration-host/8862.rss">Firewall configuration host</source>
+      </item>
+      <item>
+        <title>Firewall configuration host</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>rk1,</p>
+<p>I can help you with iptables. There are a couple different directions you can go.<br>
+First, as you correctly observed, ufw allows more things than it should, at least I think so. Protocols such as icmp, multicast DNS, and it makes many, many custom chains that confuse things even further. You can disable it and use iptables only. If you use apt and get netfilter-persistent and iptables-persistent packages, your settings will be saved and applied on each boot.<br>
+Here is a simple policy using only iptables that would accomplish everything ufw does, but without the clutter. You would type these commands in your terminal, individually. If you do that, and then download the 2 packages, an option will be presented on install to make your rules permanent. Say yes to the query. Then, your rules are set and applied on each boot. Ubuntu will store them at: /etc/iptables/rules.v4 and /etc/iptables/rules.v6<br>
+All commands preceded by sudo.<br>
+Start by disabling ufw:<br>
+sudo ufw reset (this flushes the chains so your iptables rules are the only rules parsed)<br>
+sudo ufw disable<br>
+Now start with your chain defaults:<br>
+iptables -P INPUT DROP<br>
+iptables -P FORWARD DROP<br>
+iptables -P OUTPUT ACCEPT (or DROP, but you will need to configure a rule for every outgoing connection)<br>
+These commands clear any residual rules left over  for the various tables. Think of it as a failsafe:<br>
+iptables -F<br>
+iptables -X<br>
+iptables -t nat -F<br>
+iptables -t nat -X<br>
+iptables -t mangle -F<br>
+iptables -t mangle -X<br>
+iptables -t raw -F<br>
+iptables -t raw -X<br>
+The default “table” where the majority of the rules are set is the “filter” table. The first two commands from the 8 above deal with that table. It is the default and that’s why you do not need to type: “iptables -t filter -F” although you could and it would work. The mangle, nat and raw tables manipulate packets at different points as they make their way in or out of the system. They are specialized and can be left alone in most cases. The filter table and nat table, to a lesser extent are where most rules are. When operating a vpn server, for example, you need the “nat” table. For your purposes, you don’t.<br>
+These start the rules for incoming:<br>
+iptables -A INPUT -p icmp --j DROP (optional. Sometimes useful for ping etc.)<br>
+iptables -A INPUT -m state --state ESTABLISHED --j ACCEPT<br>
+iptables -A INPUT -i lo --j ACCEPT (this is localhost)<br>
+Usually on “input” chains, when you have specific “drop” rules, you put them first, then put your “established” rule, then the rest.<br>
+If you do not use forwarding, disable it:<br>
+iptables -A FORWARD --j DROP<br>
+Now for outgoing; if you have a default ACCEPT for outgoing, these rules are not necessary. If you set a default DROP then you need them. They are only examples; your rules will be different, but take note of the syntax.<br>
+iptables -A OUTPUT -o lo --j ACCEPT (localhost)<br>
+iptables -A OUTPUT -o tun0 -s 10.x.x.x --j ACCEPT (optional for vpn)<br>
+iptables -A OUTPUT -p tcp -s [ip address] --sport 22 --j ACCEPT (This makes so your ssh can communicate out, but only from the ip you specify. Since we have an ESTABLISHED on incoming, this is the only rule you need. Port can be whatever, but 22 is common for ssh. By specifying port, other apps that share the ip address cannot misbehave because only the ssh port is allowed. “–sport” means “source port” which is the port that the outgoing packet for this rule originates from)<br>
+iptables -A OUTPUT --j DROP (Put this rule last just as a guarantee that anything not specified is dropped. You really only need this if you have a default “accept” policy for outgoing. If you have a default deny, then every packet that does not have a rule allowing it will automatically, and silently be dropped.)<br>
+IPV6. This is important. Not many people use IPV6 yet, so make sure to have rules to block it. The command changes from iptables to ip6tables to denote Ipv6. Here is a set to block everything:<br>
+Just like Ipv4, start by flushing any derelict packets:<br>
+ip6tables -F<br>
+ip6tables -X<br>
+ip6tables -t nat -F<br>
+ip6tables -t nat -X<br>
+ip6tables -t mangle -F<br>
+ip6tables -t mangle -X<br>
+ip6tables -t raw -F<br>
+ip6tables -t raw -X<br>
+Now for the actual blocking rules:<br>
+ip6tables -A INPUT --j DROP<br>
+ip6tables -A FORWARD --j DROP<br>
+ip6tables -A OUTPUT --j DROP<br>
+That’s it! Enter these rules at the end of your previous rules.</p>
+<p>Some stuff to remember:<br>
+Iptables parses in order. If you have an “accept” and then a “deny” below it for the same address or port or whatever, only the first matching rule is used.<br>
+There is a conntrack module that counts and tracks connections where it is specified in order to parse rules more quickly, not have as big a memory footprint, etc. I do not use conntrack personally. You do not really need it.<br>
+Sometimes people like to use “established” along with “related” which will assume that certain packets are part of the communication and allow them to pass. “Related” is not specifically necessary, and while it may not be harmful, for the maximum security, use the “established” on its own like we did in this example.<br>
+Make your rules as precise as possible, especially on default deny chains. As an example, iptables -A OUTPUT -o enp3s0 --j ACCEPT lets everything out on that interface whereas something like: iptables -A OUTPUT -o enp3s0 -p tcp -s [ip address] --sport 3572 --j ACCEPT means that only packets that are tcp, coming from the specified address, and specified port are allowed out on the interface enp3s0. All conditions must be met or the packet is dropped.<br>
+There are several other rules that can be used for both incoming and outgoing. They do things like block fragments, and certain types of attacks. You can add them if you like. Put them first in your chains, then put your rules underneath them. Also, when using “established,” it’s good practice to put it first, and then put your specific rules under it. If you have any “drop” rules, put them first, then “established” below them. Not a big deal, but it looks nice. Also, using “established” on a default-accept outgoing policy makes no sense. On a default-deny outgoing policy, each instance has to be specified anyway, so “established” would not apply there either. I only use “established” on the INPUT chain just like the example shows.<br>
+You can take the skeleton ruleset above and adapt it to your Ubuntu system. If you want it permanent, install the 2 packages (netfilter-persistent and iptables-persistent). Iptables can do much more than this and is very easy once you understand the syntax.</p>
+          <p><a href="http://forums.whonix.org/t/firewall-configuration-host/8862/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/firewall-configuration-host/8862/3</link>
+        <pubDate>Wed, 29 Jan 2020 17:50:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8862-3</guid>
+        <source url="http://forums.whonix.org/t/firewall-configuration-host/8862.rss">Firewall configuration host</source>
+      </item>
+      <item>
+        <title>Firewall configuration host</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Reduce as much as possible applications opening listeners on anything except localhost (127.0.0.1). Avahi / cups and a few more are maybe not needed by you and can be uninstalled. In theory, if there are no applications opening listeners to the outside world you don’t need a firewall blocking unsolicited incoming connections… But since such a dependency might be pulled  by another package without your knowledge it is advisable to have a host firewall.</p>
+<p>There is also <a href="https://github.com/Whonix/whonix-host-firewall">https://github.com/Whonix/whonix-host-firewall</a> which blocks also invalid packages but it’s development / testing was never finished (usual lack of resources, time, money).</p>
+<p>Once development of Kicksecure and/or Whonix-Host progressed further, there will be a firewall installed on the host by default.</p>
+<aside class="quote no-group" data-username="rk1" data-post="1" data-topic="8862">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/r/9f8e36/40.png" class="avatar"> rk1:</div>
+<blockquote>
+<p>tcp 0 0 127.0.0.1:9050 0.0.0.0:* LISTEN 1219/tor</p>
+</blockquote>
+</aside>
+<p>Listens on localhost only as 127.0.0.1 indicates. If this output is from the host, then this is not from Whonix.<br>
+It’s possible to configure a VM to provide an open port on the host but Whonix does not need to do that and never did that by default. This is likely from the distribution <code>tor</code> which is possibly installed on the host.</p>
+<aside class="quote no-group" data-username="rk1" data-post="1" data-topic="8862">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/r/9f8e36/40.png" class="avatar"> rk1:</div>
+<blockquote>
+<p>deny all incoming</p>
+</blockquote>
+</aside>
+<p>This means actually “deny all incoming unsolicited connections”. Really “all incoming” would mean no more internet connectivity.</p>
+<aside class="quote no-group" data-username="rk1" data-post="1" data-topic="8862">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/r/9f8e36/40.png" class="avatar"> rk1:</div>
+<blockquote>
+<p>if we have a tor process listening (if that tor process comes from Whonix)</p>
+</blockquote>
+</aside>
+<p>Not by Whonix as explained above.</p>
+          <p><a href="http://forums.whonix.org/t/firewall-configuration-host/8862/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/firewall-configuration-host/8862/2</link>
+        <pubDate>Wed, 29 Jan 2020 13:56:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8862-2</guid>
+        <source url="http://forums.whonix.org/t/firewall-configuration-host/8862.rss">Firewall configuration host</source>
+      </item>
+      <item>
+        <title>Firewall configuration host</title>
+        <dc:creator><![CDATA[rk1]]></dc:creator>
+        <description><![CDATA[
+            <p>Following Whonix instructions I set up a firewall on my Ubuntu host by just enabling gufw in its default configuration: deny incoming, allow outgoing. Simple enough. Today I issued the command: sudo iptables -L, to have a manual look at my firewall rules, this is the output for the chain INPUT:</p>
+<p>Chain INPUT (policy DROP)</p>
+<p>target     prot opt source               destination<br>
+ACCEPT     all  –  anywhere             anywhere<br>
+ACCEPT     all  –  255.255.255.255      anywhere<br>
+ACCEPT     all  –  192.168.0.0/16       192.168.0.0/16<br>
+ACCEPT     all  –  10.0.0.0/8           10.0.0.0/8<br>
+ACCEPT     all  –  172.16.0.0/12        172.16.0.0/12<br>
+ACCEPT     icmp –  anywhere             anywhere             icmp echo-request<br>
+ACCEPT     all  –  anywhere             anywhere             state RELATED,ESTABLISHED<br>
+ACCEPT     all  –  anywhere             anywhere<br>
+DROP       all  –  anywhere             anywhere<br>
+ufw-before-logging-input  all  –  anywhere             anywhere<br>
+ufw-before-input  all  –  anywhere             anywhere<br>
+ufw-after-input  all  –  anywhere             anywhere<br>
+ufw-after-logging-input  all  –  anywhere             anywhere<br>
+ufw-reject-input  all  –  anywhere             anywhere<br>
+ufw-track-input  all  –  anywhere             anywhere</p>
+<p>As you can see the default policy is DROP, which is good and as expected by setting ufw’s default (deny incoming). But then look at the rules for INPUT. As I understand the rules goes from specific to general. So if the default is to drop input, you put some specific rules in place to allow the incoming traffic you do want. Now what is the first “specific” rule on input:</p>
+<p>ACCEPT     all  –  anywhere             anywhere<br>
+meaning: yes, accept all traffic coming from anywhere going to anywhere and do so for all protocols. So while my ufw policy is dead simple: drop all incoming traffic, that policy is defeated by the very first rule that comes before that: allow everything incoming.</p>
+<p>I asked the same question on <a href="https://askubuntu.com/questions/1206557/dont-understand-my-firewall-settings" rel="nofollow noopener">https://askubuntu.com/questions/1206557/dont-understand-my-firewall-settings</a>. Thus far I got this comment: “A default install of Ubuntu Desktop has no exploitable open ports”. I thought “default install”, and I was thinking of my VPN connection and my Whonix guest system. I issued the command sudo netstat -lntup, which gave me this output:</p>
+<p>Active Internet connections (only servers)<br>
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name<br>
+tcp        0      0 127.0.0.1:9050          0.0.0.0:*               LISTEN      1219/tor<br>
+tcp        0      0 127.0.0.1:3100          0.0.0.0:*               LISTEN      5283/openvpn<br>
+tcp        0      0 127.0.0.1:42685         0.0.0.0:*               LISTEN      3194/mono<br>
+tcp        0      0 10.0.2.2:53             0.0.0.0:*               LISTEN      1721/dnsmasq<br>
+tcp        0      0 192.168.122.1:53        0.0.0.0:*               LISTEN      1484/dnsmasq<br>
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      1138/systemd-resolv<br>
+tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      6357/cupsd<br>
+tcp6       0      0 ::1:631                 :::*                    LISTEN      6357/cupsd<br>
+udp        0      0 10.0.2.2:53             0.0.0.0:*                           1721/dnsmasq<br>
+udp        0      0 192.168.122.1:53        0.0.0.0:*                           1484/dnsmasq<br>
+udp        0      0 127.0.0.53:53           0.0.0.0:*                           1138/systemd-resolv<br>
+udp        0      0 0.0.0.0:67              0.0.0.0:*                           1484/dnsmasq<br>
+udp        0      0 0.0.0.0:68              0.0.0.0:*                           1142/dhclient<br>
+udp        0      0 0.0.0.0:631             0.0.0.0:*                           6358/cups-browsed<br>
+udp        0      0 0.0.0.0:41794           0.0.0.0:*                           820/avahi-daemon: r<br>
+udp        0      0 0.0.0.0:58320           0.0.0.0:*                           5283/openvpn<br>
+udp        0      0 224.0.0.251:5353        0.0.0.0:*                           6741/chrome --type=<br>
+udp        0      0 224.0.0.251:5353        0.0.0.0:*                           6741/chrome --type=<br>
+udp        0      0 224.0.0.251:5353        0.0.0.0:*                           6703/chrome<br>
+udp        0      0 224.0.0.251:5353        0.0.0.0:*                           6703/chrome<br>
+udp        0      0 224.0.0.251:5353        0.0.0.0:*                           6741/chrome --type=<br>
+udp        0      0 0.0.0.0:5353            0.0.0.0:*                           820/avahi-daemon: r<br>
+udp6       0      0 :::50178                :::*                                820/avahi-daemon: r<br>
+udp6       0      0 :::5353                 :::*                                820/avahi-daemon: r</p>
+<p>Now the first listening process is tor, the second openvpn. And we have dnsmaq en cups. Now first off I don’t understand the Whonix instruction to deny all incoming, if we have a tor process listening (if that tor process comes from Whonix). Second: is there a relation between these listeners and my firewall rules. But still first rule: ‘accept all anywhere’… would be too broadly defined.</p>
+<p>I did a fresh install of Ubuntu just a couple of weeks back, and I never played with my firewall settings (except by enabling gufw in its default config) as I never understand much of networking.</p>
+<p>Can you shed some light here?</p>
+          <p><a href="http://forums.whonix.org/t/firewall-configuration-host/8862/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/firewall-configuration-host/8862/1</link>
+        <pubDate>Wed, 29 Jan 2020 13:22:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8862-1</guid>
+        <source url="http://forums.whonix.org/t/firewall-configuration-host/8862.rss">Firewall configuration host</source>
+      </item>
+  </channel>
+</rss>

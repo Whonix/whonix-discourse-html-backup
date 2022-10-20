@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root - Development - Whonix Forum</title>
+    <meta name="description" content="Since /dev/{,u}random are writable, would it be possible for an attacker to feed those devices with bad entropy so the attacker could then e.g. decrypt a connection?  If so, it’d best to only allow read access for the same reason we deny write access to SSL certificates.">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="8976.html" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../c/news/21.html">NEWS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root&#39;" href="8976.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/risks-of-writing-to-dev-random-crediting-entropy-rndaddentropy-related-to-untrusted-root/8976" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/risks-of-writing-to-dev-random-crediting-entropy-rndaddentropy-related-to-untrusted-root/8976" />
+<meta property="og:title" content="risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root" />
+<meta name="twitter:title" content="risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root" />
+<meta property="og:description" content="Since /dev/{,u}random are writable, would it be possible for an attacker to feed those devices with bad entropy so the attacker could then e.g. decrypt a connection?  If so, it’d best to only allow read access for the same reason we deny write access to SSL certificates." />
+<meta name="twitter:description" content="Since /dev/{,u}random are writable, would it be possible for an attacker to feed those devices with bad entropy so the attacker could then e.g. decrypt a connection?  If so, it’d best to only allow read access for the same reason we deny write access to SSL certificates." />
+<meta name="twitter:label1" value="Reading time" />
+<meta name="twitter:data1" value="3 mins 🕑" />
+<meta name="twitter:label2" value="Likes" />
+<meta name="twitter:data2" value="13 ❤" />
+<meta property="article:published_time" content="2020-02-19T20:51:30+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../index.html">
+          <img src="../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="8976.html">risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../c/development/8.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #25AAE2'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>Development</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8976.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-02-19T20:51:30Z' class='post-time'>
+                February 19, 2020,  8:51pm
+              </time>
+              <meta itemprop='dateModified' content='2020-02-19T20:51:30Z'>
+          <span itemprop='position'>#1</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Since <code>/dev/{,u}random</code> are writable, would it be possible for an attacker to feed those devices with bad entropy so the attacker could then e.g. decrypt a connection?</p>
+<p>If so, it’d best to only allow read access for the same reason we deny write access to SSL certificates.</p>
+        </div>
+
+        <meta itemprop='headline' content='risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root'>
+          <meta itemprop='keywords' content=''>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+            <div class='crawler-linkback-list' itemscope itemtype='../../../external.html?link=http://schema.org/ItemList'>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../apparmor-for-complete-system-including-init-pid1-systemd-everything-full-system-mac-policy/8339/359.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../apparmor-for-complete-system-including-init-pid1-systemd-everything-full-system-mac-policy/8339/359.html'>
+                      <span itemprop='name'>AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy</span>
+                    </a>
+                    <meta itemprop='position' content='1'>
+                  </div>
+            </div>
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/anontor'><span itemprop='name'>anontor</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8976.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-02-19T22:17:25Z' class='post-time'>
+                February 19, 2020, 10:17pm
+              </time>
+              <meta itemprop='dateModified' content='2020-02-19T22:17:25Z'>
+          <span itemprop='position'>#2</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>That’s a good question which I will try to answer: afaik, when entropy is fed into a pool from somewhere, the source is not really that important. Assuming the initial seeding was successful, even if the source fed low quality data into the pool, it would not negatively affect the overall quality. There are situations where entropy may be fed into the aggregate pool, and nothing happens–no increase in overall bits are observed. Then sometimes, entropy is fed and the total number of bits increases. As I understand it, it is most likely not possibe to detract from the quality already in there. Assuming the OS boots without blocking that is. There was a similar discussion about rdrand and if it could negatively affect the pool even if it was not completely random; the consensus seemed to be no.<br>
+Although, thinking about it some more, could an initial seeding be maliciously fed? With an initial boot time “bad seed,” any crypto derived thereafter would be compromised if in fact such a thing is possible</p>
+        </div>
+
+        <meta itemprop='headline' content='risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8976.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-02-19T22:35:45Z' class='post-time'>
+                February 19, 2020, 10:35pm
+              </time>
+              <meta itemprop='dateModified' content='2020-02-19T22:35:45Z'>
+          <span itemprop='position'>#3</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="anontor" data-post="2" data-topic="8976">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> anontor:</div>
+<blockquote>
+<p>Although, thinking about it some more, could an initial seeding be maliciously fed? With an initial boot time “bad seed,” any crypto derived thereafter would be compromised if in fact such a thing is possible</p>
+</blockquote>
+</aside>
+<p>Our threat model includes even a compromised init from doing a lot of damage.</p>
+<p>An attacker may be able to compromise init, feed a large amount of bad entropy into <code>/dev/{,u}random</code> during early boot and then use that to compromise e.g. the connection used to download kernel sources and backdoor them. Signature verification has had vulnerabilities in the past so we don’t want to rely entirely on that.</p>
+<p>Although, I’m still not sure whether <code>/dev/{,u}random</code> can have much of an effect on the overall entropy, even during early boot.</p>
+        </div>
+
+        <meta itemprop='headline' content='risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8976.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-02-19T22:52:10Z' class='post-time'>
+                February 19, 2020, 10:52pm
+              </time>
+              <meta itemprop='dateModified' content='2020-02-19T22:52:10Z'>
+          <span itemprop='position'>#4</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p><code>/dev/{,u}random</code> don’t seem to be the only problem here. There’s also a few ioctls to manage the entropy pool such as RNDADDENTROPY (which can add more entropy to the pool).</p>
+<p><a href="../../../external.html?link=https://linux.die.net/man/4/random" class="onebox" target="_blank">https://linux.die.net/man/4/random</a></p>
+<p>I’m not sure if these require write access to the devices or just the CAP_SYS_ADMIN capability.</p>
+<p>Looking at the code, they don’t seem to require write access to the device but I’m not certain.</p>
+<p><a href="../../../external.html?link=https://github.com/torvalds/linux/blob/master/drivers/char/random.c#L1899-L1953">https://github.com/torvalds/linux/blob/master/drivers/char/random.c#L1899-L1953</a></p>
+<p>I don’t really understand RNDADDTOENTCNT, RNDZAPENTCNT and RNDCLEARPOOL. Would zeroing the entropy <em>count</em> zero the entire pool and deplete the system of entropy?</p>
+<p>If so, those ioctls are massive risks. We can patch them out if needed.</p>
+<p>If only apparmor could filter ioctls like SELinux.</p>
+        </div>
+
+        <meta itemprop='headline' content='risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8976.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-02-20T06:27:51Z' class='post-time'>
+                February 20, 2020,  6:27am
+              </time>
+              <meta itemprop='dateModified' content='2020-02-20T06:27:51Z'>
+          <span itemprop='position'>#5</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p><a href="../../../external.html?link=https://www.whonix.org/wiki/Dev/Entropy#Write_to_.2Fdev.2Frandom">Writing to /dev/random is generally considered safe.</a></p>
+<p><a href="../../../external.html?link=https://www.whonix.org/wiki/Dev/Entropy#Credit_Entropy">Crediting entropy</a> can be dangerous. I.e. syscalls such as <code>RNDADDENTROPY</code> can be dangerous if the randomness added is not secret and/or predictable. Only root can use <code>RNDADDENTROPY</code>. I don’t know if it requires any capabilities. If it does not need any capabilities then indeed this can be an issue in context of <a href="../untrusted-root-improve-security-by-restricting-root/7998.html" class="inline-onebox">Untrusted Root - improve Security by Restricting Root</a> and <a href="../apparmor-for-complete-system-including-init-pid1-systemd-everything-full-system-mac-policy/8339.html" class="inline-onebox">AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy</a>.</p>
+<p>For testing purposes we might be able to use <a href="../../../external.html?link=https://www.whonix.org/wiki/Dev/Entropy#rndaddentropy_-_An_RNDADDENTROPY_ioctl_wrapper">rndaddentropy - An RNDADDENTROPY ioctl wrapper</a>. Testing this in Whonix / Kicksecure could be hard because entropy counters there are always high due to haveged / jitterentropy-rng (user space daemon and kernel module) / virio-rng. haveged / jitterentropy-rng / virio-rng are “flooding” entropy and entropy counters. That would make experimenting with changes related to entropy hard. An old, deprecated, insecure kernel version in an old virtualizer version (such as VirtualBox), offline, where there is very little entropy might actually be better suited to experiment with entropy counters.</p>
+<aside class="quote no-group" data-username="madaidan" data-post="4" data-topic="8976">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>I don’t really understand RNDADDTOENTCNT, RNDZAPENTCNT and RNDCLEARPOOL. Would zeroing the entropy <em>count</em> zero the entire pool and deplete the system of entropy?</p>
+<p>If so, those ioctls are massive risks. We can patch them out if needed.</p>
+</blockquote>
+</aside>
+<p>First, we need to understand better what are the legitimate use cases of these syscalls are and what currently legitimate programs are that make use of these. Likely users are haveged / jitterentropy-rng (user space daemon and kernel module) / virio-rng among perhaps kernel internal code. Such patches need to be carefully reviewed. Potential side effects:</p>
+<ul>
+<li>slow (or even broken) boot because RNDADDTOENTCNT is slow/broken</li>
+<li>/dev/random entropy starvation after system started</li>
+<li>low/zero entropy quality of /dev/urandom or even /dev/random</li>
+<li>broken haveged / jitterentropy-rng (user space daemon and kernel module) / virio-rng among perhaps kernel internal code</li>
+</ul>
+<hr>
+<p>If we have good entropy / randomness related questions we can direct these at Stephan Mueller, author of <a href="../../../external.html?link=https://www.chronox.de/lrng.html">Linux in-kernel Random Number Generator replacement</a>, jitterentropy-rng (kernel module landed in mainline linux), writer of entropy / randomness related research papers for German government. [1]</p>
+<ul>
+<li>Old questions: <a href="../../../external.html?link=https://github.com/smuellerDD/jitterentropy-rngd/issues/9">https://github.com/smuellerDD/jitterentropy-rngd/issues/9</a>
+</li>
+<li>Newer questions: <a href="../../../external.html?link=https://github.com/smuellerDD/jitterentropy-library/issues/16">https://github.com/smuellerDD/jitterentropy-library/issues/16</a>
+</li>
+</ul>
+<p>He may or may not be interested to add capabilities to protect entropy related syscalls. Then these would have a fair chance to land in mainline Linux, I think. Though, I cannot read his mind, but I guess from him it might make sense to wait for his new kernel random system to be merged before adding new features / discussions / controversy on top.</p>
+<hr>
+<p>[1]</p>
+<aside class="onebox pdf">
+  <header class="source">
+      <a href="../../../external.html?link=https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studies/LinuxRNG/LinuxRNG_EN.pdf" target="_blank">bsi.bund.de</a>
+  </header>
+  <article class="onebox-body">
+    <a href="../../../external.html?link=https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studies/LinuxRNG/LinuxRNG_EN.pdf" target="_blank"><span class="pdf-onebox-logo"></span></a>
+<h3><a href="../../../external.html?link=https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studies/LinuxRNG/LinuxRNG_EN.pdf" target="_blank">LinuxRNG_EN.pdf</a></h3>
+
+<p class="filesize">45.34 KB</p>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox pdf">
+  <header class="source">
+      <a href="../../../external.html?link=https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/Studien/ZufallinVMS/Randomness-in-VMs.pdf" target="_blank">bsi.bund.de</a>
+  </header>
+  <article class="onebox-body">
+    <a href="../../../external.html?link=https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/Studien/ZufallinVMS/Randomness-in-VMs.pdf" target="_blank"><span class="pdf-onebox-logo"></span></a>
+<h3><a href="../../../external.html?link=https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/Studien/ZufallinVMS/Randomness-in-VMs.pdf" target="_blank">Randomness-in-VMs.pdf</a></h3>
+
+<p class="filesize">95.75 KB</p>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/HulaHoop'><span itemprop='name'>HulaHoop</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8976.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-02-20T14:00:57Z' class='post-time'>
+                February 20, 2020,  2:00pm
+              </time>
+              <meta itemprop='dateModified' content='2020-02-20T14:06:11Z'>
+          <span itemprop='position'>#6</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="madaidan" data-post="1" data-topic="8976">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Since <code>/dev/{,u}random</code> are writable, would it be possible for an attacker to feed those devices with bad entropy so the attacker could then e.g. decrypt a connection?</p>
+</blockquote>
+</aside>
+<p>Why bother if while they are here they can see and exfiltrate plaintext form the machine?</p>
+<aside class="quote no-group" data-username="madaidan" data-post="3" data-topic="8976">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>An attacker may be able to compromise init, feed a large amount of bad entropy into <code>/dev/{,u}random</code> during early boot and then use that to compromise e.g. the connection used to download kernel sources and backdoor them.</p>
+</blockquote>
+</aside>
+<p>OK I hadn’t thought of this before, but they would still need to modify the package sig keychain to fool it into accepting the modified code. We don’t  trust server-client connections for package authenticity anyhow. If it’s broken we are screwed.</p>
+        </div>
+
+        <meta itemprop='headline' content='risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8976.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-02-20T16:21:08Z' class='post-time'>
+                February 20, 2020,  4:21pm
+              </time>
+              <meta itemprop='dateModified' content='2020-02-20T16:21:08Z'>
+          <span itemprop='position'>#7</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Patrick" data-post="5" data-topic="8976">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>I don’t know if it requires any capabilities.</p>
+</blockquote>
+</aside>
+<p>It requires CAP_SYS_ADMIN. We can’t remove that capability though since it’s widely used.</p>
+<p>Very little things are actually restricted to uid 0 anymore in Linux, everything is split up into capabilities.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="5" data-topic="8976">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>First, we need to understand better what are the legitimate use cases of these syscalls are and what currently legitimate programs are that make use of these. Likely users are haveged / jitterentropy-rng (user space daemon and kernel module) / virio-rng among perhaps kernel internal code. Such patches need to be carefully reviewed. Potential side effects:</p>
+<ul>
+<li>slow (or even broken) boot because RNDADDTOENTCNT is slow/broken</li>
+<li>/dev/random entropy starvation after system started</li>
+<li>low/zero entropy quality of /dev/urandom or even /dev/random</li>
+<li>broken haveged / jitterentropy-rng (user space daemon and kernel module) / virio-rng among perhaps kernel internal code</li>
+</ul>
+</blockquote>
+</aside>
+<p>Userspace daemons like haveged do use <code>RNDADDENTROPY</code> AFAIK. We don’t have to patch that ioctl out entirely, but we can restrict it to only the things that need it.</p>
+<p>Internal kernel code (including the jitterentropy and virtio-rng modules) don’t use these ioctls. I grepped the entire source tree and nothing uses it.</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="6" data-topic="8976">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>OK I hadn’t thought of this before, but they would still need to modify the package sig keychain to fool it into accepting the modified code. We don’t trust server-client connections for package authenticity anyhow. If it’s broken we are screwed.</p>
+</blockquote>
+</aside>
+<p>Signature verification has been <a href="../../../external.html?link=https://www.debian.org/security/2019/dsa-4371">bypassed before</a>. We don’t want to rely on it completely. Unencrypted connections are still dangerous.</p>
+<p>Even ignoring that, sabotaging the entropy still opens up tons of new surveillance opportunities (e.g. the attacker can eavesdrop on browsing/messaging/etc.) and will weaken system security as a whole.</p>
+<p>Root is isolated from other users. Even init doesn’t have access to the user’s home directory for example. More ways to further enhance the isolation was discussed here <a href="../apparmor-for-complete-system-including-init-pid1-systemd-everything-full-system-mac-policy/8339/251.html" class="inline-onebox">AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy</a></p>
+        </div>
+
+        <meta itemprop='headline' content='risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8976.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-02-20T18:53:19Z' class='post-time'>
+                February 20, 2020,  6:53pm
+              </time>
+              <meta itemprop='dateModified' content='2020-02-20T18:53:19Z'>
+          <span itemprop='position'>#8</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I created a basic kernel patch to test this. It only enables those ioctls when <code>CONFIG_RANDOM_UNSAFE_IOCTL</code> is enabled. To disable them, compile your kernel with <code>CONFIG_RANDOM_UNSAFE_IOCTL</code> disabled.</p>
+<p><a href="../../../external.html?link=https://paste.debian.net/hidden/2ffaebb6/" class="onebox" target="_blank">https://paste.debian.net/hidden/2ffaebb6/</a></p>
+<p>I did some testing to see if the entropy decreased by a considerable amount.</p>
+<p>“entropy” here being measured via the contents of <code>/proc/sys/kernel/random/entropy_avail</code>.</p>
+<p>With the ioctls enabled, entropy stays around 1180 - 1250.</p>
+<p>With the ioctls disabled, entropy stays around 1220 - 1280.</p>
+<p>Weirdly, the entropy seemed to increase with the ioctls disabled but it’s highly likely that’s just a coincidence as the contents of <code>/proc/sys/kernel/random/entropy_avail</code> can fluctuate quite a bit.</p>
+<p>The haveged systemd service failed with the message: <code>haveged: RNDADDENTROPY failed!</code>.</p>
+<p>The jitterentropy systemd service worked fine.</p>
+<p>The virto-rng module seemed to work fine.</p>
+<p>There was no noticeable slow down of boot and nothing else seemed to break.</p>
+        </div>
+
+        <meta itemprop='headline' content='risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/HulaHoop'><span itemprop='name'>HulaHoop</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8976.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-02-20T20:50:02Z' class='post-time'>
+                February 20, 2020,  8:50pm
+              </time>
+              <meta itemprop='dateModified' content='2020-02-20T20:50:02Z'>
+          <span itemprop='position'>#9</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Unless this gets reviews from someone like Stephan or Ted Ts’o and is approved for inclusion upstream, realistically it stands little chance for deployment. Accepting changes with unforeseen consequences to something as sensitive as kernel entropy, is malpractice.</p>
+        </div>
+
+        <meta itemprop='headline' content='risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8976.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-02-20T21:22:25Z' class='post-time'>
+                February 20, 2020,  9:22pm
+              </time>
+              <meta itemprop='dateModified' content='2020-02-20T21:22:25Z'>
+          <span itemprop='position'>#10</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I’m not saying to deploy it now. The patch is just for initial testing to see what happens.</p>
+        </div>
+
+        <meta itemprop='headline' content='risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="8976.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-10-09T20:35:29Z' class='post-time'>
+                October 9, 2021,  8:35pm
+              </time>
+              <meta itemprop='dateModified' content='2021-10-09T20:35:29Z'>
+          <span itemprop='position'>#11</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>me:</p>
+<blockquote>
+<p>Mixing even fully compromised entropy sources is considered secure in the current Linux kernel implementation. Though, D. J. Bernstein disagrees with that: <a href="../../../external.html?link=https://blog.cr.yp.to/20140205-entropy.html" class="inline-onebox">cr.yp.to: 2014</a></p>
+</blockquote>
+<p><a href="../../../external.html?link=https://github.com/3hhh">@3hhh</a> <a href="../../../external.html?link=https://github.com/QubesOS/qubes-issues/issues/6941#issuecomment-939260649">https://github.com/QubesOS/qubes-issues/issues/6941#issuecomment-939260649</a></p>
+<blockquote>
+<p>Bernstein assumes that you have entropy sources that you trust and some that are less trustworthy. If that’s true, his statement on “stick with the single one you trust and ditch all other input” is correct (and you only need 256 bits or so exactly once).</p>
+<p>However the Linux guys assume that you don’t want to ultimately trust any of the entropy sources available to you (or are too uninformed to make the decision) and thus live with a few potential attacks.</p>
+<p>I believe the latter is a more realisitic view atm (Linux runs on many “suboptimal” devices). If you build your own hardware RNG and use that, Bernstein’s view is more accurate.</p>
+</blockquote>
+        </div>
+
+        <meta itemprop='headline' content='risks of writing to /dev/random, crediting entropy, RNDADDENTROPY related to untrusted root'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

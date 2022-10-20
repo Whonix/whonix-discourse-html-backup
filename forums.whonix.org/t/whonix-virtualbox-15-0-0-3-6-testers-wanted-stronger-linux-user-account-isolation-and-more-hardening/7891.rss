@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</title>
+    <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891</link>
+    <description>Testers Wanted!
+
+Download the Testers-Only version of Whonix for VirtualBox:
+
+https://www.whonix.org/wiki/VirtualBox_Testers_Only_Version
+
+----
+
+Alternatively, in-place release upgrade is possible upgrade using [Whonix testers repository](https://www.whonix.org/wiki/Project-APT-Repository).
+
+----
+
+Notable Changes:
+
+* Stronger Linux User Account Isolation:
+  * Non-Qubes-Whonix only for now: Lock and expire root account in new Whonix builds. Existing users who upgraded are [advised](https://www.whonix.org/wiki/Root) to lock their root account. ([Qubes issue](https://github.com/QubesOS/qubes-issues/issues/2695))
+  * Disable root login in [virtual console](https://www.whonix.org/wiki/Desktop#Virtual_Consoles) by default.
+  * This is a purposeful security feature. No user freedom restrictions. Read more here: https://www.whonix.org/wiki/Root
+* https://forums.whonix.org/t/kernel-hardening/7296/140 and other security hardening (numerous enhancements to [security-misc](https://github.com/Whonix/security-misc))
+  * Enabling kernel panic on kernel oops after boot. (https://forums.whonix.org/t/set-oops-panic-kernel-parameter-or-kernel-panic-on-oops-1-sysctl-for-better-security/7713)
+  * https://forums.whonix.org/t/change-default-umask/7416 to `006`.
+  * Enable pam_umask.so usergroups so group permissions are same as user permissions. Debian by default uses User Private Groups (UPG). https://wiki.debian.org/UserPrivateGroups /usr/share/pam-configs/usergroups-security-misc
+  * Removes read, write and execute access for others for all users who have home  folders under folder /home by running for example &quot;chmod o-rwx /home/user&quot;  during package installation or upgrade. This will be done only once per folder  in folder /home so users who wish to relax file permissions are free to do so.  This is to protect previously created files in user home folder which were  previously created with lax file permissions prior installation of this  package.
+  * group sudo membership required to use su
+  * [passwordless](https://www.whonix.org/wiki/Root#Passwordless_Recovery_Mode_Security_Discussion) re[covery / emergency mode](https://www.whonix.org/wiki/Recovery)
+  * lock user accounts after 5 failed authentication attempts using pam_tally2 ([instructions how to unlock](https://www.whonix.org/wiki/Recovery#Unlock_User_Account:_Excessive_Wrong_Password_Entry_Attempts)) to allow users to use short, easy, `&quot;weak`&quot; passwords for their user `user` account while preventing compromised non-root users from bruteforcing their user `user` account.
+  * The thunderbolt and firewire modules are blacklisted as they can be used for DMA (Direct Memory Access) attacks.
+  * Uncommon network protocols are blacklisted: These are rarely used and may have unknown vulnerabilities. /etc/modprobe.d/uncommon-network-protocols.conf
+  * Enable IOMMU
+  * The SysRq key is restricted to only allow shutdowns/reboots.
+  * A systemd service mounts /proc with hidepid=2 at boot to prevent users from seeing each other&#39;s processes.
+  * A systemd service clears System.map on boot as these contain kernel symbols that could be useful to an attacker. ([ongoing discussion](https://forums.whonix.org/t/kernel-hardening/7296/130?u=patrick))
+  * The kernel logs are restricted to root only.
+  * The BPF JIT compiler is restricted to the root user and is hardened.
+  * The ptrace system call is restricted to the root user only.
+  * Add user `root` to group `sudo` . This is required to make above work so login as a user in a virtual console is still possible. debian/security-misc.postinst
+  * Kernel symbols in /proc/kallsyms are hidden to prevent malware from reading them and using them to learn more about what to attack on your system.
+  * Kexec is disabled as it can be used for live patching of the running kernel.
+  * See https://github.com/Whonix/security-misc for a full list.
+* https://forums.whonix.org/t/add-tor-browser-first-startup-popup-to-ask-whether-security-slider-should-be-set-to-safest/7591
+* documented how to use [recovery mode](https://www.whonix.org/wiki/Recovery)
+* enable sdwdate-gui in Qubes by default
+* Qubes-Whonix who use [multiple Whonix-Gateway](https://www.whonix.org/wiki/Multiple_Whonix-Gateway) should note updated instructions for [multiple Whonix-Workstation](https://www.whonix.org/wiki/Multiple_Whonix-Workstation#qubes) due introduction of sdwdate-gui
+* disable whonixcheck &quot;Connecting to Tor...&quot;, &quot;Connected to Tor.&quot; messages [1]
+* https://forums.whonix.org/t/anonymize-etc-machine-id/7721
+* fix anon-connection-wizard truncated text
+* anon-gpg-tweaks: disable keyservers (https://forums.whonix.org/t/gpg-recv-keys-fails-no-longer-use-keyservers-for-anything/5607)
+* add support for OnionShare &quot;bundled Tor&quot;
+* apparmor-profile-torbrowser updates (https://forums.whonix.org/t/why-does-the-tor-browser-apparmor-profile-have-sys-admin-sys-chroot-and-ptrace-capabilties/7409)
+* Enable APT seccomp sandboxing.
+* package str_replace - literal search and replace
+* https://forums.whonix.org/t/msgcollector-security-hardening/7625
+* systemd unit file hardening of services maintained by Whonix
+* Non-Qubes-Whonix: show pulseaudio plugin by default
+* Non-Qubes-Whonix: add arc-theme, gnome-themes-extra, gnome-themes-extra-data, gtk2-engines-murrine
+* `SUDO_EDITOR=&quot;mousepad&quot;` only if mousepad is installed and only if environment variable SUDO_EDITOR is not already set
+* Qubes-Whonix: speed up start of Tor Browser in DispVM ([reference](https://github.com/QubesOS/qubes-issues/issues/4918))
+* Tor Browser Updater (by Whonix developers): reduce old versions being kept to 0 in /var/cache/tb-binary
+* Tor Browser Starter (tb-starter) (by Whonix developers) hardening: implement optional `--hardening` / `tb_hardening=&quot;true&quot;` (using firejail and/or hardened-malloc) see [documentation](https://www.whonix.org/wiki/Tor_Browser#Hardening)
+* install https://forums.whonix.org/t/hardened-malloc/7474 by default to ease usage but not use it by default to avoid breakage
+
+----
+
+Interesting for developers:
+
+* add anon-base-files to whonix-host-xfce-kvm-freedom
+* add hardened-malloc to hardened-packages-dependencies-cli
+* remove unneeded dependency live-config-systemd
+* anon-base-files:
+  * do not create home folder during postinst
+  * Leave user &#39;user&#39; creation to Qubes.
+  * fix, actually use --no-create-home
+
+----
+
+[1] In favor of sdwdate-gui. whonixcheck connectivity check [code](https://github.com/Whonix/whonixcheck/blob/master/usr/lib/whonixcheck/check_tor_bootstrap.bsh) checks Tor as well as sdwdate. Due to Tor/onion slowness it often times out. Since improving that code is difficult, sdwdate-gui is used instead as a solution that provides better visual feedback to users.
+
+----
+
+This release would not have been possible without the numerous supporters of Whonix!
+
+----
+
+Please Donate!
+
+https://www.whonix.org/wiki/Donate</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 15 Aug 2019 15:20:41 +0000</lastBuildDate>
+    <category>News</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/7</link>
+        <pubDate>Thu, 15 Aug 2019 15:20:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7891-7</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891.rss">Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="1" data-topic="7898">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-9-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7898">Whonix VirtualBox 15.0.0.3.9 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/news"><span class="badge-category-bg" style="background-color: #AB9364;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="News posted by Whonix staff. The Whonix Blog. Stay Tuned. (rss)">News</span></a>
+  </div>
+  <blockquote>
+    Testers Wanted! 
+Download the Testers-Only version of Whonix for VirtualBox: 
+
+
+
+Alternatively, in-place release upgrade is possible upgrade using <a href="https://www.whonix.org/wiki/Project-APT-Repository" rel="nofollow noopener">Whonix testers repository</a>. 
+
+Notable Changes: 
+Same as <a href="https://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891" class="inline-onebox">Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</a> but bugs reported there fixed. 
+
+This release would not have been possible without the numerous supporters of Whonix! 
+
+Please Donate!
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/6</link>
+        <pubDate>Thu, 15 Aug 2019 15:20:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7891-6</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891.rss">Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</title>
+        <dc:creator><![CDATA[troubadour]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="4" data-topic="7891">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Permission issues indeed. Also fixed in msgcollector and testers repository. Hopefully.</p>
+</blockquote>
+</aside>
+<p>It is fixed.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/5</link>
+        <pubDate>Sun, 11 Aug 2019 21:18:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7891-5</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891.rss">Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks!</p>
+<aside class="quote no-group" data-post="3" data-topic="7891">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tnt_bom_bom/40/2148_2.png" class="avatar"> TNT_BOM_BOM:</div>
+<blockquote>
+<p>I cant enter whonix_repsitory nor ACW , it requires sudo password then after that it says:</p>
+<pre><code class="lang-auto">Child 'su' process failed!
+su: Authentication failure
+</code></pre>
+</blockquote>
+</aside>
+<p>Fixed in testers repository.</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/Whonix/commit/5067d7eca6cfb36b71fe62ff7f3461f87bcdb3f6" target="_blank" rel="nofollow noopener">github.com/Whonix/Whonix</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">
+    <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="https://github.com/Whonix/Whonix/commit/5067d7eca6cfb36b71fe62ff7f3461f87bcdb3f6" target="_blank" rel="nofollow noopener">lxsu -&gt; lxsudo</a>
+</h4>
+
+
+<div class="date">
+  by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+  on <a href="https://github.com/Whonix/Whonix/commit/5067d7eca6cfb36b71fe62ff7f3461f87bcdb3f6" target="_blank" rel="nofollow noopener">06:29AM - 10 Aug 19 UTC</a>
+</div>
+
+<div class="github-commit-stats">
+  changed <strong>6 files</strong>
+  with <strong>6 additions</strong>
+  and <strong>6 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-post="2" data-topic="7891">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/d9b06d/40.png" class="avatar"> troubadour:</div>
+<blockquote>
+<p>Running whonixcheck from the the main menu pops a lot of messages from msgdispatcher.</p>
+</blockquote>
+</aside>
+<p>Permission issues indeed. Also fixed in msgcollector and testers repository. Hopefully.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/4</link>
+        <pubDate>Sat, 10 Aug 2019 11:46:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7891-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891.rss">Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>I cant enter whonix_repsitory nor ACW , it requires sudo password then after that it says:</p>
+<pre><code>Child 'su' process failed!
+su: Authentication failure
+</code></pre>
+<aside class="quote no-group" data-post="2" data-topic="7891">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/d9b06d/40.png" class="avatar"> troubadour:</div>
+<blockquote>
+<p>Had to stop and start <code>msgdispatcher --x</code> to find out that all the tmp files in /run/msgcollector/whonixcheck are denied permission. Due to hardening ?</p>
+</blockquote>
+</aside>
+<p>Yes i can confirm this , seems to be from hardening.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/3</link>
+        <pubDate>Sat, 10 Aug 2019 02:23:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7891-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891.rss">Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</title>
+        <dc:creator><![CDATA[troubadour]]></dc:creator>
+        <description><![CDATA[
+            <p>First issue. Running whonixcheck from the the main menu pops a lot of messages from msgdispatcher. They are not clear about the real cause, only exit 1.</p>
+<p>Had to stop and start <code>msgdispatcher --x</code> to find out that all the tmp files in /run/msgcollector/whonixcheck are denied permission. Due to hardening ?</p>
+<p>whonixcheck cli works fine.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/2</link>
+        <pubDate>Fri, 09 Aug 2019 22:10:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7891-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891.rss">Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Testers Wanted!</p>
+<p>Download the Testers-Only version of Whonix for VirtualBox:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/VirtualBox_Testers_Only_Version" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/d/d5/Virtualbox_logo.png" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://www.whonix.org/wiki/VirtualBox_Testers_Only_Version" target="_blank" rel="nofollow noopener">VirtualBox Testers Only Version</a></h3>
+
+<p>Whonix ™ for VirtualBox - Testers Only Version</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p>Alternatively, in-place release upgrade is possible upgrade using <a href="https://www.whonix.org/wiki/Project-APT-Repository" rel="nofollow noopener">Whonix testers repository</a>.</p>
+<hr>
+<p>Notable Changes:</p>
+<ul>
+<li>Stronger Linux User Account Isolation:
+<ul>
+<li>Non-Qubes-Whonix only for now: Lock and expire root account in new Whonix builds. Existing users who upgraded are <a href="https://www.whonix.org/wiki/Root" rel="nofollow noopener">advised</a> to lock their root account. (<a href="https://github.com/QubesOS/qubes-issues/issues/2695" rel="nofollow noopener">Qubes issue</a>)</li>
+<li>Disable root login in <a href="https://www.whonix.org/wiki/Desktop#Virtual_Consoles" rel="nofollow noopener">virtual console</a> by default.</li>
+<li>This is a purposeful security feature. No user freedom restrictions. Read more here: <a href="https://www.whonix.org/wiki/Root" rel="nofollow noopener">https://www.whonix.org/wiki/Root</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="https://forums.whonix.org/t/kernel-hardening/7296/140" class="inline-onebox">Kernel Hardening</a> and other security hardening (numerous enhancements to <a href="https://github.com/Whonix/security-misc" rel="nofollow noopener">security-misc</a>)
+<ul>
+<li>Enabling kernel panic on kernel oops after boot. (<a href="https://forums.whonix.org/t/set-oops-panic-kernel-parameter-or-kernel-panic-on-oops-1-sysctl-for-better-security/7713" class="inline-onebox">set oops=panic kernel parameter or kernel.panic_on_oops=1 sysctl for better security</a>)</li>
+<li>
+<a href="https://forums.whonix.org/t/change-default-umask/7416" class="inline-onebox">Change default umask.</a> to <code>006</code>.</li>
+<li>Enable pam_umask.so usergroups so group permissions are same as user permissions. Debian by default uses User Private Groups (UPG). <a href="https://wiki.debian.org/UserPrivateGroups" rel="nofollow noopener">https://wiki.debian.org/UserPrivateGroups</a> /usr/share/pam-configs/usergroups-security-misc</li>
+<li>Removes read, write and execute access for others for all users who have home  folders under folder /home by running for example “chmod o-rwx /home/user”  during package installation or upgrade. This will be done only once per folder  in folder /home so users who wish to relax file permissions are free to do so.  This is to protect previously created files in user home folder which were  previously created with lax file permissions prior installation of this  package.</li>
+<li>group sudo membership required to use su</li>
+<li>
+<a href="https://www.whonix.org/wiki/Root#Passwordless_Recovery_Mode_Security_Discussion" rel="nofollow noopener">passwordless</a> re<a href="https://www.whonix.org/wiki/Recovery" rel="nofollow noopener">covery / emergency mode</a>
+</li>
+<li>lock user accounts after 5 failed authentication attempts using pam_tally2 (<a href="https://www.whonix.org/wiki/Recovery#Unlock_User_Account:_Excessive_Wrong_Password_Entry_Attempts" rel="nofollow noopener">instructions how to unlock</a>) to allow users to use short, easy, <code>"weak</code>" passwords for their user <code>user</code> account while preventing compromised non-root users from bruteforcing their user <code>user</code> account.</li>
+<li>The thunderbolt and firewire modules are blacklisted as they can be used for DMA (Direct Memory Access) attacks.</li>
+<li>Uncommon network protocols are blacklisted: These are rarely used and may have unknown vulnerabilities. /etc/modprobe.d/uncommon-network-protocols.conf</li>
+<li>Enable IOMMU</li>
+<li>The SysRq key is restricted to only allow shutdowns/reboots.</li>
+<li>A systemd service mounts /proc with hidepid=2 at boot to prevent users from seeing each other’s processes.</li>
+<li>A systemd service clears System.map on boot as these contain kernel symbols that could be useful to an attacker. (<a href="https://forums.whonix.org/t/kernel-hardening/7296/130">ongoing discussion</a>)</li>
+<li>The kernel logs are restricted to root only.</li>
+<li>The BPF JIT compiler is restricted to the root user and is hardened.</li>
+<li>The ptrace system call is restricted to the root user only.</li>
+<li>Add user <code>root</code> to group <code>sudo</code> . This is required to make above work so login as a user in a virtual console is still possible. debian/security-misc.postinst</li>
+<li>Kernel symbols in /proc/kallsyms are hidden to prevent malware from reading them and using them to learn more about what to attack on your system.</li>
+<li>Kexec is disabled as it can be used for live patching of the running kernel.</li>
+<li>See <a href="https://github.com/Whonix/security-misc" rel="nofollow noopener">https://github.com/Whonix/security-misc</a> for a full list.</li>
+</ul>
+</li>
+<li><a href="https://forums.whonix.org/t/add-tor-browser-first-startup-popup-to-ask-whether-security-slider-should-be-set-to-safest/7591" class="inline-onebox">add Tor Browser first startup popup to ask whether security slider should be set to safest</a></li>
+<li>documented how to use <a href="https://www.whonix.org/wiki/Recovery" rel="nofollow noopener">recovery mode</a>
+</li>
+<li>enable sdwdate-gui in Qubes by default</li>
+<li>Qubes-Whonix who use <a href="https://www.whonix.org/wiki/Multiple_Whonix-Gateway" rel="nofollow noopener">multiple Whonix-Gateway</a> should note updated instructions for <a href="https://www.whonix.org/wiki/Multiple_Whonix-Workstation#qubes" rel="nofollow noopener">multiple Whonix-Workstation</a> due introduction of sdwdate-gui</li>
+<li>disable whonixcheck “Connecting to Tor…”, “Connected to Tor.” messages [1]</li>
+<li><a href="https://forums.whonix.org/t/anonymize-etc-machine-id/7721" class="inline-onebox">Anonymize /etc/machine-id</a></li>
+<li>fix anon-connection-wizard truncated text</li>
+<li>anon-gpg-tweaks: disable keyservers (<a href="https://forums.whonix.org/t/gpg-recv-keys-fails-no-longer-use-keyservers-for-anything/5607" class="inline-onebox">gpg --recv-keys fails / no longer use keyservers for anything</a>)</li>
+<li>add support for OnionShare “bundled Tor”</li>
+<li>apparmor-profile-torbrowser updates (<a href="https://forums.whonix.org/t/why-does-the-tor-browser-apparmor-profile-have-sys-admin-sys-chroot-and-ptrace-capabilties/7409" class="inline-onebox">Why does the Tor Browser AppArmor profile have sys_admin, sys_chroot and ptrace capabilities?</a>)</li>
+<li>Enable APT seccomp sandboxing.</li>
+<li>package str_replace - literal search and replace</li>
+<li><a href="https://forums.whonix.org/t/msgcollector-security-hardening/7625" class="inline-onebox">msgcollector security hardening</a></li>
+<li>systemd unit file hardening of services maintained by Whonix</li>
+<li>Non-Qubes-Whonix: show pulseaudio plugin by default</li>
+<li>Non-Qubes-Whonix: add arc-theme, gnome-themes-extra, gnome-themes-extra-data, gtk2-engines-murrine</li>
+<li>
+<code>SUDO_EDITOR="mousepad"</code> only if mousepad is installed and only if environment variable SUDO_EDITOR is not already set</li>
+<li>Qubes-Whonix: speed up start of Tor Browser in DispVM (<a href="https://github.com/QubesOS/qubes-issues/issues/4918" rel="nofollow noopener">reference</a>)</li>
+<li>Tor Browser Updater (by Whonix developers): reduce old versions being kept to 0 in /var/cache/tb-binary</li>
+<li>Tor Browser Starter (tb-starter) (by Whonix developers) hardening: implement optional <code>--hardening</code> / <code>tb_hardening="true"</code> (using firejail and/or hardened-malloc) see <a href="https://www.whonix.org/wiki/Tor_Browser#Hardening" rel="nofollow noopener">documentation</a>
+</li>
+<li>install <a href="https://forums.whonix.org/t/hardened-malloc/7474" class="inline-onebox">hardened_malloc</a> by default to ease usage but not use it by default to avoid breakage</li>
+</ul>
+<hr>
+<p>Interesting for developers:</p>
+<ul>
+<li>add anon-base-files to whonix-host-xfce-kvm-freedom</li>
+<li>add hardened-malloc to hardened-packages-dependencies-cli</li>
+<li>remove unneeded dependency live-config-systemd</li>
+<li>anon-base-files:
+<ul>
+<li>do not create home folder during postinst</li>
+<li>Leave user ‘user’ creation to Qubes.</li>
+<li>fix, actually use --no-create-home</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p>[1] In favor of sdwdate-gui. whonixcheck connectivity check <a href="https://github.com/Whonix/whonixcheck/blob/master/usr/lib/whonixcheck/check_tor_bootstrap.bsh" rel="nofollow noopener">code</a> checks Tor as well as sdwdate. Due to Tor/onion slowness it often times out. Since improving that code is difficult, sdwdate-gui is used instead as a solution that provides better visual feedback to users.</p>
+<hr>
+<p>This release would not have been possible without the numerous supporters of Whonix!</p>
+<hr>
+<p>Please Donate!</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Donate" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/432;"><img src="https://www.whonix.org/w/images/8/83/Payment.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Donate" target="_blank" rel="nofollow noopener">Donate</a></h3>
+
+<p>PayPal, Bitcoin, Monero, other crypto currencies, etc.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891/1</link>
+        <pubDate>Fri, 09 Aug 2019 06:25:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7891-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-3-6-testers-wanted-stronger-linux-user-account-isolation-and-more-hardening/7891.rss">Whonix VirtualBox 15.0.0.3.6 - Testers Wanted! - Stronger Linux User Account Isolation and more Hardening</source>
+      </item>
+  </channel>
+</rss>

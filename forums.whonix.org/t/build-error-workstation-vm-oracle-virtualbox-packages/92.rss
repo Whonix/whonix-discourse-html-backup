@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Build error Workstation VM - Oracle Virtualbox packages</title>
+    <link>http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92</link>
+    <description>hi,
+
+I&#39;m unfortunately running into the next build error :( This time while building the Workstation VM:
+[code]Setting up virtualbox (4.1.18-dfsg-2+deb7u1) ...
+insserv: script virtualbox: service vboxdrv already provided!
+insserv: exiting now!
+update-rc.d: error: insserv rejected the script header
+dpkg: error processing virtualbox (--configure):
+ subprocess installed post-installation script returned error exit status 1
+dpkg: dependency problems prevent configuration of virtualbox-dkms:
+ virtualbox-dkms depends on virtualbox (&gt;= 4.1.18-dfsg-2+deb7u1); however:
+  Package virtualbox is not configured yet.
+
+dpkg: error processing virtualbox-dkms (--configure):
+ dependency problems - leaving unconfigured
+dpkg: dependency problems prevent configuration of virtualbox-qt:
+ virtualbox-qt depends on virtualbox (= 4.1.18-dfsg-2+deb7u1); however:
+  Package virtualbox is not configured yet.
+
+dpkg: error processing virtualbox-qt (--configure):
+ dependency problems - leaving unconfigured
+Errors were encountered while processing:
+ virtualbox
+ virtualbox-dkms
+ virtualbox-qt
+E: Sub-process /usr/bin/dpkg returned an error code (1)
+++ error_handler_general
+++ error_handler_shared
+++ last_exit_code=100
+++ last_bash_command=&#39;apt-get $apt_timeout_opts $apt_unattended_opts --yes install virtualbox&#39;
+++ &#39;[&#39; test -o xtrace = 0 &#39;]&#39;
+++ set +x
+ERROR in ./build-steps.d/1100_prepare-build-machine detected!
+Please have a look above &quot;error_handler_general&quot;, note the command that failed, its output and last_exit_code.
+- Please enter c and press enter to continue. (Recommended against!)
+- Please press enter to cleanup and exit. +++ caller
+++ last_caller=&#39;96 pre&#39;
+++ last_script=./build-steps.d/1100_prepare-build-machine
+++ rm --force /etc/apt/sources.list.d/whonix_temp.list
+++ rm --force /var/run/whonix/package_manager_lock
+++ error_handler_exit
+++ &#39;[&#39; false = true &#39;]&#39;
+++ abort_or_continue=Aborted
+++ true &#39;
+############################################################
+ERROR in ./build-steps.d/1100_prepare-build-machine detected! Aborted!
+(benchmark: 00:17:16)
+BASH_COMMAND: apt-get $apt_timeout_opts $apt_unattended_opts --yes install virtualbox
+last_exit_code: 100
+caller: 96 pre
+ERROR in ./build-steps.d/1100_prepare-build-machine! Aborted!
+############################################################
+&#39;
+++ &#39;[&#39; false = true &#39;]&#39;
+++ exit 1
+run-parts: ./build-steps.d/1100_prepare-build-machine exited with return code 1
+++ error_handler_build-machine
++++ caller
+++ : echo &#39;
+BASH_COMMAND: run-parts --verbose --exit-on-error ./build-steps.d
+ERROR ./whonix_build: | caller: 45 ./whonix_build
+&#39;
+++ exit 1[/code]
+That is to say, I installed Virtualbox-4.3 out of Oracle&#39;s Repositories prior building the Workstation VM (considered this a good idea) and 1100_prepare-build-machine doesn&#39;t seem to like that (at least that is my interpretation of the build error). Isn&#39;t it possible to use Oracle&#39;s packages instead of the Debian packages?
+
+Now, is it possible to clean the mess up. I.e. is there a way around a re-install of the Workstation Host to clean the system and start over?
+
+Also: As a precaution, i.e. avoiding further build errors: I noticed that https://www.whonix.org/wiki/Dev/BuildDocumentation_8 lacks the step https://www.whonix.org/wiki/Physical_Isolation#Install_Basic_Packages from the Physical Isolation build documentation. Is that intentional or is it a documentation mistake?
+
+thanks!</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 05 Mar 2014 18:32:44 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Build error Workstation VM - Oracle Virtualbox packages</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Out commenting stuff for a builder who is not a developer is unfortunately quite difficult (<a href="https://www.whonix.org/wiki/Dev/BuildDocumentation_8#Source_Code_Changes">https://www.whonix.org/wiki/Dev/BuildDocumentation_8#Source_Code_Changes</a>). I mean, building Whonix is probably easier than building similarly sized projects, but changes to the code… Since git is used to create a Debian upstream tarball (from which Whonix Debian Packages) are created. Even if that was done another way, such as in future when Whonix gets split into multiple packages, without understanding how git works, changing git based source is difficult anyway. If one changed a file, she can’t later easily pull updates from the original git repository. (However, with basic git knowledge it’s simple.)</p>
+<p>[Well, one could out comment that line, then reset the code, then manually do the build steps, but that would require lots of explanation as well. So that wouldn’t look like a great way either.]</p>
+<p>Probing VirtualBox version look like a rabbit hole. What about people who installed faketime from source code? Then we add such a detection code for all software that could be installed from other sources? It would require lots of code, just for this. This code adds complexity. (This complexity doesn’t endanger security, but the readability of the code and makes the build script more likely to break.) However, if I get a patch for this, I reconsider.</p>
+<p>I think a simple solution for this use case could be a build configuration “whonix_build_skip_virtualbox_install” and when set to “true” it skips “apt-get install virtualbox”? Or perhaps a more generic attempt similar to whonix_build_script_whonix_package (which was implemented in 1700_install-meta-packages to support skipping installation of the -kde packages)?</p>
+          <p><a href="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92/6</link>
+        <pubDate>Wed, 05 Mar 2014 18:32:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-92-6</guid>
+        <source url="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92.rss">Build error Workstation VM - Oracle Virtualbox packages</source>
+      </item>
+      <item>
+        <title>Build error Workstation VM - Oracle Virtualbox packages</title>
+        <dc:creator><![CDATA[Cerberus]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>One thought I don't like a lot is VBoxManage version numbers. While "apt-get install virtualbox" is simple and gives us latest Debian virtualbox version (or fails closed), just checking if VBoxManage is available won't check its version number. I am not sure what could happen, if the builder has an outdated version installed. Maybe installed it from oracle a while ago. Then forgot about it. Then removed the oracle repository. No updated version would get installed then. The build script could still fail if some VirtualBox command is used, that didn't exist in that version.</blockquote>
+I agree with you here. I see two problems with the proposed approach though:
+[code]echo "$(dpkg-query --show --showformat='${Version}' "virtualbox")"[/code]
+(1) Utilizing this query, we hit the very same wall as before. That is to say, the Oracle package name is virtualbox-4.3, not virtualbox. What we could do is querying the whole dpkg database, grep this for a virtualbox wildcard and pipe just the first line of the result to the script.
+<p>Let me explain quickly: As I understand the dpkg-query manpage, it doesn’t support regex/wildcard queries without utilizing grep/awk/sed. Let’s consider a user that has the Debian Vbox installed (3 packages), our custom query would result in a 3 line output - from which we take the first line. Good thing here is, that according to <a href="https://packages.debian.org/search?suite=wheezy&amp;searchon=names&amp;keywords=virtualbox" rel="nofollow noopener">https://packages.debian.org/search?suite=wheezy&amp;searchon=names&amp;keywords=virtualbox</a> all Vbox Debian packages have the very same version number and whatever one of the three lines of our query we pipe as the first (and only) line to the script, would provide us with correct information. If it’s Oracle, there would be just one package version - we’re fine (if we decide upon this route, I’m certainly going to provide you with the Oracle string, but see (2)).</p>
+<p>(2) You inspired me to think out of the box with your above statement and here it comes: The user could even have installed Vbox from sources and now we’d be screwed with the dpkg-query approach.</p>
+<p>So, here is my idea: What if we first would introduce a general check for the existence of the VirtualBox binary in $PATH. If there’s no result, we “sudo apt-get install …” from Debian as is. If there is a binary, we use dpkg-query as explained in (1). If there’s no result, we know that we’re dealing with a source install … we use “vboxmanage --version” to keep it recognized?</p>
+<p>I’m unfortunately still away from my Whonix box (otherwise I would have come back with the dpkg-query string already for Oracle - it is there, but only if you query for “virtualbox-4.3”, i.e. a classical “hen and egg problem” or we use the proposed approach in (1) to solve it. I just briefly wanted to get back to you and share my ideas so far.</p>
+<hr>
+<p>Or, we don’t bother to deal with it at all anymore, tell the user briefly that he needs to comment the “sudo apt-get install …” if he’s using Vbox from other sources than Debian and we tell him the required minimum Vbox version, i.e. a documentation solution rather than a (maybe not 100% reliable) scripting solution. Both works for me. What do you think?</p>
+          <p><a href="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92/5</link>
+        <pubDate>Tue, 04 Mar 2014 23:43:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-92-5</guid>
+        <source url="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92.rss">Build error Workstation VM - Oracle Virtualbox packages</source>
+      </item>
+      <item>
+        <title>Build error Workstation VM - Oracle Virtualbox packages</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>The “if” solution would be simple to implement. I would just check if “command -v VBoxManage” exists 0. Since the script only uses “VBoxManage” and not “/usr/bin/VBoxManage” the actual output of <code>command -v</code> or <code>which</code> doesn’t matter, is free to differ.</p>
+<p>One thought I don’t like a lot is VBoxManage version numbers. While “apt-get install virtualbox” is simple and gives us latest Debian virtualbox version (or fails closed), just checking if VBoxManage is available won’t check its version number. I am not sure what could happen, if the builder has an outdated version installed. Maybe installed it from oracle a while ago. Then forgot about it. Then removed the oracle repository. No updated version would get installed then. The build script could still fail if some VirtualBox command is used, that didn’t exist in that version.</p>
+<p>Hence, also some code to check the actually installed VirtualBox version would be required?</p>
+<p>Perhaps it’s also worth adding <code>vboxmanage --version</code> for debugging to the build script? Useful to have when someone sends a log.</p>
+<p>Can you post the output of</p>
+<pre><code class="lang-auto"></code></pre>
+<p>please when you installed VirtualBox from oracle?</p>
+<p>For Debian it’s.</p>
+<blockquote>4.1.18-dfsg-2+deb7u1</blockquote>
+<p>Eventually some version comparison has to be done.</p>
+          <p><a href="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92/4</link>
+        <pubDate>Sun, 02 Mar 2014 03:00:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-92-4</guid>
+        <source url="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92.rss">Build error Workstation VM - Oracle Virtualbox packages</source>
+      </item>
+      <item>
+        <title>Build error Workstation VM - Oracle Virtualbox packages</title>
+        <dc:creator><![CDATA[Cerberus]]></dc:creator>
+        <description><![CDATA[
+            <p>Suggestion: We could escape this by introducing a test to an existing VBox <em>binary</em> on the build system. I mean, other than VBox from Oracle I cannot imagine another third-party source that’s likely to be introduced prior building. In this very specific case it’s failing due to distinct naming of the packages.</p>
+<p><code>if [VBox _binary_ absent]; then
+sudo apt-get install ...
+fi</code></p>
+<p>What do you think? I’m currently away from my Whonix host but I wouldn’t wonder if both Oracle and Debian packages would result in the very same “which VirtualBox”.</p>
+          <p><a href="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92/3</link>
+        <pubDate>Sun, 02 Mar 2014 00:09:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-92-3</guid>
+        <source url="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92.rss">Build error Workstation VM - Oracle Virtualbox packages</source>
+      </item>
+      <item>
+        <title>Build error Workstation VM - Oracle Virtualbox packages</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>To create .ova’s ready made to be imported into VirtualBox, one needs VirtualBox to be installed. I call it a build dependency. (Not required for Physical Isolation builds, not installed then.)</p>
+<p>Now as a developer I have two choices. I could tell you, you need this software to be installed and this and this and this and leave the task of installing to the builder. Most projects do that. (Try to build TrueCrypt on Windows. I found it ridiculously difficult finding all the build dependencies scattered all over the web.) A bit more convenient is to provide where you can find the packages to install and to provide which commands you’ll need to run to accomplish setting them up.</p>
+<blockquote>That is to say, I installed Virtualbox-4.3 out of Oracle's Repositories prior building the Workstation VM (considered this a good idea) and 1100_prepare-build-machine doesn't seem to like that (at least that is my interpretation of the build error). Isn't it possible to use Oracle's packages instead of the Debian packages?</blockquote>
+In essence, the build script is only doing "sudo apt-get install virtualbox" (among other simple things) for you. The build script is kinda dumb. Doesn't know about Qracle repository, virtualbox versions, etc. The two different virtualbox packages seems to conflict. The same would happen if you manually installed the Oracle one and then run "sudo apt-get install virtualbox". So when you're installing virtualbox from elsewhere which then conflicts with Debian's package, installing virtualbox could be out commented from the 1100_prepare-build-machine script. Or we could add a "do not install virtualbox from Debian repository" build configuration option. (Or a command line switch, since these build configurations are probably still too difficult.)
+<blockquote>Now, is it possible to clean the mess up. I.e. is there a way around a re-install of the Workstation Host to clean the system and start over?</blockquote>
+I don't know. I never spend thought/test on that. I guess uninstalling the Oracle one should do. Or out removing virtualbox from the prepare build machine script.
+<blockquote>Also: As a precaution, i.e. avoiding further build errors: I noticed that https://www.whonix.org/wiki/Dev/BuildDocumentation_8 lacks the step https://www.whonix.org/wiki/Physical_Isolation#Install_Basic_Packages from the Physical Isolation build documentation. Is that intentional or is it a documentation mistake?</blockquote>
+This is intentional. (Not required for VM builds, 1300_create-debian-img [grml-debootstrap] does that for VM builds.)
+          <p><a href="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92/2</link>
+        <pubDate>Sun, 23 Feb 2014 12:38:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-92-2</guid>
+        <source url="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92.rss">Build error Workstation VM - Oracle Virtualbox packages</source>
+      </item>
+      <item>
+        <title>Build error Workstation VM - Oracle Virtualbox packages</title>
+        <dc:creator><![CDATA[Cerberus]]></dc:creator>
+        <description><![CDATA[
+            <p>hi,</p>
+<p>I’m unfortunately running into the next build error <img src="//forums.whonix.org/images/emoji/twitter/frowning.png?v=5" title=":frowning:" class="emoji" alt=":frowning:"> This time while building the Workstation VM:</p>
+<p>[code]Setting up virtualbox (4.1.18-dfsg-2+deb7u1) …<br>
+insserv: script virtualbox: service vboxdrv already provided!<br>
+insserv: exiting now!<br>
+update-rc.d: error: insserv rejected the script header<br>
+dpkg: error processing virtualbox (–configure):<br>
+subprocess installed post-installation script returned error exit status 1<br>
+dpkg: dependency problems prevent configuration of virtualbox-dkms:<br>
+virtualbox-dkms depends on virtualbox (&gt;= 4.1.18-dfsg-2+deb7u1); however:<br>
+Package virtualbox is not configured yet.</p>
+<p>dpkg: error processing virtualbox-dkms (–configure):<br>
+dependency problems - leaving unconfigured<br>
+dpkg: dependency problems prevent configuration of virtualbox-qt:<br>
+virtualbox-qt depends on virtualbox (= 4.1.18-dfsg-2+deb7u1); however:<br>
+Package virtualbox is not configured yet.</p>
+<p>dpkg: error processing virtualbox-qt (–configure):<br>
+dependency problems - leaving unconfigured<br>
+Errors were encountered while processing:<br>
+virtualbox<br>
+virtualbox-dkms<br>
+virtualbox-qt<br>
+E: Sub-process /usr/bin/dpkg returned an error code (1)<br>
+++ error_handler_general<br>
+++ error_handler_shared<br>
+++ last_exit_code=100<br>
+++ last_bash_command=‘apt-get $apt_timeout_opts $apt_unattended_opts --yes install virtualbox’<br>
+++ ‘[’ test -o xtrace = 0 ‘]’<br>
+++ set +x<br>
+ERROR in ./build-steps.d/1100_prepare-build-machine detected!<br>
+Please have a look above “error_handler_general”, note the command that failed, its output and last_exit_code.</p>
+<ul>
+<li>Please enter c and press enter to continue. (Recommended against!)</li>
+<li>Please press enter to cleanup and exit. +++ caller<br>
+++ last_caller=‘96 pre’<br>
+++ last_script=./build-steps.d/1100_prepare-build-machine<br>
+++ rm --force /etc/apt/sources.list.d/whonix_temp.list<br>
+++ rm --force /var/run/whonix/package_manager_lock<br>
+++ error_handler_exit<br>
+++ ‘[’ false = true ‘]’<br>
+++ abort_or_continue=Aborted<br>
+++ true ‘<br>
+############################################################<br>
+ERROR in ./build-steps.d/1100_prepare-build-machine detected! Aborted!<br>
+(benchmark: 00:17:16)<br>
+BASH_COMMAND: apt-get $apt_timeout_opts $apt_unattended_opts --yes install virtualbox<br>
+last_exit_code: 100<br>
+caller: 96 pre<br>
+ERROR in ./build-steps.d/1100_prepare-build-machine! Aborted!<br>
+############################################################<br>
+’<br>
+++ ‘[’ false = true ‘]’<br>
+++ exit 1<br>
+run-parts: ./build-steps.d/1100_prepare-build-machine exited with return code 1<br>
+++ error_handler_build-machine<br>
++++ caller<br>
+++ : echo ‘<br>
+BASH_COMMAND: run-parts --verbose --exit-on-error ./build-steps.d<br>
+ERROR ./whonix_build: | caller: 45 ./whonix_build<br>
+’<br>
+++ exit 1[/code]<br>
+That is to say, I installed Virtualbox-4.3 out of Oracle’s Repositories prior building the Workstation VM (considered this a good idea) and 1100_prepare-build-machine doesn’t seem to like that (at least that is my interpretation of the build error). Isn’t it possible to use Oracle’s packages instead of the Debian packages?</li>
+</ul>
+<p>Now, is it possible to clean the mess up. I.e. is there a way around a re-install of the Workstation Host to clean the system and start over?</p>
+<p>Also: As a precaution, i.e. avoiding further build errors: I noticed that <a href="https://www.whonix.org/wiki/Dev/BuildDocumentation_8" rel="nofollow noopener">https://www.whonix.org/wiki/Dev/BuildDocumentation_8</a> lacks the step <a href="https://www.whonix.org/wiki/Physical_Isolation#Install_Basic_Packages" rel="nofollow noopener">https://www.whonix.org/wiki/Physical_Isolation#Install_Basic_Packages</a> from the Physical Isolation build documentation. Is that intentional or is it a documentation mistake?</p>
+<p>thanks!</p>
+          <p><a href="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92/1</link>
+        <pubDate>Sun, 23 Feb 2014 03:14:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-92-1</guid>
+        <source url="http://forums.whonix.org/t/build-error-workstation-vm-oracle-virtualbox-packages/92.rss">Build error Workstation VM - Oracle Virtualbox packages</source>
+      </item>
+  </channel>
+</rss>

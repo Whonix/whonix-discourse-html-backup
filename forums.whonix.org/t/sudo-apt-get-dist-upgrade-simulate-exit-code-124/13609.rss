@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>sudo apt-get dist-upgrade --simulate exit code: 124</title>
+    <link>http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609</link>
+    <description>Recent test run failed with systemcheck in sys-whonix showing `sudo apt-get dist-upgrade --simulate exit code: 124` error. This is a fresh install of template (no updates installed on top). Otherwise, available updates are listed. I can&#39;t find what 124 exit code means, any idea?
+
+The message is visible here:
+https://openqa.qubes-os.org/tests/38930#step/mount_and_boot_options/2</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 01 May 2022 14:27:14 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>sudo apt-get dist-upgrade --simulate exit code: 124</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Ok, if it continues to be an issue, then…</p>
+<aside class="quote no-group" data-username="Patrick" data-post="3" data-topic="13609">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">timeout_after="10"
+kill_after="5"
+</code></pre>
+</blockquote>
+</aside>
+<p>…I could also simply increase the timeout there.</p>
+          <p><a href="http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609/5</link>
+        <pubDate>Sun, 01 May 2022 14:27:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13609-5</guid>
+        <source url="http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609.rss">sudo apt-get dist-upgrade --simulate exit code: 124</source>
+      </item>
+      <item>
+        <title>sudo apt-get dist-upgrade --simulate exit code: 124</title>
+        <dc:creator><![CDATA[marmarek]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="3" data-topic="13609">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Why? Slow system? High system load?</p>
+</blockquote>
+</aside>
+<p>That could be the case very much. Nested virtualization is slow. This is the first time I see this specific issue, but if it will repeat, I may need to increase timeout for the test setup…</p>
+          <p><a href="http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609/4</link>
+        <pubDate>Sun, 01 May 2022 10:52:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13609-4</guid>
+        <source url="http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609.rss">sudo apt-get dist-upgrade --simulate exit code: 124</source>
+      </item>
+      <item>
+        <title>sudo apt-get dist-upgrade --simulate exit code: 124</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Now it comes to mind that exit code 124 isn’t from APT. It’s the exit code of <code>timeout</code>.</p>
+<p>This is the command that systemcheck is running</p>
+<ul>
+<li>
+<blockquote>
+<p>sudo --non-interactive /usr/libexec/helper-scripts/apt-get-update-simulate</p>
+</blockquote>
+</li>
+</ul>
+<p>This is what then essentially, simplified happens:</p>
+<pre><code class="lang-auto">timeout_after="10"
+kill_after="5"
+
+timeout \
+   --kill-after="$kill_after" \
+   "$timeout_after" \
+   apt-get dist-upgrade --simulate
+</code></pre>
+<p>So <code>apt-get dist-upgrade --simulate</code> didn’t complete within 10 seconds and <code>sigterm</code> was sufficient to terminate <code>apt-get</code>. (<code>sigkill</code> <code>--kill-after</code> was not needed.)</p>
+<pre><code class="lang-auto">   ## `timeout` returns:
+   ## - 124 if sigterm was sufficient
+   ## - 137 if needed to use kill.
+</code></pre>
+<p>The question now is…</p>
+<blockquote>
+<p><code>apt-get dist-upgrade --simulate</code> didn’t complete within 10 seconds</p>
+</blockquote>
+<p>Why? Slow system? High system load?</p>
+<p>Transitory issue?</p>
+<p>Might be the first time that was ever reported. 10 seconds seems more than enough time for this.</p>
+<p>The error message by systemcheck could be better. I didn’t add the complex parsing/notification since this wasn’t expected.</p>
+          <p><a href="http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609/3</link>
+        <pubDate>Sun, 01 May 2022 09:58:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13609-3</guid>
+        <source url="http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609.rss">sudo apt-get dist-upgrade --simulate exit code: 124</source>
+      </item>
+      <item>
+        <title>sudo apt-get dist-upgrade --simulate exit code: 124</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>That’s weird. I have no idea how that could happen. No recent changes in Whonix package repository. If a user would report this, I would request to run the following commands to gather more debug information.</p>
+<ul>
+<li>
+<blockquote>
+<p>sudo dpkg --audit ; echo $?</p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p>sudo dpkg --configure -a ; echo $?</p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p>sudo apt-get dist-upgrade --simulate ; echo $?</p>
+</blockquote>
+</li>
+</ul>
+<p>Might make sense to add this to Qubes QA? That seems to be a useful test for any Debian based template.</p>
+          <p><a href="http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609/2</link>
+        <pubDate>Sun, 01 May 2022 09:51:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13609-2</guid>
+        <source url="http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609.rss">sudo apt-get dist-upgrade --simulate exit code: 124</source>
+      </item>
+      <item>
+        <title>sudo apt-get dist-upgrade --simulate exit code: 124</title>
+        <dc:creator><![CDATA[marmarek]]></dc:creator>
+        <description><![CDATA[
+            <p>Recent test run failed with systemcheck in sys-whonix showing <code>sudo apt-get dist-upgrade --simulate exit code: 124</code> error. This is a fresh install of template (no updates installed on top). Otherwise, available updates are listed. I can’t find what 124 exit code means, any idea?</p>
+<p>The message is visible here:</p><aside class="onebox allowlistedgeneric" data-onebox-src="https://openqa.qubes-os.org/tests/38930#step/mount_and_boot_options/2">
+  <header class="source">
+      <img src="https://openqa.qubes-os.org/asset/8eeb40a037/logo-failed-16.png" class="site-icon" width="16" height="16">
+
+      <a href="https://openqa.qubes-os.org/tests/38930#step/mount_and_boot_options/2" target="_blank" rel="noopener nofollow ugc">openqa.qubes-os.org</a>
+  </header>
+
+  <article class="onebox-body">
+    
+
+<h3><a href="https://openqa.qubes-os.org/tests/38930#step/mount_and_boot_options/2" target="_blank" rel="noopener nofollow ugc">Qubes OS openQA:...</a></h3>
+
+  <p>openQA is a testing framework mainly for distributions</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609/1</link>
+        <pubDate>Sat, 30 Apr 2022 13:33:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13609-1</guid>
+        <source url="http://forums.whonix.org/t/sudo-apt-get-dist-upgrade-simulate-exit-code-124/13609.rss">sudo apt-get dist-upgrade --simulate exit code: 124</source>
+      </item>
+  </channel>
+</rss>

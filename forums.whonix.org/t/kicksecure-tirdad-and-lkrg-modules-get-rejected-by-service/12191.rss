@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Kicksecure: tirdad and lkrg - modules get rejected by service</title>
+    <link>http://forums.whonix.org/t/kicksecure-tirdad-and-lkrg-modules-get-rejected-by-service/12191</link>
+    <description>Setup: Debian 11 amd64 + Kicksecure overlay
+
+Hi,
+
+after installing lkrg, tirdad and the dependencies, they didn&#39;t work. Looking at:
+
+```
+systemctl --failed
+systemctl status systemd-modules-load
+```
+
+It showed that `systemd-modules-load` failed and gave me the `pid 795`.
+
+
+Looking at the pid in the journal with
+
+```
+sudo journalctl _PID=795
+```
+
+
+I get this error:
+
+&gt; Aug 29 10:34:55 host systemd-modules-load[795]: Failed to insert module &#39;tirdad&#39;: Key was rejected by service
+&gt; Aug 29 10:34:55 host systemd-modules-load[795]: Failed to insert module &#39;p_lkrg&#39;: Key was rejected by service
+
+
+Disabling secure-boot doesn&#39;t fix it, neither did reinstalling all whonix-repo packages, manually running
+
+```
+sude update-grub
+```
+
+or
+
+```
+sudo update-initramfs -u
+```
+
+
+Any idea what else to try, in case this issue is on my pc?</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 29 Aug 2021 21:18:50 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/kicksecure-tirdad-and-lkrg-modules-get-rejected-by-service/12191.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Kicksecure: tirdad and lkrg - modules get rejected by service</title>
+        <dc:creator><![CDATA[not]]></dc:creator>
+        <description><![CDATA[
+            <p>Sorry, you were correct, it had nothing to do with Kicksecure.<br>
+The thread you linked was spot on and immediately solved it, I had</p>
+<p><code>module.sig_enforce=1</code></p>
+<p>enabled as grub parameter. Now the error changed from “key rejected” to “not permitted”.<br>
+I also had to disable:</p>
+<p><code>lockdown=confidentiality</code></p>
+<p>and reducing it to</p>
+<p><code>lockdown=integrity</code></p>
+<p>didn’t work either.</p>
+<p>And <code>secure boot</code> had to be turned off as well.</p>
+<p>But now lkrg is running flawlessly and the system is finally set up properly.<br>
+<strong>Thank you</strong> very much!</p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-tirdad-and-lkrg-modules-get-rejected-by-service/12191/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-tirdad-and-lkrg-modules-get-rejected-by-service/12191/3</link>
+        <pubDate>Sun, 29 Aug 2021 21:18:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12191-3</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-tirdad-and-lkrg-modules-get-rejected-by-service/12191.rss">Kicksecure: tirdad and lkrg - modules get rejected by service</source>
+      </item>
+      <item>
+        <title>Kicksecure: tirdad and lkrg - modules get rejected by service</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>At this point, you probably cannot load any kernel module whatsoever. Not limited to tirdad, lkrg. Therefore, <a href="https://www.whonix.org/wiki/unspecific" class="inline-onebox">Information Booster might be Available!</a></p>
+<p>Guess: Disabling SecureBoot is unsuffient. Possibly kernel signature verification is still enforced.</p>
+<p>Whonix / Kicksecure issue ticket:<br>
+<a href="https://forums.whonix.org/t/enforce-kernel-module-software-signature-verification-module-signing-disallow-kernel-module-loading-by-default/7880" class="inline-onebox">enforce kernel module software signature verification [module signing] / disallow kernel module loading by default</a></p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-tirdad-and-lkrg-modules-get-rejected-by-service/12191/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-tirdad-and-lkrg-modules-get-rejected-by-service/12191/2</link>
+        <pubDate>Sun, 29 Aug 2021 15:50:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12191-2</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-tirdad-and-lkrg-modules-get-rejected-by-service/12191.rss">Kicksecure: tirdad and lkrg - modules get rejected by service</source>
+      </item>
+      <item>
+        <title>Kicksecure: tirdad and lkrg - modules get rejected by service</title>
+        <dc:creator><![CDATA[not]]></dc:creator>
+        <description><![CDATA[
+            <p>Setup: Debian 11 amd64 + Kicksecure overlay</p>
+<p>Hi,</p>
+<p>after installing lkrg, tirdad and the dependencies, they didn’t work. Looking at:</p>
+<pre><code class="lang-auto">systemctl --failed
+systemctl status systemd-modules-load
+</code></pre>
+<p>It showed that <code>systemd-modules-load</code> failed and gave me the <code>pid 795</code>.</p>
+<p>Looking at the pid in the journal with</p>
+<pre><code class="lang-auto">sudo journalctl _PID=795
+</code></pre>
+<p>I get this error:</p>
+<blockquote>
+<p>Aug 29 10:34:55 host systemd-modules-load[795]: Failed to insert module ‘tirdad’: Key was rejected by service<br>
+Aug 29 10:34:55 host systemd-modules-load[795]: Failed to insert module ‘p_lkrg’: Key was rejected by service</p>
+</blockquote>
+<p>Disabling secure-boot doesn’t fix it, neither did reinstalling all whonix-repo packages, manually running</p>
+<pre><code class="lang-auto">sude update-grub
+</code></pre>
+<p>or</p>
+<pre><code class="lang-auto">sudo update-initramfs -u
+</code></pre>
+<p>Any idea what else to try, in case this issue is on my pc?</p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-tirdad-and-lkrg-modules-get-rejected-by-service/12191/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-tirdad-and-lkrg-modules-get-rejected-by-service/12191/1</link>
+        <pubDate>Sun, 29 Aug 2021 15:28:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12191-1</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-tirdad-and-lkrg-modules-get-rejected-by-service/12191.rss">Kicksecure: tirdad and lkrg - modules get rejected by service</source>
+      </item>
+  </channel>
+</rss>

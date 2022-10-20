@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>scurl - secure curl wrapper</title>
+    <link>http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125</link>
+    <description>To workaround `wget` security issues and `curl` lack of strict SSL by default, Whonix provides `scurl` wrapper script, which invokes `curl` with a few prepared command line parameters, allowing simple secure downloads.
+
+It was a nice approach, until [T673](https://phabricator.whonix.org/T673) phabricator task was resolved by this commit:
+[add --remote-name so scurl can be used as wget replacement](https://github.com/Whonix/scurl/commit/9006429ff7f9f39ff4dc367848ff45b690957881)
+And here the problem comes: this parameter **enforces file saving** and **cannot be canceled** by subsequent parameters if a user ever wants to prevent this.
+
+This new behavior broke a lot of instructions and examples in Whonix Wiki using `scurl`. As well as any manual replacement of `curl` with `scurl` for better security.
+E.g. it broke [test of per-process stream isolation](https://www.whonix.org/wiki/Stream_Isolation#torsocks):
+&gt; `scurl https://check.torproject.org | grep IP`
+
+Now it even gives an error: it can&#39;t save output to file cause can&#39;t get a filename from URL.
+So it spread outside the [scurl Wiki page](https://www.whonix.org/wiki/Secure_Downloads) now (where all `scurl` commands are broken foremost, of course).
+
+It broke the whole philosophy of original approach reflected in a wrapper name
+&quot;scurl&quot; == &quot;secure curl&quot;, which meant transparent replacement for `curl` with more strict policy for protocols only. File auto-saving is completely new and additional functionality outside of this concept, and should be solved the other way.
+
+And it was! Later there was added `scurl-download` wrapper (together with `curl-download`), which adds the same `--remote-name` parameter (along with `--location` to follow redirects). Corresponding documentation has also been added into [Whonix Wiki](https://www.whonix.org/wiki/Secure_Downloads#How-to:_Invoke_scurl-download).
+But this parameter still remains in main `scurl` wrapper as well :confused:
+
+Please fix this.
+- Consider removing `--remote-name` parameter from main `scurl` wrapper.
+- Maybe consider renaming `scurl-download` / `curl-download`, or adding symlinks with short and simple names, like `scurld` / `curld` or `scurlget` / `curlget` — in case you need a short replacement for `wget` command, and long name with dash is inconvenient here for regular users.
+- Consider improving `scurl-download` / `curl-download` wrappers:
+  - Replace `--remote-name` parameter with `--remote-name-all`, which activates the same behavior for all given URLs (for multiple downloads), also allows to cancel it for any URL (by `&quot;-o -&quot;` or `--no-remote-name`).
+  - Add `--remote-header-name` parameter, which tells curl to try to get server-specified filename first (via `Content-Disposition` header) and then extract from URL on failure only — this will allow to download dynamically generated files, &quot;attachments&quot;, etc.</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 04 Dec 2021 21:14:35 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>scurl - secure curl wrapper</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="yodawins" data-post="8" data-topic="7125">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/d07c76/40.png" class="avatar"> yodawins:</div>
+<blockquote>
+<p>Maybe consider to add <code>--cert-status</code> and/or the <code>--hsts</code> option?</p>
+</blockquote>
+</aside>
+<p>Related:</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/tb-updater/commit/57e9817fd41d70462dbc04908db7bebbafa5140c" target="_blank" rel="noopener">github.com/Whonix/tb-updater</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/tb-updater/commit/57e9817fd41d70462dbc04908db7bebbafa5140c" target="_blank" rel="noopener">use `curl` with `--cert-status`</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-12-04" data-time="21:02:53" data-timezone="UTC">09:02PM - 04 Dec 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+
+      <div class="lines" title="changed 1 files with 3 additions and 2 deletions">
+        <a href="https://github.com/Whonix/tb-updater/commit/57e9817fd41d70462dbc04908db7bebbafa5140c" target="_blank" rel="noopener">
+          <span class="added">+3</span>
+          <span class="removed">-2</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">
+Thanks for @yodawins for the suggestion!
+
+https://forums.whonix.org/t/scurl-sec<span class="show-more-container"><a href="https://github.com/Whonix/tb-updater/commit/57e9817fd41d70462dbc04908db7bebbafa5140c" target="_blank" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">ure-curl-wrapper/7125/8</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubcommit">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/systemcheck/commit/f200d0fd05a097734f346e89a50fc1a4dab39574" target="_blank" rel="noopener">github.com/Whonix/systemcheck</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/systemcheck/commit/f200d0fd05a097734f346e89a50fc1a4dab39574" target="_blank" rel="noopener">use `curl` with `--cert-status`</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-12-04" data-time="21:00:57" data-timezone="UTC">09:00PM - 04 Dec 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 0 deletions">
+        <a href="https://github.com/Whonix/systemcheck/commit/f200d0fd05a097734f346e89a50fc1a4dab39574" target="_blank" rel="noopener">
+          <span class="added">+1</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">
+Thanks for @yodawins for the suggestion!
+
+https://forums.whonix.org/t/scurl-sec<span class="show-more-container"><a href="https://github.com/Whonix/systemcheck/commit/f200d0fd05a097734f346e89a50fc1a4dab39574" target="_blank" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">ure-curl-wrapper/7125/8</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/11</link>
+        <pubDate>Sat, 04 Dec 2021 21:14:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7125-11</guid>
+        <source url="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125.rss">scurl - secure curl wrapper</source>
+      </item>
+      <item>
+        <title>scurl - secure curl wrapper</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="yodawins" data-post="8" data-topic="7125">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/d07c76/40.png" class="avatar"> yodawins:</div>
+<blockquote>
+<p>Maybe consider to add <code>--cert-status</code></p>
+</blockquote>
+</aside>
+<p>That does not seem well supported.</p>
+<pre><code>scurl --head --cert-status https://www.github.com
+scurl --head --cert-status https://www.google.com
+</code></pre>
+<blockquote>
+<p>curl: (91) No OCSP response received</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/10</link>
+        <pubDate>Fri, 03 Dec 2021 12:50:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7125-10</guid>
+        <source url="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125.rss">scurl - secure curl wrapper</source>
+      </item>
+      <item>
+        <title>scurl - secure curl wrapper</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="yodawins" data-post="8" data-topic="7125">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/y/d07c76/40.png" class="avatar"> yodawins:</div>
+<blockquote>
+<p>Maybe someone could maintain a preloaded HSTS file or would that be “overkill”?</p>
+</blockquote>
+</aside>
+<p>Too heavy for Whonix project. This should be contributed to Debian project (or perhaps curl if they’d accept it). Once available, could be enabled by default in scurl.</p>
+          <p><a href="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/9</link>
+        <pubDate>Fri, 03 Dec 2021 11:20:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7125-9</guid>
+        <source url="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125.rss">scurl - secure curl wrapper</source>
+      </item>
+      <item>
+        <title>scurl - secure curl wrapper</title>
+        <dc:creator><![CDATA[yodawins]]></dc:creator>
+        <description><![CDATA[
+            <p>Maybe consider to add <code>--cert-status</code> and/or the <code>--hsts</code> option?</p>
+<p>Maybe someone could maintain a preloaded HSTS file or would that be “overkill”?</p>
+<p>Possible future additions<br>
+<code>CURLOPT_HSTS_PRELOAD</code> - provide a set of preloaded HSTS host names</p>
+<p><a href="https://curl.se/docs/hsts.html" class="onebox" target="_blank" rel="noopener nofollow ugc">https://curl.se/docs/hsts.html</a></p>
+          <p><a href="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/8</link>
+        <pubDate>Fri, 03 Dec 2021 04:43:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7125-8</guid>
+        <source url="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125.rss">scurl - secure curl wrapper</source>
+      </item>
+      <item>
+        <title>scurl - secure curl wrapper</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/usability-misc/commit/e6554d053ac78b3ddebb994bcd7c343643b1fedc" target="_blank">github.com/Whonix/usability-misc</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/usability-misc/commit/e6554d053ac78b3ddebb994bcd7c343643b1fedc" target="_blank">--tlsv1.3</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-29" data-time="20:09:48" data-timezone="UTC">08:09PM - 29 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 4 files with 4 additions and 4 deletions">
+        <a href="https://github.com/Whonix/usability-misc/commit/e6554d053ac78b3ddebb994bcd7c343643b1fedc" target="_blank">
+          <span class="added">+4</span>
+          <span class="removed">-4</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/7</link>
+        <pubDate>Thu, 29 Oct 2020 20:10:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7125-7</guid>
+        <source url="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125.rss">scurl - secure curl wrapper</source>
+      </item>
+      <item>
+        <title>scurl - secure curl wrapper</title>
+        <dc:creator><![CDATA[Xavier]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks! I’m glad to give at least a little help to this amazing project, and thanks for keep working on it! <img src="//forums.whonix.org/images/emoji/twitter/+1.png?v=9" title=":+1:" class="emoji" alt=":+1:"><br>
+I hope the next time I notice something more to fix, I could do it again instead of just trying to workaround like usually when busy with own things <img src="//forums.whonix.org/images/emoji/twitter/sweat_smile.png?v=9" title=":sweat_smile:" class="emoji" alt=":sweat_smile:"> And that time it will be easier, since I learned a lot.</p>
+          <p><a href="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/6</link>
+        <pubDate>Fri, 12 Apr 2019 15:44:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7125-6</guid>
+        <source url="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125.rss">scurl - secure curl wrapper</source>
+      </item>
+      <item>
+        <title>scurl - secure curl wrapper</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Symlinks sorted.</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/scurl/commit/e200c6e38c395406840894820ba8ae9bd8bdc374" target="_blank" rel="nofollow noopener">github.com/Whonix/scurl</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">
+    <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="https://github.com/Whonix/scurl/commit/e200c6e38c395406840894820ba8ae9bd8bdc374" target="_blank" rel="nofollow noopener">scurlget</a>
+</h4>
+
+  <pre class="message" style="white-space: normal;">curlget
+https://phabricator.whonix.org/T899
+https://forums.whonix.org/t/scurl-wrapper-problem/7125/4</pre>
+
+<div class="date">
+  by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+  on <a href="https://github.com/Whonix/scurl/commit/e200c6e38c395406840894820ba8ae9bd8bdc374" target="_blank" rel="nofollow noopener">03:24PM - 12 Apr 19 UTC</a>
+</div>
+
+<div class="github-commit-stats">
+  changed <strong>1 files</strong>
+  with <strong>8 additions</strong>
+  and <strong>0 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-post="4" data-topic="7125">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v3/letter/x/2bfe46/40.png" class="avatar"> Xavier:</div>
+<blockquote>
+<p>I sent a pull request:</p>
+</blockquote>
+</aside>
+<p>Perfect!</p>
+<p>Merged.</p>
+<aside class="quote no-group" data-post="4" data-topic="7125">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v3/letter/x/2bfe46/40.png" class="avatar"> Xavier:</div>
+<blockquote>
+<p>Not sure if I did everything right, this is my first contribution…</p>
+</blockquote>
+</aside>
+<p>Don’t worry too much about formalities. This one was rather easy and quickly to review and merge. The more difficult, the more time needed, the more on the stack, the more useful a ticket gets as a reminder.</p>
+          <p><a href="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/5</link>
+        <pubDate>Fri, 12 Apr 2019 15:26:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7125-5</guid>
+        <source url="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125.rss">scurl - secure curl wrapper</source>
+      </item>
+      <item>
+        <title>scurl - secure curl wrapper</title>
+        <dc:creator><![CDATA[Xavier]]></dc:creator>
+        <description><![CDATA[
+            <p>I sent a pull request:<br>
+</p><aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="https://github.com/Whonix/scurl/pull/1" target="_blank" rel="nofollow noopener">github.com/Whonix/scurl</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://github.com/Xavier-nix" target="_blank" rel="nofollow noopener">
+    <img alt="Xavier-nix" src="https://avatars1.githubusercontent.com/u/49506421?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="https://github.com/Whonix/scurl/pull/1" target="_blank" rel="nofollow noopener">Fix file saving issues</a>
+</h4>
+
+<div class="date">
+  by <a href="https://github.com/Xavier-nix" target="_blank" rel="nofollow noopener">Xavier-nix</a>
+  on <a href="https://github.com/Whonix/scurl/pull/1" target="_blank" rel="nofollow noopener">03:02PM - 12 Apr 19 UTC</a>
+</div>
+
+<div class="github-commit-stats">
+  <strong>2 commits</strong>
+  changed <strong>3 files</strong>
+  with <strong>3 additions</strong>
+  and <strong>3 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Also I put a tracking task on Phabricator:<br>
+<a href="https://phabricator.whonix.org/T899" class="onebox" target="_blank" rel="nofollow noopener">https://phabricator.whonix.org/T899</a></p>
+<p>Not sure if I did everything right, this is my first contribution…</p>
+<p>As for symlinks or names - I leave it on you dear developers, cause I don’t know how do it properly and which names to choose. I marked this on Phabricator as well.<br>
+Also as far as I see, there are some changes still needed anyway, like bumping of changelog or etc.</p>
+          <p><a href="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/4</link>
+        <pubDate>Fri, 12 Apr 2019 15:12:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7125-4</guid>
+        <source url="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125.rss">scurl - secure curl wrapper</source>
+      </item>
+      <item>
+        <title>scurl - secure curl wrapper</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Could you please send pull requests?</p>
+<p><a href="https://github.com/Whonix/scurl/tree/master/usr/bin" rel="nofollow noopener">https://github.com/Whonix/scurl/tree/master/usr/bin</a></p>
+<p>(Symlinks can be sorted soon by me [or anyone] through file <code>debian/scurl.links</code>.)</p>
+          <p><a href="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/3</link>
+        <pubDate>Wed, 10 Apr 2019 18:56:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7125-3</guid>
+        <source url="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125.rss">scurl - secure curl wrapper</source>
+      </item>
+      <item>
+        <title>scurl - secure curl wrapper</title>
+        <dc:creator><![CDATA[Xavier]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>short and simple names</p>
+</blockquote>
+<p><code>durl</code> / <code>sdurl</code> ?<br>
+<code>cURL</code> stands for “client URL”,<br>
+<code>dURL</code> for “download URL”.</p>
+          <p><a href="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/2</link>
+        <pubDate>Wed, 10 Apr 2019 06:35:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7125-2</guid>
+        <source url="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125.rss">scurl - secure curl wrapper</source>
+      </item>
+      <item>
+        <title>scurl - secure curl wrapper</title>
+        <dc:creator><![CDATA[Xavier]]></dc:creator>
+        <description><![CDATA[
+            <p>To workaround <code>wget</code> security issues and <code>curl</code> lack of strict SSL by default, Whonix provides <code>scurl</code> wrapper script, which invokes <code>curl</code> with a few prepared command line parameters, allowing simple secure downloads.</p>
+<p>It was a nice approach, until <a href="https://phabricator.whonix.org/T673" rel="noopener nofollow ugc">T673</a> phabricator task was resolved by this commit:<br>
+<a href="https://github.com/Whonix/scurl/commit/9006429ff7f9f39ff4dc367848ff45b690957881" rel="noopener nofollow ugc">add --remote-name so scurl can be used as wget replacement</a><br>
+And here the problem comes: this parameter <strong>enforces file saving</strong> and <strong>cannot be canceled</strong> by subsequent parameters if a user ever wants to prevent this.</p>
+<p>This new behavior broke a lot of instructions and examples in Whonix Wiki using <code>scurl</code>. As well as any manual replacement of <code>curl</code> with <code>scurl</code> for better security.<br>
+E.g. it broke <a href="https://www.whonix.org/wiki/Stream_Isolation#torsocks" rel="noopener nofollow ugc">test of per-process stream isolation</a>:</p>
+<blockquote>
+<p><code>scurl https://check.torproject.org | grep IP</code></p>
+</blockquote>
+<p>Now it even gives an error: it can’t save output to file cause can’t get a filename from URL.<br>
+So it spread outside the <a href="https://www.whonix.org/wiki/Secure_Downloads" rel="noopener nofollow ugc">scurl Wiki page</a> now (where all <code>scurl</code> commands are broken foremost, of course).</p>
+<p>It broke the whole philosophy of original approach reflected in a wrapper name<br>
+“scurl” == “secure curl”, which meant transparent replacement for <code>curl</code> with more strict policy for protocols only. File auto-saving is completely new and additional functionality outside of this concept, and should be solved the other way.</p>
+<p>And it was! Later there was added <code>scurl-download</code> wrapper (together with <code>curl-download</code>), which adds the same <code>--remote-name</code> parameter (along with <code>--location</code> to follow redirects). Corresponding documentation has also been added into <a href="https://www.whonix.org/wiki/Secure_Downloads#How-to:_Invoke_scurl-download" rel="noopener nofollow ugc">Whonix Wiki</a>.<br>
+But this parameter still remains in main <code>scurl</code> wrapper as well <img src="//forums.whonix.org/images/emoji/twitter/confused.png?v=9" title=":confused:" class="emoji" alt=":confused:"></p>
+<p>Please fix this.</p>
+<ul>
+<li>Consider removing <code>--remote-name</code> parameter from main <code>scurl</code> wrapper.</li>
+<li>Maybe consider renaming <code>scurl-download</code> / <code>curl-download</code>, or adding symlinks with short and simple names, like <code>scurld</code> / <code>curld</code> or <code>scurlget</code> / <code>curlget</code> — in case you need a short replacement for <code>wget</code> command, and long name with dash is inconvenient here for regular users.</li>
+<li>Consider improving <code>scurl-download</code> / <code>curl-download</code> wrappers:
+<ul>
+<li>Replace <code>--remote-name</code> parameter with <code>--remote-name-all</code>, which activates the same behavior for all given URLs (for multiple downloads), also allows to cancel it for any URL (by <code>"-o -"</code> or <code>--no-remote-name</code>).</li>
+<li>Add <code>--remote-header-name</code> parameter, which tells curl to try to get server-specified filename first (via <code>Content-Disposition</code> header) and then extract from URL on failure only — this will allow to download dynamically generated files, “attachments”, etc.</li>
+</ul>
+</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/1</link>
+        <pubDate>Tue, 09 Apr 2019 14:50:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7125-1</guid>
+        <source url="http://forums.whonix.org/t/scurl-secure-curl-wrapper/7125.rss">scurl - secure curl wrapper</source>
+      </item>
+  </channel>
+</rss>

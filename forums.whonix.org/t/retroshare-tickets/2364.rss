@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>RetroShare tickets</title>
+    <link>http://forums.whonix.org/t/retroshare-tickets/2364</link>
+    <description>Opened to keep track of tickets:
+
+https://github.com/RetroShare/RetroShare/issues/355
+
+https://github.com/RetroShare/RetroShare/issues/356
+
+https://github.com/RetroShare/RetroShare/issues/357</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 10 Jan 2017 15:04:59 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/retroshare-tickets/2364.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>RetroShare tickets</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Did that work?</p>
+<hr>
+<p>As for <a href="https://www.whonix.org/wiki/Chat#RetroShare">https://www.whonix.org/wiki/Chat#RetroShare</a> chapter <a href="https://www.whonix.org/wiki/Chat#Tor">https://www.whonix.org/wiki/Chat#Tor</a>…</p>
+<blockquote>
+<p>INCOMPLETE - Depends on unimplemented features for Whonix<a href="https://github.com/RetroShare/RetroShare/issues/356">[15]</a></p>
+</blockquote>
+<p>I guess the server listens on 127.0.0.1 so the hidden service from the gateway cannot reach it?</p>
+<p><a href="https://github.com/yongboy/bindp">bindp</a> can help here.</p>
+<p>In <a href="https://phabricator.whonix.org/T561">T561</a> uwt was updated to do in essence:</p>
+<pre><code class="lang-auto">BIND_ADDR=10.152.152.11
+LD_PRELOAD+=' /usr/lib/uwt/libindp.so'
+export BIND_ADDR
+export LD_PRELOAD
+onionshare ...
+</code></pre>
+<p>It forcefully changes the bind address from the local IP to the eth0 IP. Compilation for bindp should be simple. Basically just just <code>make</code>. Or with all the compilation flags (copied from Debian).</p>
+<pre><code>gcc -nostartfiles -fpic -shared bindp.c -o libindp.so -ldl -D_GNU_SOURCE -D_FORTIFY_SOURCE=2 -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security -fPIE -pie -Wl,-z,relro -Wl,-z,now
+</code></pre>
+<p>(Otherwise I could also provide updated uwt from the testers repository.)</p>
+<p>Once you have <code>libindp.so</code>, you can use it from the command line.</p>
+<pre><code>BIND_ADDR=10.152.152.11 LD_PRELOAD='/path/to/libindp.so' retroshare
+</code></pre>
+<p>Can you try please? Because if that works, we can automate changing the listener address in the uwt package (basically just another wrapper and config variable).</p>
+          <p><a href="http://forums.whonix.org/t/retroshare-tickets/2364/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/retroshare-tickets/2364/7</link>
+        <pubDate>Tue, 10 Jan 2017 15:04:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2364-7</guid>
+        <source url="http://forums.whonix.org/t/retroshare-tickets/2364.rss">RetroShare tickets</source>
+      </item>
+      <item>
+        <title>RetroShare tickets</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Replace port number(s) 9050.</p>
+<pre><code>socat TCP-LISTEN:9050,fork TCP:10.152.152.10:9050
+</code></pre>
+<p>Or edit <code>/etc/rinetd.conf</code>. (Will lead to interactive dpkg configuration conflict resolution message when that file gets changed.) And restart rinetd.</p>
+<p>Related to:<br>
+<a href="https://phabricator.whonix.org/T464" class="onebox" target="_blank">https://phabricator.whonix.org/T464</a></p>
+          <p><a href="http://forums.whonix.org/t/retroshare-tickets/2364/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/retroshare-tickets/2364/6</link>
+        <pubDate>Thu, 05 May 2016 23:46:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2364-6</guid>
+        <source url="http://forums.whonix.org/t/retroshare-tickets/2364.rss">RetroShare tickets</source>
+      </item>
+      <item>
+        <title>RetroShare tickets</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Yeah that should work. Can you give example commands for socat so I can document them?</p>
+          <p><a href="http://forums.whonix.org/t/retroshare-tickets/2364/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/retroshare-tickets/2364/5</link>
+        <pubDate>Thu, 05 May 2016 18:10:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2364-5</guid>
+        <source url="http://forums.whonix.org/t/retroshare-tickets/2364.rss">RetroShare tickets</source>
+      </item>
+      <item>
+        <title>RetroShare tickets</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="3" data-topic="2364">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Issue: Allow alternative proxy addresses</p>
+</blockquote>
+</aside>
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/RetroShare/RetroShare/issues/356" target="_blank" rel="nofollow noopener">github.com/RetroShare/RetroShare</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/HulaHoopWhonix" rel="nofollow noopener">
+<img src="https://avatars1.githubusercontent.com/u/7875239?v=2&amp;s=96" class="thumbnail onebox-avatar" width="420" height="420">
+</a>
+
+<h4><a href="https://github.com/RetroShare/RetroShare/issues/356" target="_blank" rel="nofollow noopener">Issue: Allow alternative proxy addresses</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/HulaHoopWhonix" target="_blank" rel="nofollow noopener">HulaHoopWhonix</a>
+	on <a href="https://github.com/RetroShare/RetroShare/issues/356" target="_blank" rel="nofollow noopener">2016-04-23</a>
+	</div>
+	<div class="user">
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">In WhonixOS we run Tor on a different VM than the one where RetroShare is for improved security thru isolation. Please...</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">enhancement</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">idea</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>In meanwhile we could redirect the local address to Whonix-Gateway using rinetd / socat like we are already doing for Tor Browser (anon-ws-disable-stacked-tor), no?</p>
+          <p><a href="http://forums.whonix.org/t/retroshare-tickets/2364/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/retroshare-tickets/2364/4</link>
+        <pubDate>Thu, 05 May 2016 03:48:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2364-4</guid>
+        <source url="http://forums.whonix.org/t/retroshare-tickets/2364.rss">RetroShare tickets</source>
+      </item>
+      <item>
+        <title>RetroShare tickets</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Its this feature that’s necessary:</p>
+<blockquote>
+<p>Issue: Allow alternative proxy addresses</p>
+</blockquote>
+<p>I’ll make a footnote.</p>
+          <p><a href="http://forums.whonix.org/t/retroshare-tickets/2364/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/retroshare-tickets/2364/3</link>
+        <pubDate>Thu, 05 May 2016 03:34:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2364-3</guid>
+        <source url="http://forums.whonix.org/t/retroshare-tickets/2364.rss">RetroShare tickets</source>
+      </item>
+      <item>
+        <title>RetroShare tickets</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <ul>
+<li><a href="https://www.whonix.org/wiki/Chat#RetroShare">https://www.whonix.org/wiki/Chat#RetroShare</a></li>
+<li><a href="https://www.whonix.org/wiki/Chat#Tor">https://www.whonix.org/wiki/Chat#Tor</a></li>
+</ul>
+<p>Chapter Retroshare, sub chapter Tor, quote:</p>
+<blockquote>
+<p>INCOMPLETE - Depends on unimplemented features for Whonix</p>
+</blockquote>
+<p>Which are these unimplemented features for Whonix? Would be good to name as a footnote so these can one day be implemented. Or someone badly wanting this could then jump in an contribute exactly that.</p>
+          <p><a href="http://forums.whonix.org/t/retroshare-tickets/2364/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/retroshare-tickets/2364/2</link>
+        <pubDate>Wed, 27 Apr 2016 20:35:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2364-2</guid>
+        <source url="http://forums.whonix.org/t/retroshare-tickets/2364.rss">RetroShare tickets</source>
+      </item>
+      <item>
+        <title>RetroShare tickets</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Opened to keep track of tickets:</p>
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/RetroShare/RetroShare/issues/355" target="_blank" rel="nofollow noopener">github.com/RetroShare/RetroShare</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/HulaHoopWhonix" rel="nofollow noopener">
+<img src="https://avatars1.githubusercontent.com/u/7875239?v=2&amp;s=96" class="thumbnail onebox-avatar" width="420" height="420">
+</a>
+
+<h4><a href="https://github.com/RetroShare/RetroShare/issues/355" target="_blank" rel="nofollow noopener">Issue: Upgrade signing key to 4096</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/HulaHoopWhonix" target="_blank" rel="nofollow noopener">HulaHoopWhonix</a>
+	on <a href="https://github.com/RetroShare/RetroShare/issues/355" target="_blank" rel="nofollow noopener">2016-04-23</a>
+	</div>
+	<div class="user">
+	closed by <a href="https://github.com/cavebeat" target="_blank" rel="nofollow noopener">cavebeat</a>
+	on <a href="https://github.com/RetroShare/RetroShare/issues/355" target="_blank" rel="nofollow noopener"></a>
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">Please upgrade your release signing key to 4096 bits. 1024 is no longer secure against adversaries with large computing power.</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">bug</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/RetroShare/RetroShare/issues/356" target="_blank" rel="nofollow noopener">github.com/RetroShare/RetroShare</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/HulaHoopWhonix" rel="nofollow noopener">
+<img src="https://avatars1.githubusercontent.com/u/7875239?v=2&amp;s=96" class="thumbnail onebox-avatar" width="420" height="420">
+</a>
+
+<h4><a href="https://github.com/RetroShare/RetroShare/issues/356" target="_blank" rel="nofollow noopener">Issue: Allow alternative proxy addresses</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/HulaHoopWhonix" target="_blank" rel="nofollow noopener">HulaHoopWhonix</a>
+	on <a href="https://github.com/RetroShare/RetroShare/issues/356" target="_blank" rel="nofollow noopener">2016-04-23</a>
+	</div>
+	<div class="user">
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">In WhonixOS we run Tor on a different VM than the one where RetroShare is for improved security thru isolation. Please...</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">enhancement</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">idea</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/RetroShare/RetroShare/issues/357" target="_blank" rel="nofollow noopener">github.com/RetroShare/RetroShare</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/HulaHoopWhonix" rel="nofollow noopener">
+<img src="https://avatars1.githubusercontent.com/u/7875239?v=2&amp;s=96" class="thumbnail onebox-avatar" width="420" height="420">
+</a>
+
+<h4><a href="https://github.com/RetroShare/RetroShare/issues/357" target="_blank" rel="nofollow noopener">Issue: Allow using multiple anonymization networks simultaneously</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/HulaHoopWhonix" target="_blank" rel="nofollow noopener">HulaHoopWhonix</a>
+	on <a href="https://github.com/RetroShare/RetroShare/issues/357" target="_blank" rel="nofollow noopener">2016-04-23</a>
+	</div>
+	<div class="user">
+	closed by <a href="https://github.com/defnax" target="_blank" rel="nofollow noopener">defnax</a>
+	on <a href="https://github.com/RetroShare/RetroShare/issues/357" target="_blank" rel="nofollow noopener">2016-06-15</a>
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">When configuring RetroShare to use I2P I noticed that I cannot configure it to listen on Tor. Please allow incoming connections...</pre>
+
+<div class="labels">
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/retroshare-tickets/2364/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/retroshare-tickets/2364/1</link>
+        <pubDate>Sat, 23 Apr 2016 01:40:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2364-1</guid>
+        <source url="http://forums.whonix.org/t/retroshare-tickets/2364.rss">RetroShare tickets</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,1611 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>scripts to shrink vbox and kvm images</title>
+    <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724</link>
+    <description>i have played with a couple scripts in order to keep the virtual hd images in both virtualbox and kvm from ballooning out of control. the virtualbox script was included in the last short-lived version of the guide i work on. the kvm script is still experimental. i&#39;m posting both here if anyone would like to review or tweak. basically, they search a directory for hd images that have been modified in the past hour, and apply routines to reduce the size. both rely on &quot;zerofree&quot; in some respects. however, the kvm script also has an option to use the qemu compression option. both scripts have resulted in the freeing of gigabytes of hard drive space on the host when used. feedback welcomed.
+
+**vbox script**
+
+this script requires a user to boot into recovery mode, mount the hd as readonly, and run zerofree on it first.
+
+from a terminal, type
+`echo &quot;alias vbcompact=&#39;find ~/VirtualBox\ VMs/ \
+-type f -mtime -1 -size +10M -name *.vdi \
+-exec vboxmanage modifymedium --compact {} t {} \;&#39;&quot; &gt;&gt; ~/.bashrc`
+
+typing &quot;vbcompact&quot; later will search through the default virtualbox directory and attempt to compact any &quot;vdi&quot; file modified in the past hour. 
+
+**kvm script**
+
+this script will also see advantages from booting into recovery mode, mounting the hds readonly, and running zerofree. however, qemu compression may negate that, but may take longer. i ran into a couple issues with snapshots not working here and there after this process, which i&#39;m exploring.
+
+this one is a little more involved. it&#39;s to be appended to a user&#39;s .bashrc file.
+
+    function vmshrink() { list=$(sudo find /var/lib/libvirt/images/ -type f -mtime -1 -size +10M -name *.qcow2)
+    	for f in $list
+    	do
+    	# ask if user wants to shrink image
+    	read -e -p &quot;Shrink $f? [y/N] &quot; choice
+    	if [[ &quot;$choice&quot; == [Yy]* ]]
+    	   then
+    	    #&quot;yes&quot; choice. show file size and move original to a back up file.
+    	    ls -lh $f
+    	    sudo mv $f $f.backup
+    	    # ask if user wants to use qemu compression
+    	    read -e -p &quot;Do you want to enable disk compression on $f? [y/N] &quot; choice2
+                if [[ &quot;$choice2&quot; == [Yy]* ]]
+                  then 
+                    #&quot;yes&quot; choice. apply qemu compression.
+    		sudo qemu-img convert -O qcow2 -p -c $f.backup $f
+    	      else
+    	        #&quot;no&quot; choice. convert to remove space changed by zerofree only.
+    		sudo qemu-img convert -O qcow2 -p $f.backup $f
+    	    fi
+    	    ls -lh $f
+    	    # ask if user wants to delete the back up copy.
+    	    read -e -p &quot;Please run the vm to confirm it still works. If it works, you can remove the back up. Remove $f.backup? [y/N] &quot; choice3
+    		if [[ &quot;$choice3&quot; == [Yy]* ]]
+    	          then
+    		    #&quot;yes&quot; choice. delete backup
+    		    sudo rm $f.backup
+    		elif [[ &quot;$choice3&quot; != [Yy]* ]]
+    		  then
+    		    #&quot;no&quot; choice. ask if user wants to restore backup.
+    		    read -e -p &quot;Restore backup? [y/N] &quot; choice4
+    		    if [[ &quot;$choice4&quot; == [Yy]* ]]
+                           then
+    			  #restore backup
+                              sudo mv $f.backup $f
+    		fi
+    	fi
+    fi
+    done }
+
+the goal of both scripts was to make the process of shrinking hd images after a dist-upgrade a little simpler, rather than having to type the individual commands for each individual file.</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 03 Feb 2020 05:59:58 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <p>additionally, i am encountering an error when trying to create an external snapshot with virsh for additional “secondary” disk images which are used for persistent storage. i expected this and will research it more.</p>
+<p>an alternative method for creating snapshots for additional disks, assuming one would want to do that (i think creating backups on the additional disk makes more sense), is to create thin provisioned images for additional disks as well. while i think it is easier to keep all the files for additional disks confined to one file, i could just as easily create an additional “move your disks to another computer” script which could export the appropriate vm related xml, commit the most recent thin provisioned image to the backing file, and compress it to a tar file, ideally with a script to run that could export it into a kvm instance later. it would be similar to exporting an “ova” file from an existing virtualbox virtual machine.</p>
+<p>so, there may end up being 3-4 tools here if anyone thinks it is worth it (deballoon+snapshot script, snapshot only script, snapshot restore and management script, backup/“copy to another computer” script.).</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/42">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/42</link>
+        <pubDate>Mon, 03 Feb 2020 05:54:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-42</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <p>i’m debugging a new “alpha” version right now. it’s a little more of a complex process than i expected.</p>
+<p>so far, it will create the thin images. if a user chooses to create a snapshot of the primary disk images, it will check for a “deballoon-snapshots” directory in the same directory where the disk image is located, create a unique subdirectory named after the disk image in the “deballoon-snapshots” directory, and create a snapshot file in the subdirectory that includes the date and time in the file name. if the snapshot directories do not exist, the script will create them.  i named the main snapshot directory “deballoon-snapshots” so that nobody will confuse it with a snapshot directory created by virt-manager.</p>
+<p>also, various lock files are created at different steps in the script to determine where a crash occurred or where a user hit ctrl-c. the checking for the lock files throughout the script is where it has gotten a little complex.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/41">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/41</link>
+        <pubDate>Mon, 03 Feb 2020 05:23:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-41</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="39" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>That is a weird but possible corner case.</p>
+<p>Again without me fully understanding it:<br>
+Would it be sane not asking the user and just overwrite $f.temp?</p>
+</blockquote>
+</aside>
+<p>it would not be sane if the user is keeping it as a rollback file.  it’s unlikely, yes. however, i could better address this if i made the storing of the .temp file as a snapshot image and then create another user script to manage them.  i just haven’t moved that far into the project yet.</p>
+<p>with the current script, a temp “copy” is not made. rather, the original image to be shrunken is renamed to $f.temp. this was done to minimize the amount of disk writes and disk space needed. in that regard, the “$f.temp” file could be treated as the lock file as well. i could rewrite the script to automatically remove $f.temp if a user decides that they don’t want to restore from $f.temp after they boot the virtual machine.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>That’s a new word in my non-native English speaker brain dictionary. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+</blockquote>
+</aside>
+<p>it means “to scold.” lol.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/40">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/40</link>
+        <pubDate>Sun, 02 Feb 2020 18:42:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-40</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="tempest" data-post="38" data-topic="8724">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tempest/40/349_2.png" class="avatar"> tempest:</div>
+<blockquote>
+<p>if $f.lock file is not present, but old $f.temp is present, ask the user what they want to do with $f.temp (restore, erase, etc.).</p>
+</blockquote>
+</aside>
+<p>That is a weird but possible corner case.</p>
+<p>Again without me fully understanding it:<br>
+Would it be sane not asking the user and just overwrite $f.temp?</p>
+<aside class="quote no-group" data-username="tempest" data-post="38" data-topic="8724">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tempest/40/349_2.png" class="avatar"> tempest:</div>
+<blockquote>
+<p>admonishment</p>
+</blockquote>
+</aside>
+<p>That’s a new word in my non-native English speaker brain dictionary. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/39">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/39</link>
+        <pubDate>Fri, 31 Jan 2020 15:20:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-39</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <p>i think i can do that.</p>
+<p>if $f.lock file is present, assume crash and use old $f.temp file for process.</p>
+<p>if $f.lock file is not present, but old $f.temp is present, ask the user what they want to do with $f.temp (restore, erase, etc.).</p>
+<p>btw, to clarify the statement i made earlier about not taking this personally, since that likely came off as confusing, i misread the “principle of least astonishment” as “the principle of least <em><strong>admonishment</strong></em>” and had visions of some odd linus torvalds folk rule.  lol! my apologies for any confusion.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/38">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/38</link>
+        <pubDate>Fri, 31 Jan 2020 15:03:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-38</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I am suggesting a lockfile mechanism.</p>
+<p>sudo touch /path/to/started-some-action<br>
+run long running command that might be aborted or fail<br>
+rm -f /path/to/started-some-action</p>
+<p>Next time the script runs it can check if /path/to/started-some-action exists. If yes, you know that “run long running command that might be aborted or fail” previously did not complete. Therefore you can run “run long running command that might be aborted or fail” without asking the user.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/37">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/37</link>
+        <pubDate>Fri, 31 Jan 2020 14:38:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-37</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="35" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Well, if the “.temp” status file still exists which indicates that the<br>
+process previously did not complete, then there is even no need to ask<br>
+the user? Could this be handled the same way as “did not exist yet”?</p>
+</blockquote>
+</aside>
+<p>based on the options that are currently presented to a user, there is the potential for a user to choose not to delete the .temp file, even if everything is working.  so, the presence of a .temp file may not be evidence of a crash or something else going wrong. for example, it may involve a user who wanted to play with the recently changed vm that wants to keep the .temp file as a backup in case they want to roll back the vm to a previous state.  or, it simply could involve a scenario where the user pressed “enter” to quickly when asked if they want to remove the .temp file and, since the script defaults to treat the choice as “no,” the .temp file is simply a useless extra file.</p>
+<p>i could set the script to automatically run from the conversion steps if a .temp file is located.  however, if a user had recently made changes to the current disk image that they intend to keep, automatically converting from the old .temp image would erase those changes.</p>
+<p>so, i think presenting the user with a prompt about the presence of the .temp images, and then offering options that may include “restore the temp file,” “create a new shrunken image from the temp file,” or “delete the temp file” is probably the safer option.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/36">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/36</link>
+        <pubDate>Fri, 31 Jan 2020 14:33:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-36</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>tempest via Whonix Forum:</p>
+<blockquote>
+<p>however, i will remove the time restriction and explore having the script inform the user that a file has not been recently modified. that may make more sense.</p>
+</blockquote>
+<p>Nice.</p>
+<blockquote>
+<p>true. the first step of the script that physically alters a file is when the image is moved to the “.temp” file. the final run of the routine, assuming a user decides that the process was successful, removes the the “.temp” file.  so, a simplistic means of addressing such crash scenarios could be to have the script check if a “.temp” file exists before proceeding and, if it does, inform the user about it while mentioning the above referenced crash scenarios, and ask if they want to restore from it.</p>
+</blockquote>
+<p>Well, if the “.temp” status file still exists which indicates that the<br>
+process previously did not complete, then there is even no need to ask<br>
+the user? Could this be handled the same way as “did not exist yet”?</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/35">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/35</link>
+        <pubDate>Fri, 31 Jan 2020 10:17:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-35</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="33" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Generally, I might not be getting the full context of this. I wasn’t<br>
+considering live mode or the context in which this might appear in the<br>
+guide. I was looking at it from a very generalized perspective. Such as<br>
+for inclusion into the usability-misc package. For users who don’t read<br>
+your guide, don’t use live mode and just use the default images for<br>
+everything. For these an /easy/tool/to/compact-vm would be cool.</p>
+</blockquote>
+</aside>
+<p>the script should work as intended for someone who is using a default kvm whonix package in persistent mode.  in fact, to get it to work for someone using the “live mode” function generally with the flag in virt-manager set to “readonly” on the disk, additional steps outside of the script need to be taken. however, i will remove the time restriction and explore having the script inform the user that a file has not been recently modified. that may make more sense.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>As per murphy’s law, anything can go wrong, will go wrong. At some<br>
+point, someone will cancel/out of memory killed/power loss within an<br>
+operation (such as running qemu-img) and then lead to unexpected<br>
+results. At some point such users are going to ask about it in the forums.</p>
+<p>Therefore I am trying to foresee such situations and prevent these if<br>
+possible. Scripts should be idempotent.</p>
+<p><a href="https://arslan.io/2019/07/03/how-to-write-idempotent-bash-scripts/" rel="nofollow noopener">https://arslan.io/2019/07/03/how-to-write-idempotent-bash-scripts/</a></p>
+<p>Ideally, no matter where a previous run of the script might have been<br>
+interrupted, a re-run of the script shouldn’t make assumptions about<br>
+previous runs. Otherwise murphy’s law is going to hit in future.</p>
+<p>Sometimes a script can make assumptions about previous runs. For<br>
+example, if an action (such as qemu-img something) succeeded, a success<br>
+file can be created. Next time the script is run, use of that success<br>
+file would be reliable. (Well, it wouldn’t cover cases in which data<br>
+corruption damaged the file. (<code>echo "" &gt; /path/to/file</code>) Ideally there<br>
+would be a sanity test but I doubt that exists. md5sum might be<br>
+sufficient here since fast and not a security relevant test?</p>
+</blockquote>
+</aside>
+<p>true. the first step of the script that physically alters a file is when the image is moved to the “.temp” file. the final run of the routine, assuming a user decides that the process was successful, removes the the “.temp” file.  so, a simplistic means of addressing such crash scenarios could be to have the script check if a “.temp” file exists before proceeding and, if it does, inform the user about it while mentioning the above referenced crash scenarios, and ask if they want to restore from it.  i can play with this to attempt to be more cautious about such scenarios.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>Ah. Indeed. <code>backingcreate=n</code> happens inside the loop. What confused me<br>
+about:</p>
+<pre><code class="lang-auto">backingcreate=n
+
+# End the for loop that corresponds to primary disk images.
+done
+</code></pre>
+<p>is that <code>backingcreate=n</code> is not properly intend’ed (needs spaces in<br>
+front of it to indicate it’s part of something (something could be a<br>
+loop or function) and not standalone at the “top level” (outside of any<br>
+function or loop).</p>
+</blockquote>
+</aside>
+<p>i will put a couple spaces with it to line it up with the first if statement. that will make it more clear that it is part of the corresponding for loop.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>Probably best discussed in separate thread since different functionality?</p>
+</blockquote>
+</aside>
+<p>it is a different functionality, yes.  however, it would be simple enough to add an additional routine that asks “do you want to create a snapshot of the disk image’s current disk state.”  something else to mull over.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/34">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/34</link>
+        <pubDate>Thu, 30 Jan 2020 15:24:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-34</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>tempest via Whonix Forum:</p>
+<blockquote>
+<p>but, absent a warning in instructions, i’m not quite sure how to address it.</p>
+</blockquote>
+<p>Me neither.</p>
+<p>Generally, I might not be getting the full context of this. I wasn’t<br>
+considering live mode or the context in which this might appear in the<br>
+guide. I was looking at it from a very generalized perspective. Such as<br>
+for inclusion into the usability-misc package. For users who don’t read<br>
+your guide, don’t use live mode and just use the default images for<br>
+everything. For these an /easy/tool/to/compact-vm would be cool. One<br>
+tool could be /path/to/compact-this-disk-image. Or<br>
+/path/to/compact-disk-images-of-vm-by-vm-name. Also also compact-all-vms.</p>
+<p>As per murphy’s law, anything can go wrong, will go wrong. At some<br>
+point, someone will cancel/out of memory killed/power loss within an<br>
+operation (such as running qemu-img) and then lead to unexpected<br>
+results. At some point such users are going to ask about it in the forums.</p>
+<p>Therefore I am trying to foresee such situations and prevent these if<br>
+possible. Scripts should be idempotent.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://arslan.io/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://arslan.io/2019/07/03/how-to-write-idempotent-bash-scripts/" target="_blank">arslan.io</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/460;"><img src="https://arslan.io/images/how-to-write-idempotent-bash-scripts-1.jpeg" class="thumbnail" width="690" height="460"></div>
+
+<h3><a href="https://arslan.io/2019/07/03/how-to-write-idempotent-bash-scripts/" target="_blank">How to write idempotent Bash scripts · Fatih Arslan</a></h3>
+
+<p>This blog post shows tips and tricks to write resilient and idempotent bash scripts.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Ideally, no matter where a previous run of the script might have been<br>
+interrupted, a re-run of the script shouldn’t make assumptions about<br>
+previous runs. Otherwise murphy’s law is going to hit in future.</p>
+<p>Sometimes a script can make assumptions about previous runs. For<br>
+example, if an action (such as qemu-img something) succeeded, a success<br>
+file can be created. Next time the script is run, use of that success<br>
+file would be reliable. (Well, it wouldn’t cover cases in which data<br>
+corruption damaged the file. (<code>echo "" &gt; /path/to/file</code>) Ideally there<br>
+would be a sanity test but I doubt that exists. md5sum might be<br>
+sufficient here since fast and not a security relevant test?</p>
+<p>I am also wondering if parts of this could be refactored. A guided<br>
+compact all images could also call an external script<br>
+/path/to/compact/just/one/image.</p>
+<blockquote>
+<p>first and foremost, i am not taking any of this personally.</p>
+</blockquote>
+<p>It’s certainly not personal.</p>
+<blockquote>
+<p>critique as much as possible. i am working on this in my free time which is limited. thus, there is room for much perfection here that i will miss.</p>
+</blockquote>
+<p>Sure.</p>
+<blockquote>
+<p>perhaps it would make more sense if i simply explained in output to the user from the script that images not modified in the past 24 hours will not be touched?</p>
+</blockquote>
+<p>I think so.</p>
+<blockquote>
+<p>check the end of the if statement that creates the backing image. it is set to “y” at that point. if the for loop catches other disks where a backimg image is not created, but a backing image exists, if the user chooses to remove the “temp” file, it will also remove the backing image without this flag set, unless i am mistaken.</p>
+</blockquote>
+<p>Ah. Indeed. <code>backingcreate=n</code> happens inside the loop. What confused me<br>
+about:</p>
+<pre><code class="lang-auto">backingcreate=n
+
+# End the for loop that corresponds to primary disk images.
+done
+</code></pre>
+<p>is that <code>backingcreate=n</code> is not properly intend’ed (needs spaces in<br>
+front of it to indicate it’s part of something (something could be a<br>
+loop or function) and not standalone at the “top level” (outside of any<br>
+function or loop).</p>
+<blockquote>
+<p>i could probably do that and create another script for snapshot restoration purposes that currently aren’t available in virt-manager with this process.</p>
+</blockquote>
+<p>Probably best discussed in separate thread since different functionality?</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/33">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/33</link>
+        <pubDate>Thu, 30 Jan 2020 10:34:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-33</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="31" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>What if the backing image exists but is broken? Such as when the machine crashed, was powered off, rebooted or the process interrupted last time the script was run?</p>
+</blockquote>
+</aside>
+<p>since the backing image is read only, this should not matter. virtual machine crashes won’t affect the state of the backing image. absent disk corruption, the backing image should be rock solid. additionally, since the disk images, per instructions, should be in a read only state in order to get the full advantages of “live mode,” a new image created from a disk image that would be problematic from such crashes would have to involve a crash where someone was executing the zerofree run after an upgrade procedure or the installation of new software in a persistent mode setting, since the vm should always be run in “live mode” with the “readonly” flag set to “true” on the virtual disk otherwise. for this reason, after new images are created, the user is prompted to run the vm to make sure it boots and the data is readable before removing the temp file. if it is not bootable, or data is not readable, the user is given the option to restore the temp file, which will return the vm to its state before such a problem occurred. if such a problematic crash occurred before the zerofree run and the running of the script, it wouldn’t be script related and i’m not sure how this script could address it. instead, this would require instructions informing the user to backup their image before they put it in persistent mode to either do a dist-upgrade or install new software. but, that would be a whonix qemu/kvm use problem that exists outside of this script.</p>
+<aside class="quote no-group">
+<blockquote>
+<hr>
+<p>Currently:</p>
+<p>If no backing image exists:</p>
+<pre><code>qemu-img convert -O qcow2 -p "$f".temp "$f".backing.image
+qemu-img create -f qcow2 -b "$f".backing.image "$f"
+</code></pre>
+<p>If backing image exists:</p>
+<pre><code>qemu-img convert -B "$f".backing.image -O qcow2 -p "$f".temp "$f"
+</code></pre>
+<p>I don’t understand why these are two different procedures / commands.</p>
+</blockquote>
+</aside>
+<p>the first part of the above creates a backing image and creates a new thin provisioned image that refers to the backing image. the second part, which executes only if a backing image exists, the script converts a previously existing thin provisioned image to a new thin provisioned image that copies the data from the old thin provisioned image, which exists as the main disk that kvm boots. based on how the existing kvm config works, it refers to one unique specific file name for booting whonix. the script is written to work seamlessly with that in mind.</p>
+<p>if the former executed every time, it would treat the thin provisioned image as the main disk, and then make it the backing image from which a new thin provisioned image would be created. this would result in data loss, since the majority of the data that makes up whonix would be erased, as a thin provisioned image does not include all the data of a backing image.</p>
+<p>the commands involved are different. when no backing image is detected, a routine is run to remove the zero written space from the existing image and making it a backing image. then a command is executed to create a new thin provisioned image from there. the part that runs when a backing image already exists copies the existing thin provisioned image to a temp file and creates a new thin provisioned from there, which includes all the data in the old thin provisioned image, and refers to the backing image as the base.</p>
+<p>to simplify the above, when a backing image does not exist, a backing image is created and a thin provisioned disk is CREATED that refers to the the backing image.</p>
+<p>when a backing image and thin provisioned image does exist, the thin provisioned image is CONVERTED into a new image that refers to the backing image.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>Shouldn’t that be…?</p>
+<pre><code>if no backing image exists:
+    create backing image
+
+continue steps that assume existence of backing image (out side the if)
+</code></pre>
+</blockquote>
+</aside>
+<p>no. because, when the backing image doesn’t exist, the backing image is created and a new thin provisioned image is created that uses it. when the backing image already exists with a corresponding thin provisioned image, the script converts the old thin provisioned image into a new one, which preserves the data from the old thin provisioned image. if it created a thin provisioned image from the exsting backing image every time, rather than the existing thin provisioned image, all the data in the existing thin provisioned image would be lost, since the backing image would be used is as the base, and thus upgrades contained in the existing thin provisioned image that were implemented at times would be lost. perhaps i’m overlooking something here (my sleep and work has been off lately). but, the way it is scripted does not pose the risk of data loss, which would require more downloads to make whonix current with the latest upgrades and require more disk writes.</p>
+<p>these are separate and distinct commands. when no backing image exists, a thinner backing image is created and a brand new thin provisioned image that refers to it is created. when the backing image already exists, the existing thin provision image is used to create a new thin provisioned image that refers to the backing image.</p>
+<aside class="quote no-group">
+<blockquote>
+<blockquote>
+<p>Why care about past 24 hours?</p>
+</blockquote>
+<p>That I find a leap. Take a simpler use case. Someone using only Whonix-Gateway and Whonix-Workstation. The runs the shrink script. Nothing happens and the user doesn’t even know why. Maybe this would be a useful optional feature but a non-configurable default feature seems surprising, confusing.</p>
+<p>I am trying to follow principle of least astonishment here.</p>
+<p><a href="https://en.wikipedia.org/wiki/Principle_of_least_astonishment" rel="nofollow noopener">https://en.wikipedia.org/wiki/Principle_of_least_astonishment</a></p>
+</blockquote>
+</aside>
+<p>first and foremost, i am not taking any of this personally. critique as much as possible. i am working on this in my free time which is limited. thus, there is room for much perfection here that i will miss. also, i wrote this script with instructions that i will be providing to users that reference my guide in mind. so, that will color this script. if i am making problematic errors in that regard, they absolutely need to be adressed. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<p>on this section, the goal is to prevent someone from executing unneeded disk writes. while i could leave as an option involved, perhaps it would make more sense if i simply explained in output to the user from the script that images not modified in the past 24 hours will not be touched? i could tweak the script to give a message that “this image has not been modified in the past 24 hours and likely does not need to be processed.” or, i could provide a prompt that states something like "if you did not run zerofree in recovery mode on this image since you last ran this script, you can choose “no.”  with those, i could remove the time restriction if you think it is more beneficial.  but, especially for an ssd drive, if someone simply ignores it and runs the process, it will result in additional disk writes that will result in no benefit.</p>
+<p>since the script will only run on an image where someone has set it in persistent mode in the past 24 hours, they will arguably run it within that time frame after they have manually done a zerofree run. again, this is something i could explain in the script.  but, it makes more sense to explain in the instructions on how to put the vm into a state where the script will be useful.  if they don’t run the script within 24 hours of a manual zerofree run in persistent mode, the next time they run a zerofree run in persistent mode, the same beneficial results will occur if they run the script within 24 hours. so, the only downside here is an extra length of time for a larger disk i believe.</p>
+<p>this is arguably a scenario where virt-sparisfy work as a better tool, since it would take all user guessing out of it, doesn’t require a manual zerofree run, and could be set to simply run on every image located. but, based on my tests, it involves mcuh greater writing of data that is not required, and may pose problems for people using smaller disks, particularly for people using a msall usb thumb drive that is not affected in the same way based on how the script is currently written.</p>
+<aside class="quote no-group">
+<blockquote>
+<blockquote>
+<p>Why distinguish between non-persistent and persistent disks?</p>
+</blockquote>
+<p>That is also a very personalized conclusion. Many users probably are not using secondary disk images. Only the defaults and have everything there.</p>
+</blockquote>
+</aside>
+<p>if they do not have a secondary disk, this part of the script will not appear. for people who use a secondary disk to store persistent data, such as emails, gpg keys, ssh keys, etc, it will. it’s personalized in the sense that i’ve taken into consideration that users may have followed the instructions i’ve written to preserve email, keepassxc, ssh, gpg, etc, related files on a persistent hd, which would otherwise get forgotten in a straight “all files on one virtual hd” live mode config with kvm. thus, it offers the ability to have live mode forget any changes to the core / files on reboot, while preserving others that may be changed, and need to be persistent, in common use.</p>
+<p>this may warrant another discussion. unless i’ve missed something, the only other method i’ve seen discussed to store persistent data is to open the host hd to saving files in a shared folder. aside from opening the host hd to potential malware writes, i believe there are also issues involving snapshotting or other things if users remove files from a shared directory from inside the vm. so, using a secondary persistent virtual disk seemed cleaner. but, i could be mistaken there. the persistent virtual disk is also obviously susceptible to malware writes. but, it made more sense to me to confine such a threat to a virtual disk rather than the host disk.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>If that sounds cumbersome additional disks then this is also cumbersome for primary disks. I guess there is a huge number (absolute majority) of users only using primary and no additional disks.</p>
+</blockquote>
+</aside>
+<p>true. however, perhaps it is a false assumption on my part. i’m envisioning a scenario where someone had an issue with the base whonix os image, and wanted to reinstall a new version. in that regard, they are unlikely to copy the primary disk over. rather, they will create a new vm from a fresh whonix install. for the secondary disks, which contain custom personalized data, it’s simply easier to add that as an addtional disk, and mount it from the /etc/fstab in the new whonix image. if the secondary disks used the backing image method, they’d first need to commit the thin provisioned disk image to the backing image if they make a copy, which is an extra step that people might forget, and might result in data loss. ideally, everything on the primary disk should be relatively default, which makes a reinstall in that regard less of an issue compared to a secondary persistent disk which contains custom data that will be very problematic to lose.</p>
+<aside class="quote no-group">
+<blockquote>
+<hr>
+<pre><code># Reset the $backingcreate variable to "n".  This will prevent the script
+# from deleting a backing image that corresponds to a disk when a backing
+# image was not created during the execution of this script as the for loop
+# progresses.
+backingcreate=n
+</code></pre>
+<p>Really no need for that since there is still no use of <code>$backingcreate</code> after that point. That variable will be unset after the script finished nonetheless. It will not linger around on subsequent script runs or for other commands run on the same console. It would only linger around if <code>export</code>ed and another child script called from that script.</p>
+</blockquote>
+</aside>
+<p>check the end of the if statement that creates the backing image. it is set to “y” at that point. if the for loop catches other disks where a backing image is not created, but a backing image exists, if the user chooses to remove the “temp” file due to a boot issue, it will also remove the backing image without this flag set, unless i am mistaken. the point of this variable is to deal with a situation where a new backing image is created, the user attempts to boot per the instructions after the backing image is created, something goes wrong, and they choose to restore the temp file to it’s original state. with the flag set, it will copy the temp file back to the original file name, thus restoring the original data, and delete the backing file. in a situation without this flag set, if the issue is with a newly created thin image from a previous thin provisioned image, the backing file will be deleted and result in  extreme data loss, which will require a fresh install since the backing image is gone. without the flag, the option is left to either result in the script potentially removing the backing image, or requiring the user to remove an uneeded multi-gigabyte backing image manually.</p>
+<aside class="quote no-group">
+<blockquote>
+<pre><code>if [[ "$choice" == [Yy]* ]]
+</code></pre>
+<p>Instead you coudl use</p>
+<pre><code>if [[ ! "$choice" == [Yy]* ]]; then
+  continue
+fi
+</code></pre>
+<p>This would imo simplify the code and to remove 1 level indentation.</p>
+</blockquote>
+</aside>
+<p>i’ll play with that.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>script comments:<br>
+While it might be interesting to have 1 (or a few) scripts with comments on everything for educational purposes, this shouldn’t become the standard. The usual rule that made sense to be was the following:</p>
+<ul>
+<li>The ideal goal is to have code being so clear that it doesn’t need any comments.</li>
+<li>If you failed to express yourself in code, if something won’t be clear by reading the script, add a comment.</li>
+<li>Obvious things such as</li>
+</ul>
+<hr>
+<pre><code>## echo output to user
+echo "$output"
+</code></pre>
+<p>shouldn’t be commented for brevity.</p>
+</blockquote>
+</aside>
+<p>since this is a beta copy for review, i decided to document every step. since it is bash, some steps may not be obvious. when it comes closer to a final form, i will remove comments involving obvious steps like “echo” and such.</p>
+<p>thanks again for taking the time to review. keep in mind, this script is envisioned only for someone using the kvm whonix images on  a debian install. so, it’s fairly specific to one use scenario.</p>
+<p>on another note, should i consider adding steps to it to backup the temp thin provisioned images as snapshots? i could probably do that and create another script for snapshot restoration purposes that currently aren’t available in virt-manager with this process.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/32">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/32</link>
+        <pubDate>Thu, 30 Jan 2020 07:13:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-32</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>What if the backing image exists but is broken? Such as when the machine crashed, was powered off, rebooted or the process interrupted last time the script was run?</p>
+<hr>
+<p>Currently:</p>
+<p>If no backing image exists:</p>
+<pre><code>qemu-img convert -O qcow2 -p "$f".temp "$f".backing.image
+qemu-img create -f qcow2 -b "$f".backing.image "$f"
+</code></pre>
+<p>If backing image exists:</p>
+<pre><code>qemu-img convert -B "$f".backing.image -O qcow2 -p "$f".temp "$f"
+</code></pre>
+<p>I don’t understand why these are two different procedures / commands.</p>
+<p>Shouldn’t that be…?</p>
+<pre><code>if no backing image exists:
+    create backing image
+
+continue steps that assume existence of backing image (out side the if)
+</code></pre>
+<blockquote>
+<p>Why care about past 24 hours?</p>
+</blockquote>
+<aside class="quote no-group" data-username="tempest" data-post="28" data-topic="8724">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tempest/40/349_2.png" class="avatar"> tempest:</div>
+<blockquote>
+<p>because if one has not used the virtual machine in the past 24 hours, it likely does not have any data written to it that requires the time and disk writes to shrink the image.</p>
+</blockquote>
+</aside>
+<p>That I find a leap. Take a simpler use case. Someone using only Whonix-Gateway and Whonix-Workstation. The runs the shrink script. Nothing happens and the user doesn’t even know why. Maybe this would be a useful optional feature but a non-configurable default feature seems surprising, confusing.</p>
+<p>I am trying to follow principle of least astonishment here.</p>
+<aside class="onebox wikipedia">
+  <header class="source">
+      <a href="https://en.wikipedia.org/wiki/Principle_of_least_astonishment" target="_blank">en.wikipedia.org</a>
+  </header>
+  <article class="onebox-body">
+    
+
+<h3><a href="https://en.wikipedia.org/wiki/Principle_of_least_astonishment" target="_blank">Principle of least astonishment</a></h3>
+
+<p>The principle of least astonishment (POLA), also called the principle of least surprise (alternatively a "law" or "rule") applies to user interface and software design. A typical formulation of the principle, from 1984, is: "If a necessary feature has a high astonishment factor, it may be necessary to redesign the feature."
+ More generally, the principle means that a component of a system should behave in a way that most users will expect it to behave; the behavior should not astonish or surprise...</p>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>
+<p>Why distinguish between non-persistent and persistent disks?</p>
+</blockquote>
+<aside class="quote no-group" data-username="tempest" data-post="28" data-topic="8724">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tempest/40/349_2.png" class="avatar"> tempest:</div>
+<blockquote>
+<p>because the persistent disks tend to have more personalized data on it.</p>
+</blockquote>
+</aside>
+<p>That is also a very personalized conclusion. Many users probably are not using secondary disk images. Only the defaults and have everything there.</p>
+<aside class="quote no-group" data-username="tempest" data-post="28" data-topic="8724">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tempest/40/349_2.png" class="avatar"> tempest:</div>
+<blockquote>
+<p>if i used the method that implements a backing image, then additional data would get written to a thin provisioned disk, and if one wanted to copy that virtual disk to another machine, they’d have to execute additional commands to have all of the data contained in one virtual disk.</p>
+</blockquote>
+</aside>
+<p>If that sounds cumbersome additional disks then this is also cumbersome for primary disks. I guess there is a huge number (absolute majority) of users only using primary and no additional disks.</p>
+<hr>
+<pre><code># Reset the $backingcreate variable to "n".  This will prevent the script
+# from deleting a backing image that corresponds to a disk when a backing
+# image was not created during the execution of this script as the for loop
+# progresses.
+backingcreate=n
+</code></pre>
+<p>Really no need for that since there is still no use of <code>$backingcreate</code> after that point. That variable will be unset after the script finished nonetheless. It will not linger around on subsequent script runs or for other commands run on the same console. It would only linger around if <code>export</code>ed and another child script called from that script.</p>
+<pre><code>if [[ "$choice" == [Yy]* ]]
+</code></pre>
+<p>Instead you coudl use</p>
+<pre><code>if [[ ! "$choice" == [Yy]* ]]; then
+  continue
+fi
+</code></pre>
+<p>This would imo simplify the code and to remove 1 level indentation.</p>
+<p>script comments:<br>
+While it might be interesting to have 1 (or a few) scripts with comments on everything for educational purposes, this shouldn’t become the standard. The usual rule that made sense to be was the following:</p>
+<ul>
+<li>The ideal goal is to have code being so clear that it doesn’t need any comments.</li>
+<li>If you failed to express yourself in code, if something won’t be clear by reading the script, add a comment.</li>
+<li>Obvious things such as</li>
+</ul>
+<hr>
+<pre><code>## echo output to user
+echo "$output"
+</code></pre>
+<p>shouldn’t be commented for brevity.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/31">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/31</link>
+        <pubDate>Thu, 30 Jan 2020 06:16:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-31</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <p>here’s the updated version. i took a number of the points into consideration.</p>
+<ol>
+<li>
+<p>the initial long commands to populate the variables were not something i was able to shorten unfortunately. however, i broke them up so that they are easier to read.</p>
+</li>
+<li>
+<p>sudo has been removed. sudo was there because, before this blew up into a fairly long script, it was intended to work as a function in .bashrc, similar to the more simplistic way virtual disk shrinking can be done with virtualbox. unfortunately, that’s not currently a reality with kvm. the script will check if it is being run with root privileges and, if it isn’t, will prompt a user to use sudo to execute the script and exit.</p>
+</li>
+<li>
+<p>comments are now at nearly every step to explain what the script is doing.</p>
+</li>
+<li>
+<p>the text is all visible in nano from a standard sized terminal window. however, it still may be a little annoying to view it with the scrolls bars in this forum. so, while i’m going to paste it here, it may be easier to review from the pastebin link i created at <a href="https://pastebin.com/tNz06ETB" rel="nofollow noopener">https://pastebin.com/tNz06ETB</a></p>
+</li>
+</ol>
+<p>one of the more annoying lack of user friendly features with kvm at the moment is creating snapshots. unfortunately, if one uses the default method of internal snapshots with virt-manager, which is supposedly deprecated, the creation of a new slimmer disk image will not include the snapshots. thus, any snapshots become ghost entries that don’t work. while this was not intended to be a “backup” script, i could probably play with it further to create unique “snapshot” folders for the temporary external thin provisioned images. it would probably be easy enough to create a filename structure based on disk image name, date and time. but, i have not tried that yet.</p>
+<blockquote>
+<pre><code>#!/bin/bash
+#
+# QEMU/KVM Anti-Ballooning Disk Image Shrink Script version 1.0.Beta2
+#
+# This script will search for installed QEMU/KVM virtual machines 
+# and attempt to reduce their size.
+#
+
+# Check if script is run with root privileges.  Require root privileges.
+if [ "$EUID" -ne 0 ]
+  then
+  # If the script is not run with root privileges, echo messages instructing
+  # the user to run the script with sudo and then exit the script.
+  echo ""
+  echo "This script must be run with root privileges."
+  echo "Please use sudo to execute the script."
+  echo ""
+  exit
+fi
+
+# Backup original IFS environment settings to variable.
+ORIGINALIFS="$IFS"
+
+# Set IFS to terminate on new lines. This prevents
+# problems with files and directories that contain whitespaces.
+IFS=$'\n'
+
+# Inform the user that zerofree must be run in recovery mode
+# before this script will work. Prompt the user to shutdown the virtual machines.
+# The script will not work on any active virtual machine.
+echo ""
+echo "QEMU/KVM Anti-Ballooning Disk Image Shrink Script version 1.0.beta2"
+echo ""
+echo "THIS IS A BETA RELEASE AND IS FOR TESTING ONLY. IT MAY INADVERTANTLY"
+echo "CAUSE DAMAGE TO YOUR DISK IMAGES."
+echo ""
+echo "Ballooning is a term for the scenario where the size of virtual disk"
+echo "images continue to increase, despite the fact that a lot of the data"
+echo "that contributes to the file size increase is discarded data and no longer of"
+echo "any use.  With the use of the zerofree utility while a virtual disk image"
+echo "is mounted as read only in the Linux recovery mode, the discarded data"
+echo "can be converted to zeros.  This script uses the tools provided by"
+echo "QEMU/KVM to create new disk images while discarding all data that"
+echo "that constitutes a zero, thus saving considerable disk space at times."
+echo ""
+echo "The shrink function will only work if you ran the zerofree utility"
+echo "on your virtual machine disks while booted in Recovery Mode. Additionally,"
+echo "you must shut down your virtual machines for the shrink process to work." 
+echo ""
+read -r -e -p "Please shut down your virtual machines and press [enter] to continue."
+echo ""
+
+# Create a variable that contains the paths file names
+# for the primary virtual disks of all inactive QEMU/KVM
+# virtual machines. The primary disks are intended to be
+# booted in "Live Mode" in most circumstaces and contain
+# the majority of the operating system files. This function
+# will enable the script to create a "backing image" which is
+# a read only file that a thin provisioned image uses as a base
+# to access the majority of the required operating system data.
+# The advantage it offers are that the thin provisioned disk
+# images are smaller in size and can be process faster in the
+# future. Additionally, for users who regularly boot a virtual
+# machine in a persistent mode, the backing image can be used
+# as a safe restore point if something goes wrong.
+tempvmlistnp=$(for i in $(virsh list --name --inactive); do 
+
+	     # Parse the output to obtain the disk device name,
+             # path and file name for a virtual disk connected
+             # to a virtual machine.
+	     virsh domblklist "$i"; done |
+
+             # Parse the output for a leading directory "/" character.
+             # This prevents $tempvmlistnp from being populated
+             # with useless text from "virsh domblklist."
+             grep / |
+
+             # Parse the output for the common device names used
+             # for primary disks. This ensures that $tempvmlistnp
+             # is only populated with the path and file names of
+             # virtual disks that contain the majority of the operating
+             # system files. This will enable the script to create a 
+             # backing image and thin provisioned imagefor the virtual disk
+             # later, which reduces disk writes for the script in the future.
+	     grep -E "sda|vda|hda" |
+
+             # Print the field from the output that contains the full
+             # path and file name of the virtual disk. This will add
+             # the full path and file name of the virtual disk to
+             # $tempvmlistnp.
+             awk -F" {2,}" '{print $2}'; )
+
+# Create a variable that contains the paths file names
+# for any additional virtual disks connected to inactive QEMU/KVM
+# virtual machines. The additional disks are for persistent
+# storage of files. Therefore, the creation of a backing image
+# and thin provisioned image is avoided because it may make
+# copying the file less user friendly.
+tempvmlistp=$(for i in $(virsh list --name --inactive); do 
+
+            # Parse the output to obtain the disk device name,
+            # path and file name for a virtual disk connected
+            # to a virtual machine.
+            virsh domblklist "$i"; done|
+
+            # Parse the output for a leading directory "/" character.
+            # This prevents $tempvmlistnp from being populated
+            # with useless text from "virsh domblklist."
+            grep / |
+
+            # Parse the output for the common device names that are
+            # not used for primary disks. This ensures that $tempvmlistp
+            # is only populated with the path and file names of
+            # virtual disks that are used for persistent storage.
+            # This will enable the script to ensure that all the files
+            # that are intended to remain unchanged after a "Live Mode"
+            # virtual machine is shut down are contained in one virtual 
+            # disk file.
+            grep -E -v "sda|vda|hda" |
+
+            # Print the field from the output that contains the full
+            # path and file name of the virtual disk. This will add
+            # the full path and file name of the virtual disk to
+            # $tempvmlistp.
+            awk -F" {2,}" '{print $2}'; )
+
+# Read from the list of primary virtual disks in $tempvmlistnp
+# to populate a new variable that contains the full path and
+# file names of virtual disks that are larger than 10 megabytes
+# and have been altered in the past 24 hours. Disks that are booted
+# in "Live Mode" with the "readonly" flag set in the virtual do not
+# have a new date of modification applied to them on boot. Therefore,
+# this function prevents the script from processing files that are unlikely
+# to achieve any chnage in size upon being processed.
+tempvmlistnp2=$(for f in $tempvmlistnp; do 
+
+              # Use the find command to populate $tempvmlistnp2 with
+              # the full paths and file names of disk images that are larger
+              # than 10 megabytes and were modified in the past 24 hours.
+              find "$f" -type f -mtime -1 -size +10M; done )
+
+# Read from the list of primary virtual disks in $tempvmlistp
+# to populate a new variable that contains the full path and
+# file names of virtual disks that are larger than 10 megabytes
+# and have been altered in the past 24 hours. This will populate
+# the variable to be parsed in the function that will not create
+# backing images and thin provisioned images for persistent
+# storage disks.
+tempvmlistp2=$(for f in $tempvmlistp; do 
+
+             # Use the find command to populate $tempvmlistp2 with
+             # the full paths and file names of disk images that are larger
+             # than 10 megabytes and were modified in the past 24 hours.
+             find "$f" -type f -mtime -1 -size +10M; done )
+
+# Start the for loop to process the primary virtual disk images.
+for f in $tempvmlistnp2
+do
+
+  # Ask if user wants to shrink the disk.
+  read -r -e -p "Shrink $f? [y/N] " choice
+  echo ""
+
+  # Start of If Statement NP1
+  # Any input text that starts with Y or y will be read as "yes."
+  if [[ "$choice" == [Yy]* ]]
+
+    # If yes, move the disk image to a temporary backup copy.
+    # The temporary backup copy will be used to create the shrunken images
+    # and can also be used to revert to the old disk image in case the virtual
+    # disk is corrupted after the process.
+    then
+    mv "$f" "$f".temp
+
+    # Start of If Statement NP2
+    # Check if a backing image exists. If not, create one and
+    # and create a supporting thin provisioned disk image.
+    if [ ! -e "$f".backing.image ]
+      then
+      echo "This script will now create a backing image and thin provisioned"
+      echo "image for $f."
+      echo ""
+      echo "A backing image will only be created the first time a primary"
+      echo "disk is processed by this script. It is a read only file"
+      echo "that will not be altered by your use of the virtual machine"
+      echo "to which it is connected. Rather, all disk writes go to a smaller"
+      echo "thin provisioned disk image. The use of a backing image will result"
+      echo "in future shrink operations running much faster because there is"
+      echo "less data to process."
+      echo ""
+      echo "Also, in an emergency, the backing image can serve to restore the"
+      echo "virtual machine disk to its original state by typing the following"
+      echo "command:"
+      echo ""
+      echo "sudo mv $f.backing.image $f"
+      echo ""
+      echo "Creating backing image for $f."
+
+      # Create the reduced size backing image from the temporary backup file.
+      qemu-img convert -O qcow2 -p "$f".temp "$f".backing.image
+      echo ""
+
+      # Create the thin provisioned file.
+      qemu-img create -f qcow2 -b "$f".backing.image "$f"
+      echo ""
+
+      # Show the differences in file sizes between
+      echo Old file size = "$(du -h "$f".temp |cut -f1)"
+      echo New backing image file size = "$(du -h "$f".backing.image |cut -f1)"
+
+      # Create a variable to mark that a backing image was created by the script.
+      # This will be used later to ensure that the backing image does not get
+      # deleted if a user decides that they want to restore a temporary backup
+      # file to its original file name.
+      backingcreate="y"
+
+    # If a backing image already exists, the following steps will be executed.
+    # This will save time and ensure that data in a previously created
+    # thin provisioned disk image is not lost. 
+    else
+
+      # Create a new thin provisioned disk image that will copy the data
+      # from the temporary backup file and rely on the backing image as the
+      # base file.
+      qemu-img convert -B "$f".backing.image -O qcow2 -p "$f".temp "$f"
+
+      # Show the file sizes of the images after the procedure is complete.
+      echo ""
+      echo Old file size = "$(du -h "$f".temp |cut -f1)"
+      echo New shrunken file size = "$(du -h "$f" |cut -f1)"
+    # End of If Statement NP2
+    fi
+
+    # Prompt user to test their virtual disk by starting the corresponding
+    # virtual machine.  Ask if the user wants to delete the temporary
+    # backup file.
+    echo ""
+    echo "Start the virtual machine in virt-manager to check if you can"
+    echo "boot the virtual machine that uses the disk image entitled"
+    echo "$f."
+    echo "If you reach the desktop, it is probably safe to remove" 
+    echo "$f.temp."
+    echo ""
+    echo "If you encounter a problem booting the virtual machine,"
+    echo "do not remove the temporary file. If you choose not to"
+    echo "remove the temporary file, you will be given the option to"
+    echo "restore the temporary file to its original name which will"
+    echo "fix the problems you are experiencing."
+    echo ""
+
+    # Ask the user if they want to remove the temporary backup file.
+    read -r -e -p "Remove $f.temp? [y/N] " choice3
+    echo ""
+
+    # Start of If Statement NP3
+    # Any input text that starts with Y or y will be read as "yes."
+    if [[ "$choice3" == [Yy]* ]]
+       then
+
+       # If yes, delete the temporary backup file.
+       rm "$f".temp
+
+       # If the choice is not Y or y, ask the user
+       # if they want to restore the the temporary backup.
+       else
+       read -r -e -p "Restore the virtual disk to its original state? [y/N] " choice4
+       echo ""
+
+       # Start of If Statement NP4
+       # Any input text that starts with Y or y will be read as "yes."
+       if [[ "$choice4" == [Yy]* ]]
+          then
+
+          # If yes, restore the temporary backup file to its original name.
+          mv "$f".temp "$f"
+
+          # Start of If Statement NP5
+          # If a backing image was created during this script run, delete it.
+          if [ "$backingcreate" = "y" ]
+            then
+            rm "$f".backing.image
+          #End of If Statement NP5
+          fi
+       # End of If Statement NP4
+       fi
+    #End of If Statement NP3
+    fi
+  # Enf of If Statement NP1
+  fi
+
+# Reset the $backingcreate variable to "n".  This will prevent the script
+# from deleting a backing image that corresponds to a disk when a backing
+# image was not created during the execution of this script as the for loop
+# progresses.
+backingcreate=n
+
+# End the for loop that corresponds to primary disk images.
+done
+
+# Start the for loop to process the additional virtual disk images that
+# will not implement a backing image.
+for f in $tempvmlistp2
+do
+
+  # Ask if user wants to shrink the disk image.
+  read -r -e -p "Shrink $f? [y/N] " choice
+  echo ""
+
+  # Start of If Statement P1
+  # Any input text that starts with Y or y will be read as "yes."
+  if [[ "$choice" == [Yy]* ]]
+
+    # If yes, move the disk image to a temporary backup copy.
+    # The temporary backup copy will be used to create the shrunken images
+    # and can also be used to revert to the old disk image in case the virtual
+    # disk is corrupted after the process.
+    then
+    mv "$f" "$f".temp
+
+    # Create a new virtual disk image and remove the zeros to conserve space.
+    qemu-img convert -O qcow2 -p "$f".temp "$f"
+
+    # Show file sizes after the procedure is complete.
+    echo Old file size = "$(du -h "$f".temp |cut -f1)"
+    echo Shrunken file size = "$(du -h "$f" |cut -f1)"
+    echo ""
+
+    # Prompt user to test their virtual disk by starting the corresponding
+    # virtual machine.  Ask if the user wants to delete the temporary
+    # backup file.
+    echo "Start virt-manager to check the integrity of the persistent disk for"
+    echo "the virtual machine that uses the disk image entitled"
+    echo "$f."
+    echo "If you are able to read the files on it, it is probably safe to remove" 
+    echo "$f.temp."
+    echo ""
+    echo "If you encounter a problem reading files from the persistent"
+    echo "virtual disk, do not remove the temporary file. If you choose not to"
+    echo "remove the temporary file, you will be given the option to"
+    echo "restore the temporary file to its original name which will"
+    echo "fix the problems you are experiencing."
+    echo ""
+
+    # Ask the user if they want to remove the temporary backup file.
+    read -r -e -p "Remove $f.temp? [y/N] " choice3
+
+    # Start of If Statement P2
+    # Any input text that starts with Y or y will be read as "yes."
+    if [[ "$choice3" == [Yy]* ]]
+      then
+
+      # If yes, delete the temporary backup file.
+      rm "$f".temp
+
+      # If the choice is not Y or y, ask the user
+      # if they want to restore the the temporary backup.
+      else
+      # If no, ask user if they want to restore the backup.
+      read -r -e -p "Restore the virtual disk to its original state? [y/N] " choice4
+      echo ""
+
+      # Start of If Statement P3
+      # Any input text that starts with Y or y will be read as "yes."
+      if [[ "$choice4" == [Yy]* ]]
+        then
+
+        # If yes, restore the temporary backup file to its original name.
+        mv "$f".temp "$f"
+
+      #End of If Statement P3
+      fi
+
+    #End of If Statement P2
+    fi
+
+  # End of If Statement P1
+  fi
+
+# End the for loop to process the additional virtual disk images that
+# will not implement a backing image.
+done
+
+# Restore original IFS environment settings.
+IFS="$ORIGINALIFS"</code></pre>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/30">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/30</link>
+        <pubDate>Wed, 29 Jan 2020 03:25:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-30</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>These are good comments. A lot suitable as script comments.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/29">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/29</link>
+        <pubDate>Tue, 28 Jan 2020 15:33:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-29</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <p>i will get to the whole of this later. but, here is what i can adress quickly right now.</p>
+<aside class="quote no-group" data-post="27" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>What happens in case the user doesn’t delete the backup image (<code>"Remove $f.backup? [y/N] "</code>) (probably not will think this is a good idea) and then re-runs the script? It would overwrite the already existing backup? (<code>"Remove $f.backup? [y/N] "</code>)<br>
+Maybe then that shouldn’t be called a backup but temporary file? After all, the purpose of this script isn’t backups but shrinking. Mixing the two purposes / terminology seems wrong.</p>
+</blockquote>
+</aside>
+<p>a good point. and, yes, if the script is run again with a “backup” file that hasn’t been restored, it will be overwritten.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>What is a backing image? Versus backup image?</p>
+</blockquote>
+</aside>
+<p>a “backing image” is a disk image that thin provisioned images use as the base file.  so, changes made to the thin provisioned disk image are not written to the “backing image.” aside from protecting the initial base whonix install from accidental error, it requires less data to be written in the future, since the new images created by “qemu-img convert” that use a backing file will tend to be in the range of megabytes rather than gigabytes.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>Could use some newlines.</p>
+</blockquote>
+</aside>
+<p>additional format cleaning will be done.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>Why convert the backup image, which is a qcow2 image to another qcow image?</p>
+</blockquote>
+</aside>
+<p>“qemu-img convert” does not appear to do in place conversion.  when it converts the temporary “backup” image into the new image, it removes all the sectors that were written with zeros by zerofree, thus reducing the file size.</p>
+<aside class="quote no-group">
+<blockquote>
+<blockquote>
+<pre><code>  		        	sudo qemu-img create -f qcow2 -b "$f".backing.image "$f"
+</code></pre>
+</blockquote>
+<p>What is being created here?</p>
+</blockquote>
+</aside>
+<p>this creates a thin provisioned disk image that use “$f.backing.image” as the backing image.  the thin provisioned image will be nearly empty upon creation. future disk writes go to the thin provisioned image.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>Could you please simplify the following:</p>
+<pre><code>backingcreate="y"
+
+if [[ "$backingcreate" != [y] ]]
+</code></pre>
+<blockquote>
+<p>if [ “$backingcreate” = “y” ]</p>
+</blockquote>
+<p>or</p>
+<blockquote>
+<p>if [ ! “$backingcreate” = “y” ]</p>
+</blockquote>
+</blockquote>
+</aside>
+<p>this will be disappearing from the script.  it’s a variable i was using for debugging at one point. there are other means to achieve the same thing without a variable.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>Why care about past 24 hours?</p>
+</blockquote>
+</aside>
+<p>because if one has not used the virtual machine in the past 24 hours, it likely does not have any data written to it that requires the time and disk writes to shrink the image.  ideally, one will run the script after they have installed operating system updates in the virtual machine.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>Why distinguish between non-persistent and persistent disks?</p>
+</blockquote>
+</aside>
+<p>because the persistent disks tend to have more personalized data on it. so, i implemented a separate routine for those disks in order to keep everything confined to one disk image.  if i used the method that implements a backing image, then additional data would get written to a thin provisioned disk, and if one wanted to copy that virtual disk to another machine, they’d have to execute additional commands to have all of the data contained in one virtual disk.</p>
+<aside class="quote no-group">
+<blockquote>
+<blockquote>
+<p>if [ ! -e “$f”.backing.image ]; then</p>
+</blockquote>
+<p>Ok, creates only if not existing.<br>
+Why would <code>"$f".backing.image</code> already exist and would it be correct to continue then?</p>
+</blockquote>
+</aside>
+<p>a “backing image” for thinly provisioned clients only needs to be created once.  the script will create one if it isn’t there.  thus, if it exists, the steps that would otherwise create a “backing image” are skipped. if it didn’t check for the existence and created a new thin provisioned disk with the same name as the current thin provisioned image created before, it would overwrite the data in the old thin provisioned disk. easiest way to think of these are as snapshots.  the thin provisioned disks are essentially external snapshots that rely on the “backing image” to provide the base of the data needed to boot the system.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/28">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/28</link>
+        <pubDate>Tue, 28 Jan 2020 14:26:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-28</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Could you please post an example of the commands in which order the script would modify a file? This is to allow others to verify if this procedure makes sense. Many will not be able to read the script and imagine what commands it will be actually running.</p>
+<p>What happens in case the user doesn’t delete the backup image (<code>"Remove $f.backup? [y/N] "</code>) (probably not will think this is a good idea) and then re-runs the script? It would overwrite the already existing backup? (<code>"Remove $f.backup? [y/N] "</code>)<br>
+Maybe then that shouldn’t be called a backup but temporary file? After all, the purpose of this script isn’t backups but shrinking. Mixing the two purposes / terminology seems wrong.</p>
+<p>What is a backing image? Versus backup image?</p>
+<p>use of sudo: Probably better to check if the script is running as root and abort otherwise? Better than running sudo inside the script?</p>
+<p>The ident style seems off here:</p>
+<blockquote>
+<p>if [ ! -e “$f”.backing.image ]</p>
+</blockquote>
+<hr>
+<p>Could use some newlines.</p>
+<p>These long lines are pretty difficult to grasp.</p>
+<pre><code class="lang-auto">tempvmlistnp=$(for i in $(sudo virsh list --name --inactive); do sudo virsh domblklist "$i"; done| grep / | grep -E "sda|vda|hda" | awk -F" {2,}" '{print $2}' | sed -e 's|[[:space:]]|\ |g'; )
+</code></pre>
+<p>Would be more easy to read by splitting the long step into multiple smaller steps also also providing examples for variable contents? Example from genmkfie:</p>
+<pre><code class="lang-auto">   while read -r -d $'\n' dpkg_line; do
+      ## Example dpkg_line:
+      ## Version: 0.1-1
+      read -r first second _ &lt;&lt;&lt; "$dpkg_line"
+      ## Example first:
+      ## Version:
+      ## Example second:
+      ## 3:0.1-1
+      first="${first,,}"
+      ## Example first:
+      ## version
+      if [ "$first" = "version:" ]; then
+         make_changelog_version="$second"
+         ## Example make_changelog_version:
+         ## 3:0.1-1
+         make_pkg_revision="${second#*-}"
+         ## Example make_pkg_revision:
+         ## 1
+         temp="${second%-*}"
+         ## Example temp:
+         ## 3:0.1
+         make_pkg_version="${temp#*:}"
+         ## Example make_pkg_version:
+         ## 0.1
+         make_epoch="${second%:*}"
+         ## Example make_epoch:
+         ## 3
+         break
+      fi
+   done &lt; &lt;( dpkg-parsechangelog )
+</code></pre>
+<p>minor, some typos:</p>
+<p>datected<br>
+cirtual<br>
+intregrity<br>
+storge<br>
+backing -&gt; backup?</p>
+<blockquote>
+<pre><code>  		        	echo "No backing image datected for $f."
+  		        	echo "Creating a backing image for $f."
+  		        	sudo qemu-img convert -O qcow2 -p "$f".backup "$f".backing.image
+</code></pre>
+</blockquote>
+<p>Why convert the backup image, which is a qcow2 image to another qcow image?</p>
+<blockquote>
+<pre><code>  		        	sudo qemu-img create -f qcow2 -b "$f".backing.image "$f"
+</code></pre>
+</blockquote>
+<p>What is being created here?</p>
+<p>Could you please simplify the following:</p>
+<pre><code>backingcreate="y"
+
+if [[ "$backingcreate" != [y] ]]
+</code></pre>
+<blockquote>
+<p>if [ “$backingcreate” = “y” ]</p>
+</blockquote>
+<p>or</p>
+<blockquote>
+<p>if [ ! “$backingcreate” = “y” ]</p>
+</blockquote>
+<hr>
+<p>I find this style rather hard to follow:</p>
+<pre><code>     if [[ "$choice3" == [Yy]* ]]
+        # If yes, delete the backup file.
+        then
+           sudo rm "$f".backup
+</code></pre>
+<p>An intend for <code>then</code> followed for another intend for the actual command <code>sudo rm "$f".backup</code>.</p>
+<hr>
+<p>Seems not used:</p>
+<pre><code>backingcreate=n
+</code></pre>
+<blockquote>
+<p>Read from list of vms, check if the disk is non-persistent and filter files that have not been modified in the past 24 hours.</p>
+</blockquote>
+<p>Why care about past 24 hours?</p>
+<blockquote>
+<p>Get list of installed and inactive virtual disks and write to a hidden temporary file.</p>
+</blockquote>
+<p>Seems like no temporary file used.</p>
+<hr>
+<blockquote>
+<p>Read from list of vms, check if the disk is non-persistent and filter files that have not been modified in the past 24 hours.</p>
+</blockquote>
+<blockquote>
+<p>Read from list of vms, check if the disk is persistent and filter files that have not been modified in the past 24 hours.</p>
+</blockquote>
+<p>Why distinguish between non-persistent and persistent disks?</p>
+<hr>
+<p>Could use <code>set -e</code> or trap ERR and <code>set -o pipefail</code>.</p>
+<hr>
+<blockquote>
+<p>if [ ! -e “$f”.backing.image ]; then</p>
+</blockquote>
+<p>Ok, creates only if not existing.<br>
+Why would <code>"$f".backing.image</code> already exist and would it be correct to continue then?</p>
+<blockquote>
+<p>elif [[ “$choice3” != [Yy]* ]]</p>
+</blockquote>
+<p>This could be a simpler <code>else</code>.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/27">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/27</link>
+        <pubDate>Tue, 28 Jan 2020 13:40:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-27</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="24" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Please run through <code>shellcheck</code>.</p>
+</blockquote>
+</aside>
+<p>here’s the first beta version. it comes up clean on <a href="http://shellcheck.net" rel="nofollow noopener">shellcheck.net</a>.</p>
+<p>i have given up on trying to script booting the vms into recovery mode and running the zerofree pass for now. however, i did make some additions:</p>
+<ul>
+<li>
+<p>the script will sort disks based on whether they are a primary disk (/dev/vda1) or an additional disk (/dev/vdb1, etc.).</p>
+</li>
+<li>
+<p>if the disk is a primary disk, the script will check if a backing image is present for the disk based on the ending filename extension of “.backing.image.”  if a backing image is not present, the script will create a backing image for the disk and then create a thin provisioned disk to be used going forward.  the advantage of this are that the backing image is read only and can offer a means of restoration if something unforeseen happens, whether it’s the thin disk getting corrupted or the user making an error in persistent mode. an additional advantage is that, due to the smaller size of the thin provisioned disk, less disk reads/writes are needed for future passes of zerofree and qemu-img, due to the fact that the backing image is not read.</p>
+</li>
+<li>
+<p>if the disk is an additional disk, which are only used for persistent storage in my usage, the “qemu-img convert” command is used to create a new image of the disk. since the files stored on such disks tend to be important, i think it makes more sense to keep the data in one disk image, rather than being fractured in thin provisioned images with the additional disk as a backing image.</p>
+</li>
+<li>
+<p>the script creates a backup image of the disk image first and then creates a new disk image from the backup image.  after the qemu-img pass is complete, the user is prompted to boot the corresponding virtual machine to make sure the process was successful and did not result in corruption.  the user is then given the option to remove the backup file. if something bad happened during the conversion, which is discovered on booting the vm, the user has the option of restoring the image from the backup file.</p>
+</li>
+</ul>
+<p>i will likely add some colors to the script later in order to make it easier to read and clean up the stdout formatting.  but, if anyone who is using qemu/kvm wants to test this, please give it a try.</p>
+<blockquote>
+<pre><code>#!/bin/bash
+#
+# Version 1.0.Beta1
+#
+# This script will search for installed virtual machines and attempt to reduce
+# their size.
+#
+ORIGINALIFS="$IFS"
+IFS=$'\n'
+# Get list of installed and inactive virtual disks and write to a hidden temporary file.
+echo "You must shut down your virtual machines for the shrink process to work." 
+read -r -e -p "Please shut down your virtual machines and press [enter] to continue."
+tempvmlistnp=$(for i in $(sudo virsh list --name --inactive); do sudo virsh domblklist "$i"; done| grep / | grep -E "sda|vda|hda" | awk -F" {2,}" '{print $2}' | sed -e 's|[[:space:]]|\ |g'; )
+tempvmlistp=$(for i in $(sudo virsh list --name --inactive); do sudo virsh domblklist "$i"; done| grep / | grep -E -v "sda|vda|hda" | awk -F" {2,}" '{print $2}' | sed -e 's|[[:space:]]|\ |g'; )
+# Read from list of vms, check if the disk is non-persistent and filter files that have not been modified in the past 24 hours.
+tempvmlistnp2=$(for f in $tempvmlistnp; do sudo find "$f" -type f -mtime -1 -size +10M | sed -e 's|[[:space:]]|\\ |g'; done )
+# Read from list of vms, check if the disk is persistent and filter files that have not been modified in the past 24 hours.
+tempvmlistp2=$(for f in $tempvmlistp; do sudo find "$f" -type f -mtime -1 -size +10M | sed -e 's|[[:space:]]|\\ |g'; done )
+for f in $tempvmlistnp2
+do
+	# Ask if user wants to shrink the disk.
+	read -r -e -p "Shrink $f? [y/N] " choice
+	if [[ "$choice" == [Yy]* ]]
+	   # If yes, make a backup copy
+	   then
+		   sudo mv "$f" "$f".backup
+			# Check if a backing image exists. If not, create one and create an external snapshot."
+			        if [ ! -e "$f".backing.image ]
+					then
+				        	echo "No backing image datected for $f."
+				        	echo "Creating a backing image for $f."
+				        	sudo qemu-img convert -O qcow2 -p "$f".backup "$f".backing.image
+				        	sudo qemu-img create -f qcow2 -b "$f".backing.image "$f"
+						echo Original file size = "$(sudo du -h "$f".backup |cut -f1)"
+						echo Backing image file size = "$(sudo du -h "$f".backing.image |cut -f1)"
+						backingcreate="y"
+				fi
+        	if [[ "$backingcreate" != [y] ]]
+			then
+				# Shrink the disk
+				sudo qemu-img convert -B "$f".backing.image -O qcow2 -p "$f".backup "$f"
+				# Show file sizes after virt-sparsify procedure is complete.
+				echo Original file size = "$(sudo du -h "$f".backup |cut -f1)"
+				echo Shrunken file size = "$(sudo du -h "$f" |cut -f1)"
+		fi
+		# Prompt user to test their virtual disk by starting the corresponding cirtual machine. 
+		# Ask if the user wants to delete the backup file.
+		echo "Start virt-manager to check if you can boot the virtual machine" 
+		echo "that uses the disk image entitled"
+		echo "$f." 
+		echo "If you reach the desktop, it is probably safe to remove" 
+		echo "$f.backup."
+		read -r -e -p "Remove $f.backup? [y/N] " choice3
+		if [[ "$choice3" == [Yy]* ]]
+			# If yes, delete the backup file.
+			then
+				sudo rm "$f".backup
+		elif [[ "$choice3" != [Yy]* ]]
+				# If no, ask user if they want to restore the backup.
+				then
+					read -r -e -p "Restore backup? [y/N] " choice4
+					if [[ "$choice4" == [Yy]* ]]
+						# If yes, restore the backup file.
+						then
+							sudo mv "$f".backup "$f"
+							# If a backing image was created, delete it.
+							if [[ "$backingcreate" == [y] ]] 
+								then
+									sudo rm "$f".backing.image
+							fi
+					fi
+		fi
+	fi
+backingcreate=n
+done
+for f in $tempvmlistp2
+do
+	# Ask if user wants to shrink the disk.
+	read -r -e -p "Shrink $f? [y/N] " choice
+	if [[ "$choice" == [Yy]* ]]
+		# If yes, make a backup copy
+		then
+			sudo mv "$f" "$f".backup
+			# Shrink the disk
+			sudo qemu-img convert -O qcow2 -p "$f".backup "$f"
+			# Show file sizes after the shirnk procedure is complete.
+			echo Original file size = "$(sudo du -h "$f".backup |cut -f1)"
+			echo Shrunken file size = "$(sudo du -h "$f" |cut -f1)"
+			# Prompt user to test their virtual disk by starting the corresponding cirtual machine. 
+			# Ask if the user wants to delete the backup file.
+			echo "Start virt-manager to check the intregrity of the storge disk for the virtual machine" 
+			echo "that uses the disk image entitled"
+			echo "$f."
+			echo "If you are able to read the files on it, it is probably safe to remove" 
+			echo "$f.backup."
+			read -r -e -p "Remove $f.backup? [y/N] " choice3
+				if [[ "$choice3" == [Yy]* ]]
+					# If yes, delete the backup file.
+					then
+						sudo rm "$f".backup
+				elif [[ "$choice3" != [Yy]* ]]
+					# If no, ask user if they want to restore the backup.
+						then
+							read -r -e -p "Restore backup? [y/N] " choice4
+								if [[ "$choice4" == [Yy]* ]]
+									# If yes, restore the backup file.
+										then
+										sudo mv "$f".backup "$f"
+								fi
+				fi
+
+
+	fi
+done
+IFS="$ORIGINALIFS"</code></pre>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/26">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/26</link>
+        <pubDate>Tue, 28 Jan 2020 12:55:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-26</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="24" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Please run through <code>shellcheck</code>.</p>
+</blockquote>
+</aside>
+<p>it’s not quite there yet. i’m aware that it’s quite dirty. i’ll tidy it up with the appropriate quoting and such once a final version is ready. still looking into whether it can be used to control a vm to boot in recovery mode and do a zerofree pass.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/25">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/25</link>
+        <pubDate>Tue, 21 Jan 2020 07:01:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-25</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Please run through <code>shellcheck</code>.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/24">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/24</link>
+        <pubDate>Tue, 21 Jan 2020 06:40:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-24</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <p>so, i created a quick test vm with 16 gigs total disk space to simulate a more conservative external drive. i can confirm that virt-sparsify stalled out once the hard drive was full in that set up while processing the first whonix disk. however, the method documented above with qemu-img worked fine.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/23</link>
+        <pubDate>Tue, 21 Jan 2020 03:40:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-23</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <p>ok. i will remove the option.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/22</link>
+        <pubDate>Tue, 21 Jan 2020 01:11:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-22</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="15" data-topic="8724">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tempest/40/349_2.png" class="avatar"> tempest:</div>
+<blockquote>
+<p>on a side note, aside from the potential performance hits, is anyone aware of any security issues when using a compressed image with kvm?</p>
+</blockquote>
+</aside>
+<p>Compressing/parsing anything that can have untrusted input on the host is not a good idea. I prefer the zerofree method in the guest to this.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/21</link>
+        <pubDate>Mon, 20 Jan 2020 21:57:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-21</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <p>here’s the dirty draft version of the kvm script so far. it’s a slightly modified version of the one posted earlier. this one exports the path and filenames of the virtual disks that aren’t running, checks if they have been modified in the past 24 hours, and then passes them to the remainder of the script for processing. i also tweaked it to allow for the potential of white spaces in directory names, since i can foresee some people leaving “converted” disk images in the “virtual machines” folder if they used something like virtualbox before. but, that may be overkill as well.</p>
+<pre><code>#!/bin/bash
+#
+# This script will search for installed virtual machines and attempt to reduce
+# their size.
+#
+ORIGINALIFS="$IFS"
+IFS=$'\n'
+# Get list of installed and inactive virtual disks and write to a variable.
+echo "You must shut down your virtual machines for the shrink process to work." 
+read -e -p "Please shut down your virtual machines and press [enter] to continue."
+tempvmlist=$(for i in $(sudo virsh list --name --inactive); do sudo virsh domblklist $i --details; done| grep / | awk -F" {2,}" '{print $4}' | sed -e 's|[[:space:]]|\ |g' )
+# Read from list of vms and filter files that have not been modified in the past 24 hours.
+tempvmlist2=$(for f in $tempvmlist; do sudo find $f -type f -mtime -1 -size +10M -name *.qcow2 | sed -e 's|[[:space:]]|\\ |g'; done )
+     for f in $tempvmlist2
+	do
+	# Ask if user wants to shrink the disk.
+	read -e -p "Shrink $f? [y/N] " choice
+	if [[ "$choice" == [Yy]* ]]
+	   # If yes, make a backup copy
+	   then
+	    sudo mv $f $f.backup
+	    # Ask if user wants to enable disk compression
+	    echo "Do you want to enable additional disk compression on" 
+	    echo "$f?"
+            read -e -p "This will take longer and may affect disk performance. [y/N] " choice2
+            if [[ "$choice2" == [Yy]* ]]
+	      # If yes, enable disk compression.
+              then 
+		sudo qemu-img convert -O qcow2 -p -c $f.backup $f
+	      else
+              # If no, begin standard sparisfy procedure.
+		sudo qemu-img convert -O qcow2 -p $f.backup $f
+	    fi
+	    # Show file sizes after virt-sparsify procedure is complete.
+	    echo Original file size = $(sudo du -h $f.backup |cut -f1)
+	    echo Shrunken file size = $(sudo du -h $f |cut -f1)
+	    # Prompt user to test their virtual disk by starting the corresponding cirtual machine. 
+            # Ask if the user wants to delete the backup file.
+	    echo "Start virt-manager to check if you can boot the virtual machine" 
+            echo "that uses the disk image entitled"
+            echo "$f." 
+	    echo "If you reach the desktop, it is probably safe to remove" 
+	    echo "$f.backup."
+	    read -e -p "Remove $f.backup? [y/N] " choice3
+		if [[ "$choice3" == [Yy]* ]]
+	          # If yes, delete the backup file.
+	 	  then
+		    sudo rm $f.backup
+		elif [[ "$choice3" != [Yy]* ]]
+		  # If no, ask user if they want to restore the backup.
+		  then
+		    read -e -p "Restore backup? [y/N] " choice4
+		    if [[ "$choice4" == [Yy]* ]]
+			# If yes, restore the backup file.
+                      	then
+                          sudo mv $f.backup $f
+		fi
+	fi
+fi
+done
+IFS="$ORIGINALIFS"</code></pre>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/20</link>
+        <pubDate>Mon, 20 Jan 2020 20:44:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-20</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[tempest]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="18" data-topic="8724" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>but they are overkill here</p>
+</blockquote>
+</aside>
+<p>that is my thought as well. to dumb it down completely, the script would need to control the vm from the start in order to boot in recovery mode. from a documentation perspective, it’s easier, and arguably more beneficial, to walk a reader through the manual process. but, if it’s possible without too much of a headache, it may be worth exploring if a vm deflator custom tool were to be considered for one of the various os projects here.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/19</link>
+        <pubDate>Mon, 20 Jan 2020 15:35:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-19</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+      <item>
+        <title>scripts to shrink vbox and kvm images</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>I imagine it’s possible to script commands that interact with the guest’s shell via the console interface.</p>
+<p>There are dedicated VM orchestration tools like ansible, puppet and vagrant, but they are overkill here because they define the settings of the VM environment, do migration and a bunch of other stuff.</p>
+          <p><a href="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724/18</link>
+        <pubDate>Mon, 20 Jan 2020 14:18:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8724-18</guid>
+        <source url="http://forums.whonix.org/t/scripts-to-shrink-vbox-and-kvm-images/8724.rss">scripts to shrink vbox and kvm images</source>
+      </item>
+  </channel>
+</rss>

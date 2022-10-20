@@ -1,0 +1,637 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>How Useful is In-Guest Encryption?</title>
+    <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253</link>
+    <description>If the point of in-guest encryption is to protect against an unencrypted host or one that was captured before the guest was shutdown then IMO the benefits are very small and only realized if  users meet a very strict and unrealistic requirements for how they use VMs. In normal usecases data from a running guest will leak unencrypted all over the host and stay there:
+
+https://security.stackexchange.com/a/29538
+
+The performance penalty of running yet another layer of encryption (assuming the host has FDE) is too much given limited performance in a virtual environment as it is.
+
+
+If the point of in-guest encryption is to protect a guest image at-rest sent over untrusted networks then this too is not a good idea. While data inside the image is encrypted and protected, image headers  and the boot partition of the guest  are not and could be maliciously modified in transit without the user noticing (unless they generate a hash the image to verify integrity). It would make more sense to just use GPG to encrypt the image file than continuously incurring the performance penalty of in-guest encryption for a rare usecase - transferring used image files over the internet.</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 26 May 2017 03:08:54 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Hexagon]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="22" data-topic="1253">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>That poses a huge obstacle since images are potentially 100GB each. I think this advice is  good for extra precautions against known ciphertext attacks but realistically I don’t believe  this allows cracking AES completely?</p>
+</blockquote>
+</aside>
+<p>AES is safe without random data for the free space it’s just to prevent some meta data leaks such as what parts of the disk are encrypted and how much is stored. You also wouldn’t want to distribute such images where the space is already filled because then everyone would have the same supposedly random data. (images would still be larger though because you can’t compress them anymore with xz)</p>
+<p>[quote=“HulaHoop, post:23, topic:1253”]<br>
+No its the newer implementation using LUKS instead of the home-brew image format specific one they had earlier[/quote]</p>
+<p>Ah, good to know. Thanks.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/24">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/24</link>
+        <pubDate>Fri, 26 May 2017 03:08:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-24</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="21" data-topic="1253">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/848f3c/40.png" class="avatar"> Hexagon:</div>
+<blockquote>
+<p>Is this the same as the encryption of qcow(2) images? There are some flaws in the implementation.</p>
+</blockquote>
+</aside>
+<p>No its the <a href="https://libvirt.org/formatstorageencryption.html#StorageEncryptionLuks">newer implementation using LUKS</a> instead of the home-brew image format specific one they had earlier which was deprecated in the link you posted.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/23</link>
+        <pubDate>Fri, 26 May 2017 01:41:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-23</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="19" data-topic="1253">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>There is cryptsetup-reencrypt. Meaning: we could ship encrypted images. The master key and the password (perhaps empty if possible) would be known to the public. Users could use cryptsetup-reencrypt to fix the master key and password, i.e. to make the encryption effective.<br>
+At least as far as I understand. This would solve a redistribution<br>
+issue (images downloadable by the public) that I mentioned earlier<br>
+somewhere.</p>
+</blockquote>
+</aside>
+<p>Yes I get it. I think that would be awesome. The impact should be negligible thanks to AES acceleration.</p>
+<aside class="quote" data-post="20" data-topic="1253" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/848f3c/40.png" class="avatar"> Hexagon:</div>
+<blockquote>
+<p>While it seems obvious it might be worth noting in the wiki that you can’t use sparse images if you want to initialize the disk with random data (which is recommended to prevent disclosure of usage patterns on the encrypted drive).</p>
+</blockquote>
+</aside>
+<p>Hm. That poses a huge obstacle since images are potentially 100GB each. I think this advice is  good for extra precautions against known ciphertext attacks but realistically I don’t believe  this allows cracking AES completely?</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/22</link>
+        <pubDate>Fri, 26 May 2017 01:40:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-22</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Hexagon]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="17" data-topic="1253">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Also libvirt introduced LUKS encryption for disk image volumes.</p>
+</blockquote>
+</aside>
+<p>Is this the same as the encryption of qcow(2) images? There are <a href="https://www.berrange.com/posts/2015/03/17/qemu-qcow2-built-in-encryption-just-say-no-deprecated-now-to-be-deleted-soon/" rel="nofollow noopener">some flaws in the implementation</a>.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/21</link>
+        <pubDate>Thu, 25 May 2017 16:11:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-21</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Hexagon]]></dc:creator>
+        <description><![CDATA[
+            <p>While it seems obvious it might be worth noting in the wiki that you can’t use sparse images if you want to initialize the disk with random data (which is recommended to <a href="https://wiki.archlinux.org/index.php/Disk_encryption#Preparing_the_disk" rel="nofollow noopener">prevent disclosure of usage patterns on the encrypted drive</a>).</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/20</link>
+        <pubDate>Thu, 25 May 2017 15:57:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-20</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>There is cryptsetup-reencrypt. Meaning: we could ship encrypted images. The master key and the password (perhaps empty if possible) would be known to the public. Users could use cryptsetup-reencrypt to fix the master key and password, i.e. to make the encryption effective. At least as far as I understand. This would solve a redistribution issue (images downloadable by the public) that I mentioned earlier somewhere. (I thought, if we ship an encrypted image, the master key is known, users could change their password all they want and still be insecure. Actually that’s a non-issue.)</p>
+<aside class="quote" data-post="17" data-topic="1253">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Is this worth adding to the wiki too or is t too specific?</p>
+</blockquote>
+</aside>
+<p>Worth adding since it’s the advanced security guide anything goes. Worth getting this straight also since it influences possible Whonix Live / amnesic in some forms.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/19</link>
+        <pubDate>Thu, 25 May 2017 14:16:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-19</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>UPDATE:</p>
+<p>Found new citations</p>
+<p><a href="https://superuser.com/a/894936">https://superuser.com/a/894936</a> and <a href="https://askubuntu.com/a/721207">https://askubuntu.com/a/721207</a> agree with a source we already have (<a href="https://security.stackexchange.com/a/42186">https://security.stackexchange.com/a/42186</a>).</p>
+<p>CONCLUSION:</p>
+<blockquote>
+<p>Linux memory pages are zeroed only upon request by another process</p>
+</blockquote>
+<p>As mentioned in the last answer in the last source PaX provided the feature to wipe RAM data on free:</p>
+<p><a href="http://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options#Sanitize_all_freed_memory" class="onebox" target="_blank">http://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options#Sanitize_all_freed_memory</a></p>
+<p>While there is an upstream implementation of CONFIG_PAX_MEMORY_SANITIZE being added, it has some expensive performance impact.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://assets-cdn.github.com/favicon.ico" class="site-icon" width="32" height="32">
+      <a href="https://github.com/copperhead/linux-hardened/wiki" target="_blank" rel="nofollow noopener">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars2.githubusercontent.com/u/9757304?s=400&amp;v=4" class="thumbnail onebox-avatar" width="400" height="400">
+
+<h3><a href="https://github.com/copperhead/linux-hardened/wiki" target="_blank" rel="nofollow noopener">copperhead/linux-hardened</a></h3>
+
+<p>Minimal supplement to upstream Kernel Self Protection Project changes. Features already provided by SELinux + Yama and archs other than multiarch arm64 / x86_64 aren't in scope. Only tags have ...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Will add to the wiki later including note on luks libvirt and reencrypt.</p>
+<p>The main point here is that powering down a swapless machine after use eliminates this problem.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/18</link>
+        <pubDate>Thu, 25 May 2017 14:13:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-18</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="16" data-topic="1253">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Is <a href="https://www.whonix.org/wiki/Advanced_Security_Guide#Encrypted_Guest_Images">https://www.whonix.org/wiki/Advanced_Security_Guide#Encrypted_Guest_Images</a> still up to date?</p>
+</blockquote>
+</aside>
+<p>It probably needs some adjustments to the threat model section to explain its new benefits. Also libvirt introduced LUKS encryption for disk image volumes. I still haven’t played around with that yet. Is this worth adding to the wiki too or is t too specific?</p>
+<hr>
+<p>I need to fact check a contradicting bit of info - whether Linux memory pages are zeroed immediately after the process exits or only upon request by another process? The latter is preferred of course since secret data from a process doesn’t hang around for long.</p>
+<p><a class="mention" href="http://forums.whonix.org/u/algernon">@Algernon</a> <a class="mention" href="http://forums.whonix.org/u/hexagon">@Hexagon</a> do you know anything about this?</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/17</link>
+        <pubDate>Thu, 25 May 2017 13:32:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-17</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Is <a href="https://www.whonix.org/wiki/Advanced_Security_Guide#Encrypted_Guest_Images">https://www.whonix.org/wiki/Advanced_Security_Guide#Encrypted_Guest_Images</a> still up to date?</p>
+<p>Btw there is also <code>cryptsetup-reencrypt</code>.</p>
+<p><a href="https://manpages.debian.org/jessie/cryptsetup-bin/cryptsetup-reencrypt.8.en.html" class="onebox" target="_blank">https://manpages.debian.org/jessie/cryptsetup-bin/cryptsetup-reencrypt.8.en.html</a></p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/16</link>
+        <pubDate>Wed, 24 May 2017 21:50:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-16</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Ah, you mean <a href="https://github.com/Whonix/swap-file-creator">https://github.com/Whonix/swap-file-creator</a>. That package is useful for:</p>
+<ul>
+<li>someone implementing image encryption</li>
+<li>swap file creation is easier and more robust than trying to ship Whonix images with a swap partition</li>
+<li>useful for physical isolation</li>
+<li>hopefully one day landing in Debian’s repository. I find swap partitions non-ideal. Those complicate the disk partition layout. Risk unencrypted swap on host.</li>
+<li>using <a href="https://github.com/Whonix/swappiness-lowest">https://github.com/Whonix/swappiness-lowest</a> anyhow</li>
+<li>having unified configs for images and physical isolation, no delta “disable encryption in VMs, but have it enabled on hardware”</li>
+</ul>
+<p>It’s easiest to keep it as is.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/15</link>
+        <pubDate>Wed, 29 Jul 2015 10:59:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-15</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Now I am confused? Which parts do we have? None at all?</blockquote>
+<p>I thought Whonix encrypts its swap partition with a randomly generated key on boot, or something similar…</p>
+<p>If none of that is going on lets keep it that way because now we know why in-guest encryption doesn’t make sense.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/14</link>
+        <pubDate>Wed, 29 Jul 2015 04:33:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-14</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>I am advocating that we simply drop the parts of this feature we already have</blockquote>
+Now I am confused? Which parts do we have? None at all?
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/13</link>
+        <pubDate>Wed, 29 Jul 2015 01:27:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-13</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Don't misunderstand my intentions here. I am not unclear if I am starting to work on this anytime in this life. This is too much work. Would take me too long. What I hope to gain from this discussion is a clear dump of the current state of affairs documented in the wiki. This is useful for many purposes.</blockquote>
+<p>OK. For the record, I am advocating that we simply drop the parts of this feature we already have (I realize this too can take a lot of time) instead of extending it and also developing all kinds of ways on the host to deal with the shortcomings - and some of the OS changes needed are way beyond our project and sometimes even that is not possible if we are talking about proprietary systems. On any OS today you can either protect everything by the FDE layer or nothing at all. They are not designed for the kind of per application encryption that is being attempted here.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/12</link>
+        <pubDate>Wed, 29 Jul 2015 00:00:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-12</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Don’t misunderstand my intentions here. I am not unclear if I am starting to work on this anytime in this life. This is too much work. Would take me too long. What I hope to gain from this discussion is a clear dump of the current state of affairs documented in the wiki. This is useful for many purposes.</p>
+<ul>
+<li>having those issues eventually be fixed at some point [ex: kernel option patch to wipe RAM after VM shutdown] (less likely)</li>
+<li>strengthen security thinking, someone going through this thought experiment gains better understanding of threat models and many factors that are at work here (more likely)</li>
+<li>having a good answer, next time this topic comes up (every now and then)</li>
+<li>having documentation ready, in case this feature gets contributed</li>
+</ul>
+<blockquote>* never suspended or hibernated their host when running a guest.</blockquote>
+<blockquote>* never saved  a guest vm.</blockquote>
+<blockquote>* never enabled swap when a guest was running.</blockquote>
+Or somehow figured out how to securely wipe this?
+<blockquote>* never had the host crash on them when running a guest (if you're on Windows good luck).</blockquote>
+Can't these crash dumps be disabled or are those even enabled by default?
+<blockquote>* booted the host from a cold state and never ran your guest during the entire session - during which the machine was stolen.</blockquote>
+Yes. Plus a small exception. Maybe they were lucky and the RAM was reassigned to some other process, so the encryption key of the now powered down VM has been overwritten. And perhaps that overwriting can be made more likely?
+<blockquote>[quote]That's what I meant.[/quote]
+<p>If they are stealthily living on your host then its game over on so many levels. In-guest encryption won’t help there either.</p>
+</blockquote><br>
+True. But I think we already agreed on this.
+<p>“As long as the RAM that was previously used by the VM was not assigned to another process, the adversary can try a root escalation + load kernel module, or local kernel exploit and cold boot attack to extract the VMs encryption key.” -&gt; On the host. After getting physical access. [The threat model here.]</p>
+<p>Actually, what I am saying, this strengthens your position, that image encryption doesn’t bring huge benefits.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/11</link>
+        <pubDate>Tue, 28 Jul 2015 22:34:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-11</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Considering the warm boot leaks and the very limiting operational circumstances I’m just not seeing in-guest encryption protecting much.</p>
+<p>The only ones protected are those who:</p>
+<ul>
+<li>
+<p>never suspended or hibernated their host when running a guest.</p>
+</li>
+<li>
+<p>never saved  a guest vm.</p>
+</li>
+<li>
+<p>never enabled swap when a guest was running.</p>
+</li>
+<li>
+<p>never had the host crash on them when running a guest (if you’re on Windows good luck).</p>
+</li>
+<li>
+<p>booted the host from a cold state and never ran your guest during the entire session - during which the machine was stolen.</p>
+</li>
+</ul>
+<blockquote>That's what I meant.</blockquote>
+<p>If they are stealthily living on your host then its game over on so many levels. In-guest encryption won’t help there either.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/10</link>
+        <pubDate>Tue, 28 Jul 2015 22:16:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-10</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="8" data-topic="1253">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>[quote]But it reduces leaks, at least?</p>
+</blockquote>
+</aside>
+<p>Yes and no. Yes because nothing is written in no because without a place to offload less used pages, OOMKiller will have to kick in and start forcing processes to shutoff/crash uncleanly.[/quote]<br>
+Where is the ‘no’? Killing processes uncleanly does not produce leaks, no? And this is something which can be prevented by having an eye on free RAM. Not hard (pre-supposes one can buy high end hardware with abundance of RAM). Note: this is all in context of advanced security guide. So having an eye on available RAM is something that can be expected. And when messed up, there would still be no leak. “Just” a crash.</p>
+<blockquote>Trying to protect the guest from the host is ultimately futile.</blockquote>
+Yes, but preventing something from images (that are maybe on an encrypted external disk) leaking onto the host's disk - such as swap - is still worthwhile, no?
+<blockquote>Ah OK then warm attacks are easy feasible. In this situation the contents of the VM's RAM would still be available until the pages are requested by another process, which would then zero them out first (as confirmed by the post describing the behavior of memory allocation).</blockquote>
+Yes.
+<blockquote>[quote]That strengthens my point. As long as the RAM that was previously used by the VM was not assigned to another process, the adversary can try a root escalation + load kernel module, or local kernel exploit and cold boot attack to extract the VMs encryption key.[/quote]
+<p>On the host yes. If you mean something else please explain.</p>
+</blockquote><br>
+That’s what I meant.
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/9</link>
+        <pubDate>Tue, 28 Jul 2015 21:07:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-9</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>But it reduces leaks, at least?</blockquote>
+<p>Yes and no. Yes because nothing is written in no because without a place to offload less used pages, OOMKiller will have to kick in and start forcing processes to shutoff/crash uncleanly.</p>
+<p>Trying to protect the guest from the host is ultimately futile.</p>
+<blockquote>"When a VM has been powered down, the RAM that previously contained the VM's encryption key might not have been wiped yet? Smilar to cold boot attacks, but in this case it might even be a "warm" attack, because under this threat model, the machine and RAM is still powered." -&gt; The threat model here is, that the attack examines the computer while it's still powered on. In such as situation, the encryption key could still be in RAM, even if the VM was just powered down.</blockquote>
+<p>Ah OK then warm attacks are easy feasible. In this situation the contents of the VM’s RAM would still be available until the pages are requested by another process, which would then zero them out first (as confirmed by the post describing the behavior of memory allocation).</p>
+<blockquote>That strengthens my point. As long as the RAM that was previously used by the VM was not assigned to another process, the adversary can try a root escalation + load kernel module, or local kernel exploit and cold boot attack to extract the VMs encryption key.</blockquote>
+<p>On the host yes. If you mean something else please explain.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/8</link>
+        <pubDate>Tue, 28 Jul 2015 20:34:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-8</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>I'll add that disabling swap is not good for host stability (and still cannot prevent leaks caused by crashes)</blockquote>
+But it reduces leaks, at least?
+<p>My experience is on the contrary. As soon as the host swaps, the system becomes super slow. Unusable for moments. Since I disabled swap (enough RAM), my experience has been improved.</p>
+<blockquote>Memory dumps caused by BSOD or kernel crashes can still leave unintenteded traces on the host even with in-guest encryption and following the (unrealistic) rules.</blockquote>
+Good point. Please add this to the wiki.
+<blockquote>KVM guests are Linux processes and subject to Linux memory allocation rules. Its not possible that a VM process accesses the data of memory pages that belonged to another process.</blockquote>
+True. But besides the point. I mean something else...
+<p>“When a VM has been powered down, the RAM that previously contained the VM’s encryption key might not have been wiped yet? Smilar to cold boot attacks, but in this case it might even be a “warm” attack, because under this threat model, the machine and RAM is still powered.” -&gt; The threat model here is, that the attack examines the computer while it’s still powered on. In such as situation, the encryption key could still be in RAM, even if the VM was just powered down.</p>
+<blockquote>Linux zeroes out (i.e. fills with zeros) all pages of memory not when they are released, but when they are given to another process. Thus, no process may obtain data excerpts from another process. However, the pages will retain their old contents until they are reused. I am not aware of any patch which does the zeroing upon page release</blockquote>
+That strengthens my point. As long as the RAM that was previously used by the VM was not assigned to another process, the adversary can try a root escalation + load kernel module, or local kernel exploit and cold boot attack to extract the VMs encryption key.
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/7</link>
+        <pubDate>Tue, 28 Jul 2015 18:33:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-7</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="5" data-topic="1253">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Whonix should support encryption for is when doing a physical build and Whonix becomes the host.</p>
+</blockquote>
+</aside>
+<p>This is already documented in the physical isolation documentation (search for full disk encryption):<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/Build_Documentation/Physical_Isolation" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/472;"><img src="https://www.whonix.org/w/images/9/98/Digital-art-191226640.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Dev/Build_Documentation/Physical_Isolation" target="_blank" rel="nofollow noopener">Dev/Build Documentation/Physical Isolation</a></h3>
+
+<p>Security by Isolation. Using Whonix with Physical Isolation on Bare Metal for Better Security.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/6</link>
+        <pubDate>Tue, 28 Jul 2015 18:26:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-6</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Theoretically, one could either build Whonix using '--target root' inside a VM. (Similar to physical isolation.) Secure VM settings would be missing. (Similar to Manually Create Whonix VM Settings.) Or add an encryption feature to grml-debootstrap and/or Whonix's build script. There was an attempt to do that, which stalled.</blockquote>
+<p>With the information researched, I think the only relevant situation Whonix should support encryption for is when doing a physical build and Whonix becomes the host.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/5</link>
+        <pubDate>Tue, 28 Jul 2015 17:27:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-5</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="http://docs.openstack.org/security-guide/content/data-privacy-concerns.html" class="onebox" target="_blank">http://docs.openstack.org/security-guide/content/data-privacy-concerns.html</a></p>
+<blockquote>Instance memory scrubbing
+<p>Specific to various hypervisors is the treatment of instance memory. This behavior is not defined in OpenStack Compute, although it is generally expected of hypervisors that they will make a best effort to scrub memory either upon deletion of an instance, upon creation of an instance, or both.</p>
+<p>Xen explicitly assigns dedicated memory regions to instances and scrubs data upon the destruction of instances (or domains in Xen parlance). KVM depends more greatly on Linux page management; A complex set of rules related to KVM paging is defined in the KVM documentation.</p>
+<p>It is important to note that use of the Xen memory balloon feature is likely to result in information disclosure. We strongly recommended to avoid use of this feature.</p>
+<p>For these and other hypervisors, we recommend referring to hypervisor-specific documentation.</p>
+</blockquote>
+<p>Linux memory allocation rules govern how KVM memory ballooning works and so it should not be a risk (its enabled by default BTW). More on that below.</p>
+<hr>
+<blockquote>Disabling swap would require to wipe (special secure delete) the existing swap. It might be the safest to never have used swap before.</blockquote>
+<p>I’ll add that disabling swap is not good for host stability (and still cannot prevent leaks caused by crashes)</p>
+<blockquote>     With swap disabled, could it still happen, that the virtualizer writes [parts] of the VM's RAM's content to the disk? Virtualizer specific. TODO: Specifically ask virtualizer vendors about this.</blockquote>
+<p>Memory dumps caused by BSOD or kernel crashes can still leave unintenteded traces on the host even with in-guest encryption and following the (unrealistic) rules.</p>
+ <blockquote>   When a VM has been powered down, the RAM that previously contained the VM's encryption key might not have been wiped yet? Smilar to cold boot attacks, but in this case it might even be a "warm" attack, because under this threat model, the machine and RAM is still powered.</blockquote>
+<p>KVM guests are Linux processes and subject to Linux memory allocation rules. Its not possible that a VM process accesses the data of memory pages that belonged to another process.</p>
+<aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://security.stackexchange.com/questions/42179/is-there-any-linux-distro-or-kernel-patch-that-wipes-a-process-memory-space-afte/42186#42186" target="_blank" rel="nofollow noopener">security.stackexchange.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://security.stackexchange.com/users/655/thomas-pornin" target="_blank" rel="nofollow noopener">
+    <img alt="Thomas Pornin" src="https://www.gravatar.com/avatar/07ccc97c05f3fb80560ebc618a7de8bc?s=128&amp;d=identicon&amp;r=PG" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://security.stackexchange.com/questions/42179/is-there-any-linux-distro-or-kernel-patch-that-wipes-a-process-memory-space-afte/42186#42186" target="_blank" rel="nofollow noopener">Is there any Linux distro or kernel patch that wipes a process memory space after the process exits?</a>
+</h4>
+
+<div class="tags">
+  <strong>linux, tamper-resistance</strong>
+</div>
+
+<div class="date">
+  
+  answered by
+  <a href="https://security.stackexchange.com/users/655/thomas-pornin" target="_blank" rel="nofollow noopener">
+    Thomas Pornin
+  </a>
+  on <a href="https://security.stackexchange.com/questions/42179/is-there-any-linux-distro-or-kernel-patch-that-wipes-a-process-memory-space-afte/42186#42186" target="_blank" rel="nofollow noopener">09:19PM - 10 Sep 13</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>Linux zeroes out (i.e. fills with zeros) all pages of memory not when they are released, but when they are given to another process. Thus, no process may obtain data excerpts from another process. However, the pages will retain their old contents until they are reused. I am not aware of any patch which does the zeroing upon page release</blockquote>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/4</link>
+        <pubDate>Tue, 28 Jul 2015 17:22:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-4</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Added all of that to documentation:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Advanced_Security_Guide#Encrypted_Images" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/426;"><img src="https://www.whonix.org/w/images/4/4e/Padlocks337569640.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Advanced_Security_Guide#Encrypted_Images" target="_blank" rel="nofollow noopener">Advanced Security Guide</a></h3>
+
+<p>Computer Security Guide for Whonix Linux for Advanced Users, Whonix Hardening</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/3</link>
+        <pubDate>Tue, 28 Jul 2015 12:40:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-3</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Background… Most likely the recent criticism triggered this thread:<br>
+<a href="https://www.whonix.org/forum/index.php/topic,1458.0.html" class="onebox" target="_blank">https://www.whonix.org/forum/index.php/topic,1458.0.html</a></p>
+<p>Previous stalled attempt:<br>
+<a href="https://www.whonix.org/forum/index.php/topic,204.0.html" class="onebox" target="_blank">https://www.whonix.org/forum/index.php/topic,204.0.html</a></p>
+<p>My reply to that point:<br>
+<a href="https://www.whonix.org/forum/index.php/topic,1458.msg9186.html#msg9186" class="onebox" target="_blank">https://www.whonix.org/forum/index.php/topic,1458.msg9186.html#msg9186</a></p>
+<p>Relevant quote:</p>
+<p>[quote=“Patrick, post:4, topic:1251”]There has been an attempt to add encryption to Whonix images:<br>
+<a href="https://www.whonix.org/forum/index.php/topic,204.0.html" class="onebox" target="_blank">https://www.whonix.org/forum/index.php/topic,204.0.html</a><br>
+The master key would be known, but nevermind, thanks to cryptsetup-reencrypt this is not totally non-nonsensical.<br>
+If this is more than security theater is another question. The threat model here is, that the VM is shut down, while the host is powered up the moment the machine falls into the hand of an adversary. Virtualzer specific. The issue is, that the virtualizer might still have the key in RAM or written to the disk. Asking virtualizer vendors if this is at risk and implementing this feature is TODO.[/quote]</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/2</link>
+        <pubDate>Tue, 28 Jul 2015 10:28:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-2</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+      <item>
+        <title>How Useful is In-Guest Encryption?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>If the point of in-guest encryption is to protect against an unencrypted host or one that was captured before the guest was shutdown then IMO the benefits are very small and only realized if  users meet a very strict and unrealistic requirements for how they use VMs. In normal usecases data from a running guest will leak unencrypted all over the host and stay there:</p>
+<aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://security.stackexchange.com/questions/29535/full-disk-encryption-within-a-vm-how-secure-is-it/29538#29538" target="_blank" rel="nofollow noopener">security.stackexchange.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://security.stackexchange.com/users/953/iszi" target="_blank" rel="nofollow noopener">
+    <img alt="Iszi" src="https://www.gravatar.com/avatar/8f8571493d71202986f2a6ab0dbd7c23?s=128&amp;d=identicon&amp;r=PG" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://security.stackexchange.com/questions/29535/full-disk-encryption-within-a-vm-how-secure-is-it/29538#29538" target="_blank" rel="nofollow noopener">Full Disk Encryption within a VM, how secure is it?</a>
+</h4>
+
+<div class="tags">
+  <strong>virtualization, disk-encryption</strong>
+</div>
+
+<div class="date">
+  
+  answered by
+  <a href="https://security.stackexchange.com/users/953/iszi" target="_blank" rel="nofollow noopener">
+    Iszi
+  </a>
+  on <a href="https://security.stackexchange.com/questions/29535/full-disk-encryption-within-a-vm-how-secure-is-it/29538#29538" target="_blank" rel="nofollow noopener">08:11PM - 22 Jan 13</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>The performance penalty of running yet another layer of encryption (assuming the host has FDE) is too much given limited performance in a virtual environment as it is.</p>
+<p>If the point of in-guest encryption is to protect a guest image at-rest sent over untrusted networks then this too is not a good idea. While data inside the image is encrypted and protected, image headers  and the boot partition of the guest  are not and could be maliciously modified in transit without the user noticing (unless they generate a hash the image to verify integrity). It would make more sense to just use GPG to encrypt the image file than continuously incurring the performance penalty of in-guest encryption for a rare usecase - transferring used image files over the internet.</p>
+          <p><a href="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253/1</link>
+        <pubDate>Mon, 27 Jul 2015 23:24:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1253-1</guid>
+        <source url="http://forums.whonix.org/t/how-useful-is-in-guest-encryption/1253.rss">How Useful is In-Guest Encryption?</source>
+      </item>
+  </channel>
+</rss>

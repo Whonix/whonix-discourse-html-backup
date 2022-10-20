@@ -1,0 +1,720 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+    <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550</link>
+    <description>I&#39;ve updated all my Whonix Qubes from 15 to 16 except for 1. And I&#39;d like to avoid rebuilding it from scratch. 
+
+I followed the instructions for upgrading, including all the sanity checks and was in the midst of &quot;release-upgrade&quot; when it crashed. This has happened 2 times now. But I have not been watching it when it actually happens. I just come back and my Terminal is gone. I can&#39;t launch the Terminal or xterm. And qvm-ls reports the qube is still running.
+
+If I shut it down it will not boot anymore. This is the second attempt on this Qube. I have not yet shut it down in case there is anything you can suggest I try first. 
+
+Hopefully I can help you track down the problem.
+
+Thanks.
+
+p.s. One other piece of info. I can still access the nginx server running on this qube via a browser but I get the default nginx message as if the website data is no longer there, which is strange.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 31 Oct 2021 07:14:51 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Please someone analyze/report that exim4 issue and report to upstream, Debian.</p>
+<p>To get rid of it, if you’re lucky you can run:</p>
+<pre><code>sudo apt-get-noninteractive purge "exim*"
+</code></pre>
+<p>If that doesn’t work, you’d need to remove them all one by one:</p>
+<pre><code>sudo dpkg-noninteractive --purge --force-all exim4-config
+sudo dpkg-noninteractive --purge --force-all exim4-base
+sudo dpkg-noninteractive --purge --force-all exim4-daemon-light
+</code></pre>
+<p>Problem is… See</p>
+<pre><code>apt-cache show automysqlbackup
+</code></pre>
+<p>see its <code>Depends:</code></p>
+<p>Consider</p>
+<pre><code>sudo apt remove automysqlbackup
+</code></pre>
+<p>until upgrade is complete.</p>
+<p>Then re-try release-upgrade.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/18</link>
+        <pubDate>Sun, 31 Oct 2021 07:14:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-18</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[mimp]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks Patrick, it seemed to have worked. I think I even caught it running the new check:</p>
+<pre><code>  Conf qubes-vm-dependencies (4.0.12-1+deb11u1 Qubes Debian:deb.qubes-os.org [amd64])
+    + true 'INFO: Checking if release upgrade is safe or would result in removal of the main meta package... This will take a moment...'
+    + set +x
+    + true 'INFO: Install release upgrade of dependency packages...'
+    + apt-get-noninteractive --yes --no-install-recommends install sdwdate fasttrack-archive-keyring
+    Reading package lists... Done
+    Building dependency tree       
+    Reading state information... Done
+    The following NEW packages will be installed:
+      fasttrack-archive-keyring
+    The following packages will be upgraded:
+      sdwdate
+    1 upgraded, 1 newly installed, 0 to remove and 1196 not upgraded.
+    Need to get 0 B/130 kB of archives.
+    After this operation, 6,144 B of additional disk space will be used.
+    Selecting previously unselected package fasttrack-archive-keyring.
+    (Reading database ... 91846 files and directories currently installed.)
+    Preparing to unpack .../fasttrack-archive-keyring_2020.12.19_all.deb ...
+    Unpacking fasttrack-archive-keyring (2020.12.19) ...
+    Preparing to unpack .../sdwdate_3%3a17.1-1_all.deb ...
+    Unpacking sdwdate (3:17.1-1) over (3:15.8-1) ...
+</code></pre>
+<p>It did end with errors, but seem manageable. exim4 packages have been a problem for me in in the past, usually fixed be reconfiguring with dpkg. I see someone else posted about this recently.</p>
+<pre><code>           ##########################################
+            ## INFO: END  : setup-wizard-dist postinst configure' '3:7.1-1
+            #################################################
+            '
+            + exit 0
+            Setting up whonix-shared-default-applications-gui (3:22.0-1) ...
+            Setting up whonix-workstation-shared-packages-shared-meta (3:22.0-1) ...
+            Setting up qubes-whonix-workstation (3:22.0-1) ...
+            Errors were encountered while processing:
+             exim4-config
+             exim4-base
+             exim4-daemon-light
+             bsd-mailx
+             automysqlbackup
+            needrestart is being skipped since dpkg has failed
+            E: Sub-process /usr/bin/dpkg returned an error code (1)
+            + true 'ERROR: An error was encountered during installation of release upgrade (1/2). See above.'
+            + exit 1</code></pre>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/17</link>
+        <pubDate>Sun, 31 Oct 2021 04:09:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-17</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><code>release-upgrade</code> command version <code>1.5</code> is available now. It’s provided by the <code>whonix-legacy</code> package which has been uploaded to all Whonix 15 / buster repositories. How to check <code>release-upgrade</code> command version version number is documented on the usual documentation wiki page for this release upgrade <a href="https://www.whonix.org/wiki/Release_Upgrade_Whonix_15_to_Whonix_16" class="inline-onebox">Release Upgrade Whonix 15 to Whonix 16 - Whonix</a>.</p>
+<p>In-place release upgrade should be fixed - but it assumes a non-broken APT state. So if you had created a VM snapshot (or clone or backup) before release upgrade attempt, you’re in luck now, revert to snapshot, perform a <a href="https://www.whonix.org/wiki/Operating_System_Software_and_Updates">standard upgrade</a> to get the updated/fixed <code>release-upgrade</code> and retry the release upgrade process.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/16</link>
+        <pubDate>Sat, 23 Oct 2021 14:58:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-16</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I am working on this:<br>
+<a href="https://github.com/Whonix/whonix-legacy/blob/master/usr/sbin/release-upgrade">https://github.com/Whonix/whonix-legacy/blob/master/usr/sbin/release-upgrade</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/15</link>
+        <pubDate>Sat, 23 Oct 2021 11:59:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-15</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Not expected.</p>
+<aside class="quote no-group" data-username="mimp" data-post="13" data-topic="12550">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/47e85d/40.png" class="avatar"> mimp:</div>
+<blockquote>
+<pre><code class="lang-auto"> qubes-vm-recommended : Depends: network-manager (&gt;= 0.8.1-1) but it is not going to be installed
+                        Depends: network-manager-gnome but it is not going to be installed
+                        Depends: qubes-core-agent-network-manager but it is not going to be installed
+</code></pre>
+</blockquote>
+</aside>
+<p>Try.</p>
+<pre><code>sudo apt install qubes-vm-recommended network-manager network-manager-gnome qubes-core-agent-network-manager
+</code></pre>
+<p>And/or add/drop any number of packages from that.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/14</link>
+        <pubDate>Sat, 23 Oct 2021 09:33:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-14</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[mimp]]></dc:creator>
+        <description><![CDATA[
+            <pre><code>user@host:/usr/sbin$ sudo apt install qubes-vm-dependencies
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following package was automatically installed and is no longer required:
+  gstreamer1.0-pulseaudio
+Use 'sudo apt autoremove' to remove it.
+Recommended packages:
+  qubes-vm-recommended
+The following packages will be upgraded:
+  qubes-vm-dependencies
+1 upgraded, 0 newly installed, 0 to remove and 1178 not upgraded.
+Need to get 2,252 B of archives.
+After this operation, 0 B of additional disk space will be used.
+Get:1 https://deb.qubes-os.org/r4.0/vm bullseye/main amd64 qubes-vm-dependencies amd64 4.0.11-1+deb11u1 [2,252 B]
+Fetched 2,252 B in 7s (307 B/s)            
+(Reading database ... 92027 files and directories currently installed.)
+Preparing to unpack .../qubes-vm-dependencies_4.0.11-1+deb11u1_amd64.deb ...
+Unpacking qubes-vm-dependencies (4.0.11-1+deb11u1) over (4.0.11-1+deb10u1) ...
+Setting up qubes-vm-dependencies (4.0.11-1+deb11u1) ...
+Scanning processes...                                           
+Scanning candidates...                                          
+Scanning linux images...                                        
+
+No services need to be restarted.
+
+No containers need to be restarted.
+
+No user sessions are running outdated binaries.
+</code></pre>
+<p>Then as it recommended I tried:</p>
+<pre><code>user@host:/usr/sbin$ sudo apt install qubes-vm-recommended
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+ cython3 : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+           Recommends: python3-dev but it is not going to be installed
+ libsmbclient : Depends: samba-libs (= 2:4.13.5+dfsg-2) but it is not going to be installed
+ python3 : PreDepends: python3-minimal (= 3.7.3-1) but 3.9.2-3 is to be installed
+           Depends: python3.7 (&gt;= 3.7.3-1~) but it is not going to be installed
+           Depends: libpython3-stdlib (= 3.7.3-1) but 3.9.2-3 is to be installed
+ python3-apt : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-cairo : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-cbor : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-cffi-backend : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-dbus : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-distutils : Depends: python3:any (&gt;= 3.9.1-0~)
+ python3-dnf : Depends: python3-gpg but it is not going to be installed
+               Depends: python3-rpm (&gt;= 4.14.0-1~) but it is not going to be installed
+               Recommends: deltarpm but it is not installable
+ python3-geoip : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-gi : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-gi-cairo : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-hawkey : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-kiwisolver : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-lib2to3 : Depends: python3:any (&gt;= 3.9.1-0~)
+ python3-libapparmor : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-libcomps : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-libdnf : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-lz4 : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-markupsafe : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-matplotlib : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-msgpack : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-numpy : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-pil : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+               Recommends: python3-olefile but it is not going to be installed
+ python3-psutil : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-pyqt5.sip : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-pyx : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-qubesdb : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-snappy : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-talloc : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-tk : Depends: python3 (&gt;= 3.9.1-0~) but 3.7.3-1 is to be installed
+ python3-tornado : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-twisted-bin : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-ubjson : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-unbound : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-wsaccel : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-yaml : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-zmq : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ python3-zope.interface : Depends: python3 (&gt;= 3.9~) but 3.7.3-1 is to be installed
+ qubes-vm-recommended : Depends: network-manager (&gt;= 0.8.1-1) but it is not going to be installed
+                        Depends: network-manager-gnome but it is not going to be installed
+                        Depends: qubes-core-agent-network-manager but it is not going to be installed
+E: Error, pkgProblemResolver::Resolve generated breaks, this may be caused by held packages.
+user@host:/usr/sbin$ 
+</code></pre>
+<p>Is that expected?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/13</link>
+        <pubDate>Fri, 22 Oct 2021 21:14:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-13</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Try to install qubes-vm-dependencies only. For now. Removal of qubes-whonix-workstation would be acceptable in the debugging process as long as no important Qubes packages such as qubes-gui-agent are removed. Would be interesting if qubes-vm-dependencies could be re-installed including all the packages which qubes-vm-dependencies <code>Depends:</code> on. See also:</p>
+<pre><code>apt-cache show qubes-vm-dependencies
+</code></pre>
+<p>Maybe some Qubes package recently changed dependencies and somehow became incompatible (packaging conflict) during the buster → bullseye upgrade? The same might be happening attempting to upgrade Qubes Debian buster → bullseye?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/12</link>
+        <pubDate>Fri, 22 Oct 2021 20:30:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-12</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[mimp]]></dc:creator>
+        <description><![CDATA[
+            <p>I installed qubes-mgmt-salt-vm-connector, tried installing libc6-dev and qubes-whonix-workstation. It wouldn’t let me because qubes-mgmt-salt-vm-connector is dependent on salt-ssh.</p>
+<p>I tried<br>
+sudo apt install salt-ssh</p>
+<p>And I got the same list as above I think. It wants to upgrade 158, install 46 and remove 53 packages including qubes-whonix, qubes-whonix-workstation, etc. So then I did:</p>
+<pre><code>user@host:/usr/sbin$ sudo apt install salt-ssh libc6-dev qubes-whonix-workstation
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+  cpp-8 gir1.2-gdesktopenums-3.0 gir1.2-gnomedesktop-3.0 gir1.2-notify-0.7 gir1.2-soup-2.4
+  gnome-desktop3-data gnome-settings-daemon-common gnome-shell-common
+  gstreamer1.0-pulseaudio iio-sensor-proxy libasan5 libaudio2 libdouble-conversion1
+  libgeoclue-2-0 libgeocode-glib0 libgnome-desktop-3-17 libgweather-3-15
+  libgweather-common libhiredis0.14 libicu57 libisl19 libmng1 libnm0
+  libpulse-mainloop-glib0 libpython2.7 libupower-glib3 mutter-common python3-xcffib
+  python3.7-minimal qdbus qdbus-qt5 qtchooser qtcore4-l10n upower xserver-xorg-input-qubes
+  xserver-xorg-video-dummyqbs
+Use 'sudo apt autoremove' to remove them.
+The following additional packages will be installed:
+  bubblewrap cython3 gnome-settings-daemon-common gsettings-desktop-schemas
+  iio-sensor-proxy init libapt-pkg-perl libapt-pkg6.0 libblockdev-utils2 libblockdev2
+  libc-bin libc-dev-bin libc-devtools libc-l10n libc6 libcbor0 libcrypt-dev libcrypt1
+  libcryptsetup12 libdbd-mysql-perl libdbi-perl libdouble-conversion3 libfcgi-perl
+  libfcgi0ldbl libffi7 libfido2-1 libfile-fnmatch-perl libfreetype6 libgdk-pixbuf-2.0-0
+  libgdk-pixbuf-xlib-2.0-0 libgdk-pixbuf2.0-0 libgdk-pixbuf2.0-common
+  libgirepository-1.0-1 libglib2.0-0 libglib2.0-bin libgnutls-dane0 libgnutls30
+  libharfbuzz0b libhogweed6 libhtml-parser-perl libicu67 libintl-perl libintl-xs-perl
+  libjson-c5 libjson-glib-1.0-0 libjson-glib-1.0-common libkpathsea6 libldb2
+  liblist-moreutils-perl liblist-moreutils-xs-perl liblocale-gettext-perl liblz4-1
+  libmaxminddb0 libmd4c0 libmount1 libmpdec3 libnet-ssleay-perl libnettle8
+  libnginx-mod-http-auth-pam libnginx-mod-http-cache-purge libnginx-mod-http-dav-ext
+  libnginx-mod-http-echo libnginx-mod-http-fancyindex libnginx-mod-http-geoip
+  libnginx-mod-http-geoip2 libnginx-mod-http-headers-more-filter
+  libnginx-mod-http-image-filter libnginx-mod-http-lua libnginx-mod-http-ndk
+  libnginx-mod-http-perl libnginx-mod-http-subs-filter libnginx-mod-http-uploadprogress
+  libnginx-mod-http-upstream-fair libnginx-mod-http-xslt-filter libnginx-mod-mail
+  libnginx-mod-nchan libnginx-mod-stream libnginx-mod-stream-geoip
+  libnginx-mod-stream-geoip2 libnsl-dev libnsl2 libnss-nis libnss-nisplus libp11-kit0
+  libperl5.32 libproc-processtable-perl libptexenc1 libpython3-stdlib libpython3.9
+  libpython3.9-minimal libpython3.9-stdlib libqt5core5a libqt5dbus5 libqt5designer5
+  libqt5gui5 libqt5help5 libqt5network5 libqt5printsupport5 libqt5sql5 libqt5svg5
+  libqt5test5 libqt5widgets5 libqt5xdgiconloader3 libqt5xml5 libqubesdb libreadline8
+  libseccomp2 libselinux1 libsmbclient libsnappy1v5 libsodium23 libstdc++6 libsynctex2
+  libtalloc2 libtasn1-6 libtdb1 libteckit0 libterm-readkey-perl libtevent0 libtexlua53
+  libtexluajit2 libtext-charwidth-perl libtext-iconv-perl libtirpc-common libtirpc-dev
+  libtirpc3 libudev1 libudisks2-0 libwbclient0 libwebpmux3 libx11-6 libx11-xcb1 libxau6
+  libxcb-xinput0 libxxhash0 libzstd1 locales manpages manpages-dev nginx-common
+  nginx-extras openssh-client openssh-server openssh-sftp-server p11-kit-modules perl
+  perl-base perl-modules-5.32 python-matplotlib-data python3 python3-apt python3-cairo
+  python3-cbor python3-cffi-backend python3-dbus python3-distutils python3-geoip
+  python3-gi python3-gi-cairo python3-kiwisolver python3-ldb python3-lib2to3
+  python3-libapparmor python3-lz4 python3-markupsafe python3-matplotlib python3-minimal
+  python3-msgpack python3-nacl python3-nautilus python3-numpy python3-pil python3-psutil
+  python3-pycryptodome python3-pyqt5 python3-pyqt5.sip python3-pyx python3-qubesdb
+  python3-sip python3-snappy python3-talloc python3-tk python3-twisted-bin python3-ubjson
+  python3-wsaccel python3-yaml python3-zmq python3-zope.interface python3.9
+  python3.9-minimal qdbus qdbus-qt5 qubes-core-agent-nautilus qubes-pdf-converter ranger
+  runit-helper salt-common samba-libs tex-common texlive-base texlive-binaries
+  texlive-latex-base udev udisks2 xen-utils-common
+Suggested packages:
+  cython-doc glibc-doc libclone-perl libmldbm-perl libnet-daemon-perl
+  libsql-statement-perl dns-root-data libdata-dump-perl mmdb-bin qt5-image-formats-plugins
+  qtwayland5 fcgiwrap nginx-doc ssl-cert keychain libpam-ssh monkeysphere ssh-askpass
+  molly-guard ufw perl-doc libterm-readline-gnu-perl | libterm-readline-perl-perl
+  libtap-harness-archive-perl python3-doc python3-venv python3-apt-dbg python-apt-doc
+  python-dbus-doc python3-dbus-dbg dvipng ffmpeg inkscape python-matplotlib-doc
+  python3-cairocffi python3-gobject python3-nose python3-scipy python3-tornado
+  texlive-extra-utils texlive-latex-extra ttf-staypuft python-nacl-doc gfortran
+  python-numpy-doc python3-dev python3-numpy-dbg python3-pytest python-pil-doc
+  python3-pil-dbg python-psutil-doc python3-pyqt5-dbg python3-pyx-doc
+  texlive-fonts-recommended tix python3-tk-dbg python3-twisted-bin-dbg python3.9-venv
+  python3.9-doc binfmt-support atool caca-utils unoconv python3-mako salt-doc debhelper
+  perl-tk xzdec texlive-latex-base-doc btrfs-progs f2fs-tools libblockdev-mdraid2 mdadm
+  nilfs-tools reiserfsprogs udftools udisks2-bcache udisks2-btrfs udisks2-lvm2
+  udisks2-zram xfsprogs
+Recommended packages:
+  python3-dev apt libfcgi-bin libgdk-pixbuf2.0-bin qttranslations5-l10n
+  qt5-gtk-platformtheme libqt5sql5-sqlite | libqt5sql5-mysql | libqt5sql5-odbc
+  | libqt5sql5-psql | libqt5sql5-tds | libqt5sql5-ibase python3-olefile python3-croniter
+  dvisvgm dosfstools eject exfat-utils
+The following packages will be REMOVED:
+  gcc-8 gnome-settings-daemon gnome-tweaks libgcc-8-dev libldb1 libpython-stdlib
+  libqt4-dbus libqt4-declarative libqt4-designer libqt4-help libqt4-network libqt4-script
+  libqt4-scripttools libqt4-sql libqt4-svg libqt4-test libqt4-xml libqt4-xmlpatterns
+  libqtassistantclient4 libqtcore4 libqtdbus4 libqtgui4 nginx perl-modules-5.24 python
+  python-enum34 python-gi python-minimal python-nautilus python-qt4 python-sip
+  python-talloc python3-systemd python3-tornado4 python3.7 qubes-gui-agent
+  qubes-vm-dependencies
+The following NEW packages will be installed:
+  libapt-pkg6.0 libc-devtools libcbor0 libcrypt-dev libcrypt1 libdouble-conversion3
+  libfcgi0ldbl libffi7 libfido2-1 libgdk-pixbuf-2.0-0 libgdk-pixbuf-xlib-2.0-0 libhogweed6
+  libicu67 libjson-c5 libldb2 liblist-moreutils-xs-perl libmaxminddb0 libmd4c0 libmpdec3
+  libnettle8 libnginx-mod-http-geoip2 libnginx-mod-stream-geoip libnginx-mod-stream-geoip2
+  libnsl-dev libnsl2 libnss-nis libnss-nisplus libperl5.32 libpython3.9
+  libpython3.9-minimal libpython3.9-stdlib libreadline8 libtirpc-common libtirpc-dev
+  libtirpc3 libxcb-xinput0 manpages manpages-dev perl-modules-5.32 python3-ldb
+  python3-nautilus python3-pycryptodome python3-pyqt5.sip python3-talloc python3-zmq
+  python3.9 python3.9-minimal qdbus-qt5 runit-helper
+The following packages will be upgraded:
+  bubblewrap cython3 gnome-settings-daemon-common gsettings-desktop-schemas
+  iio-sensor-proxy init libapt-pkg-perl libblockdev-utils2 libblockdev2 libc-bin
+  libc-dev-bin libc-l10n libc6 libc6-dev libcryptsetup12 libdbd-mysql-perl libdbi-perl
+  libfcgi-perl libfile-fnmatch-perl libfreetype6 libgdk-pixbuf2.0-0
+  libgdk-pixbuf2.0-common libgirepository-1.0-1 libglib2.0-0 libglib2.0-bin
+  libgnutls-dane0 libgnutls30 libharfbuzz0b libhtml-parser-perl libintl-perl
+  libintl-xs-perl libjson-glib-1.0-0 libjson-glib-1.0-common libkpathsea6
+  liblist-moreutils-perl liblocale-gettext-perl liblz4-1 libmount1 libnet-ssleay-perl
+  libnginx-mod-http-auth-pam libnginx-mod-http-cache-purge libnginx-mod-http-dav-ext
+  libnginx-mod-http-echo libnginx-mod-http-fancyindex libnginx-mod-http-geoip
+  libnginx-mod-http-headers-more-filter libnginx-mod-http-image-filter
+  libnginx-mod-http-lua libnginx-mod-http-ndk libnginx-mod-http-perl
+  libnginx-mod-http-subs-filter libnginx-mod-http-uploadprogress
+  libnginx-mod-http-upstream-fair libnginx-mod-http-xslt-filter libnginx-mod-mail
+  libnginx-mod-nchan libnginx-mod-stream libp11-kit0 libproc-processtable-perl libptexenc1
+  libpython3-stdlib libqt5core5a libqt5dbus5 libqt5designer5 libqt5gui5 libqt5help5
+  libqt5network5 libqt5printsupport5 libqt5sql5 libqt5svg5 libqt5test5 libqt5widgets5
+  libqt5xdgiconloader3 libqt5xml5 libqubesdb libseccomp2 libselinux1 libsmbclient
+  libsnappy1v5 libsodium23 libstdc++6 libsynctex2 libtalloc2 libtasn1-6 libtdb1 libteckit0
+  libterm-readkey-perl libtevent0 libtexlua53 libtexluajit2 libtext-charwidth-perl
+  libtext-iconv-perl libudev1 libudisks2-0 libwbclient0 libwebpmux3 libx11-6 libx11-xcb1
+  libxau6 libxxhash0 libzstd1 locales nginx-common nginx-extras openssh-client
+  openssh-server openssh-sftp-server p11-kit-modules perl perl-base python-matplotlib-data
+  python3 python3-apt python3-cairo python3-cbor python3-cffi-backend python3-dbus
+  python3-distutils python3-geoip python3-gi python3-gi-cairo python3-kiwisolver
+  python3-lib2to3 python3-libapparmor python3-lz4 python3-markupsafe python3-matplotlib
+  python3-minimal python3-msgpack python3-nacl python3-numpy python3-pil python3-psutil
+  python3-pyqt5 python3-pyx python3-qubesdb python3-sip python3-snappy python3-tk
+  python3-twisted-bin python3-ubjson python3-wsaccel python3-yaml python3-zope.interface
+  qdbus qubes-core-agent-nautilus qubes-pdf-converter qubes-whonix-workstation ranger
+  salt-common salt-ssh samba-libs tex-common texlive-base texlive-binaries
+  texlive-latex-base udev udisks2 xen-utils-common
+159 upgraded, 49 newly installed, 37 to remove and 1014 not upgraded.
+Need to get 146 MB of archives.
+After this operation, 19.5 MB of additional disk space will be used.
+Do you want to continue? [Y/n] 
+</code></pre>
+<p>I hit “n”. It seems to list some important things for removal still like qubes-gui-agent.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/11</link>
+        <pubDate>Fri, 22 Oct 2021 18:54:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-11</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes, please. You’ve got the correct mindset. Don’t do insecure stuff (installing unsigned packages, saying yes to strong warnings) (you didn’t do that) but do keep shuffling around with the packages. To fix or work around this, we need to figure out the the package conflict which APT is unable to resolve.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/10</link>
+        <pubDate>Fri, 22 Oct 2021 18:24:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-10</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[mimp]]></dc:creator>
+        <description><![CDATA[
+            <p>Here is what I tried:</p>
+<p>I copied /usr/sbin/release-upgrade and in the copy I deleted everything form the install line you suggest changing above down. Then I ran that  script, doing everything before the problem occurs.</p>
+<p>Then I tried installing each of those items manually one by one.</p>
+<p><code>sudo apt-get --no-install-recommends libc6-dev</code></p>
+<p>Says it will remove the qubes/whonix packages. So I say ‘n’ and don’t install. I go through and install the other 3 packages no problem.</p>
+<p>I went back and tried installing libc6-def again. I get the same result, it wants to remove qubes-core-agent, etc. It was to upgrade 156, install 43 and remove 56 packages.</p>
+<p>If I try running</p>
+<p><code>sudo apt-get --no-install-recommends libc6-dev qubes-whonix-workstation</code></p>
+<p>I get:</p>
+<pre><code>user@host:/usr/sbin$ sudo apt-get --no-install-recommends install libc6-dev qubes-whonix-workstation
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+ qubes-whonix-workstation : Depends: qubes-whonix-shared-packages-recommended but it is not going to be installed
+E: Unable to correct problems, you have held broken packages.
+</code></pre>
+<p>So I ran:</p>
+<pre><code>sudo apt install qubes-whonix-shared-packages-recommended
+</code></pre>
+<p>Then I try installing libc6-def and qubes-whonix-workstation again. I get a similar message but the unmet dependency is now “qubes-mgmt-salt-vm-connector”</p>
+<p>I’m going to stop here for now and see what you think of this. Should I keep installing the unmet dependencies?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/9</link>
+        <pubDate>Fri, 22 Oct 2021 16:40:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-9</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>From the log, the following command</p>
+<pre><code>apt-get-noninteractive --yes --no-install-recommends install libc6-dev bsdmainutils gcc fasttrack-archive-keyring
+</code></pre>
+<p>For unknown reason results in:</p>
+<blockquote>
+<p>The following packages will be REMOVED:<br>
+kicksecure-desktop-applications-xfce<br>
+qubes-core-agent qubes-core-agent-networking qubes-gui-agent<br>
+qubes-input-proxy-sender qubes-mgmt-salt-vm-connector qubes-usb-proxy<br>
+qubes-vm-dependencies qubes-whonix qubes-whonix-shared-packages-recommended<br>
+qubes-whonix-workstation salt-common salt-ssh systemcheck whonix-firewall<br>
+whonix-shared-packages-dependencies-cli<br>
+whonix-shared-packages-recommended-cli<br>
+whonix-workstation-shared-packages-shared-meta</p>
+</blockquote>
+<p>The further debug, you’d need to either manually run the commands the build script would be running (look at <code>/usr/sbin/release-upgrade</code>) would be to edit the script and append <code>qubes-whonix-workstation</code>.</p>
+<p>i.e. make that</p>
+<pre><code class="lang-auto">apt-get-noninteractive --yes --no-install-recommends install libc6-dev bsdmainutils gcc fasttrack-archive-keyring qubes-whonix-workstation
+</code></pre>
+<p>Might also be a good idea to remove the “–yes”. I.e.</p>
+<pre><code class="lang-auto">apt-get-noninteractive --no-install-recommends install libc6-dev bsdmainutils gcc fasttrack-archive-keyring qubes-whonix-workstation
+</code></pre>
+<p>By removing the “–yes” you could abort before any above mentioned packages are installed. Removing the “–yes” everywhere in the script might be a good idea as well.</p>
+<p>You could replace the experiment <code>qubes-whonix-workstation</code> by <code>qubes-vm-dependencies</code>.</p>
+<p>The abstract task: you need to find out which package dependency of a custom installed package is created a conflict so APT decides to remove <code>qubes-whonix-workstation</code> / <code>qubes-vm-dependencies</code> instead of the custom installed package.</p>
+<p>Not too easy to debug in Qubes. Time consuming. Since you cannot snapshot a VM and easily restore at least not as far as I know.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/8</link>
+        <pubDate>Tue, 19 Oct 2021 19:13:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-8</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[mimp]]></dc:creator>
+        <description><![CDATA[
+            <p>Sorry, missed that. Here’s the full version:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://textbin.net/uploads/B2cIcQVwHZ.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://textbin.net/lzujxrcoxs" target="_blank" rel="noopener nofollow ugc">TextBin</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:200/48;"><img src="https://textbin.net/uploads/8ALlkk0tbv.png" class="thumbnail" width="200" height="48"></div>
+
+<h3><a href="https://textbin.net/lzujxrcoxs" target="_blank" rel="noopener nofollow ugc">Whonix 15 to 16 upgrade fail - TextBin</a></h3>
+
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/7</link>
+        <pubDate>Mon, 18 Oct 2021 19:26:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-7</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>So far nothing wrong with that part of the log. The log is incomplete. It stops with:</p>
+<blockquote>
+<p>Get:221 tor+https://deb.debian.org/</p>
+</blockquote>
+<p>as well as it stops at a different point.</p>
+<p>Most likely reason for incomplete log: Qubes global clipboard copy/paste has a maximum size. Unspecific to Whonix. → <a href="https://www.whonix.org/wiki/Unspecific">Information Booster might be Available!</a></p>
+<p>Complete log required.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/6</link>
+        <pubDate>Mon, 18 Oct 2021 12:46:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-6</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[mimp]]></dc:creator>
+        <description><![CDATA[
+            <p>Yeah, I noticed that. Didn’t look good. Here’s the full log:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://pastebin.com/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://pastebin.com/SYKABhTp" target="_blank" rel="noopener nofollow ugc">Pastebin</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://pastebin.com/i/facebook.png" class="thumbnail" width="" height="">
+
+<h3><a href="https://pastebin.com/SYKABhTp" target="_blank" rel="noopener nofollow ugc">whonix 16 upgrade fail in qubes - Pastebin.com</a></h3>
+
+  <p>Pastebin.com is the number one paste tool since 2002. Pastebin is a website where you can store text online for a set period of time.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/5</link>
+        <pubDate>Sun, 17 Oct 2021 18:37:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-5</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="mimp" data-post="3" data-topic="12550">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/47e85d/40.png" class="avatar"> mimp:</div>
+<blockquote>
+<p>Removing qubes-vm-dependencies (4.0.11-1+deb10u1) …<br>
+Removing qubes-gui-agent (4.0.38-1+deb10u1) …</p>
+</blockquote>
+</aside>
+<p>This is the main issue which should not be happening. Removal of several Qubes packages.</p>
+<p>The log is too short to know why this is happening. Complete log required.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/4</link>
+        <pubDate>Sun, 17 Oct 2021 07:45:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[mimp]]></dc:creator>
+        <description><![CDATA[
+            <p>didn’t get help in the qubes forum, so i set up an ssh connection and ran release-upgrade from there, here is the last output i got before it disconnected:</p>
+<blockquote>
+<p>Preparing to unpack …/udisks2_2.9.2-2_amd64.deb …<br>
+Unpacking udisks2 (2.9.2-2) over (2.8.1-4) …<br>
+(Reading database … 92835 files and directories currently installed.)<br>
+Removing policykit-1-gnome (0.105-7) …<br>
+Removing policykit-1 (0.105-25) …<br>
+Removing libpam-systemd:amd64 (241-7~deb10u8) …<br>
+Removing libqt4-declarative:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing libqt4-designer:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing libqt4-help:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing libqt4-xmlpatterns:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing libqt4-network:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing libqt4-scripttools:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing libqt4-script:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing libqt4-sql:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing libqt4-svg:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing libqt4-test:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing libqtdbus4:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing libqt4-xml:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing libqtgui4:amd64 (4:4.8.7+dfsg-18+deb10u1) …<br>
+Removing qubes-whonix (1:16.5-1) …<br>
+Removing ‘diversion of /usr/share/qubes-updates-cache/errors/ERR_INVALID_URL to /usr/share/qubes-updates-cache/errors/ERR_INVALID_URL.anondist-orig by qubes-whonix’<br>
+Removing ‘diversion of /usr/share/tinyproxy/default.html to /usr/share/tinyproxy/default.html.anondist-orig by qubes-whonix’<br>
+Removing ‘diversion of /usr/lib/qubes/qubes-setup-dnat-to-ns to /usr/lib/qubes/qubes-setup-dnat-to-ns.anondist-orig by qubes-whonix’<br>
+Removing ‘diversion of /etc/qubes-rpc/qubes.SetDateTime to /etc/qubes-rpc/qubes.SetDateTime.anondist-orig by qubes-whonix’<br>
+Removing ‘diversion of /etc/qubes-rpc/qubes.SyncNtpClock to /etc/qubes-rpc/qubes.SyncNtpClock.anondist-orig by qubes-whonix’<br>
+Removing qubes-core-agent-networking (4.0.62-1+deb10u1) …<br>
+Removing qubes-vm-dependencies (4.0.11-1+deb10u1) …<br>
+Removing qubes-gui-agent (4.0.38-1+deb10u1) …<br>
+client_loop: send disconnect: Broken pipe</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/3</link>
+        <pubDate>Sun, 17 Oct 2021 04:54:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>You can append log output to a file <code>log</code> by appending the following command.</p>
+<pre><code>&amp;&gt; log
+</code></pre>
+<p>Also output before the crash might be useful. There’s a small chance due to user modifications (installed packages) that some Qubes specific package gets removed during release which is required.</p>
+<aside class="quote no-group" data-username="mimp" data-post="1" data-topic="12550">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/47e85d/40.png" class="avatar"> mimp:</div>
+<blockquote>
+<p>If I shut it down it will not boot anymore.</p>
+</blockquote>
+</aside>
+<p>Can be debugged as if it was happening with a Debian based VM. → <a href="https://www.whonix.org/wiki/Unspecific" class="inline-onebox">Information Booster might be Available!</a></p>
+<aside class="quote no-group" data-username="mimp" data-post="1" data-topic="12550">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/47e85d/40.png" class="avatar"> mimp:</div>
+<blockquote>
+<p>p.s. One other piece of info. I can still access the nginx server running on this qube via a browser but I get the default nginx message as if the website data is no longer there, which is strange.</p>
+</blockquote>
+</aside>
+<p>Config files were reset by package default. Mentioned on the release upgrade instructions wiki page.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/2</link>
+        <pubDate>Tue, 12 Oct 2021 10:41:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+      <item>
+        <title>Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</title>
+        <dc:creator><![CDATA[mimp]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve updated all my Whonix Qubes from 15 to 16 except for 1. And I’d like to avoid rebuilding it from scratch.</p>
+<p>I followed the instructions for upgrading, including all the sanity checks and was in the midst of “release-upgrade” when it crashed. This has happened 2 times now. But I have not been watching it when it actually happens. I just come back and my Terminal is gone. I can’t launch the Terminal or xterm. And qvm-ls reports the qube is still running.</p>
+<p>If I shut it down it will not boot anymore. This is the second attempt on this Qube. I have not yet shut it down in case there is anything you can suggest I try first.</p>
+<p>Hopefully I can help you track down the problem.</p>
+<p>Thanks.</p>
+<p>p.s. One other piece of info. I can still access the nginx server running on this qube via a browser but I get the default nginx message as if the website data is no longer there, which is strange.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550/1</link>
+        <pubDate>Mon, 11 Oct 2021 23:34:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12550-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-to-16-upgrade-fails-terminal-crashes-qube-still-running/12550.rss">Whonix 15 to 16 upgrade fails, Terminal crashes, Qube still running</source>
+      </item>
+  </channel>
+</rss>

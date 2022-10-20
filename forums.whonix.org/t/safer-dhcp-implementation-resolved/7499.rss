@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Safer DHCP implementation [RESOLVED]</title>
+    <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499</link>
+    <description>I got an idea when seeing this thred:
+
+http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/do-i-need-an-unique-lan-ip-for-the-each-cloned-workstation-if-i-dont-use-them-at-a-time/7496/2
+
+@Patrick what if we include the DHCP server on the WS instead and configure its service to terminate if it detects an IP other than 10.152.152.11?
+
+This avoids race conditions between multiple instances sharing the same internal LAN. Also provides a more secure place to put the daemon. It doesn&#39;t break the sec model because we document the best way to isolate WSs is to have them on separate LANs so even if it is exploited  it is kinda expected.
+
+TO-DO: Figure out if the GW can be made immune to dynamic assignment. I guess not exposing a DHCP client guarantees that?</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 15 Jun 2019 04:29:52 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Safer DHCP implementation [RESOLVED]</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <ul>
+<li><a href="https://unix.stackexchange.com/questions/256061/is-libvirt-dnsmasq-exposed-to-the-network-if-i-run-fedora-without-a-firewall" rel="nofollow noopener">https://unix.stackexchange.com/questions/256061/is-libvirt-dnsmasq-exposed-to-the-network-if-i-run-fedora-without-a-firewall</a></li>
+</ul>
+<blockquote>
+<p>So I can see an open TCP port. However it responds as if it’s “tcpwrapped”. That implies if you connect over a different interface from <code>virbr0</code> , <code>dnsmasq</code> closes the connection without reading any data. So data you send to it doesn’t matter; it can’t e.g. exploit a classic buffer overflow.</p>
+</blockquote>
+<p>This comment is about DNS imlications for the host as DHCP is bound to a specific interface.</p>
+<hr>
+<ul>
+<li><a href="https://serverfault.com/questions/840163/custom-dnsmasq-or-custom-options-with-libvrt" rel="nofollow noopener">https://serverfault.com/questions/840163/custom-dnsmasq-or-custom-options-with-libvrt</a></li>
+</ul>
+<hr>
+<p>DNS not explicitly enabled fir guests unless added to a network’s  config.</p>
+<ul>
+<li><a href="https://fabianlee.org/2018/10/22/kvm-using-dnsmasq-for-libvirt-dns-resolution/" rel="nofollow noopener">https://fabianlee.org/2018/10/22/kvm-using-dnsmasq-for-libvirt-dns-resolution/</a></li>
+</ul>
+<hr>
+<ul>
+<li><a href="https://www.cyberciti.biz/faq/linux-kvm-libvirt-dnsmasq-dhcp-static-ip-address-configuration-for-guest-os/" rel="nofollow noopener">https://www.cyberciti.biz/faq/linux-kvm-libvirt-dnsmasq-dhcp-static-ip-address-configuration-for-guest-os/</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/12</link>
+        <pubDate>Sat, 15 Jun 2019 04:26:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7499-12</guid>
+        <source url="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss">Safer DHCP implementation [RESOLVED]</source>
+      </item>
+      <item>
+        <title>Safer DHCP implementation [RESOLVED]</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>HulaHoop via Whonix Forum:</p>
+<blockquote>
+<aside class="quote no-group" data-post="8" data-topic="7499">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Yes, as many additional vif+ interfaces as (vif1, vif2, vif3, …)<br>
+dynamically created as needed per separate WS.</p>
+</blockquote>
+</aside>
+<p>This setup is actually superior unless the user insists on having the multi WS communicate.</p>
+</blockquote>
+<p>having the multi WS communicate is supported as optional feature as per:</p>
+<p><a href="https://www.qubes-os.org/doc/firewall/#enabling-networking-between-two-qubes" rel="nofollow noopener">https://www.qubes-os.org/doc/firewall/#enabling-networking-between-two-qubes</a></p>
+<blockquote>
+<p>Do you also spawn a separate Tor daemon for each interface?</p>
+</blockquote>
+<p>No.</p>
+<blockquote>
+<p>How hard would it be to do that?</p>
+</blockquote>
+<p>Hard. Partially reinventing Qubes.</p>
+<blockquote>
+<p>It would have  the security advantages of multiple GWs while cutting down on resource use.</p>
+</blockquote>
+<p>Qubes does not have some/most of the Non-Qubes-Whonix disadvantages [no<br>
+unwanted default inter ws communication] of<br>
+<a href="https://www.whonix.org/wiki/Multiple_Whonix-Workstation" rel="nofollow noopener">https://www.whonix.org/wiki/Multiple_Whonix-Workstation</a> but it doesn’t<br>
+automate<br>
+<a href="https://www.whonix.org/wiki/Tor_Entry_Guards#Increase_Protection_from_Malicious_Entry_Guards:_One_Guard_per_Application" rel="nofollow noopener">https://www.whonix.org/wiki/Tor_Entry_Guards#Increase_Protection_from_Malicious_Entry_Guards:_One_Guard_per_Application</a>.</p>
+          <p><a href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/11</link>
+        <pubDate>Sat, 08 Jun 2019 01:58:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7499-11</guid>
+        <source url="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss">Safer DHCP implementation [RESOLVED]</source>
+      </item>
+      <item>
+        <title>Safer DHCP implementation [RESOLVED]</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="8" data-topic="7499">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Yes, as many additional vif+ interfaces as (vif1, vif2, vif3, …)<br>
+dynamically created as needed per separate WS.</p>
+</blockquote>
+</aside>
+<p>This setup is actually superior unless the user insists on having the multi WS communicate. Do you also spawn a separate Tor daemon for each interface? How hard would it be to do that? It would have  thesecurity advantages of multiple GWs while cutting down on resource use.</p>
+          <p><a href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/10</link>
+        <pubDate>Fri, 07 Jun 2019 15:43:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7499-10</guid>
+        <source url="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss">Safer DHCP implementation [RESOLVED]</source>
+      </item>
+      <item>
+        <title>Safer DHCP implementation [RESOLVED]</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="8" data-topic="7499">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Compatible with manually set static IPs in case this is needed for<br>
+something?</p>
+</blockquote>
+</aside>
+<p>Yes libvirt allows pairing a static IP from athe DHCP server to a VM with a specific MAC address. I would need to ship a VM with a preconfigured MAC and adjust the networking file to always assign it 10.152.152.11</p>
+<aside class="quote no-group" data-post="8" data-topic="7499">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>What about Tor config file based static IPs according our onion<br>
+services instructions aka <code>HiddenServicePort 80 10.152.152.11:80</code> ? Would<br>
+this break? See also next question.</p>
+</blockquote>
+</aside>
+<p>With the explicit static stuff above no it shouldn’t.</p>
+<aside class="quote no-group" data-post="8" data-topic="7499">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>How dynamic are the IPs? Ideally, the internal LAN IPs would be<br>
+automatically, dynamically assigned at first boot but then kept forever.</p>
+</blockquote>
+</aside>
+<p>Haven’t noticed will need to test again.</p>
+          <p><a href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/9</link>
+        <pubDate>Fri, 07 Jun 2019 15:41:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7499-9</guid>
+        <source url="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss">Safer DHCP implementation [RESOLVED]</source>
+      </item>
+      <item>
+        <title>Safer DHCP implementation [RESOLVED]</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <ol>
+<li>
+<p>Compatible with manually set static IPs in case this is needed for<br>
+something?</p>
+</li>
+<li>
+<p>What about Tor config file based static IPs according our onion<br>
+services instructions aka <code>HiddenServicePort 80 10.152.152.11:80</code>? Would<br>
+this break? See also next question.</p>
+</li>
+<li>
+<p>How dynamic are the IPs? Ideally, the internal LAN IPs would be<br>
+automatically, dynamically assigned at first boot but then kept forever.</p>
+</li>
+</ol>
+<p>For this purpose there could be a unique (randomly chosen) ID from which<br>
+the IP is derived so it’s unlikely that two VMs booted for the first<br>
+time (while another one is offline) end up with the same IP.</p>
+<p>(A booted VM vs another booted VM always has a unique fingerprint<br>
+compared to each other - different time stamps in logs and whatnot)</p>
+<p>HulaHoop via Whonix Forum:</p>
+<blockquote>
+<p>You mean for a network that looks like</p>
+<p>WS1 &lt;-&gt; GW &lt;-&gt; WS2<br>
+where WS1 and WS2 cannot communicate but share the same GW?</p>
+</blockquote>
+<p>Yes.</p>
+<blockquote>
+<p>Does the GW on Qubes have two different internally facing NICs in this<br>
+case?</p>
+</blockquote>
+<p>Yes, as many additional vif+ interfaces as (vif1, vif2, vif3, …)<br>
+dynamically created as needed per separate WS.</p>
+<blockquote>
+<p>Let’s decide whether we want this feature by default or simply making it optional and documenting it.</p>
+</blockquote>
+<blockquote>
+<p>Can VBox support this too?</p>
+</blockquote>
+<p>No idea but if it had and this could be enabled by default for Whonix<br>
+VBox and KVM builds at the same time, without KVM-only specifics, then<br>
+this would increase my motivation to implement this.</p>
+<blockquote>
+<p>Maybe enable it in a set of packages for KVM builds?</p>
+</blockquote>
+<p>Patches welcome.</p>
+          <p><a href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/8</link>
+        <pubDate>Fri, 07 Jun 2019 10:28:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7499-8</guid>
+        <source url="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss">Safer DHCP implementation [RESOLVED]</source>
+      </item>
+      <item>
+        <title>Safer DHCP implementation [RESOLVED]</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> let me know if the selected DHCP range is OK.</p>
+<p><strong>(To be added on wiki) Instructions on using DHCP with KVM:</strong></p>
+<p>sudo nano /etc/network/interfaces.d/30_non-qubes-whonix</p>
+<p>Comment out:<br>
+auto eth0<br>
+iface eth0 inet static</p>
+<p>Comment in:<br>
+auto eth0<br>
+iface eth0 inet dhcp</p>
+<p>Change internal network:<br>
+sudo virsh net-edit Whonix-Internal</p>
+<pre><code>&lt;ip address='10.152.152.0' netmask='255.255.192.0'&gt;
+    &lt;dhcp&gt;
+      &lt;range start='10.152.128.1' end='10.152.191.254'/&gt;
+    &lt;/dhcp&gt;
+&lt;/ip&gt;
+</code></pre>
+<p>Restart internal network:</p>
+<pre><code>sudo virsh net-destroy Whonix-Internal
+
+virsh -c qemu:///system net-start Whonix-Internal
+</code></pre>
+<p><code>sudo ifconfig</code>  confirms dynamic assigned IP functional.</p>
+<hr>
+<p>I read the manual and a default install dnsmasq does forward   requests to upstream servers recursively if it cannot resolve them.</p>
+<p>However there is evidence that it does not resolve DNS as implemented in libvirt:</p>
+<ul>
+<li><a href="https://wiki.libvirt.org/page/Libvirtd_and_dnsmasq" rel="nofollow noopener">https://wiki.libvirt.org/page/Libvirtd_and_dnsmasq</a></li>
+</ul>
+<p><em>On linux host servers, libvirtd uses dnsmasq to service the virtual networks, such as the default network. A new instance of dnsmasq is started for each virtual network, only accessible to guests in that specific network.</em></p>
+<ul>
+<li>
+<p>DNSMASQ is visible to  nmap scan from the WS but not much else.</p>
+</li>
+<li>
+<p>Sent a DNS request to it from the WS with this result:</p>
+<p>dig <a href="http://microsoft.com" rel="nofollow noopener">microsoft.com</a> <span class="mention">@10.152.152.0</span></p>
+<p>; &lt;&lt;&gt;&gt; DiG 9.11.5-P4-3-Debian &lt;&lt;&gt;&gt; <a href="http://microsoft.com" rel="nofollow noopener">microsoft.com</a> <span class="mention">@10.152.152.0</span><br>
+;; global options: +cmd<br>
+;; connection timed out; no servers could be reached</p>
+</li>
+</ul>
+<hr>
+<p>Let’s decide whether we want this feature by default or simply making it optional and documenting it. Can VBox support this too? Maybe enable it in a set of packges for KVM builds?</p>
+          <p><a href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/7</link>
+        <pubDate>Thu, 06 Jun 2019 18:04:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7499-7</guid>
+        <source url="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss">Safer DHCP implementation [RESOLVED]</source>
+      </item>
+      <item>
+        <title>Safer DHCP implementation [RESOLVED]</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="4" data-topic="7499">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Also, always good to ask: Why are we inventing something here? Why is this Whonix specific?<br>
+This is actually a missing (or existing in KVM?) virtualizer feature.</p>
+</blockquote>
+</aside>
+<p>UPDATE:<br>
+Indeed the feature exists when one defines a DHCP setting for the virtual network. No need for the sorcery in this thread. I might test and document it though I won’t enable it by default becuase it might increase theoretic attack surface.<br>
+<a href="https://wiki.libvirt.org/page/VirtualNetworking#DNS_.26_DHCP" class="onebox" target="_blank" rel="nofollow noopener">https://wiki.libvirt.org/page/VirtualNetworking#DNS_.26_DHCP</a></p>
+          <p><a href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/6</link>
+        <pubDate>Thu, 06 Jun 2019 15:46:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7499-6</guid>
+        <source url="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss">Safer DHCP implementation [RESOLVED]</source>
+      </item>
+      <item>
+        <title>Safer DHCP implementation [RESOLVED]</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="4" data-topic="7499">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>So it would still be a manual edit some config file process of setting up a multi workstation setup?</p>
+</blockquote>
+</aside>
+<p>No automated. A script to query the eth0  interface for its IP. IP  is assigned pretty early on in a VM’s life so it should be clear if it needs to start the server or the client without delaying connectivity too much.</p>
+<aside class="quote no-group" data-post="4" data-topic="7499">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Otherwise - since all downloadable Whonix images are alike - how would there be any other IP than 10.152.152.11 after first boot without manual change by user?</p>
+</blockquote>
+</aside>
+<p>Since it is based on introspection and is automated, it should be able to dynamically react to network conditions .</p>
+<aside class="quote no-group" data-post="4" data-topic="7499">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>A wholly different solution I had in mind would be Any-Workstation-VM -&gt; DHCP-Server-VM -&gt; Whonix-Gateway-VM. But developing that is also a lot work.</p>
+</blockquote>
+</aside>
+<p>Overkill and would run into the same questions this solves except now there is more dev effort and resource use.</p>
+<aside class="quote no-group" data-post="4" data-topic="7499">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Also, always good to ask: Why are we inventing something here? Why is this Whonix specific?<br>
+This is actually a missing (or existing in KVM?) virtualizer feature. Qubes instructions for multi ws are a lot simpler since Qubes automatically puts each ws into its own separate network and dynamically spins up a vif+ interface on Whonix-Gateway for each ws. Virtualizer feature request?</p>
+</blockquote>
+</aside>
+<p>You mean for a network that looks like</p>
+<p>WS1 &lt;-&gt; GW &lt;-&gt; WS2<br>
+where WS1 and WS2 cannot communicate but share the same GW?</p>
+<p>Does the GW on Qubes have two different internally facing NICs in this case?</p>
+          <p><a href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/5</link>
+        <pubDate>Thu, 06 Jun 2019 12:46:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7499-5</guid>
+        <source url="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss">Safer DHCP implementation [RESOLVED]</source>
+      </item>
+      <item>
+        <title>Safer DHCP implementation [RESOLVED]</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Since all downloadable Whonix images are alike, the problem here is, how to detect in code which is the master Whonix-Workstation running the DHCP server?</p>
+<p>Maybe the first Whonix-Workstation that starts and doesn’t find an already running DHCP server would start a DHCP server? Some room for race conditions. But ignoring race conditions for simplicity, that is easier said than implemented.</p>
+<aside class="quote no-group" data-post="1" data-topic="7499">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>what if we include the DHCP server on the WS instead and configure its service to terminate if it detects an IP other than 10.152.152.11?</p>
+</blockquote>
+</aside>
+<p>So it would still be a manual edit some config file process of setting up a multi workstation setup? Otherwise - since all downloadable Whonix images are alike - how would there be any other IP than 10.152.152.11 after first boot without manual change by user?</p>
+<p>A wholly different solution I had in mind would be Any-Workstation-VM -&gt; DHCP-Server-VM -&gt; Whonix-Gateway-VM. But developing that is also a lot work.</p>
+<p>Also, always good to ask: Why are we inventing something here? Why is this Whonix specific?<br>
+This is actually a missing (or existing in KVM?) virtualizer feature. Qubes instructions for multi ws are a lot simpler since Qubes automatically puts each ws into its own separate network and dynamically spins up a vif+ interface on Whonix-Gateway for each ws. Virtualizer feature request?</p>
+          <p><a href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/4</link>
+        <pubDate>Thu, 06 Jun 2019 11:44:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7499-4</guid>
+        <source url="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss">Safer DHCP implementation [RESOLVED]</source>
+      </item>
+      <item>
+        <title>Safer DHCP implementation [RESOLVED]</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes</p>
+<p>Code would be something like this:<br>
+If 10.152.152.11 -&gt; DHCP server starts -&gt; If DHCP server starts DHCP client is prevented from running.</p>
+          <p><a href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/3</link>
+        <pubDate>Tue, 04 Jun 2019 16:51:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7499-3</guid>
+        <source url="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss">Safer DHCP implementation [RESOLVED]</source>
+      </item>
+      <item>
+        <title>Safer DHCP implementation [RESOLVED]</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="1" data-topic="7499">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>what if we include the DHCP server on the WS instead</p>
+</blockquote>
+</aside>
+<p>Which DHCP client would be connecting to it? Another Whonix-Workstation?</p>
+          <p><a href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/2</link>
+        <pubDate>Tue, 04 Jun 2019 16:04:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7499-2</guid>
+        <source url="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss">Safer DHCP implementation [RESOLVED]</source>
+      </item>
+      <item>
+        <title>Safer DHCP implementation [RESOLVED]</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>I got an idea when seeing this thred:</p>
+<p><a href="http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/do-i-need-an-unique-lan-ip-for-the-each-cloned-workstation-if-i-dont-use-them-at-a-time/7496/2" class="onebox" target="_blank" rel="nofollow noopener">http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/do-i-need-an-unique-lan-ip-for-the-each-cloned-workstation-if-i-dont-use-them-at-a-time/7496/2</a></p>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> what if we include the DHCP server on the WS instead and configure its service to terminate if it detects an IP other than 10.152.152.11?</p>
+<p>This avoids race conditions between multiple instances sharing the same internal LAN. Also provides a more secure place to put the daemon. It doesn’t break the sec model because we document the best way to isolate WSs is to have them on separate LANs so even if it is exploited  it is kinda expected.</p>
+<p>TO-DO: Figure out if the GW can be made immune to dynamic assignment. I guess not exposing a DHCP client guarantees that?</p>
+          <p><a href="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/1</link>
+        <pubDate>Tue, 04 Jun 2019 16:02:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7499-1</guid>
+        <source url="http://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499.rss">Safer DHCP implementation [RESOLVED]</source>
+      </item>
+  </channel>
+</rss>

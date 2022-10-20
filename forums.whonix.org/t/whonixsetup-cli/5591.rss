@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>whonixsetup (CLI)</title>
+    <link>http://forums.whonix.org/t/whonixsetup-cli/5591</link>
+    <description>https://github.com/Whonix/whonixsetup as standalone:
+
+    │ python3 -c &#39;from anon_connection_wizard import tor_status; tor_status.set_enabled()&#39;                                                         │
+    │ returned exit code 1, which means failed to enable Tor.                                                                                      │
+    │                                                                                                                                              │
+    │ Error messages are as follows:                                                                                                               │
+    │ Traceback (most recent call last):                                                                                                           │
+    │   File &quot;&lt;string&gt;&quot;, line 1, in &lt;module&gt;                                                                                                       │
+    │ ImportError: No module named &#39;anon_connection_wizard&#39;                                                                                        │
+    │                                                                                                                                              │
+    │ If some dependencies are missing (for example, cannot import name &#39;tor_status&#39;):                                                             │
+    │     sudo apt-get install anon-connection-wizard
+
+It doesn&#39;t have a dependency on anon-connection-wizard. And now with tor-control-panel vs anon-connection-wizard, something to keep in mind.
+
+//cc @iry @troubadour @Algernon</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 18 Aug 2018 16:49:35 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/whonixsetup-cli/5591.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>whonixsetup (CLI)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>whonixsetup currently does not work at all, neither disabling nor enabling Tor does anything.</p>
+          <p><a href="http://forums.whonix.org/t/whonixsetup-cli/5591/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixsetup-cli/5591/6</link>
+        <pubDate>Sat, 18 Aug 2018 16:49:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5591-6</guid>
+        <source url="http://forums.whonix.org/t/whonixsetup-cli/5591.rss">whonixsetup (CLI)</source>
+      </item>
+      <item>
+        <title>whonixsetup (CLI)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Let’s put merging whonixsetup into whonix-setup-wizard on hold so we have separated CLI and GUI packages. //cc <a class="mention" href="http://forums.whonix.org/u/iry">@iry</a></p>
+<hr>
+<p>These are the 3 occurrences of using tor_status in whonixsetup which causes a dependency on tor-control-panel.</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonixsetup/blob/master/usr/lib/whonixsetup_/ft_m_1#L83" target="_blank">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonixsetup/blob/master/usr/lib/whonixsetup_/ft_m_1#L83" target="_blank">Whonix/whonixsetup/blob/master/usr/lib/whonixsetup_/ft_m_1#L83</a></h4>
+<pre class="onebox"><code class="lang-"><ol class="start lines" start="73" style="counter-reset: li-counter 72 ;">
+<li>if [ ! "$exit_code" = "0" ]; then</li>
+<li>## Back to main menu.</li>
+<li>exit 0</li>
+<li>fi</li>
+<li>
+</li>
+<li>## set_enabled() function will:</li>
+<li>## 1. create 40_tor_control_panel.conf if it was missing</li>
+<li>## 2. set final value of DisableNetwork in the file to 0</li>
+<li>## 3. restart Tor using systemd</li>
+<li>
+</li>
+<li class="selected">error_msg="$(python3 -c 'from tor_control_panel import tor_status; tor_status.set_enabled()' 2&gt;&amp;1)" || { exit_code="$?" ; true; };</li>
+<li>
+</li>
+<li>if [ "$exit_code" != "0" ]; then</li>
+<li> TITLE="whonixsetup - Error!"</li>
+<li> MSG="</li>
+<li>python3 -c 'from tor_control_panel import tor_status; tor_status.set_enabled()'</li>
+<li>returned exit code $exit_code, which means failed to enable Tor.</li>
+<li>
+</li>
+<li>Error messages are as follows:</li>
+<li>$error_msg</li>
+<li>
+</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonixsetup/blob/master/usr/lib/whonixsetup_/ft_m_1#L88" target="_blank">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonixsetup/blob/master/usr/lib/whonixsetup_/ft_m_1#L88" target="_blank">Whonix/whonixsetup/blob/master/usr/lib/whonixsetup_/ft_m_1#L88</a></h4>
+<pre class="onebox"><code class="lang-"><ol class="start lines" start="78" style="counter-reset: li-counter 77 ;">
+<li>## set_enabled() function will:</li>
+<li>## 1. create 40_tor_control_panel.conf if it was missing</li>
+<li>## 2. set final value of DisableNetwork in the file to 0</li>
+<li>## 3. restart Tor using systemd</li>
+<li>
+</li>
+<li>error_msg="$(python3 -c 'from tor_control_panel import tor_status; tor_status.set_enabled()' 2&gt;&amp;1)" || { exit_code="$?" ; true; };</li>
+<li>
+</li>
+<li>if [ "$exit_code" != "0" ]; then</li>
+<li>TITLE="whonixsetup - Error!"</li>
+<li>MSG="</li>
+<li class="selected">python3 -c 'from tor_control_panel import tor_status; tor_status.set_enabled()'</li>
+<li>returned exit code $exit_code, which means failed to enable Tor.</li>
+<li>
+</li>
+<li>Error messages are as follows:</li>
+<li>$error_msg</li>
+<li>
+</li>
+<li>If some dependencies are missing (for example, cannot import name 'tor_status'):</li>
+<li>sudo apt-get install tor-control-panel</li>
+<li>
+</li>
+<li>If there is something wrong with your Tor config, you can open /usr/local/etc/torrc.d/50_user.conf in the terminal:</li>
+<li>sudo nano /usr/local/etc/torrc.d/50_user.conf</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonixsetup/blob/master/usr/lib/whonixsetup_/ft_m_2#L68" target="_blank">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonixsetup/blob/master/usr/lib/whonixsetup_/ft_m_2#L68" target="_blank">Whonix/whonixsetup/blob/master/usr/lib/whonixsetup_/ft_m_2#L68</a></h4>
+<pre class="onebox"><code class="lang-"><ol class="start lines" start="58" style="counter-reset: li-counter 57 ;">
+<li>if [ ! "$exit_code" = "0" ]; then</li>
+<li>## Back to main menu.</li>
+<li>exit 0</li>
+<li>fi</li>
+<li>
+</li>
+<li>## set_disabled() function will:</li>
+<li>## 1. create 40_tor_control_panel.conf if it was missing</li>
+<li>## 2. set final value of DisableNetwork in the file to 1</li>
+<li>## 3. stop Tor using systemd</li>
+<li>
+</li>
+<li class="selected">python3 -c 'from tor_control_panel import tor_status; tor_status.set_disabled()' &gt;/dev/null 2&gt;&amp;1  || { exit_code="$?" ; true; };</li>
+<li>
+</li>
+<li>if [ "$exit_code" = "0" ]; then</li>
+<li>true "INFO: Ok, exit 1, so whonixsetup will end."</li>
+<li>dialog --title "whonixsetup - Success!" --msgbox 'Tor networking has been disabled.</li>
+<li>
+</li>
+<li>Note: whonixsetup disables Tor networking by writing "DisableNetwork 1" to /usr/local/etc/torrc.d/40_tor_control_panel.conf</li>
+<li>' 640 480</li>
+<li>## Signal for whonixsetup to break the while loop.</li>
+<li>exit 1</li>
+<li>else</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Could you move the code required to remove the dependency into anon-shared-helper-scripts please? <a class="mention" href="http://forums.whonix.org/u/troubadour">@troubadour</a></p>
+          <p><a href="http://forums.whonix.org/t/whonixsetup-cli/5591/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixsetup-cli/5591/5</link>
+        <pubDate>Sat, 18 Aug 2018 16:06:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5591-5</guid>
+        <source url="http://forums.whonix.org/t/whonixsetup-cli/5591.rss">whonixsetup (CLI)</source>
+      </item>
+      <item>
+        <title>whonixsetup (CLI)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://github.com/Whonix/whonixsetup/commit/88bf5b067f77ccd9b56406efb5881a91fba295c7" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/Whonix/whonixsetup/commit/88bf5b067f77ccd9b56406efb5881a91fba295c7</a></p>
+          <p><a href="http://forums.whonix.org/t/whonixsetup-cli/5591/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixsetup-cli/5591/4</link>
+        <pubDate>Tue, 07 Aug 2018 11:03:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5591-4</guid>
+        <source url="http://forums.whonix.org/t/whonixsetup-cli/5591.rss">whonixsetup (CLI)</source>
+      </item>
+      <item>
+        <title>whonixsetup (CLI)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://github.com/Whonix/whonixsetup/commit/d3859d495dff15e81874d711cf76089892c4b858" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/Whonix/whonixsetup/commit/d3859d495dff15e81874d711cf76089892c4b858</a></p>
+<p><a href="https://github.com/Whonix/whonixsetup/commit/cba0e3fb25298fbbc316ea5a1f5351acea38180d" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/Whonix/whonixsetup/commit/cba0e3fb25298fbbc316ea5a1f5351acea38180d</a></p>
+<p><a href="https://github.com/Whonix/whonixsetup/commit/b4bda7d96683e3b2506c7369088bd30c296b60b2" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/Whonix/whonixsetup/commit/b4bda7d96683e3b2506c7369088bd30c296b60b2</a></p>
+          <p><a href="http://forums.whonix.org/t/whonixsetup-cli/5591/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixsetup-cli/5591/3</link>
+        <pubDate>Sun, 05 Aug 2018 07:13:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5591-3</guid>
+        <source url="http://forums.whonix.org/t/whonixsetup-cli/5591.rss">whonixsetup (CLI)</source>
+      </item>
+      <item>
+        <title>whonixsetup (CLI)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I wonder why <code>whonixsetup</code> has a dependency on msgcollector? Doesn’t seem required?</p>
+          <p><a href="http://forums.whonix.org/t/whonixsetup-cli/5591/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixsetup-cli/5591/2</link>
+        <pubDate>Sun, 05 Aug 2018 06:55:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5591-2</guid>
+        <source url="http://forums.whonix.org/t/whonixsetup-cli/5591.rss">whonixsetup (CLI)</source>
+      </item>
+      <item>
+        <title>whonixsetup (CLI)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://github.com/Whonix/whonixsetup">https://github.com/Whonix/whonixsetup</a> as standalone:</p>
+<pre><code>│ python3 -c 'from anon_connection_wizard import tor_status; tor_status.set_enabled()'                                                         │
+│ returned exit code 1, which means failed to enable Tor.                                                                                      │
+│                                                                                                                                              │
+│ Error messages are as follows:                                                                                                               │
+│ Traceback (most recent call last):                                                                                                           │
+│   File "&lt;string&gt;", line 1, in &lt;module&gt;                                                                                                       │
+│ ImportError: No module named 'anon_connection_wizard'                                                                                        │
+│                                                                                                                                              │
+│ If some dependencies are missing (for example, cannot import name 'tor_status'):                                                             │
+│     sudo apt-get install anon-connection-wizard
+</code></pre>
+<p>It doesn’t have a dependency on anon-connection-wizard. And now with tor-control-panel vs anon-connection-wizard, something to keep in mind.</p>
+<p>//cc <a class="mention" href="http://forums.whonix.org/u/iry">@iry</a> <a class="mention" href="http://forums.whonix.org/u/troubadour">@troubadour</a> <a class="mention" href="http://forums.whonix.org/u/algernon">@Algernon</a></p>
+          <p><a href="http://forums.whonix.org/t/whonixsetup-cli/5591/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixsetup-cli/5591/1</link>
+        <pubDate>Sun, 05 Aug 2018 06:50:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5591-1</guid>
+        <source url="http://forums.whonix.org/t/whonixsetup-cli/5591.rss">whonixsetup (CLI)</source>
+      </item>
+  </channel>
+</rss>

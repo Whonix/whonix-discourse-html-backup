@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix 15: increasing allocated CPU number makes the VM incredibly slow</title>
+    <link>http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335</link>
+    <description>Weird bug. Happens both in live-boot and persistent modes.
+
+I noticed my Whonix 15 Workstation was incredibly slow: slow boot, very slow reaction times, whatever I would do (simple terminal tasks, browsing, etc.), everything is slow and almost freezing, although I have allocated 4GB of RAM and up to 4 CPUs.
+
+I tested the .qcow2 disk in other VM, and it worked just fine.
+
+I tried reinstalling everything, worked very fast as expected with default settings.
+
+Then I increased the CPU count to 4, and it was again very slow. Decreased to 1 (default), fast again...
+
+What could be the cause of such behavior?
+
+I should add just in case that I am using kernel 5.0.6, so I had to uncomment the parameter
+
+     &lt;blkiotune&gt;
+        &lt;weight&gt;250&lt;/weight&gt;
+    &lt;/blkiotune&gt;
+
+I see that the default CPU setting is &quot;host-passthrough&quot;. Could it be related (didn&#39;t test with other options)?
+
+Here are some stats to compare:
+
+&quot;fast&quot; boot with default CPU number (1):
+
+    user@host:~$ sudo systemd-analyze time
+    Startup finished in 1.318s (kernel) + 7.430s (userspace) = 8.749s 
+    graphical.target reached after 3.097s in userspace
+
+&quot;slow&quot; boot with 4 CPU:
+
+    user@host:~$ sudo systemd-analyze time
+    Startup finished in 8.774s (kernel) + 20.572s (userspace) = 29.346s 
+    graphical.target reached after 20.551s in userspace</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 08 May 2019 19:53:08 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix 15: increasing allocated CPU number makes the VM incredibly slow</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="4" data-topic="7335">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Ok, that must be removed but what must be done to add other CPUs?</p>
+</blockquote>
+</aside>
+<p>Just increment the number between the vcpu tags higher to increase their no.</p>
+<aside class="quote no-group" data-post="4" data-topic="7335">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>That might imply that adding vCPUs does undermine protection gained from CPU pinning? Can vCPUs (or any real core) be added without undermining protection gained from CPU pinning</p>
+</blockquote>
+</aside>
+<p>Yes you would pin the additional ones to different physical cpus than the ones of say Whonix GW. Needs to be done 1:1.</p>
+<p>Attempting to overcommit the no. of vcpus when pinned will cause problems like overcommitting RAM does, if their is no ballooning (because security) and if its all allocated at once (this I will change to allocate as is basis soon with Buster).</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335/5</link>
+        <pubDate>Wed, 08 May 2019 19:53:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7335-5</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335.rss">Whonix 15: increasing allocated CPU number makes the VM incredibly slow</source>
+      </item>
+      <item>
+        <title>Whonix 15: increasing allocated CPU number makes the VM incredibly slow</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>The pinning parameter <code>cpuset='1'</code> must be removed in the <code>vcpu</code> tag in the XML settings to allow adding more cores to a VM, otherwise performance issues and lockups will happen.</p>
+</blockquote>
+<p>Ok, that must be removed but what must be done to add other CPUs?</p>
+<blockquote>
+<p>CPU pinning is done to safeguard processes in other VMs that run cryptographic operations from side-channel attacks in case of a vulnerability in a crypto library.</p>
+</blockquote>
+<p>That might imply that adding vCPUs does undermine protection gained from CPU pinning? Can vCPUs (or any real core) be added without undermining protection gained from CPU pinning</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335/4</link>
+        <pubDate>Tue, 07 May 2019 21:47:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7335-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335.rss">Whonix 15: increasing allocated CPU number makes the VM incredibly slow</source>
+      </item>
+      <item>
+        <title>Whonix 15: increasing allocated CPU number makes the VM incredibly slow</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Added because you are not the first to run into this:</p>
+<ul>
+<li><a href="https://www.whonix.org/wiki/KVM#Adding_vCPUs" rel="nofollow noopener">https://www.whonix.org/wiki/KVM#Adding_vCPUs</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335/3</link>
+        <pubDate>Tue, 07 May 2019 21:14:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7335-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335.rss">Whonix 15: increasing allocated CPU number makes the VM incredibly slow</source>
+      </item>
+      <item>
+        <title>Whonix 15: increasing allocated CPU number makes the VM incredibly slow</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="1" data-topic="7335">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/o/f6c823/40.png" class="avatar"> onion_knight:</div>
+<blockquote>
+<p>I noticed my Whonix 15 Workstation was incredibly slow: slow boot, very slow reaction times, whatever I would do (simple terminal tasks, browsing, etc.), everything is slow and almost freezing, although I have allocated 4GB of RAM and up to 4 CPUs.</p>
+</blockquote>
+</aside>
+<p>That’s because I use CPU pinning by default to isolate VM CPUs from eachother to prevent side-channel attacks on crypto if there is a vuln in OpenSSL.  So even if you add more cores you are essentially overloading a single real one with this setting until it is removed.</p>
+<p>To get rid of this behavior remove the</p>
+<p><code>cpuset='1'</code></p>
+<p>in the vcpu tag.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335/2</link>
+        <pubDate>Tue, 07 May 2019 20:55:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7335-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335.rss">Whonix 15: increasing allocated CPU number makes the VM incredibly slow</source>
+      </item>
+      <item>
+        <title>Whonix 15: increasing allocated CPU number makes the VM incredibly slow</title>
+        <dc:creator><![CDATA[onion_knight]]></dc:creator>
+        <description><![CDATA[
+            <p>Weird bug. Happens both in live-boot and persistent modes.</p>
+<p>I noticed my Whonix 15 Workstation was incredibly slow: slow boot, very slow reaction times, whatever I would do (simple terminal tasks, browsing, etc.), everything is slow and almost freezing, although I have allocated 4GB of RAM and up to 4 CPUs.</p>
+<p>I tested the .qcow2 disk in other VM, and it worked just fine.</p>
+<p>I tried reinstalling everything, worked very fast as expected with default settings.</p>
+<p>Then I increased the CPU count to 4, and it was again very slow. Decreased to 1 (default), fast again…</p>
+<p>What could be the cause of such behavior?</p>
+<p>I should add just in case that I am using kernel 5.0.6, so I had to uncomment the parameter</p>
+<pre><code> &lt;blkiotune&gt;
+    &lt;weight&gt;250&lt;/weight&gt;
+&lt;/blkiotune&gt;
+</code></pre>
+<p>I see that the default CPU setting is “host-passthrough”. Could it be related (didn’t test with other options)?</p>
+<p>Here are some stats to compare:</p>
+<p>“fast” boot with default CPU number (1):</p>
+<pre><code>user@host:~$ sudo systemd-analyze time
+Startup finished in 1.318s (kernel) + 7.430s (userspace) = 8.749s 
+graphical.target reached after 3.097s in userspace
+</code></pre>
+<p>“slow” boot with 4 CPU:</p>
+<pre><code>user@host:~$ sudo systemd-analyze time
+Startup finished in 8.774s (kernel) + 20.572s (userspace) = 29.346s 
+graphical.target reached after 20.551s in userspace</code></pre>
+          <p><a href="http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335/1</link>
+        <pubDate>Tue, 07 May 2019 09:07:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7335-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335.rss">Whonix 15: increasing allocated CPU number makes the VM incredibly slow</source>
+      </item>
+  </channel>
+</rss>

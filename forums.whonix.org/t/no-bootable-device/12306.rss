@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>No bootable device</title>
+    <link>http://forums.whonix.org/t/no-bootable-device/12306</link>
+    <description>I believe I followed the instructions at wiki/KVM. Virtual machines start but no bootable device. I:
+verified the download
+extracted from the archive
+navigated to the extracted folder
+executed: touch WHONIX_BINARY_LICENSE_AGREEMENT_accepted
+executed: sudo virsh -c qemu:///system net-define Whonix_external*.xml
+executed: sudo virsh -c qemu:///system net-define Whonix_internal*.xml
+executed: sudo virsh -c qemu:///system net-autostart Whonix-External
+executed: sudo virsh -c qemu:///system net-start Whonix-External
+executed: sudo virsh -c qemu:///system net-autostart Whonix-Internal
+executed: sudo virsh -c qemu:///system net-start Whonix-Internal
+executed: sudo virsh -c qemu:///system define Whonix-Gateway*.xml
+executed: sudo virsh -c qemu:///system define Whonix-Workstation*.xml
+executed: sudo mv Whonix-Gateway*.qcow2 /var/lib/libvirt/images/Whonix-Gateway.qcow2
+executed: sudo mv Whonix-Workstation*.qcow2 /var/lib/libvirt/images/Whonix-Workstation.qcow2
+
+The only problem that I consider might exist would be permissions for the VM path:
+* /var/lib/libvirt/images/* owned by user:root 644
+* /var/lib/libvirt/images owned by user:root 711
+
+What are things to check or redo to attempt to get this to work? Clueless how to do this properly.
+
+P.S. I found the instructions to lack some specific paths which may have thrown me off. There are other topics related but they don&#39;t appear to be relevant.</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 14 Sep 2021 18:13:11 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/no-bootable-device/12306.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>No bootable device</title>
+        <dc:creator><![CDATA[absolute]]></dc:creator>
+        <description><![CDATA[
+            <p>Same result. My steps:<br>
+in virt-manager I deleted the old version then</p>
+<p>user@host:~/Whonix-XFCE-16.0.2.7.Intel_AMD64.qcow2.libvirt$ touch WHONIX_BINARY_LICENSE_AGREEMENT_accepted<br>
+user@host:~/Whonix-XFCE-16.0.2.7.Intel_AMD64.qcow2.libvirt$ sudo virsh -c qemu:///system net-define Whonix_external*.xml<br>
+error: Failed to define network from Whonix_external_network-16.0.2.7.xml<br>
+error: operation failed: network ‘Whonix-External’ already exists with uuid 05255121-a92c-46d3-8f44-e91770fe5d7c<br>
+user@host:~/Whonix-XFCE-16.0.2.7.Intel_AMD64.qcow2.libvirt$ sudo virsh -c qemu:///system net-define Whonix_internal*.xml<br>
+error: Failed to define network from Whonix_internal_network-16.0.2.7.xml<br>
+error: operation failed: network ‘Whonix-Internal’ already exists with uuid 1c0c23e8-4597-4373-87a2-aa5feb50c5a2<br>
+user@host:~/Whonix-XFCE-16.0.2.7.Intel_AMD64.qcow2.libvirt$ sudo virsh -c qemu:///system net-autostart Whonix-External<br>
+Network Whonix-External marked as autostarted<br>
+user@host:~/Whonix-XFCE-16.0.2.7.Intel_AMD64.qcow2.libvirt$ sudo virsh -c qemu:///system net-start Whonix-External<br>
+error: Failed to start network Whonix-External<br>
+error: Requested operation is not valid: network is already active<br>
+user@host:~/Whonix-XFCE-16.0.2.7.Intel_AMD64.qcow2.libvirt$ sudo virsh -c qemu:///system net-autostart Whonix-Internal<br>
+Network Whonix-Internal marked as autostarted<br>
+user@host:~/Whonix-XFCE-16.0.2.7.Intel_AMD64.qcow2.libvirt$ sudo virsh -c qemu:///system net-start Whonix-Internal<br>
+error: Failed to start network Whonix-Internal<br>
+error: Requested operation is not valid: network is already active<br>
+user@host:~/Whonix-XFCE-16.0.2.7.Intel_AMD64.qcow2.libvirt$ sudo virsh -c qemu:///system define Whonix-Gateway*.xml<br>
+Domain ‘Whonix-Gateway’ defined from Whonix-Gateway-XFCE-16.0.2.7.xml<br>
+user@host:~/Whonix-XFCE-16.0.2.7.Intel_AMD64.qcow2.libvirt$ sudo virsh -c qemu:///system define Whonix-Workstation*.xml<br>
+Domain ‘Whonix-Workstation’ defined from Whonix-Workstation-XFCE-16.0.2.7.xml<br>
+user@host:~/Whonix-XFCE-16.0.2.7.Intel_AMD64.qcow2.libvirt$ sudo mv Whonix-Gateway*.qcow2 /var/lib/libvirt/images/Whonix-Gateway.qcow2<br>
+user@host:~/Whonix-XFCE-16.0.2.7.Intel_AMD64.qcow2.libvirt$ sudo mv Whonix-Workstation*.qcow2 /var/lib/libvirt/images/Whonix-Workstation.qcow2</p>
+<p>Emulated OS says “No bootable device”</p>
+<p>/var/log/libvirt/qemu says:</p>
+<p>2021-09-14 17:54:29.417+0000: starting up libvirt version: 7.0.0, package: 3 (Andrea Bolognani <a href="mailto:eof@kiyuko.org">eof@kiyuko.org</a> Fri, 26 Feb 2021 16:46:34 +0100), qemu version: 5.2.0Debian 1:5.2+dfsg-11, kernel: 5.10.0-8-amd64, hostname: host<br>
+LC_ALL=C <br>
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin <br>
+HOME=/var/lib/libvirt/qemu/domain-9-Whonix-Gateway <br>
+XDG_DATA_HOME=/var/lib/libvirt/qemu/domain-9-Whonix-Gateway/.local/share <br>
+XDG_CACHE_HOME=/var/lib/libvirt/qemu/domain-9-Whonix-Gateway/.cache <br>
+XDG_CONFIG_HOME=/var/lib/libvirt/qemu/domain-9-Whonix-Gateway/.config <br>
+QEMU_AUDIO_DRV=spice <br>
+/usr/bin/qemu-system-x86_64 <br>
+-name guest=Whonix-Gateway,debug-threads=on <br>
+-S <br>
+-object secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-9-Whonix-Gateway/master-key.aes <br>
+-machine pc-i440fx-5.2,accel=kvm,usb=off,vmport=off,dump-guest-core=off,mem-merge=off,memory-backend=pc.ram <br>
+-cpu host,migratable=on,kvmclock=on,kvm-pv-unhalt=on,pmu=off <br>
+-m 512 <br>
+-object memory-backend-ram,id=pc.ram,size=536870912 <br>
+-overcommit mem-lock=off <br>
+-smp 1,sockets=1,cores=1,threads=1 <br>
+-uuid e92f309e-e5b3-40dc-968a-2f4ee5ba4a3b <br>
+-device vmgenid,guid=ff041a88-e834-42b0-9fae-43420936412d,id=vmgenid0 <br>
+-no-user-config <br>
+-nodefaults <br>
+-chardev socket,id=charmonitor,fd=34,server,nowait <br>
+-mon chardev=charmonitor,id=monitor,mode=control <br>
+-rtc base=utc,clock=vm,driftfix=slew <br>
+-global kvm-pit.lost_tick_policy=delay <br>
+-no-hpet <br>
+-no-shutdown <br>
+-global PIIX4_PM.disable_s3=1 <br>
+-global PIIX4_PM.disable_s4=1 <br>
+-boot menu=on,strict=on <br>
+-device piix3-usb-uhci,id=usb,bus=pci.0,addr=0x1.0x2 <br>
+-device ahci,id=sata0,bus=pci.0,addr=0x8 <br>
+-device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x5 <br>
+-blockdev ‘{“driver”:“file”,“filename”:"/var/lib/libvirt/images/Whonix-Gateway.qcow2",“node-name”:“libvirt-1-storage”,“auto-read-only”:true,“discard”:“unmap”}’ <br>
+-blockdev ‘{“node-name”:“libvirt-1-format”,“read-only”:false,“driver”:“qcow2”,“file”:“libvirt-1-storage”,“backing”:null}’ <br>
+-device virtio-blk-pci,bus=pci.0,addr=0x6,drive=libvirt-1-format,id=virtio-disk0,bootindex=1 <br>
+-netdev tap,fd=36,id=hostnet0 <br>
+-device virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:c1:95:dd,bus=pci.0,addr=0x3 <br>
+-netdev tap,fd=37,id=hostnet1 <br>
+-device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:41:51:b9,bus=pci.0,addr=0x4 <br>
+-chardev pty,id=charserial0 <br>
+-device isa-serial,chardev=charserial0,id=serial0 <br>
+-chardev spicevmc,id=charchannel0,name=vdagent <br>
+-device virtserialport,bus=virtio-serial0.0,nr=1,chardev=charchannel0,id=channel0,name=com.redhat.spice.0 <br>
+-spice port=5900,addr=127.0.0.1,disable-ticketing,disable-agent-file-xfer,seamless-migration=on <br>
+-device virtio-vga,id=video0,max_outputs=1,bus=pci.0,addr=0x2 <br>
+-object rng-random,id=objrng0,filename=/dev/urandom <br>
+-device virtio-rng-pci,rng=objrng0,id=rng0,bus=pci.0,addr=0x7 <br>
+-sandbox on,obsolete=deny,elevateprivileges=deny,spawn=deny,resourcecontrol=deny <br>
+-msg timestamp=on<br>
+char device redirected to /dev/pts/1 (label charserial0)<br>
+2021-09-14T17:55:50.018667Z qemu-system-x86_64: terminating on signal 15 from pid 824 (/usr/sbin/libvirtd)<br>
+2021-09-14 17:55:50.219+0000: shutting down, reason=destroyed<br>
+2021-09-14 18:05:34.775+0000: starting up libvirt version: 7.0.0, package: 3 (Andrea Bolognani <a href="mailto:eof@kiyuko.org">eof@kiyuko.org</a> Fri, 26 Feb 2021 16:46:34 +0100), qemu version: 5.2.0Debian 1:5.2+dfsg-11, kernel: 5.10.0-8-amd64, hostname: host<br>
+LC_ALL=C <br>
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin <br>
+HOME=/var/lib/libvirt/qemu/domain-10-Whonix-Gateway <br>
+XDG_DATA_HOME=/var/lib/libvirt/qemu/domain-10-Whonix-Gateway/.local/share <br>
+XDG_CACHE_HOME=/var/lib/libvirt/qemu/domain-10-Whonix-Gateway/.cache <br>
+XDG_CONFIG_HOME=/var/lib/libvirt/qemu/domain-10-Whonix-Gateway/.config <br>
+QEMU_AUDIO_DRV=spice <br>
+/usr/bin/qemu-system-x86_64 <br>
+-name guest=Whonix-Gateway,debug-threads=on <br>
+-S <br>
+-object secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-10-Whonix-Gateway/master-key.aes <br>
+-machine pc-i440fx-5.2,accel=kvm,usb=off,vmport=off,dump-guest-core=off,mem-merge=off,memory-backend=pc.ram <br>
+-cpu host,migratable=on,kvmclock=on,kvm-pv-unhalt=on,pmu=off <br>
+-m 512 <br>
+-object memory-backend-ram,id=pc.ram,size=536870912 <br>
+-overcommit mem-lock=off <br>
+-smp 1,sockets=1,cores=1,threads=1 <br>
+-uuid c3f9f8d9-ce41-40ff-9a4c-70be7910bb55 <br>
+-device vmgenid,guid=aedb8246-eb15-481c-865d-03d68a95918b,id=vmgenid0 <br>
+-no-user-config <br>
+-nodefaults <br>
+-chardev socket,id=charmonitor,fd=34,server,nowait <br>
+-mon chardev=charmonitor,id=monitor,mode=control <br>
+-rtc base=utc,clock=vm,driftfix=slew <br>
+-global kvm-pit.lost_tick_policy=delay <br>
+-no-hpet <br>
+-no-shutdown <br>
+-global PIIX4_PM.disable_s3=1 <br>
+-global PIIX4_PM.disable_s4=1 <br>
+-boot strict=on <br>
+-device piix3-usb-uhci,id=usb,bus=pci.0,addr=0x1.0x2 <br>
+-device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x5 <br>
+-blockdev ‘{“driver”:“file”,“filename”:"/var/lib/libvirt/images/Whonix-Gateway.qcow2",“node-name”:“libvirt-1-storage”,“auto-read-only”:true,“discard”:“unmap”}’ <br>
+-blockdev ‘{“node-name”:“libvirt-1-format”,“read-only”:false,“driver”:“qcow2”,“file”:“libvirt-1-storage”,“backing”:null}’ <br>
+-device virtio-blk-pci,bus=pci.0,addr=0x6,drive=libvirt-1-format,id=virtio-disk0,bootindex=1 <br>
+-netdev tap,fd=36,id=hostnet0 <br>
+-device virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:47:88:9b,bus=pci.0,addr=0x3 <br>
+-netdev tap,fd=37,id=hostnet1 <br>
+-device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:cd:16:28,bus=pci.0,addr=0x4 <br>
+-chardev pty,id=charserial0 <br>
+-device isa-serial,chardev=charserial0,id=serial0 <br>
+-chardev spicevmc,id=charchannel0,name=vdagent <br>
+-device virtserialport,bus=virtio-serial0.0,nr=1,chardev=charchannel0,id=channel0,name=com.redhat.spice.0 <br>
+-spice port=5900,addr=127.0.0.1,disable-ticketing,disable-agent-file-xfer,seamless-migration=on <br>
+-device virtio-vga,id=video0,max_outputs=1,bus=pci.0,addr=0x2 <br>
+-object rng-random,id=objrng0,filename=/dev/urandom <br>
+-device virtio-rng-pci,rng=objrng0,id=rng0,bus=pci.0,addr=0x7 <br>
+-sandbox on,obsolete=deny,elevateprivileges=deny,spawn=deny,resourcecontrol=deny <br>
+-msg timestamp=on<br>
+char device redirected to /dev/pts/1 (label charserial0)<br>
+2021-09-14T18:05:53.329859Z qemu-system-x86_64: terminating on signal 15 from pid 824 (/usr/sbin/libvirtd)<br>
+2021-09-14 18:05:53.737+0000: shutting down, reason=destroyed</p>
+          <p><a href="http://forums.whonix.org/t/no-bootable-device/12306/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-bootable-device/12306/12</link>
+        <pubDate>Tue, 14 Sep 2021 18:10:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12306-12</guid>
+        <source url="http://forums.whonix.org/t/no-bootable-device/12306.rss">No bootable device</source>
+      </item>
+      <item>
+        <title>No bootable device</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Download the latest version then report back.</p>
+          <p><a href="http://forums.whonix.org/t/no-bootable-device/12306/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-bootable-device/12306/11</link>
+        <pubDate>Sun, 12 Sep 2021 20:07:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12306-11</guid>
+        <source url="http://forums.whonix.org/t/no-bootable-device/12306.rss">No bootable device</source>
+      </item>
+      <item>
+        <title>No bootable device</title>
+        <dc:creator><![CDATA[absolute]]></dc:creator>
+        <description><![CDATA[
+            <p>/var/log/libvirt/qemu reads:<br>
+2021-09-12 18:40:34.542+0000: starting up libvirt version: 7.0.0, package: 3 (Andrea Bolognani <a href="mailto:eof@kiyuko.org">eof@kiyuko.org</a> Fri, 26 Feb 2021 16:46:34 +0100), qemu version: 5.2.0Debian 1:5.2+dfsg-11, kernel: 5.10.0-8-amd64, hostname: host<br>
+LC_ALL=C <br>
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin <br>
+HOME=/var/lib/libvirt/qemu/domain-8-Whonix-Gateway <br>
+XDG_DATA_HOME=/var/lib/libvirt/qemu/domain-8-Whonix-Gateway/.local/share <br>
+XDG_CACHE_HOME=/var/lib/libvirt/qemu/domain-8-Whonix-Gateway/.cache <br>
+XDG_CONFIG_HOME=/var/lib/libvirt/qemu/domain-8-Whonix-Gateway/.config <br>
+QEMU_AUDIO_DRV=spice <br>
+/usr/bin/qemu-system-x86_64 <br>
+-name guest=Whonix-Gateway,debug-threads=on <br>
+-S <br>
+-object secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-8-Whonix-Gateway/master-key.aes <br>
+-machine pc-i440fx-5.2,accel=kvm,usb=off,vmport=off,dump-guest-core=off,mem-merge=off,memory-backend=pc.ram <br>
+-cpu host,migratable=on,kvmclock=on,kvm-pv-unhalt=on,pmu=off <br>
+-m 512 <br>
+-object memory-backend-ram,id=pc.ram,size=536870912 <br>
+-overcommit mem-lock=off <br>
+-smp 1,sockets=1,cores=1,threads=1 <br>
+-uuid e92f309e-e5b3-40dc-968a-2f4ee5ba4a3b <br>
+-device vmgenid,guid=ff041a88-e834-42b0-9fae-43420936412d,id=vmgenid0 <br>
+-no-user-config <br>
+-nodefaults <br>
+-chardev socket,id=charmonitor,fd=34,server,nowait <br>
+-mon chardev=charmonitor,id=monitor,mode=control <br>
+-rtc base=utc,clock=vm,driftfix=slew <br>
+-global kvm-pit.lost_tick_policy=delay <br>
+-no-hpet <br>
+-no-shutdown <br>
+-global PIIX4_PM.disable_s3=1 <br>
+-global PIIX4_PM.disable_s4=1 <br>
+-boot menu=on,strict=on <br>
+-device piix3-usb-uhci,id=usb,bus=pci.0,addr=0x1.0x2 <br>
+-device ahci,id=sata0,bus=pci.0,addr=0x8 <br>
+-device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x5 <br>
+-blockdev ‘{“driver”:“file”,“filename”:"/var/lib/libvirt/images/Whonix-Gateway.qcow2",“node-name”:“libvirt-1-storage”,“auto-read-only”:true,“discard”:“unmap”}’ <br>
+-blockdev ‘{“node-name”:“libvirt-1-format”,“read-only”:false,“driver”:“qcow2”,“file”:“libvirt-1-storage”,“backing”:null}’ <br>
+-device virtio-blk-pci,bus=pci.0,addr=0x6,drive=libvirt-1-format,id=virtio-disk0,bootindex=1 <br>
+-netdev tap,fd=36,id=hostnet0 <br>
+-device virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:c1:95:dd,bus=pci.0,addr=0x3 <br>
+-netdev tap,fd=37,id=hostnet1 <br>
+-device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:41:51:b9,bus=pci.0,addr=0x4 <br>
+-chardev pty,id=charserial0 <br>
+-device isa-serial,chardev=charserial0,id=serial0 <br>
+-chardev spicevmc,id=charchannel0,name=vdagent <br>
+-device virtserialport,bus=virtio-serial0.0,nr=1,chardev=charchannel0,id=channel0,name=com.redhat.spice.0 <br>
+-spice port=5900,addr=127.0.0.1,disable-ticketing,disable-agent-file-xfer,seamless-migration=on <br>
+-device virtio-vga,id=video0,max_outputs=1,bus=pci.0,addr=0x2 <br>
+-object rng-random,id=objrng0,filename=/dev/urandom <br>
+-device virtio-rng-pci,rng=objrng0,id=rng0,bus=pci.0,addr=0x7 <br>
+-sandbox on,obsolete=deny,elevateprivileges=deny,spawn=deny,resourcecontrol=deny <br>
+-msg timestamp=on<br>
+char device redirected to /dev/pts/1 (label charserial0)<br>
+2021-09-12T18:40:47.836703Z qemu-system-x86_64: terminating on signal 15 from pid 824 (/usr/sbin/libvirtd)<br>
+2021-09-12 18:40:48.037+0000: shutting down, reason=destroyed</p>
+          <p><a href="http://forums.whonix.org/t/no-bootable-device/12306/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-bootable-device/12306/10</link>
+        <pubDate>Sun, 12 Sep 2021 18:42:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12306-10</guid>
+        <source url="http://forums.whonix.org/t/no-bootable-device/12306.rss">No bootable device</source>
+      </item>
+      <item>
+        <title>No bootable device</title>
+        <dc:creator><![CDATA[absolute]]></dc:creator>
+        <description><![CDATA[
+            <p>Making the qcow2 files world readable and executable doesn’t help.</p>
+          <p><a href="http://forums.whonix.org/t/no-bootable-device/12306/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-bootable-device/12306/9</link>
+        <pubDate>Sun, 12 Sep 2021 18:39:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12306-9</guid>
+        <source url="http://forums.whonix.org/t/no-bootable-device/12306.rss">No bootable device</source>
+      </item>
+      <item>
+        <title>No bootable device</title>
+        <dc:creator><![CDATA[absolute]]></dc:creator>
+        <description><![CDATA[
+            <p>Host: Debian Bullseye, 64 bit<br>
+virt-manager: version 1:3.2.0-3<br>
+Whonix: KVM version XFCE 16.0.1.7</p>
+<p>Affected component(s) or functionality: Initial loading/booting<br>
+Steps to reproduce the behavior:</p>
+<ol>
+<li>navigated to the extracted folder</li>
+<li>$ sudo virsh -c qemu:///system net-define Whonix_external*.xml</li>
+<li>$ sudo virsh -c qemu:///system net-define Whonix_internal*.xml</li>
+<li>$ sudo virsh -c qemu:///system net-autostart Whonix-External</li>
+<li>$ sudo virsh -c qemu:///system net-start Whonix-External</li>
+<li>$ sudo virsh -c qemu:///system net-autostart Whonix-Internal</li>
+<li>$ sudo virsh -c qemu:///system net-start Whonix-Internal</li>
+<li>$ sudo virsh -c qemu:///system define Whonix-Gateway*.xml</li>
+<li>$ sudo virsh -c qemu:///system define Whonix-Workstation*.xml</li>
+<li>$ sudo mv Whonix-Gateway*.qcow2 /var/lib/libvirt/images/Whonix-Gateway.qcow2</li>
+<li>$ sudo mv Whonix-Workstation*.qcow2 /var/lib/libvirt/images/Whonix-Workstation.qcow2</li>
+<li>start Whonix-Gateway in virt-manager</li>
+</ol>
+<p>Expected behavior: Whonix-Gateway should start, boot and successfully load.<br>
+Actual behavior: Whonix-Gateway fails to boot with “Booting from Hard Disk…” “Boot failed: not a bootable disk” “No bootable device.”</p>
+<p>Context: Basic setup of Whonix for KVM</p>
+<p>Relevant documentation: wiki/KVM</p>
+          <p><a href="http://forums.whonix.org/t/no-bootable-device/12306/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-bootable-device/12306/8</link>
+        <pubDate>Sun, 12 Sep 2021 18:26:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12306-8</guid>
+        <source url="http://forums.whonix.org/t/no-bootable-device/12306.rss">No bootable device</source>
+      </item>
+      <item>
+        <title>No bootable device</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>chmod user</p>
+</blockquote>
+<p>As mentioned above, <code>user</code> probably wrong.</p>
+<aside class="quote no-group" data-username="absolute" data-post="6" data-topic="12306">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> absolute:</div>
+<blockquote>
+<p>chmod user:libvirt-qemu /var/lib/libvirt/images/*</p>
+</blockquote>
+</aside>
+<p><code>*</code> cannot expand to file file names if run under user <code>user</code>. <code>*</code> is a shell function evaluated before running the command.</p>
+<p>It’s not chmod, it’s chown. Untested as I don’t maintain KVM:</p>
+<pre><code>sudo chown --recursive libvirt-qemu:kvm /var/lib/libvirt/images
+</code></pre>
+<p>I don’t know if it’s user <code>libvirt-qemu</code> and group <code>kvm</code>. Could even be <code>root:root</code> and all of this being a dead end.</p>
+          <p><a href="http://forums.whonix.org/t/no-bootable-device/12306/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-bootable-device/12306/7</link>
+        <pubDate>Sun, 12 Sep 2021 18:19:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12306-7</guid>
+        <source url="http://forums.whonix.org/t/no-bootable-device/12306.rss">No bootable device</source>
+      </item>
+      <item>
+        <title>No bootable device</title>
+        <dc:creator><![CDATA[absolute]]></dc:creator>
+        <description><![CDATA[
+            <p>Edit: I actually did chown, not chmod. Typo on my part.</p>
+<p>sudo chown user:libvirt-qemu /var/lib/libvirt/images<br>
+sudo chown user:libvirt-qemu /var/lib/libvirt/images/*<br>
+Doesn’t fix anything.</p>
+          <p><a href="http://forums.whonix.org/t/no-bootable-device/12306/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-bootable-device/12306/6</link>
+        <pubDate>Sun, 12 Sep 2021 17:52:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12306-6</guid>
+        <source url="http://forums.whonix.org/t/no-bootable-device/12306.rss">No bootable device</source>
+      </item>
+      <item>
+        <title>No bootable device</title>
+        <dc:creator><![CDATA[absolute]]></dc:creator>
+        <description><![CDATA[
+            <p>Using Whonix XFCE 16.0.1.7.</p>
+          <p><a href="http://forums.whonix.org/t/no-bootable-device/12306/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-bootable-device/12306/5</link>
+        <pubDate>Sun, 12 Sep 2021 17:48:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12306-5</guid>
+        <source url="http://forums.whonix.org/t/no-bootable-device/12306.rss">No bootable device</source>
+      </item>
+      <item>
+        <title>No bootable device</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="12306">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Which linux user account and which linux group should own files inside folder <code>/var/lib/libvirt/images</code>? <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a></p>
+</blockquote>
+</aside>
+<p>user: <code>libvirt-qemu</code></p>
+          <p><a href="http://forums.whonix.org/t/no-bootable-device/12306/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-bootable-device/12306/4</link>
+        <pubDate>Sun, 12 Sep 2021 15:20:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12306-4</guid>
+        <source url="http://forums.whonix.org/t/no-bootable-device/12306.rss">No bootable device</source>
+      </item>
+      <item>
+        <title>No bootable device</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="absolute" data-post="1" data-topic="12306">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> absolute:</div>
+<blockquote>
+<p>I believe I followed the instructions at wiki/KVM. Virtual machines start but no bootable device. I:</p>
+</blockquote>
+</aside>
+<p>I’ve updated the release version a few hours ago. Which one are you using?</p>
+          <p><a href="http://forums.whonix.org/t/no-bootable-device/12306/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-bootable-device/12306/3</link>
+        <pubDate>Sun, 12 Sep 2021 15:17:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12306-3</guid>
+        <source url="http://forums.whonix.org/t/no-bootable-device/12306.rss">No bootable device</source>
+      </item>
+      <item>
+        <title>No bootable device</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I don’t maintain KVM… But some ideas…</p>
+<aside class="quote no-group" data-username="absolute" data-post="1" data-topic="12306">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> absolute:</div>
+<blockquote>
+<p>The only problem that I consider might exist would be permissions for the VM path:</p>
+<ul>
+<li>/var/lib/libvirt/images/* owned by user:root 644</li>
+<li>/var/lib/libvirt/images owned by user:root 711</li>
+</ul>
+</blockquote>
+</aside>
+<p>Most likely wrong. I don’t think user <code>user</code> should be owning any files in <code>/var/lib/libvirt/images</code>?</p>
+<p>FYI:</p>
+<ul>
+<li><a href="https://chmodcommand.com/chmod-644/">https://chmodcommand.com/chmod-644/</a></li>
+<li><a href="https://chmodcommand.com/chmod-711/">https://chmodcommand.com/chmod-711/</a></li>
+</ul>
+<p>This might help:</p>
+<pre><code>chmod --verbose --recursive ug+rw /var/lib/libvirt/images
+</code></pre>
+<ul>
+<li>Owner Rights (u)</li>
+<li>Group Rights (g)</li>
+<li>r - read</li>
+<li>w - write</li>
+</ul>
+<p>Which linux user account and which linux group should own files inside folder <code>/var/lib/libvirt/images</code>? <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a></p>
+<aside class="quote no-group" data-username="absolute" data-post="1" data-topic="12306">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> absolute:</div>
+<blockquote>
+<p>What are things to check or redo to attempt to get this to work? Clueless how to do this properly.</p>
+</blockquote>
+</aside>
+<p><a href="https://www.whonix.org/wiki/Reporting_Bugs#Generic_Bug_Reproduction">Generic Bug Reproduction</a> always useful. I.e. using a Debian VM first. This permits to widen your search. I.e. → </p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener" title="08:50AM - 09 August 2021">Whonix – 9 Aug 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:111/58;"><img src="https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png" class="thumbnail" width="111" height="58"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener">Information Booster might be Available!</a></h3>
+
+  <p>Utilizing other resources to help solve questions/issues unspecific to Whonix ™.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/no-bootable-device/12306/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-bootable-device/12306/2</link>
+        <pubDate>Sun, 12 Sep 2021 14:32:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12306-2</guid>
+        <source url="http://forums.whonix.org/t/no-bootable-device/12306.rss">No bootable device</source>
+      </item>
+      <item>
+        <title>No bootable device</title>
+        <dc:creator><![CDATA[absolute]]></dc:creator>
+        <description><![CDATA[
+            <p>I believe I followed the instructions at wiki/KVM. Virtual machines start but no bootable device. I:<br>
+verified the download<br>
+extracted from the archive<br>
+navigated to the extracted folder<br>
+executed: touch WHONIX_BINARY_LICENSE_AGREEMENT_accepted<br>
+executed: sudo virsh -c qemu:///system net-define Whonix_external*.xml<br>
+executed: sudo virsh -c qemu:///system net-define Whonix_internal*.xml<br>
+executed: sudo virsh -c qemu:///system net-autostart Whonix-External<br>
+executed: sudo virsh -c qemu:///system net-start Whonix-External<br>
+executed: sudo virsh -c qemu:///system net-autostart Whonix-Internal<br>
+executed: sudo virsh -c qemu:///system net-start Whonix-Internal<br>
+executed: sudo virsh -c qemu:///system define Whonix-Gateway*.xml<br>
+executed: sudo virsh -c qemu:///system define Whonix-Workstation*.xml<br>
+executed: sudo mv Whonix-Gateway*.qcow2 /var/lib/libvirt/images/Whonix-Gateway.qcow2<br>
+executed: sudo mv Whonix-Workstation*.qcow2 /var/lib/libvirt/images/Whonix-Workstation.qcow2</p>
+<p>The only problem that I consider might exist would be permissions for the VM path:</p>
+<ul>
+<li>/var/lib/libvirt/images/* owned by user:root 644</li>
+<li>/var/lib/libvirt/images owned by user:root 711</li>
+</ul>
+<p>What are things to check or redo to attempt to get this to work? Clueless how to do this properly.</p>
+<p>P.S. I found the instructions to lack some specific paths which may have thrown me off. There are other topics related but they don’t appear to be relevant.</p>
+          <p><a href="http://forums.whonix.org/t/no-bootable-device/12306/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-bootable-device/12306/1</link>
+        <pubDate>Sun, 12 Sep 2021 04:56:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12306-1</guid>
+        <source url="http://forums.whonix.org/t/no-bootable-device/12306.rss">No bootable device</source>
+      </item>
+  </channel>
+</rss>

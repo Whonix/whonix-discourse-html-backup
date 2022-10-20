@@ -1,0 +1,686 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+    <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941</link>
+    <description>Hello. I can&#39;t start OpenVpn on Whonix WS 14 by means of &quot;sudo service openvpn start&quot;, i put configs to /etc/openvpn. If i try start with &quot;sudo openvpn myconfigvpn.conf - all work. But I need it at autostart. On old Whonix 13 i just put configs and make service openvpn start - all work. How i can fix it?</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 02 Oct 2018 21:03:40 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <p>It’s work! Thank you.<br>
+I just skip in guide Firewall setup, did only tunnel user, changed some things in .conf and it work as im need!</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/25">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/25</link>
+        <pubDate>Tue, 02 Oct 2018 21:03:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-25</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <code>benev</code></p>
+<aside class="quote no-group" data-post="18" data-topic="5941">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/b/71e660/40.png" class="avatar"> benev:</div>
+<blockquote>
+<p>/etc/openvpn/myvpn.conf</p>
+<p>client<br>
+<strong>dev tun</strong><br>
+proto tcp</p>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-post="22" data-topic="5941">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/b/71e660/40.png" class="avatar"> benev:</div>
+<blockquote>
+<p>Process: 442 ExecStartPre=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --rmtun --dev <strong>tun0</strong> (code=exited, status=1/FAILURE)</p>
+</blockquote>
+</aside>
+<p>Your configuration file has <code>dev tun</code> and <code>/usr/sbin/openvm</code> uses <code>--dev tun0</code>.</p>
+<p>Maybe use <code>tun0</code> in <code>openvpn.conf</code>?</p>
+<p>Another possibility is file ownership Or maybe OpenVPN is not being run under the correct user? Try looking through the Tunnels wiki to see what <code>user</code> to run OpenVPN under i.e. user <code>tunnel</code> maybe?</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/24">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/24</link>
+        <pubDate>Tue, 02 Oct 2018 10:13:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-24</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <p>After this, i did it:<br>
+<code>sudo cp /lib/systemd/system/openvpn@.service /lib/systemd/system/openvpn@openvpn.service</code></p>
+<p><code>sudo systemctl enable openvpn@openvpn</code><br>
+<code>sudo systemctl start openvpn@openvpn</code></p>
+<p>And see:<br>
+<code>Job for openvpn@openvpn.service failed because the control process exited with error code. See "systemctl status openvpn@openvpn.service" and "journalctl -xe" for details.</code></p>
+<blockquote>
+<p>sudo systemctl status openvpn@openvpn -l<br>
+● openvpn@openvpn.service - OpenVPN connection to openvpn<br>
+Loaded: loaded (/lib/systemd/system/openvpn@openvpn.service; enabled; vendor preset: enabled)<br>
+Drop-In: /lib/systemd/system/openvpn@openvpn.service.d<br>
+└─50_unpriv.conf<br>
+Active: failed (Result: exit-code) since Mon 2018-10-01 22:49:33 UTC; 23s ago<br>
+Docs: man:openvpn(8)<br>
+<a href="https://community.openvpn.net/openvpn/wiki/Openvpn23ManPage" rel="nofollow noopener">https://community.openvpn.net/openvpn/wiki/Openvpn23ManPage</a><br>
+<a href="https://community.openvpn.net/openvpn/wiki/HOWTO" rel="nofollow noopener">https://community.openvpn.net/openvpn/wiki/HOWTO</a><br>
+Process: 2365 ExecStartPre=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --rmtun --dev tun0 (code=exited, status=1/FAILURE)</p>
+<p>Oct 01 22:49:33 host systemd[1]: Starting OpenVPN connection to openvpn…<br>
+Oct 01 22:49:33 host systemd[1]: openvpn@openvpn.service: Control process exited, code=exited status=1<br>
+Oct 01 22:49:33 host systemd[1]: Failed to start OpenVPN connection to openvpn.<br>
+Oct 01 22:49:33 host systemd[1]: openvpn@openvpn.service: Unit entered failed state.<br>
+Oct 01 22:49:33 host systemd[1]: openvpn@openvpn.service: Failed with result ‘exit-code’.</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/23</link>
+        <pubDate>Mon, 01 Oct 2018 14:55:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-23</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <p>openvpn@openvpn.service - OpenVPN connection to openvpn<br>
+Loaded: loaded (/lib/systemd/system/openvpn@.service; disabled; vendor preset: enabled)<br>
+Drop-In: /lib/systemd/system/openvpn@openvpn.service.d<br>
+└─50_unpriv.conf<br>
+Active: failed (Result: exit-code) since Mon 2018-10-01 14:21:17 UTC; 42s ago<br>
+Docs: man:openvpn(8)<br>
+<a href="https://community.openvpn.net/openvpn/wiki/Openvpn23ManPage" rel="nofollow noopener">https://community.openvpn.net/openvpn/wiki/Openvpn23ManPage</a><br>
+<a href="https://community.openvpn.net/openvpn/wiki/HOWTO" rel="nofollow noopener">https://community.openvpn.net/openvpn/wiki/HOWTO</a><br>
+Process: 442 ExecStartPre=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --rmtun --dev tun0 (code=exited, status=1/FAILURE)</p>
+<p>Oct 01 14:21:16 host systemd[1]: Starting OpenVPN connection to openvpn…<br>
+Oct 01 14:21:17 host sudo[442]: sudo: a password is required<br>
+Oct 01 14:21:17 host systemd[1]: openvpn@openvpn.service: Control process exited, code=exited status=1<br>
+Oct 01 14:21:17 host systemd[1]: Failed to start OpenVPN connection to openvpn.<br>
+Oct 01 14:21:17 host systemd[1]: openvpn@openvpn.service: Unit entered failed state.<br>
+Oct 01 14:21:17 host systemd[1]: openvpn@openvpn.service: Failed with result ‘exit-code’.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/22</link>
+        <pubDate>Mon, 01 Oct 2018 14:25:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-22</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="20" data-topic="5941">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/b/71e660/40.png" class="avatar"> benev:</div>
+<blockquote>
+<p>So service is work, but VPN can’t connect.</p>
+</blockquote>
+</aside>
+<p>Could you please post the output of:</p>
+<p><code>sudo systemctl status openvpn@openvpn -l</code></p>
+<p>Be sure to redact any sensitive info.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/21</link>
+        <pubDate>Sat, 29 Sep 2018 00:33:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-21</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello. I try:</p>
+<ol>
+<li>Reinstall fresh Whonix 14</li>
+<li>Make dist-upgrade</li>
+<li>Upload files of my VPN to <code>/etc/openvpn</code>
+</li>
+<li>Edit <code>etc/default/openvpn</code> to autostart</li>
+<li>Edit my_vpn.conf with /etc/openvpn/userpass… as u said.</li>
+<li>Reboot<br>
+VPN doesn’t work.<br>
+<code>service openvpn status</code>
+</li>
+</ol>
+<p>openvpn.service - OpenVPN service<br>
+Loaded: loaded (/lib/systemd/system/openvpn.service; enabled; vendor preset: enabled)<br>
+Active: active (exited) since Fri 2018-09-28 15:23:02 UTC; 8s ago<br>
+Process: 2229 ExecStart=/bin/true (code=exited, status=0/SUCCESS)<br>
+Main PID: 2229 (code=exited, status=0/SUCCESS)</p>
+<p>Sep 28 15:23:02 host systemd[1]: Starting OpenVPN service…<br>
+Sep 28 15:23:02 host systemd[1]: Started OpenVPN service.</p>
+<p>So service is work, but VPN can’t connect.</p>
+<p>I also try rename my_vpn.conf to openvpn.conf and give 755 chmod for all VPN files - it’s too doesn’t help.</p>
+<p>And again, it’s work if i start hands from console <code>sudo openvpn --config /etc/openvpn/openvpn.conf</code></p>
+<p>Help me pleeeasee…</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/20</link>
+        <pubDate>Fri, 28 Sep 2018 15:38:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-20</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[mig5]]></dc:creator>
+        <description><![CDATA[
+            <pre><code class="lang-auto">auth-user-pass my_userpass.txt
+ca my_ca.crt
+crl-verify my_crl.pem
+</code></pre>
+<p>Try making these (and also presumably your ‘cert’ and ‘key’ parameters that you omitted) be absolute paths, instead of relative paths. In other words, add the prefix <code>/etc/openvpn/</code> to each of those values.</p>
+<p>Same as you have for the <code>up</code> and <code>down</code> parameters (they are absolute paths).</p>
+<p>The issue may be that when the openvpn daemon tries to autostart the service, it can’t find those files as it’s not operating within the context of the <code>/etc/openvpn</code> folder. That would also explain why it works fine if you start it manually whilst cd’d into <code>/etc/openvpn</code>.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/19</link>
+        <pubDate>Thu, 27 Sep 2018 01:43:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-19</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <p><code>etc/default/openvpn</code></p>
+<pre><code># This is the configuration file for /etc/init.d/openvpn
+
+#
+# Start only these VPNs automatically via init script.
+# Allowed values are "all", "none" or space separated list of
+# names of the VPNs. If empty, "all" is assumed.
+# The VPN name refers to the VPN configutation file name.
+# i.e. "home" would be /etc/openvpn/home.conf
+#
+# If you're running systemd, changing this variable will
+# require running "systemctl daemon-reload" followed by
+# a restart of the openvpn service (if you removed entries
+# you may have to stop those manually)
+#
+AUTOSTART="all"
+#AUTOSTART="none"
+#AUTOSTART="home office"
+#
+# WARNING: If you're running systemd the rest of the
+# options in this file are ignored.
+#
+# Refresh interval (in seconds) of default status files
+# located in /var/run/openvpn.$NAME.status
+# Defaults to 10, 0 disables status file generation
+#
+#STATUSREFRESH=10
+#STATUSREFRESH=0
+# Optional arguments to openvpn's command line
+OPTARGS=""
+#
+# If you need openvpn running after sendsigs, i.e.
+# to let umountnfs work over the vpn, set OMIT_SENDSIGS
+# to 1 and include umountnfs as Required-Stop: in openvpn's
+# init.d script (remember to run insserv after that)
+#
+OMIT_SENDSIGS=0
+</code></pre>
+<p>/etc/openvpn/myvpn.conf</p>
+<pre><code>client
+dev tun
+proto tcp
+
+remote vpnsite.com 443
+
+cipher AES-256-CBC
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+comp-lzo
+verb 3
+remote-cert-tls server
+ping 10
+ping-restart 60
+sndbuf 524288
+rcvbuf 524288
+
+
+auth-user-pass my_userpass.txt
+ca my_ca.crt
+crl-verify my_crl.pem
+
+
+tun-ipv6
+script-security 2
+up /etc/openvpn/update-resolv-conf
+down /etc/openvpn/update-resolv-conf
+
+
+
+tls-cipher TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA
+</code></pre>
+<p>Same VPN config worked in Whonix 13 by default</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/18</link>
+        <pubDate>Tue, 25 Sep 2018 16:56:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-18</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[mig5]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="16" data-topic="5941" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/b/71e660/40.png" class="avatar"> benev:</div>
+<blockquote>
+<p>Now, it does not work to get what I need, I have to include it from the console, by entering the command cd /etc/openvpn, sudo openvpn myvpn.conf.</p>
+</blockquote>
+</aside>
+<p>Everything about this sentence still means to me either or both of these:</p>
+<ol>
+<li>You don’t have AUTOSTART configured right in <code>/etc/default/openvpn</code>. The AUTOSTART variable defines which VPN profiles will get automatically started when you start the OpenVPN daemon.</li>
+<li>Something perhaps to do with ‘relative’ paths in your <code>/etc/openvpn/myvpn.conf</code> e.g paths to certs and keys, that only works if you are cd’d into /etc/openvpn. Which maybe breaks your startup even if your AUTOSTART is correct. You could try putting ‘absolute’ paths to your ca, cert, key, dhparams etc paths in your config to see if that helps.</li>
+</ol>
+<p>Perhaps if you paste your /etc/default/openvpn and your /etc/openvpn/myvpn.conf it will be clearer for us to help. Be sure not to paste any private keys (sometimes these are embedded in the myvpn.conf file, depends on your configuration) and perhaps mask any explicit settings e.g your server’s IP etc.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/17</link>
+        <pubDate>Tue, 25 Sep 2018 04:48:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-17</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <p>Maybe I’m not explaining correctly, I’m not English-speaking… But I need something different, not exactly what is written in this guide. I need to run VPN simply by default, without the configuration of the VPN firewall, I do not need to make a complete tunnel in the WS, I only need an interlayer, which will work only in non-configured of Tor Socks applications such as FF, I need exactly this for their own purposes. What is written in the guide - does full work through VPN, including Tor Browser, and removes the stream isolation. However, all I need is to get a white ip in FF for web surfing on several sites.I n the previous version, Whonix 13, it worked by simply putting the configuration files in /etc/openvpn and it automatically started vpn at system startup through the Openvpn service. Now, it does not work to get what I need, I have to include it from the console, by entering the command cd /etc/openvpn, sudo openvpn myvpn.conf.</p>
+<p>Help me to solve this problem, based on my conditions, please.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/16</link>
+        <pubDate>Mon, 24 Sep 2018 23:07:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-16</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/benev">@benev</a></p>
+<p>You likely made a mistake when you configured your VPN. I followed the instructions as written in the wiki and my VPN client auto starts and connects. The information you need can be found in:</p>
+<p><a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN">https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN</a></p>
+<p>You’re saying you want to use the VPN with Firefox (in Whonix Workstation) and not Tor Browser?</p>
+<p>If so:</p>
+<p>No other browsers should be used other than Tor Browser.</p>
+<p><a href="https://whonix.org/wiki/Tor_Browser#Anonymity_vs_Pseudonymity">https://whonix.org/wiki/Tor_Browser#Anonymity_vs_Pseudonymity</a></p>
+<p>Also, do not use Tor and clearnet at the same time.</p>
+<p><a href="https://whonix.org/wiki/DoNot#Use_Clearnet_and_Tor_at_the_Same_Time">https://whonix.org/wiki/DoNot#Use_Clearnet_and_Tor_at_the_Same_Time</a></p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/15</link>
+        <pubDate>Thu, 20 Sep 2018 01:23:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-15</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="13" data-topic="5941">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Try to figure out how to do that on Debian stretch</p>
+</blockquote>
+</aside>
+<p>I try, but have many Errors, Openvpn don’t work as service Out-of-box in Whonix</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/14</link>
+        <pubDate>Wed, 19 Sep 2018 16:40:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-14</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="12" data-topic="5941">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/b/71e660/40.png" class="avatar"> benev:</div>
+<blockquote>
+<p>I cannot just understand how to make autostart VPN with Openvpn service.</p>
+</blockquote>
+</aside>
+<p>Try to figure out how to do that on Debian stretch as per <a href="https://www.whonix.org/wiki/Free_Support_Principle">https://www.whonix.org/wiki/Free_Support_Principle</a>.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/13</link>
+        <pubDate>Wed, 19 Sep 2018 15:44:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-13</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <p>But at me it turned out to do so on previous a Whonix 13. Once again, I need the scheme W GW + W WS + vpn on WS, but to me is not necessary VPN for everything. It is only necessary for me that use in Firefox. Also, as i said, if i start VPN manually from console and config file - The scheme works. I cannot just understand how to make autostart VPN with Openvpn service.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/12</link>
+        <pubDate>Wed, 19 Sep 2018 14:11:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-12</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Impossible. You cannot use <code>user -&gt; Tor -&gt; VPN -&gt; destination</code> plus have stream isolation at the same time. Incompatible. If want stream isolation, stay away from <code>user -&gt; Tor -&gt; VPN -&gt; destination</code>.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/11</link>
+        <pubDate>Wed, 19 Sep 2018 12:06:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-11</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="9" data-topic="5941">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#Prevent_Bypassing_of_the_Tunnel-Link" rel="nofollow noopener">https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#Prevent_Bypassing_of_the_Tunnel-Link</a></p>
+</blockquote>
+</aside>
+<p>What?</p>
+<p>What you gave me - it removes Tor Socks in general. I do not NEED it. I need USE of Tor Socks, me need VPN to USE for Firefox, I do not want to turn off stream isolation.</p>
+<p>Please read full post.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/10</link>
+        <pubDate>Tue, 18 Sep 2018 14:59:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-10</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="8" data-topic="5941">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/b/71e660/40.png" class="avatar"> benev:</div>
+<blockquote>
+<p>in Firefox i open sites under white ip vpn, in Tor Browser and App i use Tor socks.</p>
+</blockquote>
+</aside>
+<p><a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#Prevent_Bypassing_of_the_Tunnel-Link">https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#Prevent_Bypassing_of_the_Tunnel-Link</a></p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/9</link>
+        <pubDate>Tue, 18 Sep 2018 09:11:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-9</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <p>Last situation:<br>
+After all it has turned out to start a vpn, but there are problems. 1) <strong>resolvconf</strong> every time is rewritten, there was it after “install resolvconf” as in manual. therefore every time isn’t present the Internet at inclusion and vpn can’t will be connected. When I hands write nameserver 10.152.152.10 there, vpn begins to work and resolvconf rewritten nameserver to VPN dns.</p>
+<p>But, all this isn’t important because what has turned out doesn’t suit me. It was necessary for me just collaboration work VPN and TOR, not full connection through VPN, for example: <strong>in Firefox i open sites under white ip vpn, in Tor Browser and App i use Tor socks.</strong></p>
+<p>But if to do as according to the instruction, it turns out that if Firewall it is included - Tor doesn’t work if it is switched off - VPN…</p>
+<p>HELP ME PLEASE… I already try to adjust the whole week. <img src="//forums.whonix.org/images/emoji/twitter/sob.png?v=6" title=":sob:" class="emoji" alt=":sob:"></p>
+<p>In old Whonix i just copy Vpn files to /etc/openvpn/ and all work…<br>
+But in Whonix 14 doesn’t work:( <strong>I’m need do it on Whonix Workstation 14 in VirtualBox</strong></p>
+<p>Im need use VPN only for static white IP, im don’t need full tunnel VPN on Workstation. Can’t find solution. Only one worker decision if i just start in console: openvpn /etc/openvpn/openvpn.conf and it work as im want - In firefox im see white ip, in Tor Browser - Tor ip. But i just want connect it on startup, like on old whonix with sudo service openvpn start.</p>
+<p>Thanks.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/8</link>
+        <pubDate>Mon, 17 Sep 2018 23:25:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-8</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <p>Firewall need configure too? On old Whonix 13 i just copy openvpn.conf and start and was ok…</p>
+<p>Im need VPN only for white ip, for security okay is tor</p>
+<p>Also, im use VirtualBox and Whonix 14.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/7</link>
+        <pubDate>Mon, 17 Sep 2018 13:09:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-7</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Follow the full instructions not just a a single chapter from there.</p>
+<aside class="quote no-group" data-post="4" data-topic="5941">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Then either</p>
+<ul>
+<li>
+<a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#systemd_setup">https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#systemd_setup </a> and/or</li>
+<li><a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor#systemd_setup">https://www.whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor#systemd_setup</a></li>
+</ul>
+</blockquote>
+</aside>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/6</link>
+        <pubDate>Mon, 17 Sep 2018 06:47:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-6</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="4" data-topic="5941">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#systemd_setup" rel="nofollow noopener">https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#systemd_setup </a></p>
+</blockquote>
+</aside>
+<p>After control according to this instruction, the last result:<br>
+&gt; openvpn@openvpn.service - OpenVPN connection to openvpn</p>
+<blockquote>
+<p>Loaded: loaded (/lib/systemd/system/openvpn@openvpn.service; enabled; vendor preset: enabled)<br>
+Drop-In: /lib/systemd/system/openvpn@openvpn.service.d<br>
+└─50_unpriv.conf<br>
+Active: failed (Result: exit-code) since Mon 2018-09-17 03:04:31 UTC; 9s ago<br>
+Docs: man:openvpn(8)<br>
+<a href="https://community.openvpn.net/openvpn/wiki/Openvpn23ManPage" rel="nofollow noopener">https://community.openvpn.net/openvpn/wiki/Openvpn23ManPage</a><br>
+<a href="https://community.openvpn.net/openvpn/wiki/HOWTO" rel="nofollow noopener">https://community.openvpn.net/openvpn/wiki/HOWTO</a><br>
+Process: 2535 ExecStopPost=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --rmtun --dev tun0 (code=exited, status=0/SUCCESS)<br>
+Process: 2531 ExecStart=/usr/sbin/openvpn --daemon ovpn-openvpn --status /run/openvpn/openvpn.status 10 --cd /etc/openvpn --config /etc/openvpn/openvpn.conf --writepid /run/op<br>
+Process: 2521 ExecStartPre=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --mktun --dev tun0 --dev-type tun --user tunnel --group tunnel (code=exited, status=0/SUCCESS)<br>
+Process: 2508 ExecStartPre=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --rmtun --dev tun0 (code=exited, status=0/SUCCESS)<br>
+Main PID: 2533 (code=exited, status=1/FAILURE)</p>
+<p>Sep 17 03:04:30 host ovpn-openvpn[2533]: PUSH: Received control message: 'PUSH_REPLY,dhcp-option DNS 10.6.0.1,redirect-gateway def1 bypass-dhcp,route-ipv6 0000::/2,route-ipv6 40<br>
+Sep 17 03:04:30 host ovpn-openvpn[2533]: OPTIONS IMPORT: --socket-flags option modified<br>
+Sep 17 03:04:30 host ovpn-openvpn[2533]: Socket flags: TCP_NODELAY=1 succeeded<br>
+Sep 17 03:04:31 host systemd[1]: openvpn@openvpn.service: Main process exited, code=exited, status=1/FAILURE<br>
+Sep 17 03:04:31 host sudo[2535]:   tunnel : TTY=unknown ; PWD=/etc/openvpn ; USER=root ; COMMAND=/usr/sbin/openvpn --rmtun --dev tun0<br>
+Sep 17 03:04:31 host sudo[2535]: pam_unix(sudo:session): session opened for user root by (uid=0)<br>
+Sep 17 03:04:31 host sudo[2535]: Mon Sep 17 03:04:31 2018 TUN/TAP device tun0 opened<br>
+Sep 17 03:04:31 host sudo[2535]: Mon Sep 17 03:04:31 2018 Persist state set to: OFF<br>
+Sep 17 03:04:31 host systemd[1]: openvpn@openvpn.service: Unit entered failed state.<br>
+Sep 17 03:04:31 host systemd[1]: openvpn@openvpn.service: Failed with result ‘exit-code’.</p>
+</blockquote>
+<p>Also, after “install resolvconf” there was other problem - in “sudo cat /etc/resolv.conf” i see only this text:</p>
+<blockquote>
+<p><span class="hashtag">#Dynamic</span> resolv.conf(5) file for glibc resolver(3) generated by resolvconf(8)<br>
+<span class="hashtag">#DO</span> NOT EDIT THIS FILE BY HAND – YOUR CHANGES WILL BE OVERWRITTEN</p>
+</blockquote>
+<p>If i change this text and add nameserver 10.152.152.10 or my vpn dns server, after reboot this text is overwritten.</p>
+<p>If I write nothing, then VPN can’t connect to VPN server, and in Firefox doesn’t work internet, but in Tor he work, but vpn service show “active” status.</p>
+<p>Also debug mode:</p>
+<blockquote>
+<p>user@host:/etc/openvpn$ sudo /usr/sbin/openvpn --rmtun --dev tun0<br>
+Mon Sep 17 03:13:41 2018 TUN/TAP device tun0 opened<br>
+Mon Sep 17 03:13:41 2018 Persist state set to: OFF<br>
+user@host:/etc/openvpn$ sudo /usr/sbin/openvpn --mktun --dev tun0 --dev-type tun --user tunnel --group tunnel<br>
+Mon Sep 17 03:13:48 2018 TUN/TAP device tun0 opened<br>
+Mon Sep 17 03:13:48 2018 Persist state set to: ON</p>
+</blockquote>
+<p>and<br>
+sudo -u tunnel openvpn /etc/openvpn/openvpn.conf</p>
+<p>The list line:</p>
+<blockquote>
+<p>Mon Sep 17 03:14:39 2018 ROUTE6: default_gateway=UNDEF<br>
+Mon Sep 17 03:14:39 2018 ERROR: Cannot ioctl TUNSETIFF tun0: Operation not permitted (errno=1)<br>
+Mon Sep 17 03:14:39 2018 Exiting due to fatal error</p>
+</blockquote>
+<p>But in my config “tun0”, “tun” i tried too.</p>
+<p>I don’t know what do… Help me please <img src="//forums.whonix.org/images/emoji/twitter/frowning.png?v=6" title=":frowning:" class="emoji" alt=":frowning:"></p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/5</link>
+        <pubDate>Mon, 17 Sep 2018 03:16:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-5</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Which virtualizer? VirtualBox, KVM or Qubes?</p>
+<p>Which instructions did you follow?</p>
+<p>Not Whonix specific indeed. <a href="https://www.whonix.org/wiki/Free_Support_Principle" rel="nofollow noopener">https://www.whonix.org/wiki/Free_Support_Principle</a> applies.</p>
+<hr>
+<p><code>/lib/systemd/system/openvpn.service</code> by default does nothing.</p>
+<pre><code class="lang-auto"># This service is actually a systemd target,
+# but we are using a service since targets cannot be reloaded.
+
+[Unit]
+Description=OpenVPN service
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/true
+ExecReload=/bin/true
+WorkingDirectory=/etc/openvpn
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<p>See also <code>/lib/systemd/system/openvpn@.service</code>.</p>
+<hr>
+<p>Generally, make sure to read first:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="" height="">
+      <a href="https://www.whonix.org/wiki/Tunnels/Introduction" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/452;"><img src="//forums.whonix.org/uploads/default/original/2X/d/de769ebddd8544134faebd68d8717563928d4c7b.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Tunnels/Introduction" target="_blank" rel="nofollow noopener">Tunnels/Introduction</a></h3>
+
+<p>Instructions on how to combine tunnels (VPN, SSH, proxy) with Tor. (User -&gt; Tor -&gt; proxy/VPN/SSH -&gt; Internet) (User -&gt; proxy/VPN/SSH -&gt;...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p>Then either</p>
+<ul>
+<li>
+<a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#systemd_setup" rel="nofollow noopener">https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#systemd_setup</a> and/or</li>
+<li><a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor#systemd_setup" rel="nofollow noopener">https://www.whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor#systemd_setup</a></li>
+</ul>
+<p>might apply.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/4</link>
+        <pubDate>Sun, 16 Sep 2018 07:07:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-4</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <p>It is doesn’t help…</p>
+<p>Openvpn service is work, but can’t connect to my vpn.</p>
+<p>sudo service openvpn status<br>
+openvpn.service - OpenVPN service<br>
+Loaded: loaded (/lib/systemd/system/openvpn.service; enabled; vendor preset: enabled)<br>
+Active: active (exited) since Sun 2018-09-16 00:46:01 UTC; 5min ago<br>
+Process: 686 ExecStart=/bin/true (code=exited, status=0/SUCCESS)<br>
+Main PID: 686 (code=exited, status=0/SUCCESS)<br>
+Tasks: 0 (limit: 4915)<br>
+CGroup: /system.slice/openvpn.service</p>
+<p>Sep 16 00:46:01 host systemd[1]: Starting OpenVPN service…<br>
+Sep 16 00:46:01 host systemd[1]: Started OpenVPN service.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/3</link>
+        <pubDate>Sun, 16 Sep 2018 01:01:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-3</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[mig5]]></dc:creator>
+        <description><![CDATA[
+            <p>That’s probably not Whonix-specific, but you may need to edit /etc/default/openvpn and set one of the AUTOSTART variables. Perhaps <code>AUTOSTART="all"</code> for simplest setup.</p>
+<p>You may also need to run <code>sudo systemctl daemon-reload</code> after that, and then your openvpn service will probably start next time you run <code>sudo service openvpn start</code>.</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/2</link>
+        <pubDate>Sat, 15 Sep 2018 08:16:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-2</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+      <item>
+        <title>Can&#39;t start VPN with &quot;service openvpn&quot;</title>
+        <dc:creator><![CDATA[benev]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello. I can’t start OpenVpn on Whonix WS 14 by means of “sudo service openvpn start”, i put configs to /etc/openvpn. If i try start with "sudo openvpn myconfigvpn.conf - all work. But I need it at autostart. On old Whonix 13 i just put configs and make service openvpn start - all work. How i can fix it?</p>
+          <p><a href="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941/1</link>
+        <pubDate>Sat, 15 Sep 2018 05:20:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5941-1</guid>
+        <source url="http://forums.whonix.org/t/cant-start-vpn-with-service-openvpn/5941.rss">Can&#39;t start VPN with &quot;service openvpn&quot;</source>
+      </item>
+  </channel>
+</rss>

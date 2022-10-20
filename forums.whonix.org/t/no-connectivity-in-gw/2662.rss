@@ -1,0 +1,673 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>No connectivity in GW</title>
+    <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662</link>
+    <description>Hi,
+I can&#39;t get the Whonix Gateway to connect to Tor. It failed in Qubes 3, then reinstalled from scratch 3.1 with Whonix built in, updated dom0, and strangely still nothing works. I tried to update the whonix-gw template but it requires Whonix-Gateway NetVM for updates...
+Whonixcheck failed. Connection works as normal on the fedora VMs.
+
+How should I even debug this?
+EDIT: I already tried running tor in a fedora VM and it bootstrapped perfectly, it only happens in Qubes-Whonix-GW.
+
+Thanks.</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 28 Sep 2016 22:42:15 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi Pat,<br>
+I’ve had difficulties setting up ssh before tor so I haven’t really tested anything yet, but I did notice remote ssh connections drop very quickly, which leads me to speculate some default firewall rules are to be blamed since when I flush iptables in whonix-gw it’s working fine (as I previously reported).<br>
+This is hard to debug but I hope I’ll test things more thoroughly soon.</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/71">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/71</link>
+        <pubDate>Wed, 28 Sep 2016 22:42:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-71</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Btw figuring that out would be great so we can properly document this here.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_SSH_before_Tor" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/408;"><img src="https://www.whonix.org/w/images/2/25/Norman-79860640.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_SSH_before_Tor" target="_blank" rel="nofollow noopener">Tunnels/Connecting to SSH before Tor</a></h3>
+
+<p>Instructions on how to connect to SSH before Tor (User -&gt; SSH -&gt; Tor -&gt; Internet)</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>I also do appreciate your interest in Whonix, constructiveness and great patience with the strange issue you are experiencing.</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/70">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/70</link>
+        <pubDate>Sun, 18 Sep 2016 12:07:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-70</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>One thing that will help during figuring that out:<br>
+Don’t try connecting to the ssh ProxyVM from sys-whonix. Test it with a non-Whonix VM first. That helps to exclude a layer of complexity. Once that works, re-add Whonix to the mix.</p>
+<p>You must make ssh listen (sometimes called bind) on the external interface of the ProxyVM. In case of Qubes it may be simpler and sufficient to say “listen on all interfaces”.</p>
+<p>You probably have something like this:</p>
+<pre><code class="lang-auto">ssh -D 1080 your.ssh.server
+</code></pre>
+<p>I guess you would need something like this:</p>
+<pre><code class="lang-auto">ssh -D 0.0.0.0:1080 your.ssh.server
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/69">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/69</link>
+        <pubDate>Sun, 18 Sep 2016 03:28:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-69</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi Patrick et el,<br>
+The Whonix Qubes Gateway connects to Tor through JonDoe, but I’d like to test connecting to Tor using ssh since this is too slow to be practical. How can I set a NetVM as a proxy using a ssh server? I tried doing something similar to how we set up JonDoe, but my attempts failed. I could use the ssh proxy locally in NetVM but not from whonix-gw where I set the ip and port in the torrc.<br>
+I also looked in the VPN Qubes how-to but it’s a bit advanced for me.<br>
+This is a good opportunity to thank you for your important work which works well for most people it seems.</p>
+<p>P.S. I couldn’td update the whonix-gw TemplateVM for quite a long while, until I tried to restart networking in it, maybe it could be related…</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/68">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/68</link>
+        <pubDate>Sat, 17 Sep 2016 19:18:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-68</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="66" data-topic="2662">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>configure Tor to use specific ports only using Tor’s FascistFirewall 1 setting</p>
+</blockquote>
+</aside>
+<p>I added to torrc ReachableAddresses accept *:9001 and it bootstrapped fine, and circuits were shown in arm, but it took at least an hour to get browsing in the WS.  On the other hand, iirc sometimes after I got Qubes-Whonix-GW to bootstrap, either by flushing iptables rules, or by bypassing going through the network normally, it worked normally for a while right after. I never have issues connecting to Tor in non-Qubes-Whonix, so how can it be only a port change made a difference?</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/67">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/67</link>
+        <pubDate>Thu, 01 Sep 2016 06:56:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-67</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="65" data-topic="2662">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/c/51bf81/40.png" class="avatar"> claudi8b6:</div>
+<blockquote>
+<p>I was of the impression Socks is an encrypted tunnel.</p>
+</blockquote>
+</aside>
+<ul>
+<li>the local connection from ws to gw (any socks) is unencrypted</li>
+<li>once Tor accepted the socks connection and forwards it to the Tor network it will be encrypted with 3 layers (onion layers)</li>
+<li>however, Tor traffic is not that difficult to detect. Encrypted does not mean hard to block by DPI. That requires traffic obfuscation. (documented here: <a href="https://www.whonix.org/wiki/Bridges">https://www.whonix.org/wiki/Bridges</a>)</li>
+<li>other and “regular” socks proxies are unencrypted (more info: <a href="https://www.whonix.org/wiki/Comparison_Of_Tor_with_CGI_Proxies,_Proxy_Chains,_and_VPN_Services">https://www.whonix.org/wiki/Comparison_Of_Tor_with_CGI_Proxies,_Proxy_Chains,_and_VPN_Services</a>)</li>
+</ul>
+<p>Possiblities:</p>
+<ul>
+<li>
+<p>a) some DPI is blocking Tor but not JonDo (much less popular), not so likely</p>
+</li>
+<li>
+<p>b) port blocking</p>
+</li>
+<li>
+<p>Tor in the Debian VM happened to pick ports for entry guards that are not blocked</p>
+</li>
+<li>
+<p>Tor in Whonix-Gateway VM happened to pick ports for entry guards that are blocked</p>
+</li>
+<li>
+<p>JonDo uses ports not blocked</p>
+</li>
+<li>
+<p>and when tunneling Tor through JonDo, it does no longer matter that the ports of your entry guards are blocked by your router (which might be happening)</p>
+</li>
+</ul>
+<p>To strengthen the b) hypothesis, I propose the following.</p>
+<ul>
+<li>temporarily disable tunneling through JonDo</li>
+<li>configure Tor to use specific ports only using Tor’s <code>FascistFirewall 1</code> setting</li>
+<li>that is documented in this very chapter: <a href="https://www.whonix.org/wiki/Bridges#Better_Connectivity_without_real_Censorship_Circumvention">https://www.whonix.org/wiki/Bridges#Better_Connectivity_without_real_Censorship_Circumvention</a>
+</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/66">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/66</link>
+        <pubDate>Tue, 30 Aug 2016 20:48:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-66</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi Patrick,</p>
+<p>I was of the impression Socks is an encrypted tunnel.<br>
+In any case, I tried Tor over JonDo, and it took some time, but it worked, and I’m even more puzzled than before…</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/65">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/65</link>
+        <pubDate>Tue, 30 Aug 2016 17:18:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-65</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Socks does not necessarily beat DPI. What would be interesting would be<br>
+connecting though a socks proxy service that is both encrypted (such as<br>
+Tor, JonDo) that is already working on the host.</p>
+<p>Tor would lead to Tor over Tor, but perhaps JonDo https proxy in another<br>
+VM would work? As per:</p>
+<p><a href="https://www.whonix.org/wiki/JonDonym#Connecting_to_JonDonym_before_Tor">https://www.whonix.org/wiki/JonDonym#Connecting_to_JonDonym_before_Tor</a></p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/64">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/64</link>
+        <pubDate>Sun, 28 Aug 2016 18:47:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-64</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <p>I tried something else. This time I set the Socks5Proxy directive to make it connect through a proxy in an attempt to circumvent any possible DPI on the ISP’s side, yet it’s still not working.<br>
+I tested the same directive in a non-Qubes-Whonix Tor and it worked fine.</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/63">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/63</link>
+        <pubDate>Sun, 28 Aug 2016 18:44:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-63</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <p>It’s a modem-router. I can’t see any DPI or IDS IPS options in the router’s interface. For clarification I didn’t use the same ISP when tested Qubes with another modem (modem+ISP were different, not only modem).</p>
+<p>EDIT: I’d venture to say it has to do with the country where I live in, which is notorious for surveillance by the government, if Tor standalone failed to work on the same Qubes OS too.</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/62">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/62</link>
+        <pubDate>Thu, 25 Aug 2016 18:03:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-62</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>That is very strange indeed.</p>
+<p>No idea. Can only speculate.</p>
+<p>A simple modem? Or a more sophisticated device with many (firewall)<br>
+settings or router?</p>
+<p>Perhaps any firewall settings blocking some outgoing ports? Perhaps deep<br>
+package inspection (DPI) or other stuff such as intrusion prevention<br>
+system (IDS IPS) that is detecting a false positive and blocking it?</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/61">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/61</link>
+        <pubDate>Thu, 25 Aug 2016 15:29:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-61</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <p>OK. When I used a different modem it connected.<br>
+This is bewildering, I don’t have any such problems with VritualBox Whonix.<br>
+What could possibly be causing this?</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/60">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/60</link>
+        <pubDate>Thu, 25 Aug 2016 09:17:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-60</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>No, never tried that myself. Please try the Qubes help (probably mailing list).</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.qubes-os.org/attachment/icons/512x512/apps/qubes-logo-icon.png" class="site-icon" width="500" height="500">
+      <a href="https://www.qubes-os.org/help/" target="_blank" rel="nofollow noopener">Qubes OS</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/362;"><img src="https://www.qubes-os.org/attachment/icons/qubes-logo-icon-name-slogan-fb.png" class="thumbnail"></div>
+
+<h3><a href="https://www.qubes-os.org/help/" target="_blank" rel="nofollow noopener">Documentation</a></h3>
+
+<p>User Documentation  The Basics    What is Qubes OS?   Video Tours   Screenshots   Getting Started   User FAQ   Mailing Lists   How to Contribute   Security Information    Security Center   Security...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Found something that could help.</p>
+<ul>
+<li><a href="https://groups.google.com/forum/#!topic/qubes-users/XI6rNwhYDvQ">https://groups.google.com/forum/#!topic/qubes-users/XI6rNwhYDvQ</a></li>
+<li><a href="https://www.qubes-os.org/doc/usb/">https://www.qubes-os.org/doc/usb/</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/59">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/59</link>
+        <pubDate>Tue, 23 Aug 2016 18:16:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-59</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <p>I’d like to debug this further, but I have to use a usb wifi adapter. I couldn’t find any instructions on how to use a usb wifi in Qubes - do you have any links to help with that?</p>
+<p>Thanks</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/58">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/58</link>
+        <pubDate>Tue, 23 Aug 2016 17:59:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-58</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>No.</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/57">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/57</link>
+        <pubDate>Mon, 15 Aug 2016 19:18:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-57</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <p>Should I just flush the iptables and allow everything considering I’m behind a router (with NAT)?<br>
+Which rules should I include?</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/56">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/56</link>
+        <pubDate>Mon, 15 Aug 2016 18:43:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-56</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="54" data-topic="2662">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/c/51bf81/40.png" class="avatar"> claudi8b6:</div>
+<blockquote>
+<p>Does it mean the router could be causing this somehow?</p>
+</blockquote>
+</aside>
+<p>Maybe. I once heard such a report that it was all the router’s fault but that reporter did not go into details.</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/55">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/55</link>
+        <pubDate>Mon, 08 Aug 2016 15:24:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-55</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="52" data-topic="2662">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>No. Could perhaps be hardware related.</p>
+</blockquote>
+</aside>
+<p>I installed the same Qubes in a different machine, but behind the same router, and had the same problem. Does it mean the router could be causing this somehow? When I clear the iptables rules it works, so this is odd.</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/54">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/54</link>
+        <pubDate>Sun, 07 Aug 2016 16:38:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-54</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <a href="https://www.whonix.org/blog/qubes-whonix-13-0-0-1-2-testers-wanted" target="_blank" title="07:24PM - 05 August 2016" rel="nofollow noopener">Whonix – 5 Aug 16</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/362;"><img src="https://www.whonix.org/blog/wp-content/uploads/2016/06/Whonix_Facebook-Social-Share.png" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/blog/qubes-whonix-13-0-0-1-2-testers-wanted" target="_blank" rel="nofollow noopener">Qubes-Whonix 13.0.0.1.0 TemplateVMs – Testers Wanted!</a></h3>
+
+<p>Please help testing Qubes-Whonix 13.0.0.1.0!</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p><a href="https://forums.whonix.org/t/qubes-whonix-13-0-0-1-0-templatevms-testers-wanted/2825">Qubes-Whonix 13.0.0.1.2 TemplateVMs - Testers Wanted!</a></p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/53">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/53</link>
+        <pubDate>Fri, 05 Aug 2016 19:33:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-53</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="50" data-topic="2662">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/c/51bf81/40.png" class="avatar"> claudi8b6:</div>
+<blockquote>
+<p>Any idea why it works for everyone else but me?</p>
+</blockquote>
+</aside>
+<p>No. Could perhaps be hardware related.</p>
+<p>Thank you a lot for your patience and persistence!</p>
+<p>The upcoming version of Qubes-Whonix stable maintenance release will be much more robust against race conditions. When it is out, please try it. (Might be a few days.)</p>
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-issues/issues/2228" target="_blank" rel="nofollow noopener">github.com/QubesOS/qubes-issues</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/adrelanos" rel="nofollow noopener">
+<img src="https://avatars1.githubusercontent.com/u/1985040?v=2&amp;s=96" class="thumbnail onebox-avatar" width="96" height="96">
+</a>
+
+<h4><a href="https://github.com/QubesOS/qubes-issues/issues/2228" target="_blank" rel="nofollow noopener">Issue: build Qubes-Whonix 13.0.0.1.0 templates for R3.2 final</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/2228" target="_blank" rel="nofollow noopener">2016-08-04</a>
+	</div>
+	<div class="user">
+	closed by <a href="https://github.com/marmarek" target="_blank" rel="nofollow noopener">marmarek</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/2228" target="_blank" rel="nofollow noopener">2016-08-11</a>
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">Please build Qubes-Whonix 13.0.0.1.0 templates for R3.2 final (or next RC should there be also R3.2r3).
+qubes-template-whonix tag 13.0.0.1.0
+It's supposed to be...</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: Whonix</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">task</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/52">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/52</link>
+        <pubDate>Thu, 04 Aug 2016 20:30:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-52</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks Patrick.<br>
+Any idea why it works for everyone else but me?<br>
+I could try eliminating the iptables rules for the buggy line, but it still bugs me why it happens only to me…</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/50">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/50</link>
+        <pubDate>Mon, 01 Aug 2016 20:32:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-50</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="48" data-topic="2662">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/c/51bf81/40.png" class="avatar"> claudi8b6:</div>
+<blockquote>
+<p>sometimes when I restart Gateway it reverts back to the old configuration files…</p>
+</blockquote>
+</aside>
+<p>That is a bug. Reference:</p>
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-issues/issues/2191" target="_blank" rel="nofollow noopener">github.com/QubesOS/qubes-issues</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/adrelanos" rel="nofollow noopener">
+<img src="https://avatars1.githubusercontent.com/u/1985040?v=2&amp;s=96" class="thumbnail onebox-avatar" width="96" height="96">
+</a>
+
+<h4><a href="https://github.com/QubesOS/qubes-issues/issues/2191" target="_blank" rel="nofollow noopener">Issue: bind-dirs.sh legacy function broken</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/2191" target="_blank" rel="nofollow noopener">2016-07-21</a>
+	</div>
+	<div class="user">
+	closed by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/2191" target="_blank" rel="nofollow noopener">2016-08-04</a>
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">R3.2 with testing repository
+There is a problem with the whonix-gw template. Perhaps a release critical bug.
+The symptom is starting with a...</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: Whonix</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">P: critical</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">bug</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>It is fixed in Qubes R3.2rc2 and qubes-whonix 5.7-1 (currently only in Whonix jessie-proposed-updates and testers repository).</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/49">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/49</link>
+        <pubDate>Mon, 01 Aug 2016 02:22:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-49</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="47" data-topic="2662">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>After setting your NetVM to sys-net, Whonix was fine?</p>
+</blockquote>
+</aside>
+<p>It wasn’t all I did, I both UnWhonix’d the Gateway, AND set the NetVM to sys-net.<br>
+Now I’m trying to see which change exactly made it work, but it’s not so easy, sometimes when I restart Gateway it reverts back to the old configuration files…</p>
+<p>EDIT: it’s now working with NetVM set to sys-net  and a flushed iptables, but I get a warning Could not check for software udpates (apt-get has same error in the TemplateVM as well ).<br>
+How can it be it’s working for others but not for me in this case?</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/48">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/48</link>
+        <pubDate>Wed, 20 Jul 2016 19:30:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-48</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="46" data-topic="2662">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/c/51bf81/40.png" class="avatar"> claudi8b6:</div>
+<blockquote>
+<p>Another change I had to make was to set the NetVM to sys-net for WhonixGW (also in the fedora-23 VM’s to get networking).</p>
+</blockquote>
+</aside>
+<p>After setting your NetVM to sys-net, Whonix was fine?</p>
+<p>Then it could be the following Qubes upstream bug:</p>
+<aside class="quote" data-post="1" data-topic="2737">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar">
+    <a href="https://forums.whonix.org/t/sys-firewall-sometimes-broken-does-not-function-as-proxyvm-in-qubes-r3-2-rc1/2737">sys-firewall [sometimes] broken, does not function as ProxyVM in Qubes R3.2 RC1</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/qubes-whonix"><span class="badge-category-bg" style="background-color: #63a0ff;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Everything specific to Qubes-Whonix. (devs)">Qubes-Whonix</span></a>
+  </div>
+  <blockquote>
+    Not a Whonix bug. But it affects Whonix. And could create some confusion. Therefore sharing it here.
+  </blockquote>
+</aside>
+
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-issues/issues/2141" target="_blank" rel="nofollow noopener">github.com/QubesOS/qubes-issues</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/adrelanos" rel="nofollow noopener">
+<img src="https://avatars1.githubusercontent.com/u/1985040?v=2&amp;s=96" class="thumbnail onebox-avatar" width="96" height="96">
+</a>
+
+<h4><a href="https://github.com/QubesOS/qubes-issues/issues/2141" target="_blank" rel="nofollow noopener">Issue: sys-firewall broken, does not function as ProxyVM in R3.2 / xendriverdomain systemd service not enabled in Fedora</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/2141" target="_blank" rel="nofollow noopener">2016-07-01</a>
+	</div>
+	<div class="user">
+	closed by <a href="https://github.com/marmarek" target="_blank" rel="nofollow noopener">marmarek</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/2141" target="_blank" rel="nofollow noopener">2016-07-15</a>
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">Qubes OS version (e.g., R3.1):
+R3.2 (testing repository)
+Affected TemplateVMs (e.g., fedora-23, if applicable):
+Probably any.
+Expected behavior:
+An arbitrary proxy VM with NetVM set to...</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: core</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">bug</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.1-dom0-stable</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.1-fc21-stable</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.1-fc22-stable</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.1-fc23-stable</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.1-jessie-stable</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.1-stretch-stable</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.1-wheezy-cur-test</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.1-wheezy-stable</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.2-dom0-stable</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.2-fc23-stable</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.2-fc24-stable</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.2-jessie-stable</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">r3.2-stretch-cur-test</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>The fix for it is currently only available in the Qubes testing repository. You might want to get that update or wait until it flows to stable.</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/47">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/47</link>
+        <pubDate>Wed, 20 Jul 2016 15:24:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-47</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+      <item>
+        <title>No connectivity in GW</title>
+        <dc:creator><![CDATA[claudi8b6]]></dc:creator>
+        <description><![CDATA[
+            <p>I did the UnWhonix guide and now tor connects. Another change I had to make was to set the NetVM to sys-net for WhonixGW (also in the fedora-23 VM’s to get networking).<br>
+Still confused…</p>
+          <p><a href="http://forums.whonix.org/t/no-connectivity-in-gw/2662/46">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/no-connectivity-in-gw/2662/46</link>
+        <pubDate>Wed, 20 Jul 2016 12:53:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2662-46</guid>
+        <source url="http://forums.whonix.org/t/no-connectivity-in-gw/2662.rss">No connectivity in GW</source>
+      </item>
+  </channel>
+</rss>

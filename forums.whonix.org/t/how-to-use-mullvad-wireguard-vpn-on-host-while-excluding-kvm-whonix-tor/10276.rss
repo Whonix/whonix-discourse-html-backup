@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>How to use mullvad wireguard vpn on host, while excluding kvm whonix tor.</title>
+    <link>http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276</link>
+    <description>Hi, I&#39;ve been at this all day, and I can&#39;t seem to find an answer. 
+I&#39;ve read through the Whonix wiki on Tunnles. I&#39;ve read through questions on this forum as well.
+But I cant seem to figure out, how to do it like a step by step guide. Is there anyone that may please help me with this. 
+All I want to do is be able to use my host linux (manjaro kde) with mullvad vpn for torrenting and browsing the internet, email, etc.. while at the same time be able to use guest Whonix on kvm without it going through mullvad vpn on host.</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 16 Sep 2020 22:47:30 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>How to use mullvad wireguard vpn on host, while excluding kvm whonix tor.</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for your compliments. I don’t want to imply I have the answers. My suggestion was based on a concept that would work in principle and that we have planned for Whonix Host, but it is not something we have done before or are working on right now. Try asking on Stack Exchange for more detailed answers and let us know what they say because it might help us someday.</p>
+<p>Also when I looked at the wireguard manual it had some interesting features like routing traffic from specific namespaces only or excluding them. IIRC KVM machines have their own namespaces  assigned so this might be another direction worth looking at.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276/4</link>
+        <pubDate>Wed, 16 Sep 2020 22:47:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10276-4</guid>
+        <source url="http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276.rss">How to use mullvad wireguard vpn on host, while excluding kvm whonix tor.</source>
+      </item>
+      <item>
+        <title>How to use mullvad wireguard vpn on host, while excluding kvm whonix tor.</title>
+        <dc:creator><![CDATA[aqu0s]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you so much <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a><br>
+Just trying to understand it a bit better. I also should have mentioned that this was for wireguard using wg-quick.</p>
+<p>So when I do a <code>wg show</code> I get this output:</p>
+<pre><code class="lang-auto">interface: mullvad-wg-excludewhonix.conf
+    public key: (hidden)
+    private key: (hidden)
+    listening port: 50454
+    fwmark: 0x.....
+</code></pre>
+<p>Would that mean I would do this to my mullvad-wg-excludewhonix.conf file:</p>
+<pre><code class="lang-auto">[Interface]
+PrivateKey = &lt;privatekey&gt;
+Address = 10.66.213.43/32,fc00:bbbb:bbbb:bb01::3:d52a/128
+DNS = 193.138.218.74
+PostUp = iptables -t nat -A OUTPUT -p tcp --dport 50454 -m owner --uid-owner libvirt -j ACCEPT
+PostUp = iptables -t nat -A OUTPUT -p tcp --dport 50454 -m owner --uid-owner kvm -j ACCEPT
+PreDown = iptables -t nat -A OUTPUT -p tcp --dport 50454 -m owner --uid-owner libvirt -j REJECT
+PreDown = iptables -t nat -A OUTPUT -p tcp --dport 50454 -m owner --uid-owner kvm -j REJECT
+ 
+[Peer]
+PublicKey = &lt;publickey&gt;
+Endpoint = 89.36.78.210:51820
+AllowedIPs = 0.0.0.0/0, ::/0
+</code></pre>
+<p>Because the port that showed when <code>wg show</code> command was executed, showed listening port <code>50454</code>?</p>
+<p>Or do I change the <code>--uid-owner</code> to <code>--gid-group kvm</code> and do another one for libvirt?</p>
+<p>I have also done a print out of my <code>ip address show</code> and <code>ip route</code>.<br>
+Not sure if that helps, but here is the link <a href="https://bin.privacytools.io/?165e8ed6a0bde5a6#gNLIotj8X4gwBP2st4f+t6HmqbV3s4ZwLM1fbIvEq+E=" rel="nofollow noopener">https://bin.privacytools.io/?165e8ed6a0bde5a6#gNLIotj8X4gwBP2st4f+t6HmqbV3s4ZwLM1fbIvEq+E=</a></p>
+<p>Password for privacytools privatebin/pastebin is whonixrocks</p>
+<p>EDIT:<br>
+I did try --gid-owner kvm and --gid-owner libvirt but unfortunately, that did not work.</p>
+<p>I have read through most of your wiki now, and I completely understand why this is not documented, etc… man you guys are smart with everything you do. I sincerely appreciate everything you do.</p>
+<p>Was hoping there might be a chance you might please please please be able to provide an example of the correct iptables based on the similar topic from url you posted on gentoo forum, and the what info i have, and what you have not documented for whonix gateway. I’m dying to learn how this would work. Thank you again, soo much!</p>
+          <p><a href="http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276/3</link>
+        <pubDate>Tue, 15 Sep 2020 15:15:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10276-3</guid>
+        <source url="http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276.rss">How to use mullvad wireguard vpn on host, while excluding kvm whonix tor.</source>
+      </item>
+      <item>
+        <title>How to use mullvad wireguard vpn on host, while excluding kvm whonix tor.</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>We don;t document this, but we have it for Whonix Gateway.</p>
+<p>Check this topic out for similar iptables rules:<br>
+<a href="https://forums.gentoo.org/viewtopic-t-811484-start-0.html" class="onebox" target="_blank">https://forums.gentoo.org/viewtopic-t-811484-start-0.html</a></p>
+          <p><a href="http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276/2</link>
+        <pubDate>Tue, 15 Sep 2020 12:43:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10276-2</guid>
+        <source url="http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276.rss">How to use mullvad wireguard vpn on host, while excluding kvm whonix tor.</source>
+      </item>
+      <item>
+        <title>How to use mullvad wireguard vpn on host, while excluding kvm whonix tor.</title>
+        <dc:creator><![CDATA[aqu0s]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi, I’ve been at this all day, and I can’t seem to find an answer.<br>
+I’ve read through the Whonix wiki on Tunnles. I’ve read through questions on this forum as well.<br>
+But I cant seem to figure out, how to do it like a step by step guide. Is there anyone that may please help me with this.<br>
+All I want to do is be able to use my host linux (manjaro kde) with mullvad vpn for torrenting and browsing the internet, email, etc… while at the same time be able to use guest Whonix on kvm without it going through mullvad vpn on host.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276/1</link>
+        <pubDate>Mon, 14 Sep 2020 23:44:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10276-1</guid>
+        <source url="http://forums.whonix.org/t/how-to-use-mullvad-wireguard-vpn-on-host-while-excluding-kvm-whonix-tor/10276.rss">How to use mullvad wireguard vpn on host, while excluding kvm whonix tor.</source>
+      </item>
+  </channel>
+</rss>

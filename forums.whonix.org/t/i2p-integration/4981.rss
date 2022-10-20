@@ -1,0 +1,942 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>I2P Integration</title>
+    <link>http://forums.whonix.org/t/i2p-integration/4981</link>
+    <description>**NOTICE:**
+
+A more updated guide is found here:
+
+https://github.com/mutedstorm/Whonix-I2P
+
+***
+
+I&#39;ll keep updating this Post to share my current Progress and to collect everything in one Thread
+
+### Status : 
+- I2P Router works in the Gateway (reseeds fine via Tor, builds Tunnels etc)
+- Forwarding Workstation -&gt; Gateway works
+- Torrents work (see below)
+
+
+## Steps to reproduce (quick Draft) : 
+
+### Notes:
+- Please excuse the ugly Presentation and Wording (i know its all over the Place, going to fix that soon(tm))
+- Privoxy isn&#39;t working, i left it in there for others to see what i did wrong
+- i left Foxyproxy setup in it to have a way to verify that the Forwarding and I2P is working properly 
+- Tested only on Qubes OS 3.2 and Whonix 13
+- i think a lot can be done better but i haven&#39;t had the Time to research it
+
+
+#### Preparation    
+    
+Create a separate Gateway (TemplateVM&amp;) ProxyVm and Workstation (TemplateVM&amp;) AppVM
+
+
+
+## Installing I2P
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Whonix Gateway (Template)VM
+
+We&#39;ll install I2P using the Debian packages.from the &#39;official&#39; I2P project&#39;s. (Kytv used to build the packages used by both (his repo and the offical )(see Disclaimer) ).
+
+Before adding the repo https://geti2p.net/en/download/debian, fetch the key and verify https://geti2p.net/_static/i2p-debian-repo.key.asc fingerprints. Always check the fingerprint for yourself. The output at the moment is:
+
+        pub  4096R/0x67ECE5605BCF1346 2013-10-10 I2P Debian Package Repository &lt;killyourtv@i2pmail.org&gt;
+              Key fingerprint = 7840 E761 0F28 B904 7535  49D7 67EC E560 5BCF 1346
+
+
+**Download key with scurl to home folder.**
+
+`user@host:~$ scurl -o i2p-debian-repo.key.asc https://geti2p.net/_static/i2p-debian-repo.key.asc`
+
+
+**Check fingerprints/owners without importing anything.**
+
+`user@host:~$ gpg -n --import --import-options import-show i2p-debian-repo.key.asc`
+
+**If it looks good import into trusted.gpg.d.&lt;ref&gt;**
+**To import asc key files into trusted.gpg.d they must be converted into a .gpg keychain file first.&lt;/ref&gt;**
+
+`user@host:~$ gpg --no-default-keyring --keyring ./i2p-pubkey.gpg --import i2p-debian-repo.key.asc`
+
+`user@host:~$ sudo cp i2p-pubkey.gpg /etc/apt/trusted.gpg.d/i2p-pubkey.gpg`
+
+**For default Whonix 13 using Debian stable:**
+
+`user@host:~$ echo -e ‘deb https://deb.i2p2.de/ jessie main\ndeb-src https://deb.i2p2.de/ jessie main’ | sudo tee /etc/apt/sources.list.d/i2p-release.list &gt; /dev/null`
+
+**For Whonix 14 using Debian Stretch**
+ 
+`user@host:~$ echo -e ‘deb https://deb.i2p2.de/ stretch main\ndeb-src https://deb.i2p2.de/ stretch main’ | sudo tee /etc/apt/sources.list.d/i2p-release.list &gt; /dev/null`
+
+**Update Packages**
+        
+`user@host:~$ sudo apt-get update`
+
+
+#### Install I2P, its dependencies and (optional) iceweasel:
+
+
+`user@host:~$ sudo apt-get install i2p i2p-keyring iceweasel 
+
+
+**Configure I2P as a service that automatically runs when your system boots, set the amount of Ram to your needs and leave the User as i2psvc** 
+
+`user@host:~$ sudo dpkg-reconfigure i2p`
+
+**Make the I2P folders persistent in the ProxyVM by adding the following to `/usr/lib/qubes-bind-dirs.d/40_qubes-whonix.conf`** 
+
+    binds+=( &#39;/etc/i2p&#39; )
+    binds+=( &#39;/var/lib/i2p/i2p-config/&#39; )
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Whonix Gateway (Proxy)VM
+
+Edit the firewall rules
+
+**Add the settings in the Whonix-Firewall `/etc/whonix_firewall.d/50_user.conf`  (Uncomment any SocksPort you dont need)**
+
+    NO_NAT_USERS+=&quot; $(id -u i2psvc)&quot;
+    SOCKS_PORT_I2P_BOB=2827
+    SOCKS_PORT_I2P_TAHOE=3456
+    SOCKS_PORT_I2P_WWW=4444
+    SOCKS_PORT_I2P_WWW2=4445
+    SOCKS_PORT_I2P_IRC=6668
+    SOCKS_PORT_I2P_XMPP=7622
+    SOCKS_PORT_I2P_CONTROL=7650
+    SOCKS_PORT_I2P_SOCKSIRC=7651
+    SOCKS_PORT_I2P_SOCKS=7652
+    SOCKS_PORT_I2P_I2CP=7654
+    SOCKS_PORT_I2P_SAM=7656
+    SOCKS_PORT_I2P_EEP=7658
+    SOCKS_PORT_I2P_SMTP=7659
+    SOCKS_PORT_I2P_POP=7660
+    SOCKS_PORT_I2P_BOTESMTP=7661
+    SOCKS_PORT_I2P_BOTEIMAP=7662
+    SOCKS_PORT_I2P_MTN=8998
+    SOCKS_PORT_PRIVOXY=8118
+        
+**Now reload the Whonix Firewall**
+ 
+`user@host:~$ sudo /usr/bin/whonix_firewall`
+
+
+**Add these Lines to `/var/lib/i2p/i2p-config/router.config` to Reseed via Tor** 
+    
+    stat.full=false
+    stat.logFile=stats.log
+    stat.logFilters=
+    stat.summaries=
+    i2np.upnp.enable=false
+    router.reseedProxy.authEnable=false
+    router.reseedProxyEnable=false
+    router.reseedSSLDisable=false
+    router.reseedSSLProxy.authEnable=false
+    router.reseedSSLProxyEnable=true
+    router.reseedSSLProxyHost=127.0.0.1
+    router.reseedSSLProxyPort=9050
+    router.reseedSSLProxyType=SOCKS5
+    router.reseedSSLRequired=false
+
+**Disable the Outproxy** 
+
+We don&#39;t want to access the Clearnet with I2P run the following to disable Outproxies 
+
+Remove the outproxy from the tunnel on port 4444
+
+`user@host:~$ sed -i &#39;/^.*tunnel\.0\.\(proxyList\|option\.i2ptunnel\.httpclient\.SSLOutproxies\)/d&#39; &quot;/var/lib/i2p/i2p-config/i2ptunnel.config&quot;`
+
+Disable the https outproxy (port 4445)
+
+`user@host:~$ sed -i &#39;s|^.*\(tunnel\.6\.startOnLoad\).*|\1=false|&#39; &quot;/var/lib/i2p/i2p-config/i2ptunnel.config&quot;`
+
+
+
+#### Changing I2P&#39;s listening interface
+
+I2P listens for connections on 127.0.0.1. This won&#39;t work for us since we want to access I2P from the Workstation. 
+We&#39;ll setup I2P to listen on the Gateway IP, which could be 10.137.x.10 depending on the Whonix version that you&#39;re using. Note: 
+By the time we&#39;re finished here, you will be able to access I2P from the workstation via 127.0.0.1 as well.
+
+`user@host:~$ GATEWAYIP=$(ip addr | grep &#39;eth1&#39; | grep -v &#39;BROADCAST&#39; | cut -d / -f 1 | awk &#39;{print $2}&#39;)`
+
+`user@host:~$ sudo sed -i &quot;s/\(.*interface=\).*/\1$GATEWAYIP/g;s/\(.*targetHost=\).*/\1$GATEWAYIP/g&quot; /var/lib/i2p/i2p-config/i2ptunnel.config`
+
+`user@host:~$ sudo sed -i &quot;s/127\.0\.0\.1/$GATEWAYIP/g&quot; /var/lib/i2p/i2p-config/clients.config`
+
+`user@host:~$ echo -e ‘usimail.host=$GATEWAYIP’ | sudo tee /var/lib/i2p/i2p-config/susimail.config &gt; /dev/null
+`
+    
+**change the Router console listening IP back to localhost**          
+          
+`user@host:~$ sudo sed -i &quot;s/clientApp\.0\.args\=7657 \:\:1\,$GATEWAYIP/clientApp\.0\.args\=7657 \:\:1\,127\.0\.0\.1 \./g&quot; /var/lib/i2p/i2p-config/clients.config`
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Whonix Workstation (Template)VM
+
+**Install Privoxy**
+
+`user@host:~$ sudo apt-get install privoxy`
+
+**Edit the /etc/privoxy/user.action and add i2p forwarding** 
+
+    forward .i2p 127.0.0.1:4444
+    accept-intercepted-requests 1
+    max-client-connections 512
+
+
+#### Forwarding Whonix-Workstations Ports to Whonix-Gateway local Ports
+
+**Open /etc/anon-ws-disable-stacked-tor.d/50_user.conf with a editor in your Worksation-Template and insert the following:**
+
+    I2P_PORTS=&quot;2827 3456 4444 4445 6668 7622 7650 7651 7654 7656 7658 7659 7660 7661 7662 8998 8118&quot;
+
+    for i2p_port in $I2P_PORTS ; do
+       $pre_command socat TCP-LISTEN:$i2p_port,fork,bind=127.0.0.1 TCP:$GATEWAY_IP:$i2p_port &amp;
+    done
+
+### Whonix Workstation (App)VM 
+
+#### Edit TorBrowser to use Privoxy
+
+
+**Open the TorBrowser enter `about:config` and change these Settings**
+
+    extensions.torbutton.use_nontor_proxy;true
+    network.proxy.no_proxies_on;0
+    network.proxy.http;127.0.0.1
+    network.proxy.http_port;8118
+    network.proxy.socks;         &lt;--(blank)
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### currently working on:
+- shortening the Setup Guide and adding current changes
+- rewriting Scripts (pretty awful atm)
+- modifying Itoopie
+- writing a terminal monitor for I2P (like arm/nyx)
+
+### TBD
+- Torrents need a extra Application (Robert or Transmission-I2P) or files need to be moved between the Gateway (i2psnark) and the Workstation (i don&#39;t like the later option)
+- https://forums.whonix.org/t/tor-browser-tbb-profile-with-custom-about-config-settings/4888/15
+needs to be solved
+- I&#39;m thinking about switching to I2Pd for better performance and lower Memory needs (should be optional though)
+- I2Pcontrol isn&#39;t included yet so we would need to download that or use a localhost browser on the Gateway
+- itoopie could be used to display Bandwidth, Tunnel count, Status Informations and change basic configs similar to arm/nyx. It would require I2Pcontrol though.
+
+I had a short chat with ZZZ on i2p-dev about running I2P Plugins in another VM, currently this isn&#39;t possible but they are thinking about Packaging Plugins as Debian Package in the long run and add the option to run them standalone.
+
+...more to come</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 25 Jul 2022 17:06:22 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/i2p-integration/4981.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks, merged.</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/344">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/344</link>
+        <pubDate>Mon, 25 Jul 2022 17:06:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-344</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubpullrequest" data-onebox-src="https://github.com/Whonix/anon-apps-config/pull/1">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/anon-apps-config/pull/1" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/anon-apps-config</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/anon-apps-config/pull/1" target="_blank" rel="noopener nofollow ugc">disable ntp time check</a>
+    </h4>
+
+    <div class="branches">
+      <code>Whonix:master</code> ← <code>TNTBOMBOM:patch-2</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2022-07-25" data-time="16:17:46" data-timezone="UTC">04:17PM - 25 Jul 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/TNTBOMBOM" target="_blank" rel="noopener nofollow ugc">
+          <img alt="TNTBOMBOM" src="https://avatars.githubusercontent.com/u/11895339?v=4" class="onebox-avatar-inline" width="20" height="20">
+          TNTBOMBOM
+        </a>
+      </div>
+
+      <div class="lines" title="1 commits changed 1 files with 1 additions and 0 deletions">
+        <a href="https://github.com/Whonix/anon-apps-config/pull/1/files" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+1</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">disabled time check since it uses ntp which doesnt exist in whonix. (it has no e<span class="show-more-container"><a href="https://github.com/Whonix/anon-apps-config/pull/1" target="_blank" rel="noopener nofollow ugc" class="show-more">…</a></span><span class="excerpt hidden">ffect on the connection)</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Disabled ntp time check by i2p.</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/343">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/343</link>
+        <pubDate>Mon, 25 Jul 2022 16:19:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-343</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="3" data-topic="13719">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img loading="lazy" alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/eyedeekay/40/1511_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/tor-browser-customization-using-user-js-for-example-for-i2pbrowser/13719/3">Tor Browser Customization using user.js (for example for i2pbrowser)</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development/8"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of components looking for maintainer)">Development</span></a>
+  </div>
+  <blockquote>
+    If you were to maintain 2 copies of the Tor Browser, then you could configure it in policies.json instead, which might yield different results. I’ve only done a little testing on my end to experiment with in-I2P TLS certificates, but so far this mechanism has allowed me to configure some things in Firefox which I could not before.
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/342">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/342</link>
+        <pubDate>Thu, 30 Jun 2022 19:19:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-342</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="0x1f" data-post="340" data-topic="4981" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/0x1f/40/2975_2.png" class="avatar"> 0x1f:</div>
+<blockquote>
+<p>It’d just make things a lot more harder to maintain and would add more attack surface and decrease development time on other components of Whonix</p>
+</blockquote>
+</aside>
+<p>well if there is no easy way to have it maintained then it wont make it as default thats for sure, mostly as well <a class="mention" href="http://forums.whonix.org/u/eyedeekay">@eyedeekay</a> gonna help with that otherwise also no future for i2p by default (left to users to install it).</p>
+<p>Though at the moment in whonix-workstation there is already script automatically configure i2p once installed to be compatible with Tor connections (like disabling upnp, ntp time check, inbound connection…etc)</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/341">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/341</link>
+        <pubDate>Wed, 29 Jun 2022 21:00:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-341</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[0x1f]]></dc:creator>
+        <description><![CDATA[
+            <p>It’d just make things a lot more harder to maintain and would add more attack surface and decrease development time on other components of Whonix</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/340">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/340</link>
+        <pubDate>Wed, 29 Jun 2022 11:07:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-340</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>One way to see it that a lot of time was spent on this with meager results (?) that should be spend on more worthwhile things.</p>
+<p>A different way to see this would be interpreting the number of users ever active in this forum thread (or generally on I2P) as a high user interest in I2P.</p>
+<p>Long time no polls.<br>
+(<a href="https://forums.whonix.org/t/polls-collections-surveys/6504" class="inline-onebox">polls collections (surveys)</a>)</p>
+<p>Therefore I’ve started with a very basic question to get a bit of a baseline before asking more specific questions in follow-up polls later.</p>
+<aside class="onebox twitterstatus" data-onebox-src="https://twitter.com/Whonix/status/1542064351015747586">
+  <header class="source">
+
+      <a href="https://twitter.com/Whonix/status/1542064351015747586" target="_blank" rel="noopener">twitter.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://pbs.twimg.com/profile_images/1477222846287994884/yAUo8Yvp_400x400.jpg" class="thumbnail onebox-avatar" width="400" height="400">
+<h4><a href="https://twitter.com/Whonix/status/1542064351015747586" target="_blank" rel="noopener">Whonix ™</a></h4>
+<div class="twitter-screen-name"><a href="https://twitter.com/Whonix/status/1542064351015747586" target="_blank" rel="noopener">@Whonix</a></div>
+
+<div class="tweet">
+  <span class="tweet-description">Do you use I2P?</span>
+</div>
+
+<div class="date">
+  <a href="https://twitter.com/Whonix/status/1542064351015747586" class="timestamp" target="_blank" rel="noopener">8:36 AM - 29 Jun 2022</a>
+
+
+    <span class="retweet">
+      <svg viewBox="0 0 640 512" width="14px" height="16px" aria-hidden="true">
+        <path d="M629.657 343.598L528.971 444.284c-9.373 9.372-24.568 9.372-33.941 0L394.343 343.598c-9.373-9.373-9.373-24.569 0-33.941l10.823-10.823c9.562-9.562 25.133-9.34 34.419.492L480 342.118V160H292.451a24.005 24.005 0 0 1-16.971-7.029l-16-16C244.361 121.851 255.069 96 276.451 96H520c13.255 0 24 10.745 24 24v222.118l40.416-42.792c9.285-9.831 24.856-10.054 34.419-.492l10.823 10.823c9.372 9.372 9.372 24.569-.001 33.941zm-265.138 15.431A23.999 23.999 0 0 0 347.548 352H160V169.881l40.416 42.792c9.286 9.831 24.856 10.054 34.419.491l10.822-10.822c9.373-9.373 9.373-24.569 0-33.941L144.971 67.716c-9.373-9.373-24.569-9.373-33.941 0L10.343 168.402c-9.373 9.373-9.373 24.569 0 33.941l10.822 10.822c9.562 9.562 25.133 9.34 34.419-.491L96 169.881V392c0 13.255 10.745 24 24 24h243.549c21.382 0 32.09-25.851 16.971-40.971l-16.001-16z"></path>
+      </svg>
+      1
+    </span>
+</div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Suggestions for future polls and their wording are welcome.</p>
+<ul>
+<li>Twitter limits to maximum 4 choices.</li>
+<li>25 characters per choice maximum.</li>
+</ul>
+<p>Related, for comparison, planned future poll:</p>
+<blockquote>
+<p>Do you use ZeroNet?</p>
+<ul>
+<li>Yes</li>
+<li>No</li>
+</ul>
+</blockquote>
+<p>To be posted in a few days?</p>
+<p>Instead of only doing this on Twitter which could skew results, a poll or polls could be repeated in Whonix forums similar to a previous poll: <a href="https://forums.whonix.org/t/user-poll-xfce-vs-kde-kde-deprecation-considered/6235" class="inline-onebox">User Poll - XFCE vs KDE - KDE Deprecation Considered!</a></p>
+<p>Draft Twitter polls:</p>
+<blockquote>
+<p>Whonix I2P Connection Scheme Wishlist</p>
+<ul>
+<li>None. Keep as is.</li>
+<li>Parallel to Tor.</li>
+<li>user → Tor → I2P → dest</li>
+</ul>
+</blockquote>
+<hr>
+<blockquote>
+<p>Whonix I2P Integration Wishlist</p>
+<ul>
+<li>Keep as-is.</li>
+<li>Easier installation.</li>
+<li>Installed by default.</li>
+</ul>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/339">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/339</link>
+        <pubDate>Wed, 29 Jun 2022 08:55:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-339</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="0x1f" data-post="337" data-topic="4981" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/0x1f/40/2975_2.png" class="avatar"> 0x1f:</div>
+<blockquote>
+<p>So many posts to drill through, I just wanted to say that if this is possible, it should be a detached project from Whonix</p>
+</blockquote>
+</aside>
+<p>What did you have concluded from the posts before? why do you see it bad idea for i2p to be in whonix?</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/338">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/338</link>
+        <pubDate>Wed, 29 Jun 2022 07:07:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-338</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[0x1f]]></dc:creator>
+        <description><![CDATA[
+            <p>So many posts to drill through, I just wanted to say that if this is possible, it should be a detached project from Whonix</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/337">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/337</link>
+        <pubDate>Tue, 28 Jun 2022 21:48:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-337</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox allowlistedgeneric" data-onebox-src="https://i2pgit.org/i2p-hackers/i2p.i2p/-/merge_requests/59">
+  <header class="source">
+      <img src="https://i2pgit.org/uploads/-/system/appearance/favicon/1/favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://i2pgit.org/i2p-hackers/i2p.i2p/-/merge_requests/59" target="_blank" rel="noopener nofollow ugc">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="http://i2pgit.org/assets/twitter_card-570ddb06edf56a2312253c5872489847a0f385112ddbcd71ccfa1570febab5d2.jpg" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://i2pgit.org/i2p-hackers/i2p.i2p/-/merge_requests/59" target="_blank" rel="noopener nofollow ugc">Update system_i2p (!59) · Merge requests · I2P Developers / i2p.i2p · GitLab</a></h3>
+
+  <p>Some denied messages shown in journactl e.g: Jun 05 19:01:10 I2P audit[710]: AVC apparmor="DENIED" operation="open" profile="system_i2p" name="/proc/cgroups" pid=710 comm="java" requested_mask="r" denied_mask="r" fsuid=106 ouid=0 So...</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/336">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/336</link>
+        <pubDate>Tue, 14 Jun 2022 19:44:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-336</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="334" data-topic="4981">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Correct?</p>
+</blockquote>
+</aside>
+<p>Yes</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/335">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/335</link>
+        <pubDate>Tue, 31 May 2022 15:18:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-335</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>So in summary…</p>
+<hr>
+<p><a href="https://www.whonix.org/w/index.php?title=I2P&amp;oldid=77939">old, last revision really using using privoxy:</a></p>
+<ul>
+<li>i2p webinterface functional</li>
+<li>i2p eepsites functional</li>
+<li>clearnet broken</li>
+<li>onion functional</li>
+</ul>
+<hr>
+<p>current revision without privoxy [1]:<br>
+(<a href="https://www.whonix.org/w/index.php?title=I2P&amp;oldid=83477">this at time of writing</a>)</p>
+<ul>
+<li>i2p webinterface functional</li>
+<li>i2p eepsites functional</li>
+<li>clearnet functional</li>
+<li>onion broken</li>
+</ul>
+<hr>
+<p>Correct?</p>
+<hr>
+<p>[1] privoxy get installed but not configured so effectively doing nothing.</p>
+<aside class="quote no-group" data-username="TNT_BOM_BOM" data-post="333" data-topic="4981">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tnt_bom_bom/40/2148_2.png" class="avatar"> TNT_BOM_BOM:</div>
+<blockquote>
+<p>Note: In TB <code>network.proxy.socks_remote_dns</code> is now hardcoded and its reversible to always to the same state.</p>
+</blockquote>
+</aside>
+<p>Confirmed. This is true. That is also what I described here:<br>
+<a href="https://forums.whonix.org/t/tor-browser-customization-using-user-js-for-example-for-i2pbrowser/13719" class="inline-onebox">Tor Browser Customization using user.js (for example for i2pbrowser)</a></p>
+<p>The same in other words:<br>
+<code>network.proxy.socks_remote_dns</code> set to <code>true</code> is now hardcoded directly by Tor Browser and it always reverts to Tor Browser default after Tor Browser restart.</p>
+<p>i2p inside Whonix-Workstation instructions - both old and new - require <code>network.proxy.socks_remote_dns</code> set to <code>false</code>.</p>
+<p>Unless the user re-applies these Tor Browser settings all the time which is very bad usability, I don’t think we currently have a good solution with or without privoxy.</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/334">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/334</link>
+        <pubDate>Tue, 31 May 2022 12:00:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-334</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="329" data-topic="4981">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Reverse any edits removing it please (if they’ve been committed).</p>
+</blockquote>
+</aside>
+<p>Its easy to do that, But now i just tested privoxy instructions the clearnet in TB doesnt work, But .i2p and .onion does work.</p>
+<p>The current instructions which is without privoxy,  .i2p work, and clearnet work, .onion not.</p>
+<p>What we have common is .i2p in both working, So i dunno do you have a solution for clearnet issue + privoxy?</p>
+<p>Otherwise .i2p working properly with current instructions, But if privoxy can solve all connections (clearnet, .i2p, .onion) then i dunno how to do that, Please test and see how to do that properly.</p>
+<p>Note: In TB <code>network.proxy.socks_remote_dns</code> is now hardcoded and its reversible to always to the same state.</p>
+<hr>
+<p>Asked <a class="mention" href="http://forums.whonix.org/u/eyedeekay">@eyedeekay</a> and replied:</p>
+<blockquote>
+<ul>
+<li>eyedeekay: There are several ways to do it, one is a proxy.pac, one is to use privoxy to route everything, the last is to use containers-specific proxies in multi-account containers</li>
+<li>eyedeekay: My preference is for the last because you can use the containers to enforce network boundaries, dropping I2P requests from the Tor container and Tor requests from the I2P container</li>
+<li>eyedeekay: But which way is best remains to be seen</li>
+</ul>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/333">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/333</link>
+        <pubDate>Mon, 30 May 2022 22:52:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-333</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="1" data-topic="13719">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img loading="lazy" alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/tor-browser-customization-using-user-js-for-example-for-i2pbrowser/13719">Tor Browser Customization using user.js (for example for i2pbrowser)</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development/8"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of components looking for maintainer)">Development</span></a>
+  </div>
+  <blockquote>
+    I was wondering if creating user.js: 
+
+/home/user/.tb/tor-browser/Browser/TorBrowser/Data/Browser/profile.default/user.js 
+
+Some settings such as: 
+user_pref("network.proxy.socks_remote_dns", false);
+
+can be changed. Result: 
+No. Unfortunately above cannot be changed. It seems it is now hardocded in a binary file: /home/user/.tb/tor-browser/Browser/libxul.so 
+To make sure my method is valid of using user.js is right, that the file path to user.js is correct, that user.js is generally supported. …
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/332">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/332</link>
+        <pubDate>Mon, 30 May 2022 09:56:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-332</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes those instructions were added by me recently (and were functional) when I went ahead and retested it with I2P and Tor Browser to browse eepsites seamlessly.</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/331">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/331</link>
+        <pubDate>Fri, 27 May 2022 20:25:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-331</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Currently as of the latest revision privoxy does nothing with the instructions as is. So with the instructions as is, privoxy is doing nothing.</p>
+<p>In <a href="https://www.whonix.org/w/index.php?title=I2P&amp;type=revision&amp;diff=77944&amp;oldid=77939">https://www.whonix.org/w/index.php?title=I2P&amp;type=revision&amp;diff=77944&amp;oldid=77939</a> <a class="mention" href="http://forums.whonix.org/u/tnt_bom_bom">@TNT_BOM_BOM</a> removed configuring Tor Browser for using privoxy with its default port 8118. Why was it removed? I guess it was removed because the instructions where dysfunctional and unmaintained at that time if I remember right? I think I tried and failed. It was probably due to Tor Browser changes.</p>
+<p>This is the last old revision which still uses privoxy / port 8118:<br>
+<a href="https://www.whonix.org/w/index.php?title=I2P&amp;oldid=77939">https://www.whonix.org/w/index.php?title=I2P&amp;oldid=77939</a></p>
+<p>I expect re-adding privoxy to be complicated and require several hours of tinkering if it’s possible at all.</p>
+<p>In case I am wrong… Can you currently use i2p with Tor Browser and privoxy? <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a></p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/330">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/330</link>
+        <pubDate>Fri, 27 May 2022 16:35:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-330</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="TNT_BOM_BOM" data-post="328" data-topic="4981">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tnt_bom_bom/40/2148_2.png" class="avatar"> TNT_BOM_BOM:</div>
+<blockquote>
+<p>Privoxy now is just an extra package useless for the end user.</p>
+</blockquote>
+</aside>
+<p>NOT useless. It allows for auto-redirection of special domains like.i2p and freesites to their respective daemons. Without it the UX of these alternative networks is degraded severely. Reverse any edits removing it please (if they’ve been committed).</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/329">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/329</link>
+        <pubDate>Fri, 27 May 2022 15:44:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-329</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="326" data-topic="4981" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Appended it to the step" <strong>5.</strong> Configure <a href="http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Tor_Browser" rel="noopener nofollow ugc">Tor Browser</a> to allow connections to I2P". Not sure you prefer this or just an obscure ref note.</p>
+</blockquote>
+</aside>
+<p>In the latest update to I2P wiki, Where do you see Privoxy useful?</p>
+<p>Privoxy now is just an extra package useless for the end user.</p>
+<p>If privoxy can be removed then it should be removed from the wiki, And only optional choice for the end user he can install it if he want to as any other package.</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/328">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/328</link>
+        <pubDate>Thu, 19 May 2022 18:49:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-328</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="325" data-topic="4981">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>At the moment privoxy does nothing. It just listens on port 8118 and that port is no longer used on <a href="https://www.whonix.org/wiki/I2P">Invisible Internet Project (I2P)</a>.</p>
+<p>Also privoxy config would have to be restored?</p>
+</blockquote>
+</aside>
+<p>Still same issue.</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/327">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/327</link>
+        <pubDate>Wed, 30 Mar 2022 14:36:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-327</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Appended it to the step" <strong>5.</strong> Configure <a href="https://www.whonix.org/wiki/Tor_Browser">Tor Browser</a> to allow connections to I2P". Not sure you prefer this or just an obscure ref note.</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/326">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/326</link>
+        <pubDate>Tue, 29 Mar 2022 17:39:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-326</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Could you please document the purpose of privoxy?</p>
+<p>At the moment privoxy does nothing. It just listens on port 8118 and that port is no longer used on <a href="https://www.whonix.org/wiki/I2P" class="inline-onebox">Invisible Internet Project (I2P)</a>.</p>
+<p>Also privoxy config would have to be restored?</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/325">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/325</link>
+        <pubDate>Fri, 21 Jan 2022 16:07:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-325</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks. Working well and I re-added the privoxy package in the installation instructions.</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/324">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/324</link>
+        <pubDate>Fri, 21 Jan 2022 15:01:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-324</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="317" data-topic="4981">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p><a class="mention" href="http://forums.whonix.org/u/tnt_bom_bom">@TNT_BOM_BOM</a> can you test and update the wiki please?</p>
+</blockquote>
+</aside>
+<p>done and added some improvements:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/a/a4/Whonix-home-favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/I2P" target="_blank" rel="noopener nofollow ugc" title="06:14PM - 18 January 2022">Whonix – 18 Jan 22</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/b/b1/I2plogo.png" class="thumbnail onebox-avatar" width="24" height="24">
+
+<h3><a href="https://www.whonix.org/wiki/I2P" target="_blank" rel="noopener nofollow ugc">Invisible Internet Project (I2P)</a></h3>
+
+  <p>I2P over Tor. Tunneling the I2P Anonymizing Network over the Tor Anonymizing Network. Connection Schema: Tor → I2P → Destination.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/323">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/323</link>
+        <pubDate>Tue, 18 Jan 2022 21:57:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-323</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="1" data-topic="13012">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/letter_avatar_proxy/v4/letter/k/b5e925/40.png" class="avatar">
+    <a href="https://forums.whonix.org/t/i2p-used-to-work-in-whonix-15-now-it-doesnt-in-whonix-16/13012">I2P used to work in Whonix 15 now it doesn't in Whonix 16</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/support/5"><span class="badge-category-bg" style="background-color: #8C6238;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="User support for the Whonix operating system. (devs)">Support</span></a>
+  </div>
+  <blockquote>
+    long time whonix user and supporter here hi <img width="20" height="20" src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title="slight_smile" alt="slight_smile" class="emoji"> 
+On whonix 15 i used a guide created by Desnake from Alphabay which went like this 
+Run the following code:
+
+sudo apt-get install apt-transport-https -y;wget -q -O - https repo.i2pd.xyz/.help/add_repo | sudo bash -s -;sudo apt-get update;sudo apt-get install i2pd -y;sudo service i2pd start
+
+The above command installs secure package installation with HTTPS, gets signing keys and imports them, updates packages to recognize your newly added…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/322">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/322</link>
+        <pubDate>Wed, 15 Dec 2021 15:07:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-322</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>sure thing, atm I2P changing their i2p installation instructions to<br>
+match latest apt changes (deprecating apt-key) once finished i will<br>
+update the wiki:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://i2pgit.org/uploads/-/system/appearance/favicon/1/favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://i2pgit.org/i2p-hackers/i2p.www/-/issues/33" target="_blank" rel="noopener nofollow ugc">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://i2pgit.org/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png" class="thumbnail onebox-avatar" width="128" height="128">
+
+<h3><a href="https://i2pgit.org/i2p-hackers/i2p.www/-/issues/33" target="_blank" rel="noopener nofollow ugc">shorten&amp;fix i2p installation with debian repository instructions (#33) ·...</a></h3>
+
+  <p>https://geti2p.net/en/download/debian we see:   Ensure that apt-transport-https and curl are installed.  sudo apt-get update...</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://i2pgit.org/uploads/-/system/appearance/favicon/1/favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://i2pgit.org/i2p-hackers/i2p.www/-/merge_requests/15" target="_blank" rel="noopener nofollow ugc">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://i2pgit.org/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png" class="thumbnail onebox-avatar" width="128" height="128">
+
+<h3><a href="https://i2pgit.org/i2p-hackers/i2p.www/-/merge_requests/15" target="_blank" rel="noopener nofollow ugc">Simplify Debian page content per suggestions from @anonymousmaybe (!15) ·...</a></h3>
+
+  <p>Closes #33 and presents a less involved installation process...</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/321">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/321</link>
+        <pubDate>Sun, 26 Sep 2021 08:11:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-321</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+      <item>
+        <title>I2P Integration</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This: <a href="https://forums.whonix.org/t/i2p-integration/4981/314" class="inline-onebox">I2P Integration - #314 by Patrick</a></p>
+<p>Otherwise would be good to rehash what has been discussed in this forum thread.</p>
+          <p><a href="http://forums.whonix.org/t/i2p-integration/4981/320">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/i2p-integration/4981/320</link>
+        <pubDate>Wed, 22 Sep 2021 18:07:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4981-320</guid>
+        <source url="http://forums.whonix.org/t/i2p-integration/4981.rss">I2P Integration</source>
+      </item>
+  </channel>
+</rss>

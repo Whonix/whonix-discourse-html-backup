@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix Installation Triggers</title>
+    <link>http://forums.whonix.org/t/whonix-installation-triggers/771</link>
+    <description>I was wondering if you currently have any post installation triggers that you emit when Whonix has completed installing.
+
+I had a few issues installing the whonix-qubes package before installing Whonix gateway or workstation so I placed the installation afterwards which allows me to make sure certain services are enabled / disabled. 
+
+I want to try to install it before Whonix again though to be able to remove custom code from the template into the whonix-qubes package that is needed just to be able to get Whonix to build thereby keeping anything Whonix related in this one package.  This will allow you to quickly see any work arounds I needed to use so we can implement those fixes in the mainline code itself and not needing to touch the Qubes templates.
+
+With so many packages that Whonix installs, I even wonder if there is one master package that will always be installed last to trigger the event when using the build system.
+
+Currently this is what has to be done after Whonix is installed.  If no trigger event exists for the specific package, I can just create a trigger based on some file that gets installed or modified (most likely candidate is to watch the /etc/init.d file)
+
+1. I need to place this file.  Can it be placed before whonix begins installation?
+        mkdir -p /root/.whonix
+        touch /root/.whonix/first_run_initializer.done
+
+2. This needs to be appended.  I do not know what package it belongs to but can watch the file itself
+        echo &#39;WHONIXCHECK_NO_EXIT_ON_UNSUPPORTED_VIRTUALIZER=&quot;1&quot;&#39; &gt;&gt; /etc/whonix.d/30_whonixcheck_default
+
+3. Need to make sure Tor is disabled.  I think you may already do this though
+
+4. Need to make sure sdwdate is disabled.  I get many weird errors pop up otherwise stating I can&#39;t connect even though it just connected.  I think the errors are cached.  I re-enable both Tor and sdwdate just before whonix-setup.
+
+5. Need to disable spice-vdagent since it is not needed
+
+6. Need to disable swap-file-creator since it is not needed
+
+7. Need to disable whonix-initializer as its unwanted ;)
+
+So, most of the above I think I can just add watch triggers on the files themselves.
+
+Another idea I just had was to just build all the Whonix Debian packages but not install them with the Whonix builder.  Thats what Qubes does; first all modules are created in a development chroot environment.  Then, another chroot environment is created for the template itself without needing all the build tools installed.  
+
+Instead I would just include every package required as a Depends or Recommend within the whonix-qubes package and when I install whonix-qubes, it will install all the Whonix packages from the repo created by the builder on the file system which then gives me more control over the process.  Would this work?  Or am I just better to stick with triggers?</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 04 Jan 2015 14:26:22 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-installation-triggers/771.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix Installation Triggers</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>I was wondering if you currently have any post installation triggers that you emit when Whonix has completed installing.</blockquote>
+I suppose you mean during the build process after installation of packages by build-steps.d/1700_install-packages?
+<p>Yes, hopefully this is very well supported. For one, there is the chroot scripts mechanism, chroot-scripts-post.d, see:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/Source_Code_Intro#Chroot_Scripts" target="_blank" title="05:19PM - 01 March 2020">Whonix – 1 Mar 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:598/500;"><img src="https://www.whonix.org/w/images/f/fa/Accept-47587640.png" class="thumbnail" width="598" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Dev/Source_Code_Intro#Chroot_Scripts" target="_blank">Dev/Source Code Intro - Whonix</a></h3>
+
+<p>Introduction into Whonix ™ source code.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Also if you look into the build-steps.d folder (<a href="https://github.com/Whonix/Whonix/tree/master/build-steps.d">https://github.com/Whonix/Whonix/tree/master/build-steps.d</a>) you can sneak in your stuff at any point.  <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<blockquote>I had a few issues installing the whonix-qubes package before installing Whonix gateway or workstation so I placed the installation afterwards which allows me to make sure certain services are enabled / disabled.</blockquote>
+If you want to install a package before all others, you can either create a build step that runs before build-steps.d/1700_install-packages. But I don't think this will be needed. I guess it's best if you look here.
+<p>In this script <a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/1700_install-packages#L350">https://github.com/Whonix/Whonix/blob/master/build-steps.d/1700_install-packages#L350</a> search for that line:</p>
+<pre><code class="lang-auto">pkg-install-maybe anon-shared-build-apt-sources-tpo</code></pre>
+<p>Then add</p>
+<pre><code class="lang-auto">pkg-install-maybe whonix-qubes</code></pre>
+<p>above it.</p>
+<p>Should we install the package on all images by default + make sure the whonix-qubes packages only does stuff when running inside Qubes? This would make standalone VMs easier where users download qcow2 (or raw) images from <a href="http://whonix.org">whonix.org</a> if you still want to support that use case in future. Otherwise, if it should be only installed when running withing Qubes builder, then we can easily add a [font=courier]–target qubes[/font] command line option, which sets a Qubes specific variable, that will be obeyed by build-steps.d/1700_install-packages.</p>
+<p>(Command line parser: <a href="https://github.com/Whonix/Whonix/blob/master/help-steps/parse-cmd#L120">https://github.com/Whonix/Whonix/blob/master/help-steps/parse-cmd#L120</a>)</p>
+<blockquote>I want to try to install it before Whonix again though to be able to remove custom code from the template into the whonix-qubes package that is needed just to be able to get Whonix to build thereby keeping anything Whonix related in this one package.</blockquote>
+Okay.
+<blockquote>This will allow you to quickly see any work arounds I needed to use so we can implement those fixes in the mainline code itself and not needing to touch the Qubes templates.</blockquote>
+Yes, getting fixed into mainline sounds very good.
+<blockquote>With so many packages that Whonix installs, I even wonder if there is one master package that will always be installed last to trigger the event when using the build system.</blockquote>
+That master package would be the package whonix-gateway or whonix-workstation. But I don't think that would be a good mechanism. Custom builders might skip installation of that package. There probably much better hooks as described above.
+<blockquote>Currently this is what has to be done after Whonix is installed.  If no trigger event exists for the specific package, I can just create a trigger based on some file that gets installed or modified (most likely candidate is to watch the /etc/init.d file)</blockquote>
+<blockquote>1. I need to place this file.  Can it be placed before whonix begins installation?
+        mkdir -p /root/.whonix
+        touch /root/.whonix/first_run_initializer.done</blockquote>
+You could write a build step called build-steps.d/1600_qubes that therefore runs before build-steps.d/1700_install-packages or we can reintroduce the chroot-scripts-pre.d mechanism.
+<blockquote>2. This needs to be appended.  I do not know what package it belongs to but can watch the file itself
+        echo 'WHONIXCHECK_NO_EXIT_ON_UNSUPPORTED_VIRTUALIZER="1"' &gt;&gt; /etc/whonix.d/30_whonixcheck_default</blockquote>
+That should be fixed in whonixcheck that comes with Whonix 10. I think we discussed/fixed this elsewhere already but not sure. If you get this updated file for testing, it should work out of the box:
+https://github.com/Whonix/whonixcheck/blob/master/usr/lib/whonixcheck/check_virtualizer#L65
+<p>As a side note, generally, when having the “.d” mechanism (<a href="https://www.whonix.org/wiki/Whonix_Configuration_Files#.d_style_configuration_folders">https://www.whonix.org/wiki/Whonix_Configuration_Files#.d_style_configuration_folders</a>) it’s best not to touch the original file but to ship one that overrules the default setting. (Higher number named file.)</p>
+<blockquote>3. Need to make sure Tor is disabled.  I think you may already do this though</blockquote>
+Whonix comes with Tor disabled by default for a long time now.
+<p>“DisableNetwork 1” is set in <a href="https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/share/tor/tor-service-defaults-torrc.anondist#L61">https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/share/tor/tor-service-defaults-torrc.anondist#L61</a> which means “Tor do no networking at all!”. The Tor service starts upon first boot,  but does nothing. That should be totally fine. The default /etc/tor/torrc comes with out commented “<span class="hashtag">#DisableNetwork</span> 0”, which does nothing by default. (<a href="https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/tor/torrc.anondist">https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/tor/torrc.anondist</a>)</p>
+<p>We then rely on whonixsetup (or whonix-setup-wizard in Whonix 10) for in commenting “DisableNetwork 0” (= enable networking) in /etc/tor/torrc.</p>
+<p>That works for build process and first boot. But you want to disable Tor after Whonix has been started once and after “DisableNetwork 0” has been set in /etc/tor/torrc already? Because you need this for template updating or so?</p>
+<blockquote>4. Need to make sure sdwdate is disabled.  I get many weird errors pop up otherwise stating I can't connect even though it just connected.  I think the errors are cached.  I re-enable both Tor and sdwdate just before whonix-setup.</blockquote>
+Actually, sdwdate should just patiently and quietly wait as long as the Tor daemon is started but in "DisableNetwork 1" (= network disabled) mode. For hours, days, and so forth. Issues are coming if you disable the Tor daemon from starting.
+<p>Or it’s a systemd issue? I don’t know why Whonix, based on Debian wheezy in Qubes is using systemd anyhow. Sdwdate’s init script has a “# X-Start-Before: tor”, which means, Tor should start before sdwdate, so sdwdate wouldn’t run into a closed (not yet created) Tor socket.</p>
+<blockquote>5. Need to disable spice-vdagent since it is not needed</blockquote>
+Hm. I see. It is weird having it installed on Qubes. I think this could be a solution:
+Let's make spice-vdagent a "weak recommended package"?:
+https://www.whonix.org/forum/index.php/topic,852
+<blockquote>6. Need to disable swap-file-creator since it is not needed</blockquote>
+swap-file-creator has to be ported to systemd anyhow. At the moment you can only disable the daemon startup or append "exit 0" to /etc/default/swap-file-creator. Would it help if there was a .d config folder to easily drop a snippet to disable it in Whonix 10?
+<blockquote>7. Need to disable whonix-initializer as its unwanted ;)</blockquote>
+I see. Another weird dependency. It always boils down again to package manager technical limitations:
+https://www.whonix.org/wiki/Whonix_Debian_Packages#Technical_Stuff
+<p>Anyhow. Making we could split the anon-shared-packages-recommended (<a href="https://github.com/Whonix/anon-meta-packages/blob/master/debian/control#L32">https://github.com/Whonix/anon-meta-packages/blob/master/debian/control#L32</a>) package and the whonix-shared-packages-dependencies (<a href="https://github.com/Whonix/anon-meta-packages/blob/master/debian/control#L267">https://github.com/Whonix/anon-meta-packages/blob/master/debian/control#L267</a>) package.</p>
+<p>whonix-initializer isn’t very useful for [font=arial]–target root[/font] builds anyhow.</p>
+<p>Have some *-non-kvm-qemu-virtualbox-vmware-? package and/or *-kvm-qemu-virtualbox-vmware-? which does not depend on swap-file-creator, whonix-initializer?</p>
+<blockquote>So, most of the above I think I can just add watch triggers on the files themselves.</blockquote>
+I think it's best to avoid triggers where ever possible and to find cleaner, more robust, more long term solutions.
+<blockquote>Another idea I just had was to just build all the Whonix Debian packages but not install them with the Whonix builder.  Thats what Qubes does; first all modules are created in a development chroot environment.</blockquote>
+<blockquote>Then, another chroot environment is created for the template itself without needing all the build tools installed.</blockquote>
+Interesting!
+<p>Whonix kinda support it. Just [font=arial]–target root[/font] don’t profit from it yet. For building raw images (etc.), the build dependencies are not installed inside the images. They’re only installed on the build host. But if you are using [font=arial]–target root[/font], then build dependencies are installed on the same systems as the target system (= root).</p>
+<blockquote>Instead I would just include every package required as a Depends or Recommend within the whonix-qubes package and when I install whonix-qubes, it will install all the Whonix packages from the repo created by the builder on the file system which then gives me more control over the process.  Would this work?</blockquote>
+Probably, yes. Would require quite some work, but sounds interesting.
+https://www.whonix.org/wiki/Dev/Source_Code_Intro#Chroot_Scripts would have to be added somehow - or omitted. Or we can somehow get rid of them altogether.
+<p>I wouldn’t advice making the whonix-qubes package a jack of all trades device, though. I.e. not be 1) ship Whonix specific configs and scripts for Qubes support + 2) depend on lots of custom package selections. (That doesn’t mean, I am opposed to it! Just saying.) It would be better to split the package into 1) and for dependencies (2)) another package. Perhaps package the mainline <a href="https://github.com/Whonix/anon-meta-packages">https://github.com/Whonix/anon-meta-packages</a> better so the whonix-qubes package has to do as little as possible.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-installation-triggers/771/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-installation-triggers/771/2</link>
+        <pubDate>Sun, 04 Jan 2015 14:26:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-771-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-installation-triggers/771.rss">Whonix Installation Triggers</source>
+      </item>
+      <item>
+        <title>Whonix Installation Triggers</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>I was wondering if you currently have any post installation triggers that you emit when Whonix has completed installing.</p>
+<p>I had a few issues installing the whonix-qubes package before installing Whonix gateway or workstation so I placed the installation afterwards which allows me to make sure certain services are enabled / disabled.</p>
+<p>I want to try to install it before Whonix again though to be able to remove custom code from the template into the whonix-qubes package that is needed just to be able to get Whonix to build thereby keeping anything Whonix related in this one package.  This will allow you to quickly see any work arounds I needed to use so we can implement those fixes in the mainline code itself and not needing to touch the Qubes templates.</p>
+<p>With so many packages that Whonix installs, I even wonder if there is one master package that will always be installed last to trigger the event when using the build system.</p>
+<p>Currently this is what has to be done after Whonix is installed.  If no trigger event exists for the specific package, I can just create a trigger based on some file that gets installed or modified (most likely candidate is to watch the /etc/init.d file)</p>
+<ol>
+<li>
+<p>I need to place this file.  Can it be placed before whonix begins installation?<br>
+mkdir -p /root/.whonix<br>
+touch /root/.whonix/first_run_initializer.done</p>
+</li>
+<li>
+<p>This needs to be appended.  I do not know what package it belongs to but can watch the file itself<br>
+echo ‘WHONIXCHECK_NO_EXIT_ON_UNSUPPORTED_VIRTUALIZER=“1”’ &gt;&gt; /etc/whonix.d/30_whonixcheck_default</p>
+</li>
+<li>
+<p>Need to make sure Tor is disabled.  I think you may already do this though</p>
+</li>
+<li>
+<p>Need to make sure sdwdate is disabled.  I get many weird errors pop up otherwise stating I can’t connect even though it just connected.  I think the errors are cached.  I re-enable both Tor and sdwdate just before whonix-setup.</p>
+</li>
+<li>
+<p>Need to disable spice-vdagent since it is not needed</p>
+</li>
+<li>
+<p>Need to disable swap-file-creator since it is not needed</p>
+</li>
+<li>
+<p>Need to disable whonix-initializer as its unwanted <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=5" title=":wink:" class="emoji" alt=":wink:"></p>
+</li>
+</ol>
+<p>So, most of the above I think I can just add watch triggers on the files themselves.</p>
+<p>Another idea I just had was to just build all the Whonix Debian packages but not install them with the Whonix builder.  Thats what Qubes does; first all modules are created in a development chroot environment.  Then, another chroot environment is created for the template itself without needing all the build tools installed.</p>
+<p>Instead I would just include every package required as a Depends or Recommend within the whonix-qubes package and when I install whonix-qubes, it will install all the Whonix packages from the repo created by the builder on the file system which then gives me more control over the process.  Would this work?  Or am I just better to stick with triggers?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-installation-triggers/771/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-installation-triggers/771/1</link>
+        <pubDate>Sat, 03 Jan 2015 21:27:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-771-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-installation-triggers/771.rss">Whonix Installation Triggers</source>
+      </item>
+  </channel>
+</rss>

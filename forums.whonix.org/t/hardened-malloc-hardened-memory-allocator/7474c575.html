@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>Hardened Malloc - Hardened Memory Allocator - Development - Whonix Forum</title>
+    <meta name="description" content="Security researcher, Daniel Micay has created hardened_malloc which is a hardened memory allocator that protects against heap corruption vulnerabilities. 
+It isn’t available in the Debian repos but is very easy to build &amp;hellip;">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="7474c575.html?page=6" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../c/news/21.html">NEWS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;Hardened Malloc - Hardened Memory Allocator&#39;" href="7474.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474?page=6" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474?page=6" />
+<meta property="og:title" content="Hardened Malloc - Hardened Memory Allocator" />
+<meta name="twitter:title" content="Hardened Malloc - Hardened Memory Allocator" />
+<meta property="og:description" content="Great!  Though, having bubblewrap as a dependency of usablity-misc package is bit non-idea. But in practice probably good enough since we’re probably going to install sandboxed-app-launcher by default which depends on bubblewrap anyhow." />
+<meta name="twitter:description" content="Great!  Though, having bubblewrap as a dependency of usablity-misc package is bit non-idea. But in practice probably good enough since we’re probably going to install sandboxed-app-launcher by default which depends on bubblewrap anyhow." />
+<meta name="twitter:label1" value="Reading time" />
+<meta name="twitter:data1" value="28 mins 🕑" />
+<meta name="twitter:label2" value="Likes" />
+<meta name="twitter:data2" value="218 ❤" />
+<meta property="article:published_time" content="2020-10-08T16:13:45+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+        <link rel="prev" href="7474af4d.html?page=5">
+        <link rel="next" href="7474235c.html?page=7">
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../index.html">
+          <img src="../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="7474.html">Hardened Malloc - Hardened Memory Allocator</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../c/development/8.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #25AAE2'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>Development</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-08T16:13:45Z' class='post-time'>
+                October 8, 2020,  4:13pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-08T16:13:45Z'>
+          <span itemprop='position'>#102</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Great!</p>
+<p>Though, having bubblewrap as a dependency of usablity-misc package is bit non-idea. But in practice probably good enough since we’re probably going to install sandboxed-app-launcher by default which depends on bubblewrap anyhow.</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+          <meta itemprop='keywords' content=''>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-08T16:18:40Z' class='post-time'>
+                October 8, 2020,  4:18pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-08T16:18:40Z'>
+          <span itemprop='position'>#103</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="madaidan" data-post="93" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p><a href="../../../external.html?link=https://github.com/vmonaco/kloak/pull/32">Fix AppArmor and seccomp</a></p>
+</blockquote>
+</aside>
+<p>Merged in Whonix/kloak.</p>
+<aside class="quote no-group quote-modified" data-username="madaidan" data-post="94" data-topic="7474" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<aside class="quote no-group" data-username="Patrick" data-post="91" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>The host hardened malloc was disabled. Only Whonix VM hardened malloc kicksecure enabled (+lkrg). It results in VirtualBox host software VM crash.</p>
+</blockquote>
+</aside>
+<p>I can’t seem to reproduce this. What exactly did you do to cause this? Please also post the contents of VBox.log.</p>
+</blockquote>
+</aside>
+<p>I cannot reproduce this anymore.</p>
+<aside class="quote no-group" data-username="madaidan" data-post="93" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Make sure to also create <code>/etc/sysctl.d/30_hardened-malloc-kicksecure.conf</code> with:</p>
+<pre><code class="lang-auto">vm.max_map_count=524240
+</code></pre>
+<p>as per <a href="../../../external.html?link=https://github.com/GrapheneOS/hardened_malloc#traditional-linux-based-operating-systems">https://github.com/GrapheneOS/hardened_malloc#traditional-linux-based-operating-systems</a></p>
+</blockquote>
+</aside>
+<p>I guess let’s ship that config file with hardened-malloc-kicksecure package?<br>
+Will read more about <code>vm.max_map_count</code> and then probably add. Perhaps that is related to the VirtualBox issue too.</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-08T17:44:31Z' class='post-time'>
+                October 8, 2020,  5:44pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-08T17:44:31Z'>
+          <span itemprop='position'>#104</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../external.html?link=https://github.com/Whonix/hardened_malloc/commit/cd9577830903ff89826cf30aca79010f0b2ec4bf" target="_blank">github.com/Whonix/hardened_malloc</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../external.html?link=https://github.com/Whonix/hardened_malloc/commit/cd9577830903ff89826cf30aca79010f0b2ec4bf" target="_blank">ship `/etc/sysctl.d/hardened_malloc.conf` with `vm.max_map_count = 524240`</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-08" data-time="17:39:17" data-timezone="UTC">05:39PM - 08 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 2 files with 8 additions and 0 deletions">
+        <a href="../../../external.html?link=https://github.com/Whonix/hardened_malloc/commit/cd9577830903ff89826cf30aca79010f0b2ec4bf" target="_blank">
+          <span class="added">+8</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">https://github.com/GrapheneOS/hardened_malloc#traditional-linux-based-operating-systems
+Thanks to @madaidan for the suggestion!
+https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/93</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-08T18:10:48Z' class='post-time'>
+                October 8, 2020,  6:10pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-08T18:10:48Z'>
+          <span itemprop='position'>#105</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p><code>man</code> issues actually make this look really ugly during upgrading.</p>
+<pre><code>Processing triggers for man-db (2.8.5-2) ...
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+/usr/bin/mandb: zcat: Bad system call (core dumped)
+</code></pre>
+<p>Perhaps we config-package-dev displace <code>man</code> and use the <code>hardened-malloc-disable</code> wrapper?</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-08T18:16:27Z' class='post-time'>
+                October 8, 2020,  6:16pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-08T18:16:27Z'>
+          <span itemprop='position'>#106</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Already using this:</p>
+<aside class="quote no-group quote-modified" data-username="Patrick" data-post="104" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><a href="../../../external.html?link=https://github.com/Whonix/hardened_malloc/commit/cd9577830903ff89826cf30aca79010f0b2ec4bf">ship <code>/etc/sysctl.d/hardened_malloc.conf</code> with <code>vm.max_map_count = 524240</code></a></p>
+</blockquote>
+</aside>
+<p>Two more issues…</p>
+<hr>
+<p>Shutdown of Non-Qubes-Whonix in VirtualBox without hardened-malloc-kicksecure was almost instant. Less than 5 seconds.</p>
+<p>It now takes 30 seconds longer. I found clue on this by <a href="../../../external.html?link=https://www.whonix.org/wiki/Troubleshooting#Enable_Persistent_Systemd_Journal_Log">Enabling Persistent Systemd Journal Log</a> and <a href="../../../external.html?link=https://www.whonix.org/wiki/Troubleshooting#Check_Systemd_Journal_Log_of_Previous_Boot">Checking Systemd Journal Log of Previous Boot</a>.</p>
+<p>The following command before (no hardened-malloc-kicksecure) were almost instant.</p>
+<pre><code>sudo systemctl stop swap-file-creator
+</code></pre>
+<p>(This happens during shutdown.)</p>
+<p>It odes this:</p>
+<pre><code>sudo bash -x /usr/share/swap-file-creator/stop
+</code></pre>
+<p>Further tracked down to the following command which is now very slow:</p>
+<pre><code>sudo cryptsetup --batch-mode luksClose swapfile
+</code></pre>
+<p>Any idea how to fix this?</p>
+<hr>
+<p>VirtualBox crash issue is back.</p>
+<p>And LKRG is unrelated. Happens with and without. Will keep looking into and come back with log later.</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-08T18:30:44Z' class='post-time'>
+                October 8, 2020,  6:30pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-08T18:30:44Z'>
+          <span itemprop='position'>#107</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Patrick" data-post="105" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Perhaps we config-package-dev displace <code>man</code> and use the <code>hardened-malloc-disable</code> wrapper?</p>
+</blockquote>
+</aside>
+<p>Sounds good for now.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="106" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Any idea how to fix this?</p>
+</blockquote>
+</aside>
+<p>You could try using <code>hardened-malloc-disable</code> for <code>cryptsetup</code>?</p>
+<p>I’m also looking into the Chromium issue now.</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-08T22:11:42Z' class='post-time'>
+                October 8, 2020, 10:11pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-08T22:11:42Z'>
+          <span itemprop='position'>#108</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>The Chromium issue appears to be a real bug in Debian’s old package. I’ve reported it here <a href="../../../external.html?link=https://bugs.debian.org/971876" rel="nofollow noopener">https://bugs.debian.org/971876</a></p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-09T13:29:32Z' class='post-time'>
+                October 9, 2020,  1:29pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-09T13:29:32Z'>
+          <span itemprop='position'>#109</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p><code>man</code> is functional when using <code>hardened-malloc-disable</code> but console output still showing errors.</p>
+<pre><code>hardened-malloc-disable man nano
+</code></pre>
+<blockquote>
+<p>ERROR: ld.so: object ‘/usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so’ from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.<br>
+ERROR: ld.so: object ‘/usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so’ from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.</p>
+</blockquote>
+<hr>
+<pre><code>hardened-malloc-disable chromium
+</code></pre>
+<p>Still not starting. Similar error message. hardened-malloc-disable seems to not fully disable hardened malloc?</p>
+<aside class="quote no-group" data-username="madaidan" data-post="108" data-topic="7474" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>The Chromium issue appears to be a real bug in Debian’s old package. I’ve reported it here <a href="../../../external.html?link=https://bugs.debian.org/971876">https://bugs.debian.org/971876</a></p>
+</blockquote>
+</aside>
+<p>I.e. newer versions of Chromium are functional? Then perhaps upstream Chromium already fixed it either knowingly or unknowingly (by refactoring / rewrite of the related code)?</p>
+<hr>
+<pre><code>sudo mandb -cq
+</code></pre>
+<p>(This is what happens during apt install / upgrade / dpkg mandb trigger.</p>
+<blockquote>
+<p>mandb: zcat: Bad system call (core dumped)<br>
+tons of repetitions</p>
+</blockquote>
+<p>Maybe it would be fixed by the <code>man</code> wrapper. Perhaps both, <code>man</code> and <code>mandb</code> need to be wrapped with <code>hardened-malloc-disable</code>.</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-09T14:24:32Z' class='post-time'>
+                October 9, 2020,  2:24pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-09T14:24:32Z'>
+          <span itemprop='position'>#110</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Patrick" data-post="109" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><code>man</code> is functional when using <code>hardened-malloc-disable</code> but console output still showing errors.</p>
+</blockquote>
+</aside>
+<p>We could add <code>2&gt;/dev/null</code> but that would hide other, valid errors.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="109" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Still not starting. Similar error message. hardened-malloc-disable seems to not fully disable hardened malloc?</p>
+</blockquote>
+</aside>
+<p>It’s not to do with hardened_malloc. It’s to do with the sandbox.</p>
+<aside class="quote no-group" data-username="madaidan" data-post="93" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Make sure to enable unprivileged user namespaces or disable the browser sandbox though as bubblewrap sets <code>no_new_privs</code> which disables the setuid sandbox.</p>
+</blockquote>
+</aside>
+<p>You need to enable unprivileged user namespaces or run Chromium without a sandbox (the <code>--no-sandbox</code> flag) as bubblewrap disables the setuid sandbox.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="109" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>I.e. newer versions of Chromium are functional? Then perhaps upstream Chromium already fixed it either knowingly or unknowingly (by refactoring / rewrite of the related code)?</p>
+</blockquote>
+</aside>
+<p>Yes, most likely. We could try Debian backports.</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-09T14:41:02Z' class='post-time'>
+                October 9, 2020,  2:41pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-09T14:41:02Z'>
+          <span itemprop='position'>#111</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="madaidan" data-post="110" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>We could add <code>2&gt;/dev/null</code> but that would hide other, valid errors.</p>
+</blockquote>
+</aside>
+<p>Yes. Much too intrusive.</p>
+<aside class="quote no-group" data-username="madaidan" data-post="107" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>You could try using <code>hardened-malloc-disable</code> for <code>cryptsetup</code> ?</p>
+</blockquote>
+</aside>
+<p>Still not solution for swap-file-creator on the horizon.</p>
+<p>That fixes it but would add the <code>ERROR: ld.so: object '/usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.</code> message to the boot process. Well, we could hide that, but then legitimate error which might happen in future (for some users) would be hidden from our view and fixing too.</p>
+<p>Also cryptsetup luksFormat got slower by approximately factor 7.<br>
+(5 seconds without; 35 seconds with.)<br>
+Though, no errors reported with, except the performance regression.<br>
+Worth reporting upstream or to be expected?</p>
+<p>Wondering about other solutions…</p>
+<p>To enable hardened malloc globally is there any other option than editing <code>/etc/ld.so.preload</code>?</p>
+<p>Can systemd somehow ignore contents of <code>/etc/ld.so.preload</code>? Then that could fix swap-file-creator.</p>
+<p>The man / mandb issue is currently breaking the package build. It somehow messes the man pages up a bit. Lintian will complain.</p>
+<blockquote>
+<p>genmkfile: manpage-has-bad-whatis-entry usr/share/man/man8/genmkfile.8.gz</p>
+</blockquote>
+<p>Didn’t try wrapping man / mandb with <code>hardened-malloc-disable</code> yet.</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-09T14:52:30Z' class='post-time'>
+                October 9, 2020,  2:52pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-09T14:52:30Z'>
+          <span itemprop='position'>#112</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Patrick" data-post="111" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Worth reporting upstream or to be expected?</p>
+</blockquote>
+</aside>
+<p>Not sure. We’ll need to investigate what exactly in <code>cryptsetup</code> is causing this. For now, can you try rebuilding hardened_malloc but with a few more expensive security features disabled? <a href="../../../external.html?link=https://github.com/GrapheneOS/hardened_malloc#configuration" rel="nofollow noopener">https://github.com/GrapheneOS/hardened_malloc#configuration</a></p>
+<p>Try disabling <code>CONFIG_WRITE_AFTER_FREE_CHECK</code>, <code>CONFIG_SLOT_RANDOMIZE</code>, etc. and check if performance changes at all. See if you can narrow it down a bit.</p>
+<p>Keep our custom config options though. Just append these ones to it.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="111" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>To enable hardened malloc globally is there any other option than editing <code>/etc/ld.so.preload</code> ?</p>
+</blockquote>
+</aside>
+<p>We could build it into glibc but that would require maintaining a Whonix fork.</p>
+<p>Side note: musl is developing another hardened malloc implementation inspired by hardened_malloc that will be built into it by default (although it’s not as hardened as hardened_malloc).</p>
+<p><a href="../../../external.html?link=https://www.openwall.com/lists/musl/2020/05/13/1" class="onebox" target="_blank" rel="nofollow noopener">https://www.openwall.com/lists/musl/2020/05/13/1</a></p>
+<aside class="quote no-group" data-username="Patrick" data-post="111" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Can systemd somehow ignore contents of <code>/etc/ld.so.preload</code> ?</p>
+</blockquote>
+</aside>
+<p>I don’t think so.</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-09T15:08:49Z' class='post-time'>
+                October 9, 2020,  3:08pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-09T15:08:49Z'>
+          <span itemprop='position'>#113</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>glibc feature request: <a href="../../../external.html?link=https://sourceware.org/bugzilla/show_bug.cgi?id=26723">LD_ETC_IGNORE - environment variable to ignore /etc/ld.so.preload configuration file on a per-application basis</a></p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+            <div class='crawler-linkback-list' itemscope itemtype='../../../external.html?link=http://schema.org/ItemList'>
+                  <div itemprop='itemListElement' itemscope itemtype='../../../external.html?link=http://schema.org/ListItem'>
+                    <a href="../eliminate-ld-preload-and-other-dangerous-environment-variables/10594/2.html" itemscope itemtype='http://schema.org/DiscussionForumPosting' itemprop='item'>
+                      <meta itemprop='url' content='../eliminate-ld-preload-and-other-dangerous-environment-variables/10594/2.html'>
+                      <span itemprop='name'>Eliminate LD_PRELOAD and other Dangerous Environment Variables</span>
+                    </a>
+                    <meta itemprop='position' content='2'>
+                  </div>
+            </div>
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-10T12:33:44Z' class='post-time'>
+                October 10, 2020, 12:33pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-10T12:33:44Z'>
+          <span itemprop='position'>#114</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I’ve made a summary of all open issues:<br>
+<a href="../../../external.html?link=https://www.whonix.org/wiki/Hardened_Malloc#Issues">https://www.whonix.org/wiki/Hardened_Malloc#Issues</a></p>
+<aside class="quote no-group" data-username="Patrick" data-post="113" data-topic="7474" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>glibc feature request: <a href="../../../external.html?link=https://sourceware.org/bugzilla/show_bug.cgi?id=26723">LD_ETC_IGNORE - environment variable to ignore /etc/ld.so.preload configuration file on a per-application basis</a></p>
+</blockquote>
+</aside>
+<p>That did not go too well yet.</p>
+<aside class="quote no-group" data-username="madaidan" data-post="112" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>We could build it into glibc but that would require maintaining a Whonix fork.</p>
+</blockquote>
+</aside>
+<p>That still wouldn’t give us a way to disable hardened malloc on a per application basis without extraneous stderr error message?</p>
+<p>( <code>ERROR: ld.so: object  ‘/usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so’ from  /etc/ld.so.preload cannot be preloaded (cannot open shared object file):  ignored.</code>)</p>
+<aside class="quote no-group" data-username="madaidan" data-post="107" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>You could try using <code>hardened-malloc-disable</code> for <code>cryptsetup</code> ?</p>
+</blockquote>
+</aside>
+<p>adding <code>hardened-malloc-disable</code> not appropriate as this would inject stderr output <code>ERROR:  ld.so: object  ‘/usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so’ from  /etc/ld.so.preload cannot be preloaded (cannot open shared object file):  ignored.</code> during early boot process (swap-file-creator) and not appropriate to silence stderr either as this would hide legitimate error messages too.</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-10T13:06:02Z' class='post-time'>
+                October 10, 2020,  1:06pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-10T13:06:02Z'>
+          <span itemprop='position'>#115</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Here is a new approach for disabling hardened malloc on a per-application basis without extraneous console stderr output.</p>
+<p>Why hide folder <code>/usr/lib/libhardened_malloc.so</code> from application if we can hide <code>/etc/ld.so.preload</code> configuration file?</p>
+<pre><code>sudo touch /etc/empty
+bwrap --dev-bind / / --ro-bind /etc/empty /etc/ld.so.preload man nano
+</code></pre>
+<p>That would be an <code>ld-system-preload-disable</code> tool.<br>
+(But not a global <code>ld-disable-tool</code> because it would not modify <code>LD_PRELOAD</code> environment variable. We could invent such a tool easily too if needed.)</p>
+<p>That would be good enough?</p>
+<p>It would not be an <code>hardened-malloc-disable</code> tool because other entries (unrelated user specific preloads) in <code>/etc/ld.so.preload</code> configuration file would be excluded too. A  <code>hardened-malloc-disable</code> could copy <code>/etc/ld.so.preload</code> to a (temporary?) file, use</p>
+<pre><code>str_replace /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so "" /path/to/other-ld.so.preload-file
+</code></pre>
+<p>and then use brwap to point the application to that file instead.</p>
+<p>Should could added to <code>helper-scripts</code> package. (Previously my mistake directing <code>hardened-malloc-disable</code> at <code>usablity-misc</code> package.) Is an <code>hardened-malloc-disable</code> tool worth the effort or is <code>ld-system-preload-disable</code> tool sufficient?</p>
+<p>Is it a security issue that users (non-root) can disable <code>/etc/ld.so.preload</code>? Is that something only root should be able to configure?</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="3" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-11T15:24:11Z' class='post-time'>
+                October 11, 2020,  3:24pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-11T15:24:11Z'>
+          <span itemprop='position'>#116</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Patrick" data-post="115" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>That would be good enough?</p>
+</blockquote>
+</aside>
+<p>Yes, that would be great. Verified with <code>/proc/self/maps</code> that hardened_malloc is not loaded.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="115" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Is an <code>hardened-malloc-disable</code> tool worth the effort or is <code>ld-system-preload-disable</code> tool sufficient?</p>
+</blockquote>
+</aside>
+<p><code>ld-system-preload-disable</code> should be sufficient for now.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="115" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Is it a security issue that users (non-root) can disable <code>/etc/ld.so.preload</code> ?</p>
+</blockquote>
+</aside>
+<p>No. An attacker can only disable it for new processes that they create which there isn’t any point in. They can’t disable it for already existing processes. E.g. a malicious site can’t just disable hardened_malloc for Firefox and exploit it.</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-11T15:27:20Z' class='post-time'>
+                October 11, 2020,  3:27pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-11T15:27:20Z'>
+          <span itemprop='position'>#117</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Patrick" data-post="115" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">sudo touch /etc/empty
+bwrap --dev-bind / / --ro-bind /etc/empty /etc/ld.so.preload man nano
+</code></pre>
+</blockquote>
+</aside>
+<p>Is there any reason to create a new file instead of:</p>
+<pre><code class="lang-auto">bwrap --dev-bind / / --ro-bind /dev/null /etc/ld.so.preload man nano
+</code></pre>
+<p>?</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-11T16:05:40Z' class='post-time'>
+                October 11, 2020,  4:05pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-11T16:05:40Z'>
+          <span itemprop='position'>#118</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="madaidan" data-post="110" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>We could try Debian backports.</p>
+</blockquote>
+</aside>
+<p>I tried Chromium from Debian backports and still got the same error so the error could be from Debian’s patches or the backport isn’t a recent enough version.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="../../../external.html?link=https://salsa.debian.org/uploads/-/system/appearance/favicon/1/gitlabian_32.png" class="site-icon" width="16" height="16">
+      <a href="../../../external.html?link=https://salsa.debian.org/chromium-team/chromium/-/tree/master/debian/patches" target="_blank" rel="nofollow noopener">GitLab</a>
+  </header>
+  <article class="onebox-body">
+    <img src="../../../external.html?link=https://salsa.debian.org/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png" class="thumbnail onebox-avatar" width="128" height="128">
+
+<h3><a href="../../../external.html?link=https://salsa.debian.org/chromium-team/chromium/-/tree/master/debian/patches" target="_blank" rel="nofollow noopener">debian/patches · master · chromium / chromium</a></h3>
+
+<p>Chromium packaging</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>I’ll look over the patches and see if I can find anything. Looking at these has also made me realize just how terrible the Debian Chromium package is (they disable important mitigations like CFI, automatic variable initialization, etc.)</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-11T16:10:29Z' class='post-time'>
+                October 11, 2020,  4:10pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-11T16:10:29Z'>
+          <span itemprop='position'>#119</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I just tried the same version of Chromium as in the Debian repos but on a different distro (Arch) and the error wasn’t there. It’s most likely Debian’s patches.</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-11T16:20:26Z' class='post-time'>
+                October 11, 2020,  4:20pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-11T16:20:26Z'>
+          <span itemprop='position'>#120</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>madaidan via Whonix Forum:</p>
+<blockquote>
+<aside class="quote no-group" data-username="Patrick" data-post="115" data-topic="7474">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">sudo touch /etc/empty
+bwrap --dev-bind / / --ro-bind /etc/empty /etc/ld.so.preload man nano
+</code></pre>
+</blockquote>
+</aside>
+<p>Is there any reason to create a new file instead of:</p>
+<pre><code class="lang-auto">bwrap --dev-bind / / --ro-bind /dev/null /etc/ld.so.preload man nano
+</code></pre>
+<p>?</p>
+</blockquote>
+<p>While not tested by me yet, using /dev/null seems much better.</p>
+<p>Will add the new wrapper soon and remove the old one (wrong package, my<br>
+mistake, and probably no need to reintroduce).</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="7474.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2020-10-11T16:38:10Z' class='post-time'>
+                October 11, 2020,  4:38pm
+              </time>
+              <meta itemprop='dateModified' content='2020-10-11T16:38:10Z'>
+          <span itemprop='position'>#121</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Implemented that.</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../external.html?link=https://github.com/Whonix/helper-scripts/commit/d13cd5aeedfc09f5a811b05c95ef059065091380" target="_blank">github.com/Whonix/helper-scripts</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../external.html?link=https://github.com/Whonix/helper-scripts/commit/d13cd5aeedfc09f5a811b05c95ef059065091380" target="_blank">add ld-system-preload-disable</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2020-10-11" data-time="16:31:04" data-timezone="UTC">04:31PM - 11 Oct 20 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../external.html?link=https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 3 files with 41 additions and 1 deletions">
+        <a href="../../../external.html?link=https://github.com/Whonix/helper-scripts/commit/d13cd5aeedfc09f5a811b05c95ef059065091380" target="_blank">
+          <span class="added">+41</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/116
+Thanks to @madaidan for the suggestion!</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>There is one issue.</p>
+<p>This fails if file /etc/ld.so.preload does not exists.</p>
+<blockquote>
+<p>bwrap: Can’t create file at /etc/ld.so.preload: Permission denied</p>
+</blockquote>
+<p>Can this be fixed at <code>bwrap</code> level? Or must I make sure at packaging level that file <code>/etc/ld.so.preload</code> always exists?<br>
+(That is for systems with hardened-malloc-kicksecure-enable not installed.)</p>
+<hr>
+<p>Could you please report your chromium related findings to Debian? I guess replying again to<br>
+<a href="../../../external.html?link=https://bugs.debian.org/971876">https://bugs.debian.org/971876</a> for the hardened malloc issue? (i.e. Debian patches are probably responsible for introducing the issue.)</p>
+<p>And a separate ticket about CFI etc.?</p>
+        </div>
+
+        <meta itemprop='headline' content='Hardened Malloc - Hardened Memory Allocator'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+
+    <div role='navigation' itemscope itemtype='http://schema.org/SiteNavigationElement' class="topic-body crawler-post">
+        <span itemprop='name'><a rel="prev" itemprop="url" href="7474af4d.html?page=5">← previous page</a></span>
+        <span itemprop='name'><b><a rel="next" itemprop="url" href="7474235c.html?page=7">next page →</a></b></span>
+    </div>
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

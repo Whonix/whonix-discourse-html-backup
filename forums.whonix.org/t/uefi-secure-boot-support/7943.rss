@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>UEFI Secure Boot support</title>
+    <link>http://forums.whonix.org/t/uefi-secure-boot-support/7943</link>
+    <description>
+
+The necessary features to make this simple were done after the Buster Freeze by some months. 
+
+This article has the best info on enabling it in Libvirt:
+
+https://specs.openstack.org/openstack/nova-specs/specs/train/approved/allow-secure-boot-for-qemu-kvm-guests.html
+
+Until then I&#39;ll take a crack at it and see how ready support is now.
+
+Here is also Tails&#39; research on the topic:
+
+https://tails.boum.org/blueprint/UEFI_Secure_boot/
+
+
+***
+
+
+Preliminary build support for KVM in debootstrap can be bolted on until it is developed upstream.</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 13 Sep 2019 14:59:05 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/uefi-secure-boot-support/7943.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>UEFI Secure Boot support</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Nice but looks like it supports Fedora paths of ovmf binaries also if we were to do this no snapshots are possible so lets stick to the iso verified grub boot.</p>
+          <p><a href="http://forums.whonix.org/t/uefi-secure-boot-support/7943/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uefi-secure-boot-support/7943/4</link>
+        <pubDate>Fri, 13 Sep 2019 14:59:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7943-4</guid>
+        <source url="http://forums.whonix.org/t/uefi-secure-boot-support/7943.rss">UEFI Secure Boot support</source>
+      </item>
+      <item>
+        <title>UEFI Secure Boot support</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>Under QEMU with OVMF Secure Boot</p>
+</blockquote>
+<p><a href="https://docs.clip-os.org/clipos/boot_integrity.html#under-qemu-with-ovmf" class="onebox" target="_blank" rel="nofollow noopener">https://docs.clip-os.org/clipos/boot_integrity.html#under-qemu-with-ovmf</a></p>
+<hr>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://github.com/puiterwijk/qemu-ovmf-secureboot" target="_blank" rel="nofollow noopener">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars3.githubusercontent.com/u/967561?s=400&amp;amp;v=4" class="thumbnail" width="" height="">
+
+<h3><a href="https://github.com/puiterwijk/qemu-ovmf-secureboot" target="_blank" rel="nofollow noopener">puiterwijk/qemu-ovmf-secureboot</a></h3>
+
+<p>Script to generate an OVMF vars file with default secure boot key enrolled. - puiterwijk/qemu-ovmf-secureboot</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/uefi-secure-boot-support/7943/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uefi-secure-boot-support/7943/3</link>
+        <pubDate>Fri, 13 Sep 2019 06:03:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7943-3</guid>
+        <source url="http://forums.whonix.org/t/uefi-secure-boot-support/7943.rss">UEFI Secure Boot support</source>
+      </item>
+      <item>
+        <title>UEFI Secure Boot support</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Status update:</p>
+<ul>
+<li>
+<p>Manually figured out the path to ovmf firmware and pointed libvirt to it and modified other settings to allow EFI boot.</p>
+<pre><code>   &lt;os&gt;   
+   &lt;type arch='x86_64' machine='pc-q35-3.0'&gt;hvm&lt;/type&gt;
+   &lt;loader readonly='yes' secure='yes' type='pflash'&gt;/usr/share/OVMF/OVMF_CODE.fd&lt;/loader&gt;
+   &lt;nvram template='/usr/share/qemu/OVMF.fd'&gt;/var/lib/libvirt/qemu/nvram/guest_VARS.fd&lt;/nvram&gt;
+   &lt;boot dev='hd'/&gt;
+   &lt;/os&gt;  
+   &lt;features&gt;
+   &lt;smm state='on'/&gt;
+
+   &lt;controller type='pci' index='0' model='pcie-root'/&gt;
+</code></pre>
+<p>change piix3 bus to 0x02</p>
+</li>
+<li>
+<p>Installed the latest packages required on Buster:</p>
+<p><a href="https://wiki.debian.org/SecureBoot/Testing" rel="nofollow noopener">https://wiki.debian.org/SecureBoot/Testing</a></p>
+<p>apt install shim-signed grub-efi-amd64-signed linux-image-4.19.0-4-amd64</p>
+</li>
+</ul>
+<p>Result:</p>
+<p>I can now boot into the EFI menu however the secure boot option is grayed out. Turns out there is a key enrollment step which is very difficult to do and most instructions out there are either outdated or irrelevant for Debian. Even harder is the question of how to accomplish this in an automated way because Whonix usability will go to shit if this is the amount of effort needed to boot the system.</p>
+<p>Also turns out that enabling secure boot prevents VMs from supporting snapshots which makes it very impractical for everyday use.</p>
+<blockquote>
+<p>Error creating snapshot: Operation not supported: internal snapshots of a VM with pflash based firmware are not supported</p>
+</blockquote>
+<hr>
+<p>Other notes:</p>
+<p>What is the security value of this feature if it relies on a shim signed with a key from MS that has been previously leaked?</p>
+<p>While secure boot will prevent  an attacker from loading their own modules, Sophisticated attackers are usually going to exploit holes in the signed code or arrange current running code in memory to execute their instructions. The only work on this is being researched by grsec under their KERNSEAL stuff which isn;t even available as of yet.</p>
+<blockquote>
+<p>DATA ONLY ATTACKS<br>
+A rootkit attack that modifies kernel data structures without<br>
+injecting new code is called a “data-only rootkit attack.” Under<br>
+a data-only attack the attacker has full access to read and write<br>
+all  kernel  memory,  but  is  unable  to  add  new  code  or  modify<br>
+existing code that will be executed with the kernel’s privilege<br>
+level.</p>
+</blockquote>
+<aside class="onebox pdf">
+  <header class="source">
+      <a href="https://www.cs.cmu.edu/~rdriley/research/pubs/dorf.pdf" target="_blank" rel="nofollow noopener">cs.cmu.edu</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://www.cs.cmu.edu/~rdriley/research/pubs/dorf.pdf" target="_blank" rel="nofollow noopener"><span class="pdf-onebox-logo"></span></a>
+<h3><a href="https://www.cs.cmu.edu/~rdriley/research/pubs/dorf.pdf" target="_blank" rel="nofollow noopener">dorf.pdf</a></h3>
+
+<p class="filesize">169.20 KB</p>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/uefi-secure-boot-support/7943/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uefi-secure-boot-support/7943/2</link>
+        <pubDate>Mon, 26 Aug 2019 17:47:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7943-2</guid>
+        <source url="http://forums.whonix.org/t/uefi-secure-boot-support/7943.rss">UEFI Secure Boot support</source>
+      </item>
+      <item>
+        <title>UEFI Secure Boot support</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>The necessary features to make this simple were done after the Buster Freeze by some months.</p>
+<p>This article has the best info on enabling it in Libvirt:</p>
+<p><a href="https://specs.openstack.org/openstack/nova-specs/specs/train/approved/allow-secure-boot-for-qemu-kvm-guests.html" class="onebox" target="_blank" rel="nofollow noopener">https://specs.openstack.org/openstack/nova-specs/specs/train/approved/allow-secure-boot-for-qemu-kvm-guests.html</a></p>
+<p>Until then I’ll take a crack at it and see how ready support is now.</p>
+<p>Here is also Tails’ research on the topic:</p>
+<p><a href="https://tails.boum.org/blueprint/UEFI_Secure_boot/" class="onebox" target="_blank" rel="nofollow noopener">https://tails.boum.org/blueprint/UEFI_Secure_boot/</a></p>
+<hr>
+<p>Preliminary build support for KVM in debootstrap can be bolted on until it is developed upstream.</p>
+          <p><a href="http://forums.whonix.org/t/uefi-secure-boot-support/7943/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/uefi-secure-boot-support/7943/1</link>
+        <pubDate>Sat, 24 Aug 2019 20:02:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7943-1</guid>
+        <source url="http://forums.whonix.org/t/uefi-secure-boot-support/7943.rss">UEFI Secure Boot support</source>
+      </item>
+  </channel>
+</rss>

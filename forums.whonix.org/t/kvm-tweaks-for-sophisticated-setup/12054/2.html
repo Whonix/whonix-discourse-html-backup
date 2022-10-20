@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>KVM tweaks for sophisticated setup - #2 by Patrick - KVM - Whonix Forum</title>
+    <meta name="description" content="KVM tweaks for sophisticated setup
+I want to deploy a minimal Whonix instance in the cloud. 
+I use a server with multiple cores. How can I optimize the KVM config files? 
+What should be changed? 
+What I want to change: 
+&amp;hellip;">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="../12054.html" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../../c/news/21.html">NEWS</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;KVM tweaks for sophisticated setup&#39;" href="../12054.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/kvm-tweaks-for-sophisticated-setup/12054/2" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/kvm-tweaks-for-sophisticated-setup/12054/2" />
+<meta property="og:title" content="KVM tweaks for sophisticated setup" />
+<meta name="twitter:title" content="KVM tweaks for sophisticated setup" />
+<meta property="og:description" content="Note: I don’t maintain Whonix KVM but I can answer a few build script specific questions.   The usual build documentation:     --flavor whonix-gateway-cli --flavor whonix-workstation-cli   Might be Undocumented, Untested or Unsupported Features?   --vmsize 200G  as per:      Seems undocumented. This page is at time of writing for VirtualBox only.    Mostly unspecific to Whonix. Hence:     Never tried. Never heard. I suggest to make this a question unspecific to Whonix or just try.   You could co..." />
+<meta name="twitter:description" content="Note: I don’t maintain Whonix KVM but I can answer a few build script specific questions.   The usual build documentation:     --flavor whonix-gateway-cli --flavor whonix-workstation-cli   Might be Undocumented, Untested or Unsupported Features?   --vmsize 200G  as per:      Seems undocumented. This page is at time of writing for VirtualBox only.    Mostly unspecific to Whonix. Hence:     Never tried. Never heard. I suggest to make this a question unspecific to Whonix or just try.   You could co..." />
+<meta property="article:published_time" content="2021-08-03T14:55:04+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../../index.html">
+          <img src="../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="../12054.html">KVM tweaks for sophisticated setup</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../../c/kvm/11.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #9EB83B'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>KVM</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/jeffxxxxxxxx'><span itemprop='name'>jeffxxxxxxxx</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../12054.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-08-02T00:25:13Z' class='post-time'>
+                August 2, 2021, 12:25am
+              </time>
+              <meta itemprop='dateModified' content='2021-08-02T00:25:13Z'>
+          <span itemprop='position'>#1</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <h1>
+<a name="kvm-tweaks-for-sophisticated-setup-1" class="anchor" href="#kvm-tweaks-for-sophisticated-setup-1"></a>KVM tweaks for sophisticated setup</h1>
+<p>I want to deploy a minimal Whonix instance in the cloud.<br>
+I use a server with multiple cores. How can I optimize the KVM config files?<br>
+What should be changed?</p>
+<p>What I want to change:</p>
+<ol>
+<li>No running GUI programs. I can this achieve by compiling Whonix KVM CLI, right?</li>
+<li>Increased disk space for my database (WS)</li>
+<li>Increased mount of cores (WS + GW). Does an increased amount of cores on the GW help with performance/stability? I know Tor is mostly single threaded.</li>
+<li>Increased amount of RAM (WS +GW).  Does an increased amount of RAM on the GW help with performance/stability?</li>
+</ol>
+<p>What can I do additionally for an sophisticated KVM setup?</p>
+<p>Is it possible to use the folder host shared folder technique to store the database folder outside of Whonix? Would this be a performance problem?</p>
+        </div>
+
+        <meta itemprop='headline' content='KVM tweaks for sophisticated setup'>
+          <meta itemprop='keywords' content=''>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../12054.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-08-03T14:55:04Z' class='post-time'>
+                August 3, 2021,  2:55pm
+              </time>
+              <meta itemprop='dateModified' content='2021-08-03T14:55:04Z'>
+          <span itemprop='position'>#2</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Note: I don’t maintain Whonix KVM but I can answer a few build script specific questions.</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="1" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<ul>
+<li>No running GUI programs. I can this achieve by compiling Whonix KVM CLI, right?</li>
+</ul>
+</blockquote>
+</aside>
+<p>The usual build documentation:</p><aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="../../../../external.html?link=https://www.whonix.org/wiki/Dev/Build_Documentation" target="_blank" rel="noopener" title="10:01AM - 26 December 2020">Whonix – 26 Dec 20</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:110/79;"><img src="../../../../external.html?link=https://www.whonix.org/w/images/c/c6/Blue-143734640.jpg" class="thumbnail" width="110" height="79"></div>
+
+<h3><a href="../../../../external.html?link=https://www.whonix.org/wiki/Dev/Build_Documentation" target="_blank" rel="noopener">Build and Update Whonix ™ from Source Code</a></h3>
+
+  <p>Instructions on How to Build Whonix ™ Virtual Machine Images or Whonix ™ Packages from Source Code.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>
+<ul>
+<li><code>--flavor whonix-gateway-cli</code></li>
+<li><code>--flavor whonix-workstation-cli</code></li>
+</ul>
+</blockquote>
+<p>Might be <a href="../../../../external.html?link=https://www.whonix.org/wiki/Untested" class="inline-onebox">Undocumented, Untested or Unsupported Features</a>?</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="1" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<ul>
+<li>Increased disk space for my database (WS)</li>
+</ul>
+</blockquote>
+</aside>
+<p><code>--vmsize 200G</code></p>
+<p>as per:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="../../../../external.html?link=https://www.whonix.org/wiki/Build_Configuration" target="_blank" rel="noopener" title="01:09PM - 02 May 2021">Whonix – 2 May 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:110/58;"><img src="../../../../external.html?link=https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png" class="thumbnail" width="110" height="58"></div>
+
+<h3><a href="../../../../external.html?link=https://www.whonix.org/wiki/Build_Configuration" target="_blank" rel="noopener">Build Configuration</a></h3>
+
+  <p>Non-Qubes-Whonix ™ Build Configuration. APT Repository, Onion Sources, APT Cache, VM Settings, Skip Steps, Source Code Changes</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="1" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<ul>
+<li>Increased mount of cores (WS + GW). Does an increased amount of cores on the GW help with performance/stability? I know Tor is mostly single threaded.</li>
+</ul>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="1" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<ol>
+<li>Increased amount of RAM (WS +GW). Does an increased amount of RAM on the GW help with performance/stability?</li>
+</ol>
+</blockquote>
+</aside>
+<p>Seems undocumented. This page is at time of writing for VirtualBox only.</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="../../../../external.html?link=https://www.whonix.org/wiki/Tuning" target="_blank" rel="noopener" title="06:32AM - 31 July 2021">Whonix – 31 Jul 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:110/62;"><img src="../../../../external.html?link=https://www.whonix.org/w/images/4/47/Gear-192875640.jpg" class="thumbnail" width="110" height="62"></div>
+
+<h3><a href="../../../../external.html?link=https://www.whonix.org/wiki/Tuning" target="_blank" rel="noopener">VirtualBox Tuning</a></h3>
+
+  <p>Making Whonix ™ Faster. Tuning Whonix ™.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Mostly unspecific to Whonix. Hence:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="../../../../external.html?link=https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="../../../../external.html?link=https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener" title="01:00PM - 19 July 2021">Whonix – 19 Jul 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:110/58;"><img src="../../../../external.html?link=https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png" class="thumbnail" width="110" height="58"></div>
+
+<h3><a href="../../../../external.html?link=https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener">Information Booster might be Available!</a></h3>
+
+  <p>Learn how other resources might be helpful since this is mostly unspecific to Whonix ™.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="1" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>Is it possible to use the folder host shared folder technique to store the database folder outside of Whonix? Would this be a performance problem?</p>
+</blockquote>
+</aside>
+<p>Never tried. Never heard. I suggest to make this a question unspecific to Whonix or just try.</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="1" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>What can I do additionally for an sophisticated KVM setup?</p>
+</blockquote>
+</aside>
+<p>You could contribute to this one:</p>
+<aside class="quote quote-modified" data-post="1" data-topic="12067">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="../../hosting-a-tor-relay-and-or-bridge-for-better-anonymity/12067.html">hosting a Tor relay and/or bridge for better anonymity</a> <a class="badge-wrapper  bullet" href="../../../c/development/8.html"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    Added here recently: 
+
+
+
+Hosting a Tor relay and/or bridge and using it to mix one’s own traffic might be beneficial for anonymity. Advanced users only! Please refer to the write-ups by The Tor Project, the developers of the Tor software. 
+Quote The Tor Project <a href="../../../../external.html?link=https://blog.torproject.org/new-low-cost-traffic-analysis-attacks-mitigations">New low cost traffic analysis attacks and mitigations</a> <a href="../../../../external.html?link=https://web.archive.org/web/https://blog.torproject.org/new-low-cost-traffic-analysis-attacks-mitigations">[archive]</a>: 
+
+In terms of mitigating the use of these vectors in attacks against Tor, here’s our recommendations for various groups in our community: 
+Users: Do multiple things at once …
+  </blockquote>
+</aside>
+
+<p><a href="../../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Generic_Bug_Reproduction">Generic Bug Reproduction</a> / research / contact upstream / enhance documentation.</p>
+        </div>
+
+        <meta itemprop='headline' content='KVM tweaks for sophisticated setup'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/jeffxxxxxxxx'><span itemprop='name'>jeffxxxxxxxx</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../12054.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-08-03T21:08:28Z' class='post-time'>
+                August 3, 2021,  9:08pm
+              </time>
+              <meta itemprop='dateModified' content='2021-08-03T21:08:28Z'>
+          <span itemprop='position'>#3</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Thanks!<br>
+I hope HolaHoop will answer my other questions too.</p>
+        </div>
+
+        <meta itemprop='headline' content='KVM tweaks for sophisticated setup'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/HulaHoop'><span itemprop='name'>HulaHoop</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../12054.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-08-04T03:06:13Z' class='post-time'>
+                August 4, 2021,  3:06am
+              </time>
+              <meta itemprop='dateModified' content='2021-08-04T03:09:56Z'>
+          <span itemprop='position'>#4</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="1" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>No running GUI programs. I can this achieve by compiling Whonix KVM CLI, right?</p>
+</blockquote>
+</aside>
+<p>Sure a custom KVM cli build is feasible though I don;t provide one currently because of low demand.</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="1" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>Increased disk space for my database (WS)</p>
+</blockquote>
+</aside>
+<p>You have up to 100GB though you can feel free to expand this using the QEMU disk utilities or you can add a second larger virtual disk and mount that inside the guest and place your db file there.</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="1" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>Increased mount of cores (WS + GW). Does an increased amount of cores on the GW help with performance/stability? I know Tor is mostly single threaded.</p>
+</blockquote>
+</aside>
+<p>You need to remove CPU pinning if you want to see the effect of core increases. Tor’s performance has some design limitations, particularly when it comes to DoS resistance. As for hosting onions you need to take a look at onion balance for high perf deployments.</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="1" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>Increased amount of RAM (WS +GW). Does an increased amount of RAM on the GW help with performance/stability?</p>
+</blockquote>
+</aside>
+<p>For normal desktop uses the current defaults cut it and going any further will just be a waste of resources. The current allocations should be reasonable on most user’s hardware. If you have more resources, you can always run multiple GW-WS pairs concurrently for multitasking.</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="1" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>Is it possible to use the folder host shared folder technique to store the database folder outside of Whonix? Would this be a performance problem?</p>
+</blockquote>
+</aside>
+<p>Yes it should be possible and is recommended for backup purposes. It shouldn’t impact performance unless you have a very high rate of db queries. The throughput of file transfers is OK in my experience. report back if it isn’t.</p>
+        </div>
+
+        <meta itemprop='headline' content='KVM tweaks for sophisticated setup'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/jeffxxxxxxxx'><span itemprop='name'>jeffxxxxxxxx</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../12054.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-09-28T08:40:31Z' class='post-time'>
+                September 28, 2021,  8:40am
+              </time>
+              <meta itemprop='dateModified' content='2021-09-28T08:40:31Z'>
+          <span itemprop='position'>#5</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="HulaHoop" data-post="4" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Sure a custom KVM cli build is feasible though I don;t provide one currently because of low demand.</p>
+</blockquote>
+</aside>
+<p>Is it basically the CLI compile flag or is there more to do?</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="4" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>You have up to 100GB though you can feel free to expand this using the QEMU disk utilities or you can add a second larger virtual disk and mount that inside the guest and place your db file there.</p>
+</blockquote>
+</aside>
+<p>Is it documented somewhere how QEMU disk change is correctly done?</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="4" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>You need to remove CPU pinning if you want to see the effect of core increases. Tor’s performance has some design limitations, particularly when it comes to DoS resistance. As for hosting onions you need to take a look at onion balance for high perf deployments.</p>
+</blockquote>
+</aside>
+<p>I know Onionbalance. Check out EndGame ddos protection.</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="4" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>You need to remove CPU pinning if you want to see the effect of core increases. Tor’s performance has some design limitations, particularly when it comes to DoS resistance. As for hosting onions you need to take a look at onion balance for high perf deployments.</p>
+</blockquote>
+</aside>
+<p>Can I remove CPU pining only on the WS and keep the GW? Does I increase the risk for security flaws by enabling multi core optimization (removing pinning)?</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="4" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>For normal desktop uses the current defaults cut it and going any further will just be a waste of resources. The current allocations should be reasonable on most user’s hardware. If you have more resources, you can always run multiple GW-WS pairs concurrently for multitasking.</p>
+</blockquote>
+</aside>
+<p>Are you meaning maxing out multi core systems with multiple pairs of GW-WS and “connect” them with Onionbalance or multiple GW pointing to one WS?</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="4" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Yes it should be possible and is recommended for backup purposes. It shouldn’t impact performance unless you have a very high rate of db queries. The throughput of file transfers is OK in my experience. report back if it isn’t.</p>
+</blockquote>
+</aside>
+<p>Awesome!</p>
+        </div>
+
+        <meta itemprop='headline' content='KVM tweaks for sophisticated setup'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/HulaHoop'><span itemprop='name'>HulaHoop</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../12054.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-09-29T14:59:32Z' class='post-time'>
+                September 29, 2021,  2:59pm
+              </time>
+              <meta itemprop='dateModified' content='2021-09-29T14:59:32Z'>
+          <span itemprop='position'>#6</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="5" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>Is it basically the CLI compile flag or is there more to do?</p>
+</blockquote>
+</aside>
+<p>Nothing more AFAIK <a class="mention" href="../../../../external.html?link=https://forums.whonix.org/u/patrick">@Patrick</a> can confirm.</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="5" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>Is it documented somewhere how QEMU disk change is correctly done?</p>
+</blockquote>
+</aside>
+<p>You can look at the QEMU projects documentation on expanding the current drive. Adding a new one is easily done from the VM’s devices tab.</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="5" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>Check out EndGame ddos protection.</p>
+</blockquote>
+</aside>
+<p>Interesting project thanks.</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="5" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>Can I remove CPU pining only on the WS and keep the GW?</p>
+</blockquote>
+</aside>
+<p>yes</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="5" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>Does I increase the risk for security flaws by enabling multi core optimization (removing pinning)?</p>
+</blockquote>
+</aside>
+<p>It would so I would change the pinning to assign to different physical CPUs without throwing it out, but you are limited by the number of physical cores.</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="5" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>Are you meaning maxing out multi core systems with multiple pairs of GW-WS and “connect” them with Onionbalance or multiple GW pointing to one WS?</p>
+</blockquote>
+</aside>
+<p>Depends on what services you want to run. Onionbalance is about distributing very high onion traffic for a front end onion to multiple Tors running behind the scenes.  Assuming a well resourced WS that can handle the site and db backend - this setup would run multiple GW and one WS.</p>
+<p>The multiple GW-WS pairs  in the documentation are for desktop users who want to run many tasks under different unrelated identities concurrently. The conclusion we reached when asking a researcher was that all GWs should run with the same guard configured to limit the damage of picking a bad guard node.</p>
+        </div>
+
+        <meta itemprop='headline' content='KVM tweaks for sophisticated setup'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../12054.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-09-29T16:04:53Z' class='post-time'>
+                September 29, 2021,  4:04pm
+              </time>
+              <meta itemprop='dateModified' content='2021-09-29T16:04:53Z'>
+          <span itemprop='position'>#7</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="HulaHoop" data-post="6" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Nothing more AFAIK <a class="mention" href="../../../../external.html?link=https://forums.whonix.org/u/patrick">@Patrick</a> can confirm.</p>
+</blockquote>
+</aside>
+<p>Nothing more.</p>
+        </div>
+
+        <meta itemprop='headline' content='KVM tweaks for sophisticated setup'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/jeffxxxxxxxx'><span itemprop='name'>jeffxxxxxxxx</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../12054.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-10-12T03:14:07Z' class='post-time'>
+                October 12, 2021,  3:14am
+              </time>
+              <meta itemprop='dateModified' content='2021-10-12T03:14:07Z'>
+          <span itemprop='position'>#8</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="HulaHoop" data-post="6" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>It would so I would change the pinning to assign to different physical CPUs without throwing it out, but you are limited by the number of physical cores.</p>
+</blockquote>
+</aside>
+<p>The only thing I need to do is to change the pinning number (to change the CPU core)?</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="6" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>The multiple GW-WS pairs in the documentation are for desktop users who want to run many tasks under different unrelated identities concurrently. The conclusion we reached when asking a researcher was that all GWs should run with the same guard configured to limit the damage of picking a bad guard node.</p>
+</blockquote>
+</aside>
+<p>I could also increase the throughput of the server with just one identity, right? I hope this won’t be necessary once Tor RUST is ready.</p>
+        </div>
+
+        <meta itemprop='headline' content='KVM tweaks for sophisticated setup'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/jeffxxxxxxxx'><span itemprop='name'>jeffxxxxxxxx</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../12054.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-10-12T03:15:06Z' class='post-time'>
+                October 12, 2021,  3:15am
+              </time>
+              <meta itemprop='dateModified' content='2021-10-12T03:15:06Z'>
+          <span itemprop='position'>#9</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Thanks for the confirmation!</p>
+        </div>
+
+        <meta itemprop='headline' content='KVM tweaks for sophisticated setup'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/HulaHoop'><span itemprop='name'>HulaHoop</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../12054.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-10-13T14:25:31Z' class='post-time'>
+                October 13, 2021,  2:25pm
+              </time>
+              <meta itemprop='dateModified' content='2021-10-13T14:25:31Z'>
+          <span itemprop='position'>#10</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="8" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>The only thing I need to do is to change the pinning number (to change the CPU core)?</p>
+</blockquote>
+</aside>
+<p>Yes. Please look at the libvirt manual for further info if you’re not sure.</p>
+<aside class="quote no-group" data-username="jeffxxxxxxxx" data-post="8" data-topic="12054">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/j/b19c9b/40.png" class="avatar"> jeffxxxxxxxx:</div>
+<blockquote>
+<p>I could also increase the throughput of the server with just one identity, right? I hope this won’t be necessary once Tor RUST is ready.</p>
+</blockquote>
+</aside>
+<p>Yes. It also depends on the Onion service design and performance limitations rather than just the lang Tor is coded in.</p>
+        </div>
+
+        <meta itemprop='headline' content='KVM tweaks for sophisticated setup'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

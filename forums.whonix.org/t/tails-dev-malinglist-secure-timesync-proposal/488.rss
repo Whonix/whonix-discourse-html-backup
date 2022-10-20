@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Tails-dev malinglist secure timesync proposal</title>
+    <link>http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488</link>
+    <description>The current secure timesyncing solution has some serious implications for security because they rely on an untrusted model using clearnet servers. Even though SSL is used, the broken CA model negates its protection and the adversary could easily MITM requests and send fake replies or potentially exploit the time synchornizer process running on the system.
+
+To overcome this, a reassessment of the tordate/anondate approach was made and improved upon, to overcome the problems mentioned above and the shortcomings that led to its deprecation.
+
+***
+
+[u]Problems and solutions:[/u]
+
+[b]Couldn&#39;t the consensus data  be replayed?[/b]
+Not possible if forcing Tor to depend only on verified consensus data. Tor doesn&#39;t depend on CAs and SSL is safe from cryptanalysis meaning no MITM attack is possible when communication with DirAuths
+
+[b]But what if a bridge feeds the client a stale consensus?[/b]
+We have come up with a technique to check against this very kind of attack. In short, it involves fetching consensus data through the Tor bridge connection and cross referencing it with what the bridge gave us. If its off, the user will be warned and the stale data will be replaced by the fresh set.
+
+[b]
+If the time is off Tor attempts to connect but fails, then anondate fetches a consensus and Tor is restarted. This pattern is fingerprinatble![/b]
+Yes logically this signalling pattern could be looked for by DPI boxes sitting on the network.
+The fix is to have some way, for example Systemd, or something similar if Debian stable doesn&#39;t have it yet, constantly monitor the Tor process&#39; connection, and if it detects any drops, it would block Tor from reconnection attempts and triggers sdwdate/anondate fetches a fresh valid consensus and sets the time appropriately allowing Tor to connect normally.
+
+Then after Tor connects the time is further adjusted using HS descriptors.
+
+-
+
+Use of Hidden Service descriptors to obtain more accurate time:
+
+There are some problems with using Directory Authority consensus data, the only one IMO is the fuzzy window of three hours which makes it harder to set a realistic time.
+
+My proposal is to have sdwdate query the DHT for specific Hidden Service descriptors from the HSDir Authorities without actually connecting to them and calculate a more finegrained time to set. Here is why i think its a good idea:
+
+    Descriptors contain a timestamp field which shows the time they are generated.Time reported is number of microseconds since 1970.
+    Descriptors are signed by the HS and cannot be spoofed by the HSDirAuth.
+    Descriptors are refreshed hourly. [1]
+    A &quot;malicious&quot; HS that want to fool our time check has to go out of its way and forge the timestamp in its descriptor. If they are doing this by just running with a wrong clock, they will make themselves inaccessible.
+    The damage is much limited (only and 18 hour window not 7 days) before HSDir Authorities reject these forgeries. [2]
+    There does exist stable, available and friendly HS besides the TPO one that was taken down. The only addresses that will be used are ones in the &quot;pal&quot; pool. These will be Whistleblowing and Freedom friendly sites. Some suggestions: Wikileaks, RiseUp (each service they provide has a unique HS address assigned), TheNewyorker&#39;s SecureDrop service and probably more.
+    The way to go about this is to fetch descriptors without connecting.
+    The timestamps will be compared for to get an accurate reading.
+
+A high time resolution is possible, we can pinpoint within that one hour range the probable time because each server was started at a different time than the other so it uploads its descriptor at asyncronously.
+
+With 1400 HSAuth Dirs on the network, I don&#39;t think there will be much of a load problem.
+
+[1] http://donncha.is/2013/05/trawling-tor-hidden-services/
+[2] https://gitweb.torproject.org/torspec.git?a=blob_plain;hb=HEAD;f=rend-spec.txt</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 12 Sep 2014 02:32:40 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Tails-dev malinglist secure timesync proposal</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="5" data-topic="488">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Thanks for improving it. I added a few more changes then posted to the list.</p>
+</blockquote>
+</aside>
+<p><a href="https://mailman.boum.org/pipermail/tails-dev/2014-September/006876.html" class="onebox" target="_blank">https://mailman.boum.org/pipermail/tails-dev/2014-September/006876.html</a></p>
+          <p><a href="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488/6</link>
+        <pubDate>Fri, 12 Sep 2014 02:32:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-488-6</guid>
+        <source url="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488.rss">Tails-dev malinglist secure timesync proposal</source>
+      </item>
+      <item>
+        <title>Tails-dev malinglist secure timesync proposal</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for improving it. I added a few more changes then posted to the list.</p>
+          <p><a href="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488/5</link>
+        <pubDate>Fri, 12 Sep 2014 01:08:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-488-5</guid>
+        <source url="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488.rss">Tails-dev malinglist secure timesync proposal</source>
+      </item>
+      <item>
+        <title>Tails-dev malinglist secure timesync proposal</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I try to communicate in ways, so others not involved into our recent discussions will be able to reenact what has been discussed here. So, for anyone wondering why a whole passage was removed without replacement, see:<br>
+<a href="https://github.com/Whonix/Whonix/issues/320">https://github.com/Whonix/Whonix/issues/320</a>)</p>
+          <p><a href="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488/4</link>
+        <pubDate>Thu, 11 Sep 2014 16:15:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-488-4</guid>
+        <source url="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488.rss">Tails-dev malinglist secure timesync proposal</source>
+      </item>
+      <item>
+        <title>Tails-dev malinglist secure timesync proposal</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Revised this. But rather blindly. Because I haven’t read rend spec yet or throughly thought this through. However, it should now be a bit clearer.</p>
+<p>References may be wrong. Reference [2] isn’t in the text.</p>
+<p>Not sure if I missed any improvements from <a href="https://lists.torproject.org/pipermail/tor-talk/2014-September/034724.html">https://lists.torproject.org/pipermail/tor-talk/2014-September/034724.html</a>.</p>
+<p>Feel free to improve this again, feel free to wait a bit more for answers on tor-talk, feel free to post it on tails-dev then.</p>
+<p>If they can be convinced, very likely I can be convinced as well.</p>
+<p>[hr]</p>
+<p>The current secure timesyncing solution has some serious implications for security because they rely on an untrusted model using clearnet servers. Even though SSL is used, the broken CA model negates its protection and the adversary could easily MITM requests and send fake replies or potentially exploit the time synchronizer process running on the system.</p>
+<p>To overcome this, here is a suggestion for a reassessment of the tordate approach, to overcome the problems mentioned above and the shortcomings.</p>
+<p>Use of Hidden Service descriptors to obtain more accurate time:</p>
+<p>There are some problems with using Directory Authority consensus data, the only one IMO is the fuzzy window of three hours which makes it harder to set a realistic time.</p>
+<p>My proposal is to have a time synchronizer daemon query the DHT for specific Hidden Service descriptors from the HSDir Authorities without actually connecting to them and calculate a more finegrained time to set. Here is why i think its a good idea:</p>
+<ul>
+<li>Descriptors contain a timestamp field which shows the time they are generated. Time reported is number of microseconds since 1970.</li>
+<li>Descriptors are signed by the HS and cannot be spoofed by the HSDirAuth.</li>
+<li>Descriptors are refreshed hourly. [1]</li>
+<li>A “malicious” HS that want to fool our time check has to go out of its way and forge the timestamp in its descriptor. If they are doing this by just running with a wrong clock, they will make themselves inaccessible.</li>
+<li>According to rend-spec, the damage is much limited (only and 18 hour<br>
+window) before HSDir Authorities reject these forgeries.</li>
+<li>There does exist stable, available and friendly HS besides the TPO one that was taken down. The only addresses that will be used are those of trusted organizations that will not carry out the forging attacks described above. These will be Whistleblowing and Freedom friendly sites. Some suggestions: Wikileaks, RiseUp (each service they provide has a unique HS address assigned), TheNewyorker’s SecureDrop service and probably more.</li>
+<li>The way to go about this is to fetch descriptors without connecting.</li>
+<li>The timestamps will be averaged to get a more accurate reading.</li>
+</ul>
+<p>A high time resolution is possible, we can pinpoint within that one hour range the probable time because each server was started at a different time than the other so it uploads its descriptor at asynchronously.</p>
+<p>With 1400 HSAuth Dirs on the network, I don’t think there will be much of a load problem.</p>
+<p>Problems and solutions:</p>
+<p>Couldn’t the consensus data be replayed?</p>
+<p>Not possible if forcing Tor to depend only on verified consensus data. Tor doesn’t depend on CAs and SSL is safe from cryptanalysis meaning no MITM attack is possible when communication with DirAuths</p>
+<p>But what if a bridge feeds the client a stale consensus?</p>
+<p>We have come up with a technique to check against this very kind of attack. In short, it involves fetching consensus data through the Tor bridge connection and cross referencing it with what the bridge gave us. If its off, the user will be warned and the stale data will be replaced by the fresh set. Then after Tor connects the time is further adjusted using HS descriptors.</p>
+<p>[1] <a href="http://donncha.is/2013/05/trawling-tor-hidden-services/">http://donncha.is/2013/05/trawling-tor-hidden-services/</a><br>
+[2] <a href="https://gitweb.torproject.org/torspec.git?a=blob_plain;hb=HEAD;f=rend-spec.txt">https://gitweb.torproject.org/torspec.git?a=blob_plain;hb=HEAD;f=rend-spec.txt</a></p>
+          <p><a href="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488/3</link>
+        <pubDate>Thu, 11 Sep 2014 16:06:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-488-3</guid>
+        <source url="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488.rss">Tails-dev malinglist secure timesync proposal</source>
+      </item>
+      <item>
+        <title>Tails-dev malinglist secure timesync proposal</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Working on this one at the moment.</p>
+          <p><a href="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488/2</link>
+        <pubDate>Thu, 11 Sep 2014 15:51:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-488-2</guid>
+        <source url="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488.rss">Tails-dev malinglist secure timesync proposal</source>
+      </item>
+      <item>
+        <title>Tails-dev malinglist secure timesync proposal</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>The current secure timesyncing solution has some serious implications for security because they rely on an untrusted model using clearnet servers. Even though SSL is used, the broken CA model negates its protection and the adversary could easily MITM requests and send fake replies or potentially exploit the time synchornizer process running on the system.</p>
+<p>To overcome this, a reassessment of the tordate/anondate approach was made and improved upon, to overcome the problems mentioned above and the shortcomings that led to its deprecation.</p>
+<hr>
+<p><span class="bbcode-u">Problems and solutions:</span></p>
+<p><span class="bbcode-b">Couldn’t the consensus data  be replayed?</span><br>
+Not possible if forcing Tor to depend only on verified consensus data. Tor doesn’t depend on CAs and SSL is safe from cryptanalysis meaning no MITM attack is possible when communication with DirAuths</p>
+<p><span class="bbcode-b">But what if a bridge feeds the client a stale consensus?</span><br>
+We have come up with a technique to check against this very kind of attack. In short, it involves fetching consensus data through the Tor bridge connection and cross referencing it with what the bridge gave us. If its off, the user will be warned and the stale data will be replaced by the fresh set.</p>
+<p><span class="bbcode-b"><br>
+If the time is off Tor attempts to connect but fails, then anondate fetches a consensus and Tor is restarted. This pattern is fingerprinatble!</span><br>
+Yes logically this signalling pattern could be looked for by DPI boxes sitting on the network.<br>
+The fix is to have some way, for example Systemd, or something similar if Debian stable doesn’t have it yet, constantly monitor the Tor process’ connection, and if it detects any drops, it would block Tor from reconnection attempts and triggers sdwdate/anondate fetches a fresh valid consensus and sets the time appropriately allowing Tor to connect normally.</p>
+<p>Then after Tor connects the time is further adjusted using HS descriptors.</p>
+<ul>
+<li>
+</li>
+</ul>
+<p>Use of Hidden Service descriptors to obtain more accurate time:</p>
+<p>There are some problems with using Directory Authority consensus data, the only one IMO is the fuzzy window of three hours which makes it harder to set a realistic time.</p>
+<p>My proposal is to have sdwdate query the DHT for specific Hidden Service descriptors from the HSDir Authorities without actually connecting to them and calculate a more finegrained time to set. Here is why i think its a good idea:</p>
+<pre><code>Descriptors contain a timestamp field which shows the time they are generated.Time reported is number of microseconds since 1970.
+Descriptors are signed by the HS and cannot be spoofed by the HSDirAuth.
+Descriptors are refreshed hourly. [1]
+A "malicious" HS that want to fool our time check has to go out of its way and forge the timestamp in its descriptor. If they are doing this by just running with a wrong clock, they will make themselves inaccessible.
+The damage is much limited (only and 18 hour window not 7 days) before HSDir Authorities reject these forgeries. [2]
+There does exist stable, available and friendly HS besides the TPO one that was taken down. The only addresses that will be used are ones in the "pal" pool. These will be Whistleblowing and Freedom friendly sites. Some suggestions: Wikileaks, RiseUp (each service they provide has a unique HS address assigned), TheNewyorker's SecureDrop service and probably more.
+The way to go about this is to fetch descriptors without connecting.
+The timestamps will be compared for to get an accurate reading.
+</code></pre>
+<p>A high time resolution is possible, we can pinpoint within that one hour range the probable time because each server was started at a different time than the other so it uploads its descriptor at asyncronously.</p>
+<p>With 1400 HSAuth Dirs on the network, I don’t think there will be much of a load problem.</p>
+<p>[1] <a href="http://donncha.is/2013/05/trawling-tor-hidden-services/">http://donncha.is/2013/05/trawling-tor-hidden-services/</a><br>
+[2] <a href="https://gitweb.torproject.org/torspec.git?a=blob_plain;hb=HEAD;f=rend-spec.txt">https://gitweb.torproject.org/torspec.git?a=blob_plain;hb=HEAD;f=rend-spec.txt</a></p>
+          <p><a href="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488/1</link>
+        <pubDate>Wed, 10 Sep 2014 02:20:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-488-1</guid>
+        <source url="http://forums.whonix.org/t/tails-dev-malinglist-secure-timesync-proposal/488.rss">Tails-dev malinglist secure timesync proposal</source>
+      </item>
+  </channel>
+</rss>

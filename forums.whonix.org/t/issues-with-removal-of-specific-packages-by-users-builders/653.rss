@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Issues with removal of specific packages by users / builders</title>
+    <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653</link>
+    <description>It is a real pity. Now that Whonix&#39;s functionality is split into multiple packages, which made Whonix&#39;s source code much simpler to grasp, we still cannot tell users who wish to remove certain functionality to simply uninstall the package. Each package still needs a mechanism to disable its functionality while being enabled.
+
+For example, a common use case were users wish to tunnel all their traffic through something... ( https://www.whonix.org/wiki/Tunnels/Introduction )
+[i]uwt[/i] ( https://github.com/Whonix/uwt ) is a common source of confusion. ( https://phabricator.whonix.org/T142 )
+
+We cannot simply tell users to remove it. Unfortunately, it&#39;s not all that simple. There are side effects.
+
+[code]sudo apt-get purge uwt[/code]
+
+They would see something like this.
+
+[code]Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+  anon-banned-packages anon-iceweasel-warning gpl-sources-download knetattach-hide power-savings-disable-in-vms poweroff-passwordless rads scurl shared-folder-help swap-file-creator swappiness-lowest tor-ctrl
+Use &#39;apt-get autoremove&#39; to remove them.
+The following packages will be REMOVED:
+  anon-shared-packages-recommended* uwt* whonix-shared-packages-recommended*
+0 upgraded, 0 newly installed, 3 to remove and 2 not upgraded.
+After this operation, 152 kB disk space will be freed.
+Do you want to continue [Y/n]? [/code]
+
+Whonix inherits a limitation of Debian&#39;s package management. (No idea if other distributions have a solution for this.) Unfortunately, there is no middle ground between [i]Depends:[/i] and [i]Recommends:[/i] that could be used for [i]meta packages[/i].
+
+Documentation on how users could work around such issues has been added:
+https://www.whonix.org/wiki/Whonix_Debian_Packages
+
+Also more verbose technical information on the issue:
+https://www.whonix.org/wiki/Whonix_Debian_Packages#Technical_Stuff
+
+Please check if these explanations make sense. I would be happy to clarify any questions you might have. Maybe you have an idea how to solve this mess, but I am not positive there is a solution here. Seems a limitation by Debian and it would require some kind middle ground between  [i]Depends:[/i] and [i]Recommends:[/i] in [i]debian/control[/i].</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 14 Oct 2019 09:46:11 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>dpkg feature request report submitted</p>
+<aside class="quote no-group" data-post="11" data-topic="653">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Weak-Depends - something in the middle between Recommends: and Depends:</p>
+</blockquote>
+</aside>
+<p><a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942303" class="onebox" target="_blank" rel="nofollow noopener">https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942303</a></p>
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/13</link>
+        <pubDate>Mon, 14 Oct 2019 09:46:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-13</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Small nitpicks done, but very well written.</p>
+<hr>
+<blockquote>
+<p>Package: dpkg<br>
+Severity: wishlist<br>
+X-Debbugs-CC: <a href="mailto:whonix-devel@whonix.org">whonix-devel@whonix.org</a></p>
+<p>It would be useful if there was something in between of <code>Recommends:</code> and <code>Depends:</code>.</p>
+<p>“Weak-Depends”</p>
+<ul>
+<li>Similar to “Depends”. It lists packages that get installed when using <code>apt --no-install-recommends meta-package</code>, but any package listed there can be removed without removing the meta-package which referenced the <code>Weak-Depends:</code>.</li>
+</ul>
+<p>In other words…</p>
+<p>“Weak-Depends”: Declares a weak dependency. Most users of this package may benefit from installing packages listed in this field, but can have reasonable functionality without them.</p>
+<p>The “Suggests” debian/control field does not work for this use case. Very few users are using ‘apt --install-suggests’. And ‘apt --no-install-suggests’ is the default. Also when using ‘apt dist-upgrade’ this leads to inconsistencies:</p>
+<ul>
+<li>newly added packages to “Suggests” are not installed</li>
+<li>removed packages from “Suggests” aren’t removed</li>
+</ul>
+<p>Use case:</p>
+<p>Let’s take for example the meta package ‘lxde’. Sometimes users are happy with such meta packages generally and would like to keep it. However, ‘lxde’ ‘Depends:’ on ‘galculator’. Maybe a user prefers a different calculator and wants to remove that one.</p>
+<p>(Let’s assume galculator isn’t essential for lxde. I guess it is. But if it isn’t, please don’t concentrate on the specific example but the general use case. There are many such examples.)</p>
+<p>[This isn’t the best example too. Perhaps things that take a lot disk space or are more intrusive such as context menu integrations by file compressors are more worthwhile.]</p>
+<p>In that case removal of galculator would lead to removal of lxde. Next time “apt autoremove” is being run other packages which are not intended by the user to be uninstalled get uninstalled. Something simple as removal of galculator isn’t that simple. Would galculator move from “Depends” to “Weak-Depends” everything would be perfect.</p>
+<p>Cheers,<br>
+Patrick</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/12</link>
+        <pubDate>Sat, 12 Oct 2019 15:01:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-12</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Please review / improve the following - planned to post soon - feature request against dpkg.</p>
+<pre><code>Weak-Depends - something in the middle between Recommends: and Depends:
+</code></pre>
+<hr>
+<blockquote>
+<p>Package: dpkg<br>
+Severity: wishlist<br>
+X-Debbugs-CC: <a href="mailto:whonix-devel@whonix.org">whonix-devel@whonix.org</a></p>
+<p>It would be useful if there was something in between of <code>Recommends:</code> and <code>Depends:</code>.</p>
+<p>“Weak-Depends”</p>
+<ul>
+<li>Similar to “Depends”. List of packages that gets installed when using <code>apt --no-install-recommends meta-package</code> but any package listed there can be removed without removing the meta-package which referenced the <code>Weak-Depends:</code>.</li>
+</ul>
+<p>In other words…</p>
+<p>“Weak-Depends”: This declares a weak dependency. Many users of this package may benefit from installing packages listed in this field but can have reasonable functions without them.</p>
+<p>The “Suggests” debian/control field does not work for this use case. Very few users are using ‘apt --install-suggests’. And ‘apt --no-install-suggests’ is the default. Also when using ‘apt dist-upgrade’ this leads to inconsistencies:</p>
+<ul>
+<li>newly added packages to “Suggests” are not installed</li>
+<li>removed packages from “Suggests” aren’t removed</li>
+</ul>
+<p>Use case:</p>
+<p>Let’s take for example the meta package ‘lxde’. Sometimes users are happy with such meta packages generally and would like to keep it. However, ‘lxde’ ‘Depends:’ on ‘galculator’. Maybe a user prefers a different calculator and wants to remove that one.</p>
+<p>(Let’s assume galculator isn’t essential for lxde. I guess it is. But if it isn’t, please don’t concentrate on the specific example but the general use case. There are many such examples.)</p>
+<p>[This isn’t the best example too. Perhaps things that take a lot disk space or are more intrusive such as context menu integrations by file compressors are more worthwhile.]</p>
+<p>In that case removal of galculator would lead to removal of lxde. Next time “apt autoremove” is being run other packages which are not intended by the user to be uninstalled get uninstalled. Something simple as removal of galculator isn’t that simple. Would galculator move from “Depends” to “Weak-Depends” everything would be perfect.</p>
+<p>Cheers,<br>
+Patrick</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/11</link>
+        <pubDate>Sat, 12 Oct 2019 10:10:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-11</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://forums.whonix.org/t/remove-xarchiver-package-without-removing-whonix-packages/8285/4" class="inline-onebox">Remove Xarchiver package without removing whonix packages?</a></p>
+<blockquote>
+<p>Debian packages support only <code>Recommends:</code> or <code>Depends:</code> . There is nothing in the middle. The missing feature is:</p>
+<blockquote>
+<p><code>Weak-Depends:</code> list of packages that gets installed when using <code>apt --no-install-recommends</code> but any package listed there can be removed without removing the package which referenced the <code>Weak-Depends:</code></p>
+</blockquote>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/10</link>
+        <pubDate>Sat, 12 Oct 2019 09:47:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-10</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Actually, there might be a very crude workaround.</p>
+<pre><code>sudo dpkg --purge --force-all uwt
+</code></pre>
+<p>By then, any other attempt to apt-get install, dist-upgrade or remove would fail until one runs <code>sudo apt-get install -f</code>. That would fix it (and reinstall uwt). However, if one can live with that, this may be an acceptable workaround.</p>
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/9</link>
+        <pubDate>Thu, 12 Jan 2017 15:58:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-9</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="1" data-topic="652">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v3/letter/n/f17d59/40.png" class="avatar"><a href="//forums.whonix.org/t/replacing-whonix-meta-packages-with-saltstack-chef-or-puppet/652/1">Replacing Whonix meta packages with SaltStack, Chef or Puppet?</a>
+</div>
+<blockquote>
+<p>Just get rid of the meta packages and use a micro-version of SaltStack, Chef or Puppet to manage the installation and removal of individual packages.</p>
+<p>I could set up a Salt minion in a day or so that would be able to manage many scenarios. These management systems can install using the systems package manager or directly from git, pip, ftp, etc.  They can also take care of any configurations that may be required.</p>
+<p>It can be hard to wrap you head around what they actually can do for you and there is a steep learning curve if you don’t have anything to start with, but if someone like me provided a pretty much complete setup, you would then be able to very easily figure stuff out.</p>
+<p>For instance, not that I am suggesting you do this at all, but to give an example to the configuration power they offer, Salt, Chef or Puppet could completely replace the existing Whonix installation where everything is handled by the management software including building VM’s, and the ability to deploy on multiple platforms as it has ability to map package names.</p>
+<p>Anyway, just let me know if you want me to though a test system together for you to take a look at as its no bother for me to do so since I will be creating something for myself anyway.  Just have to know what you want to see.</p>
+<p>Maybe have a glace at Salts reference page, as that may give you an idea of what it can do <a href="http://docs.saltstack.com/en/latest/ref/index.html" data-bbcode="true" rel="nofollow noopener">http://docs.saltstack.com/en/latest/ref/index.html</a> and most importantly its built in modules <a href="http://docs.saltstack.com/en/latest/ref/modules/all/index.html" data-bbcode="true" rel="nofollow noopener">http://docs.saltstack.com/en/latest/ref/modules/all/index.html</a></p>
+</blockquote>
+</aside>
+<p>Split and will answer here:<br>
+<a href="https://forums.whonix.org/t/replacing-whonix-meta-packages-with-saltstack-chef-or-puppet">https://forums.whonix.org/t/replacing-whonix-meta-packages-with-saltstack-chef-or-puppet</a></p>
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/8</link>
+        <pubDate>Mon, 10 Nov 2014 07:39:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-8</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>How likely is it that Debian upstream will add the dependency changes you are looking for if I tell them about it?</blockquote>
+Very low and after having wrapped my head about this, I don't even know how to work around this for Whonix's own meta packages.
+<blockquote>Would it need large changes to apt and what it does now?</blockquote>
+Yes. It's a known issue. To fix this, you'd need a great concept on how to fix it + proof of concept implementation + very good social skills to get agreement from the debian developers. I have little hope it's happening anytime soon.
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/7</link>
+        <pubDate>Sun, 09 Nov 2014 13:51:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-7</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>How likely is it that Debian upstream will add the dependency changes you are looking for if I tell them about it? Would it need large changes to apt and what it does now?</p>
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/6</link>
+        <pubDate>Sun, 09 Nov 2014 13:35:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-6</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Even a wizard/script should better not uninstall uwt. Disable it for a more robust solution. Let’s see how whonixsetup wizard develops. ( <a href="https://forums.whonix.org/t/graphical-gui-whonix-setup-wizard-anon-connection-wizard-technical-discussion/650" class="inline-onebox">[graphical gui] Whonix Setup Wizard / Anon Connection Wizard - Technical Discussion</a> ) And we got <a href="https://phabricator.whonix.org/T142" rel="nofollow noopener">https://phabricator.whonix.org/T142</a> as a note. Maybe some day.</p>
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/5</link>
+        <pubDate>Fri, 07 Nov 2014 18:03:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-5</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Its probably best if the dependency workarond for things like the VPN ( that need removal of uwt) are done by a script with a wizard front-end. That way users won’t be confused or shoot themselves in the foot.</p>
+<p>You can’t hope to do this for every meta-package in Whonix without upstrem support for such a feature but at least the common supported use cases will be handled safely.</p>
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/4</link>
+        <pubDate>Fri, 07 Nov 2014 17:51:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-4</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>That page is a case study.</p>
+<blockquote>This is (a beginning of) a case study into dependencies which cannot be properly, or often at all, expressed with the current static provides/requires/conflicts/obsoletes dependencies of rpm.</blockquote>
+<p>Not a feature in rpm.</p>
+<p>Interesting page, to see we’re not the only ones having trouble with this.</p>
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/3</link>
+        <pubDate>Fri, 07 Nov 2014 17:36:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-3</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>I looked at how other packaging formats work and rpm seems to have a way to do what you need. I don’t know if Debian will accepts rpms. apt-rpm can install rpms on debian without conversion.</p>
+<p><a href="https://web.archive.org/web/20160513021804/https://rpm.org/wiki/DynamicDependencies" class="onebox" target="_blank" rel="nofollow noopener">https://web.archive.org/web/20160513021804/https://rpm.org/wiki/DynamicDependencies</a></p>
+<blockquote>Case 3 (aka supplements)
+<pre><code>This is a weak reverse require. In Suse, the opposite of 1), does not exist in debian.
+
+This is useful when the using recommends is not feasible or possible: A package can reasonably "recommend" its own sub-packages, but beyond that it might not be feasible or even possible at all: for example a packages from distro vendors cannot refer to every extension/enhancement package that may exist in 3rd party repositories at any given time. Or if you have a binary-only package which can't be modified, but when installed you want to have it pull your own package in (eg to provide site-configuration)&lt;/blockquote&gt;</code></pre>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/2</link>
+        <pubDate>Fri, 07 Nov 2014 17:25:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-2</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+      <item>
+        <title>Issues with removal of specific packages by users / builders</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>It is a real pity. Now that Whonix’s functionality is split into multiple packages, which made Whonix’s source code much simpler to grasp, we still cannot tell users who wish to remove certain functionality to simply uninstall the package. Each package still needs a mechanism to disable its functionality while being enabled.</p>
+<p>For example, a common use case were users wish to tunnel all their traffic through something… ( <a href="https://www.whonix.org/wiki/Tunnels/Introduction">https://www.whonix.org/wiki/Tunnels/Introduction</a> )<br>
+<span class="bbcode-i">uwt</span> ( <a href="https://github.com/Whonix/uwt">https://github.com/Whonix/uwt</a> ) is a common source of confusion. ( <a href="https://phabricator.whonix.org/T142">https://phabricator.whonix.org/T142</a> )</p>
+<p>We cannot simply tell users to remove it. Unfortunately, it’s not all that simple. There are side effects.</p>
+<pre><code class="lang-auto">sudo apt-get purge uwt</code></pre>
+<p>They would see something like this.</p>
+<p><code>Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+  anon-banned-packages anon-iceweasel-warning gpl-sources-download knetattach-hide power-savings-disable-in-vms poweroff-passwordless rads scurl shared-folder-help swap-file-creator swappiness-lowest tor-ctrl
+Use 'apt-get autoremove' to remove them.
+The following packages will be REMOVED:
+  anon-shared-packages-recommended* uwt* whonix-shared-packages-recommended*
+0 upgraded, 0 newly installed, 3 to remove and 2 not upgraded.
+After this operation, 152 kB disk space will be freed.
+Do you want to continue [Y/n]? </code></p>
+<p>Whonix inherits a limitation of Debian’s package management. (No idea if other distributions have a solution for this.) Unfortunately, there is no middle ground between <span class="bbcode-i">Depends:</span> and <span class="bbcode-i">Recommends:</span> that could be used for <span class="bbcode-i">meta packages</span>.</p>
+<p>Documentation on how users could work around such issues has been added:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Whonix_Debian_Packages" target="_blank" title="10:26PM - 23 November 2019">Whonix – 23 Nov 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:614/500;"><img src="https://www.whonix.org/w/images/a/aa/Box-158523640.png" class="thumbnail" width="614" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Whonix_Debian_Packages" target="_blank">Whonix Debian Packages - Whonix</a></h3>
+
+<p>Which Whonix ™ Debian packages are safe to remove? What is a meta package? What other packages do Whonix ™ meta packages install? Which packages should never be removed? Why is package X installed?</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Also more verbose technical information on the issue:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Whonix_Debian_Packages#Technical_Stuff" target="_blank" title="10:26PM - 23 November 2019">Whonix – 23 Nov 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:614/500;"><img src="https://www.whonix.org/w/images/a/aa/Box-158523640.png" class="thumbnail" width="614" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Whonix_Debian_Packages#Technical_Stuff" target="_blank">Whonix Debian Packages - Whonix</a></h3>
+
+<p>Which Whonix ™ Debian packages are safe to remove? What is a meta package? What other packages do Whonix ™ meta packages install? Which packages should never be removed? Why is package X installed?</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Please check if these explanations make sense. I would be happy to clarify any questions you might have. Maybe you have an idea how to solve this mess, but I am not positive there is a solution here. Seems a limitation by Debian and it would require some kind middle ground between  <span class="bbcode-i">Depends:</span> and <span class="bbcode-i">Recommends:</span> in <span class="bbcode-i">debian/control</span>.</p>
+          <p><a href="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653/1</link>
+        <pubDate>Fri, 07 Nov 2014 12:16:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-653-1</guid>
+        <source url="http://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653.rss">Issues with removal of specific packages by users / builders</source>
+      </item>
+  </channel>
+</rss>

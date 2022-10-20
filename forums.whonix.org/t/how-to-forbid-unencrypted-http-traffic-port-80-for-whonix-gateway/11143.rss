@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>How to forbid unencrypted HTTP traffic (port 80) for Whonix Gateway?</title>
+    <link>http://forums.whonix.org/t/how-to-forbid-unencrypted-http-traffic-port-80-for-whonix-gateway/11143</link>
+    <description>Hello,
+
+I would like to drop/forbid all outgoing HTTP browser traffic (port 80) with some kind of firewall rule in the Whonix Gateway machine. Instead HTTPS should be used on port 443.
+
+After some research,  I have found and edited the whonix-gateway-firewall file in `/usr/bin/whonix-gateway-firewall` (see github_dot_com/Whonix/whonix-firewall/blob/21b467c/usr/bin/whonix-gateway-firewall#L507-L514):
+```
+if [ &quot;$WORKSTATION_TRANSPARENT_TCP&quot; = &quot;1&quot; ]; then
+         ## Catch all remaining TCP and redirect to TransPort.
+         ## Only user installed applications not configured to use a SocksPort are affected.
+         $iptables_cmd -t nat -A PREROUTING -i &quot;$int_if_item&quot; -p tcp --syn -j REDIRECT --to-ports &quot;$TRANS_PORT_WORKSTATION&quot; # (1) &lt;---
+
+         ## Optionally restrict TransPort.
+         ## Replace above rule with a more restrictive one, e.g.:
+         #$iptables_cmd -t nat -A PREROUTING -i &quot;$int_if_item&quot; -p tcp --match multiport --dports 80,443 --syn -j REDIRECT --to-ports &quot;$TRANS_PORT_WORKSTATION&quot; # (2) &lt;---
+      fi
+```
+, where I replaced (1) by (2) and chose `--dports 443` as valid ports.
+
+This works so far, but I guess, it now *only* allows port 443. Is there a way to adjust the rule to state, that just port 80 is *not* allowed?
+
+TIA, yanga</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 17 Feb 2021 08:55:09 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/how-to-forbid-unencrypted-http-traffic-port-80-for-whonix-gateway/11143.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>How to forbid unencrypted HTTP traffic (port 80) for Whonix Gateway?</title>
+        <dc:creator><![CDATA[yanga-dafu]]></dc:creator>
+        <description><![CDATA[
+            <p>Turns out, it was easier than expected - just append a <code>!</code> to the match extension.</p>
+<p>multiport version:</p>
+<pre><code class="lang-auto">--match multiport ! --dports 80
+</code></pre>
+<p>or just with <code>tcp</code>:</p>
+<pre><code class="lang-auto">! --dport 80
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/how-to-forbid-unencrypted-http-traffic-port-80-for-whonix-gateway/11143/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-forbid-unencrypted-http-traffic-port-80-for-whonix-gateway/11143/2</link>
+        <pubDate>Wed, 17 Feb 2021 08:55:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11143-2</guid>
+        <source url="http://forums.whonix.org/t/how-to-forbid-unencrypted-http-traffic-port-80-for-whonix-gateway/11143.rss">How to forbid unencrypted HTTP traffic (port 80) for Whonix Gateway?</source>
+      </item>
+      <item>
+        <title>How to forbid unencrypted HTTP traffic (port 80) for Whonix Gateway?</title>
+        <dc:creator><![CDATA[yanga-dafu]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello,</p>
+<p>I would like to drop/forbid all outgoing HTTP browser traffic (port 80) with some kind of firewall rule in the Whonix Gateway machine. Instead HTTPS should be used on port 443.</p>
+<p>After some research,  I have found and edited the whonix-gateway-firewall file in <code>/usr/bin/whonix-gateway-firewall</code> (see github_dot_com/Whonix/whonix-firewall/blob/21b467c/usr/bin/whonix-gateway-firewall#L507-L514):</p>
+<pre><code class="lang-auto">if [ "$WORKSTATION_TRANSPARENT_TCP" = "1" ]; then
+         ## Catch all remaining TCP and redirect to TransPort.
+         ## Only user installed applications not configured to use a SocksPort are affected.
+         $iptables_cmd -t nat -A PREROUTING -i "$int_if_item" -p tcp --syn -j REDIRECT --to-ports "$TRANS_PORT_WORKSTATION" # (1) &lt;---
+
+         ## Optionally restrict TransPort.
+         ## Replace above rule with a more restrictive one, e.g.:
+         #$iptables_cmd -t nat -A PREROUTING -i "$int_if_item" -p tcp --match multiport --dports 80,443 --syn -j REDIRECT --to-ports "$TRANS_PORT_WORKSTATION" # (2) &lt;---
+      fi
+</code></pre>
+<p>, where I replaced (1) by (2) and chose <code>--dports 443</code> as valid ports.</p>
+<p>This works so far, but I guess, it now <em>only</em> allows port 443. Is there a way to adjust the rule to state, that just port 80 is <em>not</em> allowed?</p>
+<p>TIA, yanga</p>
+          <p><a href="http://forums.whonix.org/t/how-to-forbid-unencrypted-http-traffic-port-80-for-whonix-gateway/11143/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-forbid-unencrypted-http-traffic-port-80-for-whonix-gateway/11143/1</link>
+        <pubDate>Tue, 16 Feb 2021 22:32:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11143-1</guid>
+        <source url="http://forums.whonix.org/t/how-to-forbid-unencrypted-http-traffic-port-80-for-whonix-gateway/11143.rss">How to forbid unencrypted HTTP traffic (port 80) for Whonix Gateway?</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>change whonix source indentation</title>
+    <link>http://forums.whonix.org/t/change-whonix-source-indentation/15613</link>
+    <description>Something is bugging me for quite a while, it may sound silly but it breaks my flow because I have to correct whonix indentation, and change my editor indentation to 3 only for whonix file just doesn&#39;t work if you are not always working with whonix only files.
+
+Currently whonix is using `3 spaces` for indentation, it is not standard to use an odd number. I also don&#39;t know of anyone who manually indents to 3 spaces, they either indent to `2` or `4` or `8`, so my guess is that past and present developers use(d) their editor configuration to set 3 spaces for indentation.
+
+Can this be corrected by the great search and replace to all whonix files?
+
+Pattern tor search for is `^   .*` for the first degree of indentation and adding 3 spaces for other levels of indentation.
+
+`grep --color=auto &quot;^   .*&quot; /usr/bin/whonix-gateway-firewall`, of literally any whonix file and you will see it is using 3 spaces for indentation.
+
+I made this for 5 levels of indentation:
+```sh
+sed \
+        -e &quot;s/^               /          /g&quot; \
+        -e &quot;s/^            /        /g&quot; \
+        -e &quot;s/^         /      /g&quot; \ 
+        -e &quot;s/^      /    /g&quot; \
+        -e &quot;s/^   /  /g&quot; \
+        FILE
+```
+15 spaces becomes 10, 12 become 8, 9 become 6, 6 becomes 4, 3 becomes 2.
+
+I prefer 2 spaces because then it has less chances or hitting the 79 char mark,  but 4 spaces would also be fine, but not 3.</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 26 Sep 2022 20:25:52 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/change-whonix-source-indentation/15613.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>change whonix source indentation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>shfmt seems to be an excellent tool! Great suggestion!</p>
+<p>I’ve changed all scripts in whonix-firewall repository. Let me know if you like it.</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="6" data-topic="15613">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<pre><code class="lang-auto">shfmt --indent 2 --space-redirects --switch-case-indent FILE
+</code></pre>
+</blockquote>
+</aside>
+<p>As for other scripts being modified by anyone, feel free to give it a pass with that shfmt command first and put it into the first commit.</p>
+<p>As for automating it project wide… Not sure… It seems to change some things too much. So it needs to be manually reviewed. For example, it changed…</p>
+<pre><code>  bash_n_output="$(bash -n "$i" 2&gt;&amp;1)" || { bash_n_exit_code="$?" ; true; };
+</code></pre>
+<p>To:</p>
+<pre><code>bash_n_output="$(bash -n "$i" 2&gt;&amp;1)" || {
+  bash_n_exit_code="$?"
+  true
+}
+</code></pre>
+<p>Both styles aren’t great. I probably would not write it that way nowadays.</p>
+<p>That functionality can and should probably be implemented in some better way anyhow. Can and should probably be simplified to:</p>
+<pre><code class="lang-auto">  if ! bash -n "$i" ; then
+    output_cmd "ERROR: Invalid config file: '$i'" &gt;&amp;2
+    exit 1
+  fi
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/change-whonix-source-indentation/15613/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/change-whonix-source-indentation/15613/7</link>
+        <pubDate>Mon, 26 Sep 2022 20:25:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15613-7</guid>
+        <source url="http://forums.whonix.org/t/change-whonix-source-indentation/15613.rss">change whonix source indentation</source>
+      </item>
+      <item>
+        <title>change whonix source indentation</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>Found a good one available on testing/bookworm.</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://github.com/mvdan/sh">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="32" height="32">
+
+      <a href="https://github.com/mvdan/sh" target="_blank" rel="noopener nofollow ugc">GitHub</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/345;"><img src="https://opengraph.githubassets.com/eabc502e771ac43008af79f8eff9925f8c137f3824506a428d599d21c2f98eb2/mvdan/sh" class="thumbnail" width="690" height="345"></div>
+
+<h3><a href="https://github.com/mvdan/sh" target="_blank" rel="noopener nofollow ugc">GitHub - mvdan/sh: A shell parser, formatter, and interpreter with bash...</a></h3>
+
+  <p>A shell parser, formatter, and interpreter with bash support; includes shfmt - GitHub - mvdan/sh: A shell parser, formatter, and interpreter with bash support; includes shfmt</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+<p><a href="https://tracker.debian.org/pkg/golang-mvdan-sh" class="onebox" target="_blank" rel="noopener nofollow ugc">https://tracker.debian.org/pkg/golang-mvdan-sh</a></p>
+<p>on a debian testing enabled dev machine:</p>
+<pre><code class="lang-auto">sudo apt install golang-mvdan-sh-dev shfmt
+</code></pre>
+<p>I recommend reading the man page for shfmt.</p>
+<p>Good options:</p>
+<pre><code class="lang-auto">shfmt --indent 2 --space-redirects --switch-case-indent FILE
+</code></pre>
+<p>use <code>-w|--write</code> to write to file.</p>
+<p>The above is for formatting from the command line.</p>
+<p>For the future, during development, editing files, I recommend <a href="https://editorconfig.org/" rel="noopener nofollow ugc">https://editorconfig.org/</a> and use an editor that support editorconfig (many does), with this, when saving the file, editorconfig will correct the format.</p>
+          <p><a href="http://forums.whonix.org/t/change-whonix-source-indentation/15613/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/change-whonix-source-indentation/15613/6</link>
+        <pubDate>Sun, 25 Sep 2022 12:13:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15613-6</guid>
+        <source url="http://forums.whonix.org/t/change-whonix-source-indentation/15613.rss">change whonix source indentation</source>
+      </item>
+      <item>
+        <title>change whonix source indentation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>If there’s a reliable re-formatting method (specialized tool, sed, script, …), I am happy to do it project wide.</p>
+<p>Until then, for anyone who modifies any scripts, feel free to change indentation to 2 spaces. However, change of indentation level (except for trivial scripts) needs to be in a separate commit to make it easier to review. (Not good to mix complex code changes with script wide indentation level changes.)</p>
+          <p><a href="http://forums.whonix.org/t/change-whonix-source-indentation/15613/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/change-whonix-source-indentation/15613/5</link>
+        <pubDate>Sun, 25 Sep 2022 08:40:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15613-5</guid>
+        <source url="http://forums.whonix.org/t/change-whonix-source-indentation/15613.rss">change whonix source indentation</source>
+      </item>
+      <item>
+        <title>change whonix source indentation</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>Probably there is, but will have to search, I don’t know.</p>
+          <p><a href="http://forums.whonix.org/t/change-whonix-source-indentation/15613/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/change-whonix-source-indentation/15613/4</link>
+        <pubDate>Sat, 24 Sep 2022 23:02:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15613-4</guid>
+        <source url="http://forums.whonix.org/t/change-whonix-source-indentation/15613.rss">change whonix source indentation</source>
+      </item>
+      <item>
+        <title>change whonix source indentation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Above sed script doesn’t work.</p>
+<p>It fails for example on whonix-firewall debian/whonix-firewall.postinst. Hard to explain. But the indent style is messed up. Easy to reproduce and see.</p>
+<p>Do we need to invent a sed script here? Isn’t there some existing tool for code reformatting?</p>
+          <p><a href="http://forums.whonix.org/t/change-whonix-source-indentation/15613/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/change-whonix-source-indentation/15613/3</link>
+        <pubDate>Sat, 24 Sep 2022 21:38:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15613-3</guid>
+        <source url="http://forums.whonix.org/t/change-whonix-source-indentation/15613.rss">change whonix source indentation</source>
+      </item>
+      <item>
+        <title>change whonix source indentation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Ok, I compared and clearly nobody (in my quick review) is using 3.</p>
+<p>So 2 it is.</p>
+          <p><a href="http://forums.whonix.org/t/change-whonix-source-indentation/15613/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/change-whonix-source-indentation/15613/2</link>
+        <pubDate>Sat, 24 Sep 2022 21:20:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15613-2</guid>
+        <source url="http://forums.whonix.org/t/change-whonix-source-indentation/15613.rss">change whonix source indentation</source>
+      </item>
+      <item>
+        <title>change whonix source indentation</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>Something is bugging me for quite a while, it may sound silly but it breaks my flow because I have to correct whonix indentation, and change my editor indentation to 3 only for whonix file just doesn’t work if you are not always working with whonix only files.</p>
+<p>Currently whonix is using <code>3 spaces</code> for indentation, it is not standard to use an odd number. I also don’t know of anyone who manually indents to 3 spaces, they either indent to <code>2</code> or <code>4</code> or <code>8</code>, so my guess is that past and present developers use(d) their editor configuration to set 3 spaces for indentation.</p>
+<p>Can this be corrected by the great search and replace to all whonix files?</p>
+<p>Pattern tor search for is <code>^   .*</code> for the first degree of indentation and adding 3 spaces for other levels of indentation.</p>
+<p><code>grep --color=auto "^   .*" /usr/bin/whonix-gateway-firewall</code>, of literally any whonix file and you will see it is using 3 spaces for indentation.</p>
+<p>I made this for 5 levels of indentation:</p>
+<pre><code class="lang-auto">sed \
+        -e "s/^               /          /g" \
+        -e "s/^            /        /g" \
+        -e "s/^         /      /g" \ 
+        -e "s/^      /    /g" \
+        -e "s/^   /  /g" \
+        FILE
+</code></pre>
+<p>15 spaces becomes 10, 12 become 8, 9 become 6, 6 becomes 4, 3 becomes 2.</p>
+<p>I prefer 2 spaces because then it has less chances or hitting the 79 char mark,  but 4 spaces would also be fine, but not 3.</p>
+          <p><a href="http://forums.whonix.org/t/change-whonix-source-indentation/15613/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/change-whonix-source-indentation/15613/1</link>
+        <pubDate>Sat, 24 Sep 2022 17:33:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15613-1</guid>
+        <source url="http://forums.whonix.org/t/change-whonix-source-indentation/15613.rss">change whonix source indentation</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Virsh edit XML</title>
+    <link>http://forums.whonix.org/t/virsh-edit-xml/902</link>
+    <description>Hi there,
+
+I am running a Whonix Workstation  9.6 physical build on KVM using lvm logical volume.
+Everything is fine except I cannot change the machine&#39;s xml using virsh edit in order to make the changes to deactivate the kvmclock, it always returns to it&#39;s original version.
+
+how I proceed:
+
+- stop the lvm group (and all its logical volumes)
+- virsh dumpxml XYZ machine &gt; XYZ.xml file
+- undefine the machine XYZ (this deletes the virsh xml)
+- edit the copied XYZ.xml file (add the line &lt;timer name=&#39;kvmclock&#39; present=&#39;no&#39;/&gt; )
+- virsh define XYZ.xml
+
+This is how it should be (?)...
+But if I edit the virsh xml again, the inserted line is gone  :-[
+
+What am I missing here?</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 10 Mar 2015 21:03:18 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/virsh-edit-xml/902.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Virsh edit XML</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for the warm welcome <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<blockquote>vhost-net fails at startup (should be kernel related? not a Whonix issue)</blockquote>
+<p>I have set KVM to prefer the kernel virtio network driver if present on the system or else it falls back to virtio-net. From what I gather, Debian stable kernel doesn’t enable vhost-net by default.</p>
+<p>Juat ignore virt-xml-validate warnings. From my experience there is something buggy about it on Debian that makes it complain about perfectly good configurations as of recently.</p>
+<p>By reporting tsc, it means your kvmclock clock is now gone and everything is working as expected.</p>
+          <p><a href="http://forums.whonix.org/t/virsh-edit-xml/902/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virsh-edit-xml/902/11</link>
+        <pubDate>Tue, 10 Mar 2015 21:03:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-902-11</guid>
+        <source url="http://forums.whonix.org/t/virsh-edit-xml/902.rss">Virsh edit XML</source>
+      </item>
+      <item>
+        <title>Virsh edit XML</title>
+        <dc:creator><![CDATA[BM-2cU]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a>, welcome back!   8)</p>
+<p>I installed a fresh debian stable without qemu-kvm or libvirt.<br>
+Then I added qemu-kvm and libvirt from backport and installed the Whonix qcow using the kvm xml.</p>
+<p>vhost-net fails at startup (should be kernel related? not a Whonix issue)</p>
+<p>then checking with virt-xml-validate:</p>
+<p><code>virt-xml-validate ~/Downloads/Whonix-Gateway_kvm-9.6.xmlRelax-NG validity error : Extra element devices in interleave
+Whonix-Gateway_kvm-9.6.xml:30: element devices: Relax-NG validity error : Element domain failed to validate content
+Whonix-Gateway_kvm-9.6.xml fails to validate</code></p>
+<p>current_clocksource on the guest gives me tsc <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<p><code>sudo cat /sys/devices/system/clocksource/clocksource0/current_clock source 
+tsc</code></p>
+<p>even when I cut out all other elements from the clock element so it remains</p>
+<p><code>  &lt;clock offset='utc'&gt;
+    &lt;timer name='kvmclock' present='no'/&gt;
+  &lt;/clock&gt;</code><br>
+the clock source on the guest tells me just tsc.</p>
+<p>My conclusion is that I <span class="bbcode-u">have to</span> install qemu-kvm and libvirt from backport on a fresh install.<br>
+Otherwise I am fighting windmills^^</p>
+          <p><a href="http://forums.whonix.org/t/virsh-edit-xml/902/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virsh-edit-xml/902/10</link>
+        <pubDate>Tue, 10 Mar 2015 19:06:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-902-10</guid>
+        <source url="http://forums.whonix.org/t/virsh-edit-xml/902.rss">Virsh edit XML</source>
+      </item>
+      <item>
+        <title>Virsh edit XML</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Try the files here, if they don’t work your best bet is using Debian Jessie because its been tested as fully compatible:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="32" height="32">
+      <a href="https://github.com/Whonix/whonix-libvirt/tree/master/usr/share/whonix-libvirt/xml" target="_blank">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars3.githubusercontent.com/u/4500165?s=400&amp;v=4" class="thumbnail onebox-avatar" width="400" height="400">
+
+<h3><a href="https://github.com/Whonix/whonix-libvirt/tree/master/usr/share/whonix-libvirt/xml" target="_blank">Whonix/whonix-libvirt</a></h3>
+
+<p>Whonix Libvirt XML Files for KVM - https://www.whonix.org/wiki/KVM - Whonix/whonix-libvirt</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/virsh-edit-xml/902/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virsh-edit-xml/902/9</link>
+        <pubDate>Tue, 10 Mar 2015 13:58:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-902-9</guid>
+        <source url="http://forums.whonix.org/t/virsh-edit-xml/902.rss">Virsh edit XML</source>
+      </item>
+      <item>
+        <title>Virsh edit XML</title>
+        <dc:creator><![CDATA[BM-2cU]]></dc:creator>
+        <description><![CDATA[
+            <p>Good question^^ there is no timer listed at all, just the utc offset.<br>
+As mentioned before I want add </p>
+<p>My guess is that when removing the libvirt stable the <span class="bbcode-i">virt-xml-validate</span> remained or is not included/updated in the backport. First I will install a fresh Debian with libvirt directly from backport just to exclude this possibility.<br>
+If that doesn’t help I will download the qcow2 images and compare the xml files.</p>
+          <p><a href="http://forums.whonix.org/t/virsh-edit-xml/902/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virsh-edit-xml/902/8</link>
+        <pubDate>Mon, 09 Mar 2015 16:34:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-902-8</guid>
+        <source url="http://forums.whonix.org/t/virsh-edit-xml/902.rss">Virsh edit XML</source>
+      </item>
+      <item>
+        <title>Virsh edit XML</title>
+        <dc:creator><![CDATA[verifi]]></dc:creator>
+        <description><![CDATA[
+            <p>What timers are listed in your XML files?</p>
+          <p><a href="http://forums.whonix.org/t/virsh-edit-xml/902/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virsh-edit-xml/902/7</link>
+        <pubDate>Mon, 09 Mar 2015 15:00:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-902-7</guid>
+        <source url="http://forums.whonix.org/t/virsh-edit-xml/902.rss">Virsh edit XML</source>
+      </item>
+      <item>
+        <title>Virsh edit XML</title>
+        <dc:creator><![CDATA[BM-2cU]]></dc:creator>
+        <description><![CDATA[
+            <p>After removing (also configs) I installed from backport</p>
+<p><code>
+libvirt-bin 1.2.9-9~bpo70+1 
+qemu-kvm 2.1+dfsg-9~bpo70+1 
+virt-manager 0.9.1-4</code></p>
+<p>the problem with <span class="bbcode-i">virt-xml-validate</span> remains</p>
+<p><code>
+element timer: Relax-NG validity error : Element domain has extra content: timer</code></p>
+          <p><a href="http://forums.whonix.org/t/virsh-edit-xml/902/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virsh-edit-xml/902/6</link>
+        <pubDate>Mon, 09 Mar 2015 12:17:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-902-6</guid>
+        <source url="http://forums.whonix.org/t/virsh-edit-xml/902.rss">Virsh edit XML</source>
+      </item>
+      <item>
+        <title>Virsh edit XML</title>
+        <dc:creator><![CDATA[BM-2cU]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/verifi">@verifi</a></p>
+<p>Thank-you for the advice. Using nas I use uuid for lvm anyway. Maybe it makes sense to investigate and compare security between lvm vg/lv and qcow.</p>
+<p>I am still using libvirt from stable. I tried the backport version but then had big trouble with the devices of my other guests. A clean remove of the backport version didn’t work.</p>
+          <p><a href="http://forums.whonix.org/t/virsh-edit-xml/902/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virsh-edit-xml/902/5</link>
+        <pubDate>Mon, 09 Mar 2015 10:52:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-902-5</guid>
+        <source url="http://forums.whonix.org/t/virsh-edit-xml/902.rss">Virsh edit XML</source>
+      </item>
+      <item>
+        <title>Virsh edit XML</title>
+        <dc:creator><![CDATA[verifi]]></dc:creator>
+        <description><![CDATA[
+            <p>What version of libvirt are you running? Libvirt validation removes settings it doesn’t recognize from an edited XML file. Those settings can be about new features the old libvirt knows nothing about. Anything older than Jessie for host will give errors of features not being supported. Run libvirt 1.2.9 and above for best results.</p>
+<p>About LVM check the warnings at the end of this page.</p>
+<p><a href="https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Virtualization_Administration_Guide/sect-Virtualization-Adding_storage_devices_to_guests-Adding_hard_drives_and_other_block_devices_to_a_guest.html" class="onebox" target="_blank" rel="nofollow noopener">https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Virtualization_Administration_Guide/sect-Virtualization-Adding_storage_devices_to_guests-Adding_hard_drives_and_other_block_devices_to_a_guest.html</a></p>
+          <p><a href="http://forums.whonix.org/t/virsh-edit-xml/902/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virsh-edit-xml/902/4</link>
+        <pubDate>Mon, 09 Mar 2015 01:38:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-902-4</guid>
+        <source url="http://forums.whonix.org/t/virsh-edit-xml/902.rss">Virsh edit XML</source>
+      </item>
+      <item>
+        <title>Virsh edit XML</title>
+        <dc:creator><![CDATA[BM-2cU]]></dc:creator>
+        <description><![CDATA[
+            <p>At least I found the reason why this line got lost, virt-xml-validate gives me</p>
+<pre><code class="lang-auto"></code></pre>
+<p>Maybe this gets solved if I use the backport libvirt, but I don’t like it because it misses a lot of interfaces and cannot be 100% uninstalled.</p>
+<p>kvmclock is not deactivated in the vm, it still shows up with</p>
+<p><code>sudo cat /sys/devices/system/clocksource/clocksource0/current_clocksource
+kvm-clock</code></p>
+<blockquote>Why are you using LVM instead of the qcow images?</blockquote>
+If I make a physical isolation build on kvm using lvm I have a far better performance.
+How does a lvm misconfiguration look like?
+          <p><a href="http://forums.whonix.org/t/virsh-edit-xml/902/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virsh-edit-xml/902/3</link>
+        <pubDate>Mon, 09 Mar 2015 00:32:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-902-3</guid>
+        <source url="http://forums.whonix.org/t/virsh-edit-xml/902.rss">Virsh edit XML</source>
+      </item>
+      <item>
+        <title>Virsh edit XML</title>
+        <dc:creator><![CDATA[verifi]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>I am running a Whonix Workstation  9.6 physical build on KVM using lvm logical volume.
+Everything is fine except I cannot change the machine's xml using virsh edit in order to make the changes to deactivate the kvmclock, it always returns to it's original version.</blockquote>
+<p>kvmclock is deactivated in the XML you don’t need to do it.</p>
+<p>You can still edit a running machine’s XML but the changes won’t take effect until you stop and restart it. No need for undefining redefining anything. Simply edit the configuration that comes up by calling virsh edit <span class="bbcode-i">machine name</span> then save the changes and exit.</p>
+<p>Why are you using LVM instead of the qcow images? An lvm misconfiguration could expose the real filesystem to malicious processes running on the guest. From what I know, the Whonix build script can still allow you to roll your own qcow image from source instead of using orebuilt ones provided here.</p>
+          <p><a href="http://forums.whonix.org/t/virsh-edit-xml/902/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virsh-edit-xml/902/2</link>
+        <pubDate>Sun, 08 Mar 2015 22:41:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-902-2</guid>
+        <source url="http://forums.whonix.org/t/virsh-edit-xml/902.rss">Virsh edit XML</source>
+      </item>
+      <item>
+        <title>Virsh edit XML</title>
+        <dc:creator><![CDATA[BM-2cU]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi there,</p>
+<p>I am running a Whonix Workstation  9.6 physical build on KVM using lvm logical volume.<br>
+Everything is fine except I cannot change the machine’s xml using virsh edit in order to make the changes to deactivate the kvmclock, it always returns to it’s original version.</p>
+<p>how I proceed:</p>
+<ul>
+<li>stop the lvm group (and all its logical volumes)</li>
+<li>virsh dumpxml XYZ machine &gt; XYZ.xml file</li>
+<li>undefine the machine XYZ (this deletes the virsh xml)</li>
+<li>edit the copied XYZ.xml file (add the line  )</li>
+<li>virsh define XYZ.xml</li>
+</ul>
+<p>This is how it should be (?)…<br>
+But if I edit the virsh xml again, the inserted line is gone  :-[</p>
+<p>What am I missing here?</p>
+          <p><a href="http://forums.whonix.org/t/virsh-edit-xml/902/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virsh-edit-xml/902/1</link>
+        <pubDate>Sun, 08 Mar 2015 19:32:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-902-1</guid>
+        <source url="http://forums.whonix.org/t/virsh-edit-xml/902.rss">Virsh edit XML</source>
+      </item>
+  </channel>
+</rss>

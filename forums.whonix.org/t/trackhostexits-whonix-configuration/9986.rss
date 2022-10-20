@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>TrackHostExits - Whonix configuration</title>
+    <link>http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986</link>
+    <description>I&#39;ve been struggling with exit IPs changing and logging me out of a site.  Is there a secure way to access a site with exit IP that is secure from monitoring and that still allows for secure connections to sites.  So you can use it for regularly visited sites without revealing your entry IP? 
+
+Thanks,.</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 01 Aug 2020 14:39:59 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>TrackHostExits - Whonix configuration</title>
+        <dc:creator><![CDATA[81a989]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="ak88" data-post="7" data-topic="9986">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/ee7513/40.png" class="avatar"> ak88:</div>
+<blockquote>
+<p>If I’m not mistaken, this only applies when they are on different domains (technically, origins), not tabs.</p>
+</blockquote>
+</aside>
+<p>Thanks for clarifying.</p>
+          <p><a href="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/8</link>
+        <pubDate>Sat, 01 Aug 2020 14:39:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9986-8</guid>
+        <source url="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986.rss">TrackHostExits - Whonix configuration</source>
+      </item>
+      <item>
+        <title>TrackHostExits - Whonix configuration</title>
+        <dc:creator><![CDATA[ak88]]></dc:creator>
+        <description><![CDATA[
+            <p>There is a torrc option just for this purpose, called “TrackHostExits”, where you can specify a list of domains for which Tor will reuse the same exit for that domain for as long as possible. There was some talk about deprecating it a while back, so I’m not sure if it still works or not.</p>
+<p>In any case, if you use that option, make sure you set up a single-purpose gateway which you only use for visiting that particular site. The anonymity implications for using circuits longer than 10 minutes was never really understood or investigated, so it may make you stick out like a sore thumb. Also, due to a bug that option will completely break whonix’s stream isolation; the gateway will mix together all traffic from all its clients. That’s why it’s important you only use that gateway for one site at a time. <a href="https://trac.torproject.org/projects/tor/ticket/18200" rel="nofollow noopener">https://trac.torproject.org/projects/tor/ticket/18200</a></p>
+<p>TrackHostExits host,.domain,…</p>
+<pre><code>For each value in the comma separated list, Tor will track recent connections to hosts that match this value and attempt to reuse the same exit node for each. If the value is prepended with a '.', it is treated as matching an entire domain. If one of the values is just a '.', it means match everything. This option is useful if you frequently connect to sites that will expire all your authentication cookies (i.e. log you out) if your IP address changes. Note that this option does have the disadvantage of making it more clear that a given history is associated with a single user. However, most people who would wish to observe this will observe it through cookies or other protocol-specific means anyhow.
+</code></pre>
+<p>TrackHostExitsExpire NUM</p>
+<pre><code>Since exit servers go up and down, it is desirable to expire the association between host and exit server after NUM seconds. The default is 1800 seconds (30 minutes).
+</code></pre>
+<p><a href="http://qrmfuxwgyzk5jdjz.onion/docs/tor-manual.html.en" class="onebox" target="_blank" rel="nofollow noopener">http://qrmfuxwgyzk5jdjz.onion/docs/tor-manual.html.en</a></p>
+<aside class="quote no-group" data-username="Fost" data-post="5" data-topic="9986">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/f/ebca7d/40.png" class="avatar"> Fost:</div>
+<blockquote>
+<p>Wouldn’t a page reload actually trigger a change of exits as well? Or is the exit change solely based on a clock system?</p>
+</blockquote>
+</aside>
+<p>It depends. If the TCP connection to the site is still open, the browser will just request the page over the existing connection. If the connection is closed, the browser will open a new connection, and in that case Tor is guaranteed not to use a circuit that was opened more than 10 minutes ago. It is up to the browser, and the server, how long they decide to keep the TCP connection open.</p>
+<p>When a new circuit is built and used for the first time, a timer is started, and after 10 minutes, the circuit is marked as “dirty”. Tor won’t close any existing connections that are using that circuit, but it won’t route any new client connections through it. Therefore, you could have a connection still alive from hours ago, but any new connection must use a circuit younger than 10 minutes. The “new identity” button immediately marks all circuits dirty.</p>
+<aside class="quote no-group" data-username="81a989" data-post="6" data-topic="9986">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/8/a9a28c/40.png" class="avatar"> 81a989:</div>
+<blockquote>
+<p>Exit changes are triggered by 10 minutes without activity by default. (You can see somewhere in the torrc man file.) That’s a tor client setting.</p>
+</blockquote>
+</aside>
+<p>MaxCircuitDirtiness NUM</p>
+<pre><code>Feel free to reuse a circuit that was first used at most NUM seconds ago, but never attach a new stream to a circuit that is too old. For hidden services, this applies to the last time a circuit was used, not the first. Circuits with streams constructed with SOCKS authentication via SocksPorts that have KeepAliveIsolateSOCKSAuth also remain alive for MaxCircuitDirtiness seconds after carrying the last such stream. (Default: 10 minutes)
+</code></pre>
+<p>You could also hard code a single exit node into your torrc with ExitNodes:</p>
+<p>ExitNodes node,node,…</p>
+<pre><code>A list of identity fingerprints, country codes, and address patterns of nodes to use as exit node---that is, a node that delivers traffic for you outside the Tor network. See the ExcludeNodes option for more information on how to specify nodes.
+
+Note that if you list too few nodes here, or if you exclude too many exit nodes with ExcludeExitNodes, you can degrade functionality. For example, if none of the exits you list allows traffic on port 80 or 443, you won’t be able to browse the web.
+
+Note also that not every circuit is used to deliver traffic outside of the Tor network. It is normal to see non-exit circuits (such as those used to connect to hidden services, those that do directory fetches, those used for relay reachability self-tests, and so on) that end at a non-exit node. To keep a node from being used entirely, see ExcludeNodes and StrictNodes.
+
+The ExcludeNodes option overrides this option: any node listed in both ExitNodes and ExcludeNodes is treated as excluded.
+
+The .exit address notation, if enabled via MapAddress, overrides this option
+</code></pre>
+<p>Again, any of these options may make your traffic stick out from the crowd, so use a dedicated gateway just for the sites where you need it.</p>
+<aside class="quote no-group" data-username="81a989" data-post="6" data-topic="9986">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/8/a9a28c/40.png" class="avatar"> 81a989:</div>
+<blockquote>
+<p>However, TBB uses stream isolation for different tabs. So a new tab will take a different path. That might not be true if a new tab is made from right-clicking an existing webpage.</p>
+</blockquote>
+</aside>
+<p>If I’m not mistaken, this only applies when they are on different domains (technically, origins), not tabs. If you open <a href="https://check.torproject.org/" rel="nofollow noopener">https://check.torproject.org/</a> in two tabs at the same time, you get the same exit address. Tabs of the same domain follow the regular isolation rules AFAIK.</p>
+          <p><a href="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/7</link>
+        <pubDate>Sat, 01 Aug 2020 01:08:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9986-7</guid>
+        <source url="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986.rss">TrackHostExits - Whonix configuration</source>
+      </item>
+      <item>
+        <title>TrackHostExits - Whonix configuration</title>
+        <dc:creator><![CDATA[81a989]]></dc:creator>
+        <description><![CDATA[
+            <p>This is how I know it. Tor Project does make changes, so check behind me on what I tell you.</p>
+<p>Exit changes are triggered by 10 minutes without activity by default. (You can see somewhere in the torrc man file.) That’s a tor client setting.</p>
+<p>However, TBB uses stream isolation for different tabs. So a new tab will take a different path. That might not be true if a new tab is made from right-clicking an existing webpage.</p>
+          <p><a href="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/6</link>
+        <pubDate>Fri, 31 Jul 2020 20:13:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9986-6</guid>
+        <source url="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986.rss">TrackHostExits - Whonix configuration</source>
+      </item>
+      <item>
+        <title>TrackHostExits - Whonix configuration</title>
+        <dc:creator><![CDATA[Fost]]></dc:creator>
+        <description><![CDATA[
+            <p>that’s good to know. Wouldn’t a page reload actually trigger a change of exits as well? Or is the exit change solely based on a clock system? Thanks for clarifying.</p>
+          <p><a href="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/5</link>
+        <pubDate>Fri, 31 Jul 2020 14:08:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9986-5</guid>
+        <source url="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986.rss">TrackHostExits - Whonix configuration</source>
+      </item>
+      <item>
+        <title>TrackHostExits - Whonix configuration</title>
+        <dc:creator><![CDATA[Fost]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks,</p>
+<p>I’ll try your suggestion.</p>
+          <p><a href="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/4</link>
+        <pubDate>Fri, 31 Jul 2020 13:19:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9986-4</guid>
+        <source url="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986.rss">TrackHostExits - Whonix configuration</source>
+      </item>
+      <item>
+        <title>TrackHostExits - Whonix configuration</title>
+        <dc:creator><![CDATA[81a989]]></dc:creator>
+        <description><![CDATA[
+            <p>Exits change every ten minutes when they are not used. You could reload the page every few minutes.</p>
+          <p><a href="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/3</link>
+        <pubDate>Wed, 29 Jul 2020 17:54:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9986-3</guid>
+        <source url="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986.rss">TrackHostExits - Whonix configuration</source>
+      </item>
+      <item>
+        <title>TrackHostExits - Whonix configuration</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>No.</p>
+<p>Consider reporting to website owner.</p>
+<p>Any other workaround will be non-ideal. Workarounds:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Tunnels/Introduction" target="_blank" title="12:29PM - 19 June 2020">Whonix – 19 Jun 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:95/67;"><img src="https://www.whonix.org/w/images/8/86/Beyond-1087922640.jpg" class="thumbnail" width="95" height="67"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Tunnels/Introduction" target="_blank">Combining Tunnels with Tor</a></h3>
+
+<p>Information on whether Tor gets more or less secure when combining Tor with tunnels such as VPN, SSH, proxies. (User → Tor → proxy/VPN/SSH → Internet) (User → proxy/VPN/SSH → Tor → Internet)</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/2</link>
+        <pubDate>Fri, 24 Jul 2020 14:41:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9986-2</guid>
+        <source url="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986.rss">TrackHostExits - Whonix configuration</source>
+      </item>
+      <item>
+        <title>TrackHostExits - Whonix configuration</title>
+        <dc:creator><![CDATA[Fost]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve been struggling with exit IPs changing and logging me out of a site.  Is there a secure way to access a site with exit IP that is secure from monitoring and that still allows for secure connections to sites.  So you can use it for regularly visited sites without revealing your entry IP?</p>
+<p>Thanks,.</p>
+          <p><a href="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986/1</link>
+        <pubDate>Thu, 23 Jul 2020 21:01:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9986-1</guid>
+        <source url="http://forums.whonix.org/t/trackhostexits-whonix-configuration/9986.rss">TrackHostExits - Whonix configuration</source>
+      </item>
+  </channel>
+</rss>

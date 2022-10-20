@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+    <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104</link>
+    <description>So here I am again trying to switch from VirtualBox to KVM/virt-manager full-time...
+
+I&#39;ve just downloaded the libvirt images,  last available version (14.0.1.4). Just a few points I&#39;d like to discuss/find solutions for.
+
+**First**, I had to adapt the display in order to have a normal resolution: Whisker Menu -&gt; display -&gt; changed Resolution to 1920x1080. Works great, and survives reboot! 
+
+**Suggestion:** **shouldn&#39;t this resolution be set as default in the libvirt images?** It&#39;s hard-coded in this file: `.config/xfce4/xfconf/xfce-perchannel-xml/displays.xml` on XFCE4, and so can be simply added during the build phase:
+
+      &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        &lt;channel name=&quot;displays&quot; version=&quot;1.0&quot;&gt;
+          &lt;property name=&quot;Default&quot; type=&quot;empty&quot;&gt;
+            &lt;property name=&quot;Virtual-0&quot; type=&quot;string&quot; value=&quot;Virtual-0&quot;&gt;
+              &lt;property name=&quot;Active&quot; type=&quot;bool&quot; value=&quot;true&quot;/&gt;
+              &lt;property name=&quot;Resolution&quot; type=&quot;string&quot; value=&quot;1920x1080&quot;/&gt;
+              &lt;property name=&quot;RefreshRate&quot; type=&quot;double&quot; value=&quot;59.962844&quot;/&gt;
+              &lt;property name=&quot;Rotation&quot; type=&quot;int&quot; value=&quot;0&quot;/&gt;
+              &lt;property name=&quot;Reflection&quot; type=&quot;string&quot; value=&quot;0&quot;/&gt;
+              &lt;property name=&quot;Primary&quot; type=&quot;bool&quot; value=&quot;true&quot;/&gt;
+              &lt;property name=&quot;Position&quot; type=&quot;empty&quot;&gt;
+                &lt;property name=&quot;X&quot; type=&quot;int&quot; value=&quot;0&quot;/&gt;
+                &lt;property name=&quot;Y&quot; type=&quot;int&quot; value=&quot;0&quot;/&gt;
+              &lt;/property&gt;
+            &lt;/property&gt;
+          &lt;/property&gt;
+        &lt;/channel&gt;
+
+Otherwise first users boot a machine with a very poor 1024x768 resolution and won&#39;t know how to change this... Quite a putting off experience!
+
+**2. Clipboard copy not working?**
+
+Although spice-vdagent is installed and running, I am unable to copy-paste text from the vm to the host and vice-versa:
+
+    user@host:~$ ps auxf | grep -i vdagent | grep -v grep
+    root       541  0.0  0.1  35140  2656 ?        Ss   13:52   0:00 /usr/sbin/spice-vdagentd
+    user       929  0.0  0.3 176320  6976 ?        Ss   13:52   0:00 /usr/bin/spice-vdagent
+
+ Anything I am missing to make this work? Or is it expected behavior? On other, non-whonix (debian) KVM VMs that I have been playing with lately, the installation of `spice-vdagent` package was enough to make it work out of the box. Is it different with Whonix?
+
+**3. grub-live is not installed, so whonix-live is not available by default**
+Again, this may be expected behavior, but I thought that since December it would be installed by default on all Whonix images (see http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/installing-whonix-live-mode-in-all-distributed-images/6467/10). 
+
+Is it not the case? The genmon applet is working btw...
+
+    user@host:~$ sudo apt install grub-live
+    [sudo] password for user:         
+    Reading package lists... Done
+    Building dependency tree       
+    Reading state information... Done
+    The following additional packages will be installed:
+      live-boot live-boot-doc live-boot-initramfs-tools live-config-systemd
+      live-tools rsync uuid-runtime
+    Suggested packages:
+      cryptsetup curlftpfs httpfs2 debian-installer-launcher eject openssh-client
+      openssh-server
+    The following NEW packages will be installed:
+      grub-live live-boot live-boot-doc live-boot-initramfs-tools
+      live-config-systemd live-tools rsync uuid-runtime
+    0 upgraded, 8 newly installed, 0 to remove and 2 not upgraded.
+    Need to get 684 kB of archives.
+    After this operation, 1,306 kB of additional disk space will be used.
+    Do you want to continue? [Y/n]</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 16 Apr 2019 12:17:31 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+        <dc:creator><![CDATA[onion_knight]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="11" data-topic="7104" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Still needs a volunteer to test it in VirtualBox.</p>
+</blockquote>
+</aside>
+<p>I think the problem does not exist in VirtualBox as guest additions take automatically care of seamless full resolution.</p>
+          <p><a href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/12</link>
+        <pubDate>Tue, 16 Apr 2019 12:17:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7104-12</guid>
+        <source url="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</source>
+      </item>
+      <item>
+        <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Still needs a volunteer to test it in VirtualBox.</p>
+          <p><a href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/11</link>
+        <pubDate>Mon, 15 Apr 2019 17:42:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7104-11</guid>
+        <source url="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</source>
+      </item>
+      <item>
+        <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes I did. It works as advertised though that particular resolution does not match my screen. I think it would be hard to pick a good resolution that works for everybody. Anyway I will document it because it is that good.</p>
+          <p><a href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/10</link>
+        <pubDate>Mon, 15 Apr 2019 15:56:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7104-10</guid>
+        <source url="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</source>
+      </item>
+      <item>
+        <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="8" data-topic="7104">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v3/letter/o/f6c823/40.png" class="avatar"> onion_knight:</div>
+<blockquote>
+<p>Any feedback regarding my proposal for the new default resolution?</p>
+</blockquote>
+</aside>
+<aside class="quote" data-post="3" data-topic="7104">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/3">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/kvm"><span class="badge-category-bg" style="background-color: #9EB83B;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Everything specific to Whonix KVM. (devs)">KVM</span></a>
+  </div>
+  <blockquote>
+    Could you test this please? <a class="mention" href="http://forums.whonix.org/u/algernon">@Algernon</a>
+  </blockquote>
+</aside>
+
+<p>Unresolved. If no one volunteers doing this, not going to happen.</p>
+          <p><a href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/9</link>
+        <pubDate>Mon, 15 Apr 2019 10:23:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7104-9</guid>
+        <source url="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</source>
+      </item>
+      <item>
+        <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+        <dc:creator><![CDATA[onion_knight]]></dc:creator>
+        <description><![CDATA[
+            <p>Great, thanks!<br>
+<a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a> Any feedback regarding my proposal for the new default resolution? Did you experiment it?</p>
+          <p><a href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/8</link>
+        <pubDate>Mon, 15 Apr 2019 07:53:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7104-8</guid>
+        <source url="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</source>
+      </item>
+      <item>
+        <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>OK done.</p>
+          <p><a href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/7</link>
+        <pubDate>Mon, 08 Apr 2019 15:21:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7104-7</guid>
+        <source url="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</source>
+      </item>
+      <item>
+        <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+        <dc:creator><![CDATA[onion_knight]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes, this is what I meant.</p>
+          <p><a href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/6</link>
+        <pubDate>Mon, 08 Apr 2019 09:57:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7104-6</guid>
+        <source url="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</source>
+      </item>
+      <item>
+        <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="4" data-topic="7104">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/o/f6c823/40.png" class="avatar"> onion_knight:</div>
+<blockquote>
+<p>Understood. Is it documented in the wiki?</p>
+</blockquote>
+</aside>
+<p>The reasoning yes: <a href="https://www.whonix.org/wiki/KVM#Clipboard_Sharing" rel="nofollow noopener">https://www.whonix.org/wiki/KVM#Clipboard_Sharing</a> how to reverse it no. Is this what you meant?</p>
+          <p><a href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/5</link>
+        <pubDate>Fri, 05 Apr 2019 17:54:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7104-5</guid>
+        <source url="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</source>
+      </item>
+      <item>
+        <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+        <dc:creator><![CDATA[onion_knight]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="2" data-topic="7104">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>That is a conscious decision by me to avoid accidentally cross pasting info between non anonymous VMs and Whonix. It saved me many times. Also keep in mind a malicious guest will be able to read the clipboard if enabled.</p>
+<p>I assume you know what you’re doing so to enable, edit the workstation xml and scroll down to the spice section and remove the restriction.</p>
+</blockquote>
+</aside>
+<p>Understood. Is it documented in the wiki?</p>
+<aside class="quote no-group" data-post="2" data-topic="7104">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Patrick mentioned that will change by Whonix 15.</p>
+</blockquote>
+</aside>
+<p>OK. But I think it’s now default in the VirtualBox images? Anyway I’ve installed it myself in KVM <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=6" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<aside class="quote no-group" data-post="2" data-topic="7104">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Thanks for your feedback <a class="mention" href="http://forums.whonix.org/u/onion_knight">@onion_knight</a></p>
+</blockquote>
+</aside>
+<p>You’re welcome!</p>
+          <p><a href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/4</link>
+        <pubDate>Thu, 04 Apr 2019 22:15:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7104-4</guid>
+        <source url="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</source>
+      </item>
+      <item>
+        <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="2" data-topic="7104">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> what do you think? Is this a good solution that can be cleanly added and applies to all users?</p>
+</blockquote>
+</aside>
+<p>Could you test this please? <a class="mention" href="http://forums.whonix.org/u/algernon">@Algernon</a></p>
+          <p><a href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/3</link>
+        <pubDate>Thu, 04 Apr 2019 17:14:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7104-3</guid>
+        <source url="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</source>
+      </item>
+      <item>
+        <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="1" data-topic="7104">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/o/f6c823/40.png" class="avatar"> onion_knight:</div>
+<blockquote>
+<p>So here I am again trying to switch from VirtualBox to KVM/virt-manager full-time…</p>
+</blockquote>
+</aside>
+<p>Good to hear <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=6" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<aside class="quote no-group" data-post="1" data-topic="7104">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/o/f6c823/40.png" class="avatar"> onion_knight:</div>
+<blockquote>
+<p><strong>First</strong> , I had to adapt the display in order to have a normal resolution: Whisker Menu -&gt; display -&gt; changed Resolution to 1920x1080. Works great, and survives reboot!</p>
+</blockquote>
+</aside>
+<p>Awesome then I’ll document it after experimenting.</p>
+<aside class="quote no-group" data-post="1" data-topic="7104">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/o/f6c823/40.png" class="avatar"> onion_knight:</div>
+<blockquote>
+<p><strong>Suggestion:</strong> <strong>shouldn’t this resolution be set as default in the libvirt images?</strong> It’s hard-coded in this file: <code>.config/xfce4/xfconf/xfce-perchannel-xml/displays.xml</code> on XFCE4, and so can be simply added during the build phase:</p>
+</blockquote>
+</aside>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> what do you think? Is this a good solution that can be cleanly added and applies to all users?</p>
+<aside class="quote no-group" data-post="1" data-topic="7104">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/o/f6c823/40.png" class="avatar"> onion_knight:</div>
+<blockquote>
+<ol start="2">
+<li>Clipboard copy not working?</li>
+</ol>
+</blockquote>
+</aside>
+<p>That is a conscious decision by me to avoid accidentally cross pasting info between non anonymous VMs and Whonix. It saved me many times. Also keep in mind a malicious guest will be able to read the clipboard if enabled.</p>
+<p>I assume you know what you’re doing so to enable, edit the workstation xml and scroll down to the spice section and remove the restriction.</p>
+<aside class="quote no-group" data-post="1" data-topic="7104">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/o/f6c823/40.png" class="avatar"> onion_knight:</div>
+<blockquote>
+<p><strong>3. grub-live is not installed, so whonix-live is not available by default</strong></p>
+</blockquote>
+</aside>
+<p>Patrick mentioned that will change by Whonix 15.</p>
+<p>Thanks for your feedback <a class="mention" href="http://forums.whonix.org/u/onion_knight">@onion_knight</a></p>
+          <p><a href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/2</link>
+        <pubDate>Thu, 04 Apr 2019 15:50:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7104-2</guid>
+        <source url="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</source>
+      </item>
+      <item>
+        <title>Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</title>
+        <dc:creator><![CDATA[onion_knight]]></dc:creator>
+        <description><![CDATA[
+            <p>So here I am again trying to switch from VirtualBox to KVM/virt-manager full-time…</p>
+<p>I’ve just downloaded the libvirt images,  last available version (14.0.1.4). Just a few points I’d like to discuss/find solutions for.</p>
+<p><strong>First</strong>, I had to adapt the display in order to have a normal resolution: Whisker Menu -&gt; display -&gt; changed Resolution to 1920x1080. Works great, and survives reboot!</p>
+<p><strong>Suggestion:</strong> <strong>shouldn’t this resolution be set as default in the libvirt images?</strong> It’s hard-coded in this file: <code>.config/xfce4/xfconf/xfce-perchannel-xml/displays.xml</code> on XFCE4, and so can be simply added during the build phase:</p>
+<pre><code>  &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+    &lt;channel name="displays" version="1.0"&gt;
+      &lt;property name="Default" type="empty"&gt;
+        &lt;property name="Virtual-0" type="string" value="Virtual-0"&gt;
+          &lt;property name="Active" type="bool" value="true"/&gt;
+          &lt;property name="Resolution" type="string" value="1920x1080"/&gt;
+          &lt;property name="RefreshRate" type="double" value="59.962844"/&gt;
+          &lt;property name="Rotation" type="int" value="0"/&gt;
+          &lt;property name="Reflection" type="string" value="0"/&gt;
+          &lt;property name="Primary" type="bool" value="true"/&gt;
+          &lt;property name="Position" type="empty"&gt;
+            &lt;property name="X" type="int" value="0"/&gt;
+            &lt;property name="Y" type="int" value="0"/&gt;
+          &lt;/property&gt;
+        &lt;/property&gt;
+      &lt;/property&gt;
+    &lt;/channel&gt;
+</code></pre>
+<p>Otherwise first users boot a machine with a very poor 1024x768 resolution and won’t know how to change this… Quite a putting off experience!</p>
+<p><strong>2. Clipboard copy not working?</strong></p>
+<p>Although spice-vdagent is installed and running, I am unable to copy-paste text from the vm to the host and vice-versa:</p>
+<pre><code>user@host:~$ ps auxf | grep -i vdagent | grep -v grep
+root       541  0.0  0.1  35140  2656 ?        Ss   13:52   0:00 /usr/sbin/spice-vdagentd
+user       929  0.0  0.3 176320  6976 ?        Ss   13:52   0:00 /usr/bin/spice-vdagent
+</code></pre>
+<p>Anything I am missing to make this work? Or is it expected behavior? On other, non-whonix (debian) KVM VMs that I have been playing with lately, the installation of <code>spice-vdagent</code> package was enough to make it work out of the box. Is it different with Whonix?</p>
+<p><strong>3. grub-live is not installed, so whonix-live is not available by default</strong><br>
+Again, this may be expected behavior, but I thought that since December it would be installed by default on all Whonix images (see <a href="http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/installing-whonix-live-mode-in-all-distributed-images/6467/10" rel="nofollow noopener">http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/installing-whonix-live-mode-in-all-distributed-images/6467/10</a>).</p>
+<p>Is it not the case? The genmon applet is working btw…</p>
+<pre><code>user@host:~$ sudo apt install grub-live
+[sudo] password for user:         
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following additional packages will be installed:
+  live-boot live-boot-doc live-boot-initramfs-tools live-config-systemd
+  live-tools rsync uuid-runtime
+Suggested packages:
+  cryptsetup curlftpfs httpfs2 debian-installer-launcher eject openssh-client
+  openssh-server
+The following NEW packages will be installed:
+  grub-live live-boot live-boot-doc live-boot-initramfs-tools
+  live-config-systemd live-tools rsync uuid-runtime
+0 upgraded, 8 newly installed, 0 to remove and 2 not upgraded.
+Need to get 684 kB of archives.
+After this operation, 1,306 kB of additional disk space will be used.
+Do you want to continue? [Y/n]</code></pre>
+          <p><a href="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104/1</link>
+        <pubDate>Thu, 04 Apr 2019 14:18:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7104-1</guid>
+        <source url="http://forums.whonix.org/t/back-to-kvm-questions-on-default-resolution-grub-live-and-clipboard-sharing-in-14-0-1-4/7104.rss">Back to KVM: questions on default resolution, grub-live and clipboard sharing in 14.0.1.4</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Add qemu-utils to the kvm installation</title>
+    <link>http://forums.whonix.org/t/add-qemu-utils-to-the-kvm-installation/12208</link>
+    <description>Current installation of kvm will show this error message: 
+
+    user@host:~$ sudo systemctl status libvirtd
+    ● libvirtd.service - Virtualization daemon
+         Loaded: loaded (/lib/systemd/system/libvirtd.service; enabled; vendor preset: enabled)
+         Active: active (running) since Sun 2021-08-29 04:44:36 +04; 2 days ago
+    TriggeredBy: ● libvirtd.socket
+                 ● libvirtd-ro.socket
+                 ● libvirtd-admin.socket
+           Docs: man:libvirtd(8)
+                 https://libvirt.org
+       Main PID: 744 (libvirtd)
+          Tasks: 23 (limit: 32768)
+         Memory: 23.3M
+            CPU: 9.091s
+         CGroup: /system.slice/libvirtd.service
+                 ├─ 744 /usr/sbin/libvirtd
+                 ├─ 953 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script=/usr/lib&gt;
+                 ├─ 954 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script=/usr/lib&gt;
+                 └─1007 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/Whonix-External.conf --leasefile-ro --dhcp-script=&gt;
+
+    Aug 31 05:30:47 host dnsmasq-dhcp[953]: DHCPDISCOVER(virbr0) 52:54:00:a7:69:01
+    Aug 31 05:30:47 host dnsmasq-dhcp[953]: DHCPOFFER(virbr0) 192.168.122.94 52:54:00:a7:69:01
+    Aug 31 05:30:47 host dnsmasq-dhcp[953]: DHCPREQUEST(virbr0) 192.168.122.94 52:54:00:a7:69:01
+    Aug 31 05:30:48 host dnsmasq-dhcp[953]: DHCPACK(virbr0) 192.168.122.94 52:54:00:a7:69:01 ArcoLinuxD
+    Aug 31 05:32:59 host libvirtd[744]: internal error: End of file from qemu monitor
+    Aug 31 05:37:43 host libvirtd[744]: internal error: creation of non-raw file images is not supported without qemu-img.
+    Aug 31 05:52:54 host libvirtd[744]: internal error: creation of non-raw file images is not supported without qemu-img.
+    Aug 31 05:53:17 host libvirtd[744]: internal error: creation of non-raw file images is not supported without qemu-img.
+    Aug 31 05:54:35 host libvirtd[744]: internal error: creation of non-raw file images is not supported without qemu-img.
+    Aug 31 06:00:49 host libvirtd[744]: internal error: creation of non-raw file images is not supported without qemu-img.
+
+which effect the installation of generic os.
+
+so better to add qemu-utils to the installation line: 
+
+    user@host:~$ sudo apt install qemu-utils
+    Reading package lists... Done
+    Building dependency tree... Done
+    Reading state information... Done
+    Suggested packages:
+      debootstrap qemu-block-extra
+    The following NEW packages will be installed:
+      qemu-utils
+    0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+    Need to get 1,197 kB of archives.
+    After this operation, 6,223 kB of additional disk space will be used.
+    Get:1 https://deb.debian.org/debian testing/main amd64 qemu-utils amd64 1:5.2+dfsg-11 [1,197 kB]
+    Fetched 1,197 kB in 4s (313 kB/s)                       
+    Selecting previously unselected package qemu-utils.
+    (Reading database ... 136246 files and directories currently installed.)
+    Preparing to unpack .../qemu-utils_1%3a5.2+dfsg-11_amd64.deb ...
+    Unpacking qemu-utils (1:5.2+dfsg-11) ...
+    Setting up qemu-utils (1:5.2+dfsg-11) ...
+    Processing triggers for man-db (2.9.4-2) ...
+    user@host:~$ sudo systemctl restart libvirtd
+    user@host:~$ sudo systemctl status libvirtd
+    ● libvirtd.service - Virtualization daemon
+         Loaded: loaded (/lib/systemd/system/libvirtd.service; enabled; vendor preset: enabled)
+         Active: active (running) since Tue 2021-08-31 06:15:45 +04; 4s ago
+    TriggeredBy: ● libvirtd.socket
+                 ● libvirtd-ro.socket
+                 ● libvirtd-admin.socket
+           Docs: man:libvirtd(8)
+                 https://libvirt.org
+       Main PID: 38517 (libvirtd)
+          Tasks: 22 (limit: 32768)
+         Memory: 31.0M
+            CPU: 666ms
+         CGroup: /system.slice/libvirtd.service
+                 ├─  953 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script=/usr/li&gt;
+                 ├─  954 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script=/usr/li&gt;
+                 ├─ 1007 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/Whonix-External.conf --leasefile-ro --dhcp-script&gt;
+                 └─38517 /usr/sbin/libvirtd
+
+    Aug 31 06:15:45 host systemd[1]: Starting Virtualization daemon...
+    Aug 31 06:15:45 host systemd[1]: Started Virtualization daemon.
+    Aug 31 06:15:46 host dnsmasq[953]: read /etc/hosts - 5 addresses
+    Aug 31 06:15:46 host dnsmasq[953]: read /var/lib/libvirt/dnsmasq/default.addnhosts - 0 addresses
+    Aug 31 06:15:46 host dnsmasq-dhcp[953]: read /var/lib/libvirt/dnsmasq/default.hostsfile
+    Aug 31 06:15:47 host dnsmasq[1007]: read /etc/hosts - 5 addresses
+    Aug 31 06:15:47 host dnsmasq[1007]: read /var/lib/libvirt/dnsmasq/Whonix-External.addnhosts - 0 addresses
+    user@host:~$</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 12 Sep 2021 16:35:18 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/add-qemu-utils-to-the-kvm-installation/12208.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Add qemu-utils to the kvm installation</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="TNT_BOM_BOM" data-post="1" data-topic="12208">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tnt_bom_bom/40/2148_2.png" class="avatar"> TNT_BOM_BOM:</div>
+<blockquote>
+<p><code>qemu-utils</code></p>
+</blockquote>
+</aside>
+<p>Updated the wiki. Not sure about distros other than Debian so contributions welcome. Let me know if the current package install list is up-to-date for first time users on Bullseye.</p>
+          <p><a href="http://forums.whonix.org/t/add-qemu-utils-to-the-kvm-installation/12208/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/add-qemu-utils-to-the-kvm-installation/12208/2</link>
+        <pubDate>Sun, 12 Sep 2021 16:35:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12208-2</guid>
+        <source url="http://forums.whonix.org/t/add-qemu-utils-to-the-kvm-installation/12208.rss">Add qemu-utils to the kvm installation</source>
+      </item>
+      <item>
+        <title>Add qemu-utils to the kvm installation</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>Current installation of kvm will show this error message:</p>
+<pre><code>user@host:~$ sudo systemctl status libvirtd
+● libvirtd.service - Virtualization daemon
+     Loaded: loaded (/lib/systemd/system/libvirtd.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sun 2021-08-29 04:44:36 +04; 2 days ago
+TriggeredBy: ● libvirtd.socket
+             ● libvirtd-ro.socket
+             ● libvirtd-admin.socket
+       Docs: man:libvirtd(8)
+             https://libvirt.org
+   Main PID: 744 (libvirtd)
+      Tasks: 23 (limit: 32768)
+     Memory: 23.3M
+        CPU: 9.091s
+     CGroup: /system.slice/libvirtd.service
+             ├─ 744 /usr/sbin/libvirtd
+             ├─ 953 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script=/usr/lib&gt;
+             ├─ 954 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script=/usr/lib&gt;
+             └─1007 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/Whonix-External.conf --leasefile-ro --dhcp-script=&gt;
+
+Aug 31 05:30:47 host dnsmasq-dhcp[953]: DHCPDISCOVER(virbr0) 52:54:00:a7:69:01
+Aug 31 05:30:47 host dnsmasq-dhcp[953]: DHCPOFFER(virbr0) 192.168.122.94 52:54:00:a7:69:01
+Aug 31 05:30:47 host dnsmasq-dhcp[953]: DHCPREQUEST(virbr0) 192.168.122.94 52:54:00:a7:69:01
+Aug 31 05:30:48 host dnsmasq-dhcp[953]: DHCPACK(virbr0) 192.168.122.94 52:54:00:a7:69:01 ArcoLinuxD
+Aug 31 05:32:59 host libvirtd[744]: internal error: End of file from qemu monitor
+Aug 31 05:37:43 host libvirtd[744]: internal error: creation of non-raw file images is not supported without qemu-img.
+Aug 31 05:52:54 host libvirtd[744]: internal error: creation of non-raw file images is not supported without qemu-img.
+Aug 31 05:53:17 host libvirtd[744]: internal error: creation of non-raw file images is not supported without qemu-img.
+Aug 31 05:54:35 host libvirtd[744]: internal error: creation of non-raw file images is not supported without qemu-img.
+Aug 31 06:00:49 host libvirtd[744]: internal error: creation of non-raw file images is not supported without qemu-img.
+</code></pre>
+<p>which effect the installation of generic os.</p>
+<p>so better to add qemu-utils to the installation line:</p>
+<pre><code>user@host:~$ sudo apt install qemu-utils
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+Suggested packages:
+  debootstrap qemu-block-extra
+The following NEW packages will be installed:
+  qemu-utils
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Need to get 1,197 kB of archives.
+After this operation, 6,223 kB of additional disk space will be used.
+Get:1 https://deb.debian.org/debian testing/main amd64 qemu-utils amd64 1:5.2+dfsg-11 [1,197 kB]
+Fetched 1,197 kB in 4s (313 kB/s)                       
+Selecting previously unselected package qemu-utils.
+(Reading database ... 136246 files and directories currently installed.)
+Preparing to unpack .../qemu-utils_1%3a5.2+dfsg-11_amd64.deb ...
+Unpacking qemu-utils (1:5.2+dfsg-11) ...
+Setting up qemu-utils (1:5.2+dfsg-11) ...
+Processing triggers for man-db (2.9.4-2) ...
+user@host:~$ sudo systemctl restart libvirtd
+user@host:~$ sudo systemctl status libvirtd
+● libvirtd.service - Virtualization daemon
+     Loaded: loaded (/lib/systemd/system/libvirtd.service; enabled; vendor preset: enabled)
+     Active: active (running) since Tue 2021-08-31 06:15:45 +04; 4s ago
+TriggeredBy: ● libvirtd.socket
+             ● libvirtd-ro.socket
+             ● libvirtd-admin.socket
+       Docs: man:libvirtd(8)
+             https://libvirt.org
+   Main PID: 38517 (libvirtd)
+      Tasks: 22 (limit: 32768)
+     Memory: 31.0M
+        CPU: 666ms
+     CGroup: /system.slice/libvirtd.service
+             ├─  953 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script=/usr/li&gt;
+             ├─  954 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script=/usr/li&gt;
+             ├─ 1007 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/Whonix-External.conf --leasefile-ro --dhcp-script&gt;
+             └─38517 /usr/sbin/libvirtd
+
+Aug 31 06:15:45 host systemd[1]: Starting Virtualization daemon...
+Aug 31 06:15:45 host systemd[1]: Started Virtualization daemon.
+Aug 31 06:15:46 host dnsmasq[953]: read /etc/hosts - 5 addresses
+Aug 31 06:15:46 host dnsmasq[953]: read /var/lib/libvirt/dnsmasq/default.addnhosts - 0 addresses
+Aug 31 06:15:46 host dnsmasq-dhcp[953]: read /var/lib/libvirt/dnsmasq/default.hostsfile
+Aug 31 06:15:47 host dnsmasq[1007]: read /etc/hosts - 5 addresses
+Aug 31 06:15:47 host dnsmasq[1007]: read /var/lib/libvirt/dnsmasq/Whonix-External.addnhosts - 0 addresses
+user@host:~$</code></pre>
+          <p><a href="http://forums.whonix.org/t/add-qemu-utils-to-the-kvm-installation/12208/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/add-qemu-utils-to-the-kvm-installation/12208/1</link>
+        <pubDate>Wed, 01 Sep 2021 02:21:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12208-1</guid>
+        <source url="http://forums.whonix.org/t/add-qemu-utils-to-the-kvm-installation/12208.rss">Add qemu-utils to the kvm installation</source>
+      </item>
+  </channel>
+</rss>

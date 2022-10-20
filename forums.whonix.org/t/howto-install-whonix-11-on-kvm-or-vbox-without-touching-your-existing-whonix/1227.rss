@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>[HOWTO] Install Whonix-11 on KVM or VBox WITHOUT Touching Your Existing Whonix</title>
+    <link>http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227</link>
+    <description>We need more testers of Whonix 11.  If you haven&#39;t tried 11 yet, because you are unwilling to take the risk of making significant changes to your existing Whonix (stable, perfect) setup, this guide is for YOU!
+
+This guide appiles to existing users of Whonix who wants to help us test Whonix 11, which is the first release based on Debian Jessie, instead of Wheezy (Whonix-10, and earlier).
+
+As Jessie represents a major change for Debian, I recommend all users perform a clean install of Whonix 11, as opposed to upgrading from Whonix 10.
+
+On VBox, adding Whonix 11 to your list of VMs is a trivial exercise.  During the Gateway*.ova import process, when the System Description window pops up, change the name of the VM to something with &#39;11&#39; in it, so you&#39;ll know later which of the two Gateways you want to use.  You can also rename the *.vdi file to be created with some unique name.  Obviously, repeat the steps for the 11-Workstation.
+
+Most importantly, for KVM users, this guide will show you how to add a Whonix 11 network, and create a new domain without impacting your existing Whonix 10 installation.
+
+On KVM, adding Whonix 11 to your list of existing VMs is also a trivial exercise, but a tad more involved.
+
+First, edit the Gateway-11*.xml file and change the: 
+
+&lt;name&gt;Whonix-Gateway&lt;/name&gt;
+
+to something unique with 11 in it, so you can keep both Gateways straight later.  I also change the qcow2 file name to something more pleasing and unique on this line:
+
+&lt;source file=&#39;/var/lib/libvirt/images/Whonix-Gateway.qcow2&#39;/&gt;
+
+Save your changes, and save the file to a different filename if you prefer.
+
+You can now create your new Whonix 11 Gateway domain by running something like:
+
+virsh -c qemu:///system define ~/Whonix-Gateway-My-Modified-11*.xml
+
+Now you can repeat those steps you just did for the Gateway, for the 11-Workstation, and finally, create its domain.
+
+virsh -c qemu:///system define ~/Whonix-Workstation-My-Modified-11*.xml
+
+Your existing network should look like this:
+
+# virsh net-list
+
+Name                 State      Autostart     Persistent
+----------------------------------------------------------
+ default              active     yes           yes
+ Whonix               active     yes           yes
+
+I&#39;ve never been sure whether folks understand this, because the Whonix KVM instructions don&#39;t even address this critical matter. 
+
+When you run ifconfig, it should show, in addition to your physical network hardware and lo, virbr0 and virbr1.
+ 
+default (NAT NIC) controls virbr0, and Whonix controls virbr1 (Whonix NIC).  Therefore, we need to add a Whonix 11 network, which will control virbr2 (Whonix 11 NIC).
+
+To accomplish this, edit your Whonix_network-11.xml file so it matches mine:
+
+&lt;network&gt;
+  &lt;name&gt;Whonix-11&lt;/name&gt;
+  &lt;bridge name=&#39;virbr2&#39; stp=&#39;on&#39; delay=&#39;0&#39;/&gt;
+&lt;/network&gt;
+
+Save your changes.  Now run something like:
+
+virsh -c qemu:///system net-define ~/Whonix_network-My-Modified-11.xml
+
+followed by:
+
+virsh -c qemu:///system net-autostart Whonix-11
+
+and:
+
+virsh -c qemu:///system net-start Whonix-11
+
+Now you can move or copy your Gateway-11 and Worskstation-11 qcow2 images into
+/var/lib/libvirt/images.
+
+At this point, you should reboot your host system.
+
+Now re-run virsh net-list, and you should see:
+
+# virsh net-list
+ Name                 State      Autostart     Persistent
+----------------------------------------------------------
+ default              active     yes           yes
+ Whonix               active     yes           yes
+ Whonix-11            active     yes           yes
+
+Now edit the NIC details of your new Gateway-11 domain.  Ensure NIC #1 is pointed at NAT, and NIC #2 is pointed at your new Whonix-11 network.
+ 
+In the new Worskstation-11, also ensure its NIC is pointed at your new Whonix-11 network.  This also holds true for any other KVM OS you might be running behind the new Gateway-11. 
+
+That&#39;s it folks.  I know this approach works, because I use the 10-Gateway and the 11-Gateway every day in both KVM and VBox.
+
+BTW:  Concerning VBox, I&#39;m running the 9 July 2015 release of VBox 5.  All Whonix VBox users should take advantage of the brand new Disk Encryption support offered (only) in VBox 5, and us old-school LUKS guys will keep on LUKKING!  : 8)
+
+P.S.  Patrick - check your email - and respond.  ;D
+
+Edit by Patrick:
+Changed title to better reflect this is an how to rather than question.</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 17 Jul 2015 08:47:38 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>[HOWTO] Install Whonix-11 on KVM or VBox WITHOUT Touching Your Existing Whonix</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>Yo Patrick,</p>
+<p>Concerning your twin requests:  Done and Done.  8)</p>
+<p>CCP</p>
+          <p><a href="http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227/4</link>
+        <pubDate>Fri, 17 Jul 2015 08:47:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1227-4</guid>
+        <source url="http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227.rss">[HOWTO] Install Whonix-11 on KVM or VBox WITHOUT Touching Your Existing Whonix</source>
+      </item>
+      <item>
+        <title>[HOWTO] Install Whonix-11 on KVM or VBox WITHOUT Touching Your Existing Whonix</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Concerning VBox, I'm running the 9 July 2015 release of VBox 5.</blockquote>
+Glad to hear that works for you. Please check:
+Whonix doesn't work in VirtualBox 5.0.0
+https://www.whonix.org/forum/index.php/topic,1412.0.html
+Haven't found time to check myself yet.
+          <p><a href="http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227/3</link>
+        <pubDate>Thu, 16 Jul 2015 20:16:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1227-3</guid>
+        <source url="http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227.rss">[HOWTO] Install Whonix-11 on KVM or VBox WITHOUT Touching Your Existing Whonix</source>
+      </item>
+      <item>
+        <title>[HOWTO] Install Whonix-11 on KVM or VBox WITHOUT Touching Your Existing Whonix</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>I've never been sure whether folks understand this, because the Whonix KVM instructions don't even address this critical matter.</blockquote>
+Please take this to the KVM sub forums for HulaHoop's attention.
+          <p><a href="http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227/2</link>
+        <pubDate>Thu, 16 Jul 2015 19:34:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1227-2</guid>
+        <source url="http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227.rss">[HOWTO] Install Whonix-11 on KVM or VBox WITHOUT Touching Your Existing Whonix</source>
+      </item>
+      <item>
+        <title>[HOWTO] Install Whonix-11 on KVM or VBox WITHOUT Touching Your Existing Whonix</title>
+        <dc:creator><![CDATA[Corrupt_Correct_Pig]]></dc:creator>
+        <description><![CDATA[
+            <p>We need more testers of Whonix 11.  If you haven’t tried 11 yet, because you are unwilling to take the risk of making significant changes to your existing Whonix (stable, perfect) setup, this guide is for YOU!</p>
+<p>This guide appiles to existing users of Whonix who wants to help us test Whonix 11, which is the first release based on Debian Jessie, instead of Wheezy (Whonix-10, and earlier).</p>
+<p>As Jessie represents a major change for Debian, I recommend all users perform a clean install of Whonix 11, as opposed to upgrading from Whonix 10.</p>
+<p>On VBox, adding Whonix 11 to your list of VMs is a trivial exercise.  During the Gateway*.ova import process, when the System Description window pops up, change the name of the VM to something with ‘11’ in it, so you’ll know later which of the two Gateways you want to use.  You can also rename the *.vdi file to be created with some unique name.  Obviously, repeat the steps for the 11-Workstation.</p>
+<p>Most importantly, for KVM users, this guide will show you how to add a Whonix 11 network, and create a new domain without impacting your existing Whonix 10 installation.</p>
+<p>On KVM, adding Whonix 11 to your list of existing VMs is also a trivial exercise, but a tad more involved.</p>
+<p>First, edit the Gateway-11*.xml file and change the:</p>
+<p>Whonix-Gateway</p>
+<p>to something unique with 11 in it, so you can keep both Gateways straight later.  I also change the qcow2 file name to something more pleasing and unique on this line:</p>
+
+<p>Save your changes, and save the file to a different filename if you prefer.</p>
+<p>You can now create your new Whonix 11 Gateway domain by running something like:</p>
+<p>virsh -c qemu:///system define ~/Whonix-Gateway-My-Modified-11*.xml</p>
+<p>Now you can repeat those steps you just did for the Gateway, for the 11-Workstation, and finally, create its domain.</p>
+<p>virsh -c qemu:///system define ~/Whonix-Workstation-My-Modified-11*.xml</p>
+<p>Your existing network should look like this:</p>
+<h1>virsh net-list</h1>
+<h2>Name                 State      Autostart     Persistent</h2>
+<p>default              active     yes           yes<br>
+Whonix               active     yes           yes</p>
+<p>I’ve never been sure whether folks understand this, because the Whonix KVM instructions don’t even address this critical matter.</p>
+<p>When you run ifconfig, it should show, in addition to your physical network hardware and lo, virbr0 and virbr1.</p>
+<p>default (NAT NIC) controls virbr0, and Whonix controls virbr1 (Whonix NIC).  Therefore, we need to add a Whonix 11 network, which will control virbr2 (Whonix 11 NIC).</p>
+<p>To accomplish this, edit your Whonix_network-11.xml file so it matches mine:</p>
+
+  Whonix-11
+  
+
+<p>Save your changes.  Now run something like:</p>
+<p>virsh -c qemu:///system net-define ~/Whonix_network-My-Modified-11.xml</p>
+<p>followed by:</p>
+<p>virsh -c qemu:///system net-autostart Whonix-11</p>
+<p>and:</p>
+<p>virsh -c qemu:///system net-start Whonix-11</p>
+<p>Now you can move or copy your Gateway-11 and Worskstation-11 qcow2 images into<br>
+/var/lib/libvirt/images.</p>
+<p>At this point, you should reboot your host system.</p>
+<p>Now re-run virsh net-list, and you should see:</p>
+<h1>virsh net-list</h1>
+<h2>Name                 State      Autostart     Persistent</h2>
+<p>default              active     yes           yes<br>
+Whonix               active     yes           yes<br>
+Whonix-11            active     yes           yes</p>
+<p>Now edit the NIC details of your new Gateway-11 domain.  Ensure NIC <span class="hashtag">#1</span> is pointed at NAT, and NIC <span class="hashtag">#2</span> is pointed at your new Whonix-11 network.</p>
+<p>In the new Worskstation-11, also ensure its NIC is pointed at your new Whonix-11 network.  This also holds true for any other KVM OS you might be running behind the new Gateway-11.</p>
+<p>That’s it folks.  I know this approach works, because I use the 10-Gateway and the 11-Gateway every day in both KVM and VBox.</p>
+<p>BTW:  Concerning VBox, I’m running the 9 July 2015 release of VBox 5.  All Whonix VBox users should take advantage of the brand new Disk Encryption support offered (only) in VBox 5, and us old-school LUKS guys will keep on LUKKING!  : 8)</p>
+<p>P.S.  Patrick - check your email - and respond.  ;D</p>
+<p>Edit by Patrick:<br>
+Changed title to better reflect this is an how to rather than question.</p>
+          <p><a href="http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227/1</link>
+        <pubDate>Thu, 16 Jul 2015 16:32:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1227-1</guid>
+        <source url="http://forums.whonix.org/t/howto-install-whonix-11-on-kvm-or-vbox-without-touching-your-existing-whonix/1227.rss">[HOWTO] Install Whonix-11 on KVM or VBox WITHOUT Touching Your Existing Whonix</source>
+      </item>
+  </channel>
+</rss>

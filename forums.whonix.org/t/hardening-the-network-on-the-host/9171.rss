@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Hardening the network on the host</title>
+    <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171</link>
+    <description>I&#39;m trying to harden my host to not leak anything to clearnet.
+I have an idea to get EntryNodes IP addresses from TorProject site, add them to iptables as allowed, and prohibit other traffic.
+
+Question:
+Do TOR or WG connect to other IPs except entrynodes during normal operation?
+Any directory services or anything else?
+Can I spoil something with this configuration?</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 16 Jul 2020 02:27:06 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[81a989]]></dc:creator>
+        <description><![CDATA[
+            <p>I have a iptables ruleset too, but this one filters traffic by user. Best when tor is running as a system account. Regular user accounts have too many processes.</p>
+<p>Example works for Debian. If you use sdwdate then you should allow by group and not user. uid-owner is user, gid-owner is group. Pick one, not both.</p>
+<p>Examples that filter outgoing traffic are rare, so I doubt if OUTPUT needs RELATED ctstate or not. Does anyone have the answer to that?</p>
+<pre><code>iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A OUTPUT -p tcp -m tcp -m owner --uid-owner debian-tor -j ACCEPT
+iptables -A OUTPUT -p tcp -m tcp -m owner --gid-owner debian-tor -j ACCEPT</code></pre>
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/13</link>
+        <pubDate>Thu, 16 Jul 2020 02:27:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-13</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[Helia]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you for your help!</p>
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/12</link>
+        <pubDate>Fri, 03 Apr 2020 23:29:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-12</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>When using Tor with Entry Guards (as opposed to a bridge), Tor will pick a couple different Entrys for the client; that’s what you see in the state file. Sometimes, if you use the netstat command, you may see that there are 3 or more connections open, but you are connected to only one Guard. That’s normal. Tor keeps the connections open in case something happens like a network interruption.<br>
+The reasons that a Guard can change during a session are varied. Sometimes it’s because there are modifications in the torrc file. Modifying options like Exit Nodes, Number of Entry Guards and others can cause these changes to take place. Sometimes it’s something on the server side also. Bottom line is that if you leave your Tor client to do its magic on its own without modifying any parameters related to routing and network pathways, then what you see is normal behavior. Tor works best when left to sort out its paths through the network on its own.<br>
+So if you would like to, you can add your separate Guards to your iptables rules and still the ruleset would be secure because only Tor connections would be allowed. The Guards do not lead anywhere else except to a middle node in Tor’s network.<br>
+Also, Whonix introduced Onion Vanguards recently that offers several types of protection methods both for hidden services and for Tor clients accessing hidden services. Very interesting material. All of these different algorithms and protocols work together to keep Tor relatively secure.</p>
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/11</link>
+        <pubDate>Tue, 31 Mar 2020 22:54:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-11</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[Helia]]></dc:creator>
+        <description><![CDATA[
+            <p>I have already discovered Nyx and it is a very nice program <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<p>You’re right, the state file contains a list of Guards by nickname, and I’d have to use <a href="http://metrics.torproject.org/rs.html" rel="nofollow noopener">metrics.torproject.org/rs.html</a> to find out each Guard’s IP from my state file.</p>
+<p>I noticed a small problem with me: Quite often, Nyx shows me a change of Guard. Every few or several hours. They are always in the state file, but they change.<br>
+That’s why I thought about adding everyone to iptables, but first look up their IP addresses <a href="https://metrics.torproject.org/rs.html" rel="nofollow noopener">https://metrics.torproject.org/rs.html</a></p>
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/10</link>
+        <pubDate>Tue, 31 Mar 2020 13:14:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-10</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Well, here is what I would do in order to make sure you add the correct address: If you are using a Bridge, then add it’s address right away. If using an Entry/Guard node, then either the state file would work, or simply make a Tor connection for a day or two, and observe the address of your Guard/Entry node. Use Nyx (in the Gateway list of programs) to do this. Click on Nyx, once it opens, press the right arrow key once (–&gt;) That screen shows you your circuits. Number 1 “Guard” is your Guard/Entry address.<br>
+The reason I suggest Nyx in addition to the state file is because sometimes the state file lists the connection by “nickname” and not the actual IP. At least in Nyx you can easily find it.</p>
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/9</link>
+        <pubDate>Tue, 31 Mar 2020 01:12:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-9</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[Helia]]></dc:creator>
+        <description><![CDATA[
+            <p>I thought the connections to directory authorities were before connecting to the input nodes. Now I understand that they are part of the code after establishing connection with Entry Guards, for example.<br>
+So I can add IP addresses from the TOR status file (/var/lib/tor/state) to iptables permissions, because they will not change for about 30 days?</p>
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/8</link>
+        <pubDate>Sat, 28 Mar 2020 22:58:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-8</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Sure, there are those connections, but remember that these happen over your Tor connection. Directory authorities are a listing of all trusted relays and nodes. (the “consensus”) This is Tor’s way of verifying trust for the nodes on its network that gets updated real time every hour or so. The actual verification protocol is part of your Tor client code; you do not have to do anything on your end.<br>
+You can use the rules above and not have any problems accessing Tor’s network. Add to them according to your network but those should get you started</p>
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/7</link>
+        <pubDate>Sat, 28 Mar 2020 01:07:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-7</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[Helia]]></dc:creator>
+        <description><![CDATA[
+            <p>That’s exactly what I wanted to do <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"><br>
+But on the TOR forum I received information that there may be additional connections to directory caches and directory authorities.<br>
+What do you think about it?</p>
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/6</link>
+        <pubDate>Fri, 27 Mar 2020 13:11:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-6</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Helia,<br>
+You can try this on your host, assuming you have a “NAT” connection.<br>
+Iptables rules can accomodate your needs nicely. Instead of whitelisting all entry nodes (which would be a quite large and convoluted list), see what your current Entry/Guard node is. You can see this by using Nyx in the Gateway. Once you know this, on your host, set rules like this (with sudo privileges):<br>
+First,  default drop policy</p>
+<h1>iptables -P INPUT DROP</h1>
+<h1>iptables -P FORWARD DROP</h1>
+<h1>iptables -P OUTPUT DROP</h1>
+<p>These will make it so everything NOT listed as a rule will be discarded/dropped. You will cut off all incoming and outgoing traffic except for what is explicitly defined with an iptables rule.</p>
+<h1>iptables -A OUTPUT -p tcp -d [entry-guard-ip] --j ACCEPT</h1>
+<p>And for incoming,</p>
+<h1>iptables -A INPUT -p tcp -s [entry-guard-ip] --j ACCEPT</h1>
+<p>Right under that,</p>
+<h1>iptables -A INPUT ! -a [entry-guard-ip] --j DROP</h1>
+<p>You do not need any dns rules for Tor on your host. You do need localhost though for both incoming and outgoing:</p>
+<h1>iptables -A INPUT -i lo --j ACCEPT</h1>
+<p>and</p>
+<h1>iptables -A OUTPUT -o lo --j ACCEPT</h1>
+<p>This enables your host to talk only to Tor. The entry/guard is the only IP that can communicate in either direction, and localhost of course. Put those rules into a small script, give it chmod +x privs and run it before you start Whonix. Keep in mind, entry guards change periodically, so every now and again, check Nyx to see what the current one is and adjust the iptables rules. Those wll get you started. I encourage you to take a closer look at the Whonix Firewall code for both the Gateway and Workstation on Github. There are some useful, all purpose rules that you can optionally add to your configuration.</p>
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/5</link>
+        <pubDate>Tue, 24 Mar 2020 02:48:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-5</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>There is no easy solution for your question. I am providing pointers if you like to research this more.</p>
+<p>corridor is “90%” done for non-Qubes, i.e. Debian based hosts. Implementing the remaining 10% may be doable but difficult.</p>
+<p><a href="https://github.com/rustybird/corridor">https://github.com/rustybird/corridor</a> as per original upstream can be used on a physically isolated, physically separate gateway computer in front of any other computer (using Whonix). In that case you can ignore the fork of corridor by Whonix at whonix .org/wiki/Corridor.</p>
+<p>software fork: <a href="https://en.wikipedia.org/wiki/Fork_(software_development)">https://en.wikipedia.org/wiki/Fork_(software_development)</a></p>
+<p>Whonix host firewall is in development but initial version might not have this feature. Not clear if it ever will have this feature.</p>
+<p>Your initial questions are Tor specific questions. Not Whonix specific questions. <a href="https://www.whonix.org/wiki/Free_Support_Principle">https://www.whonix.org/wiki/Free_Support_Principle</a> explains that it’s better to ask such questions elsewhere. For what you plan on doing it doesn’t matter if you are using Whonix or Tor Browser. Therefore these questions can be directed at the general Tor community.</p>
+<p>What you’re asking for isn’t done in an easy, out of the box way. Only options are to exert great effort or wait and check later.</p>
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/4</link>
+        <pubDate>Sun, 22 Mar 2020 18:45:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-4</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[Helia]]></dc:creator>
+        <description><![CDATA[
+            <p>I am very confused by various information <img src="//forums.whonix.org/images/emoji/twitter/frowning.png?v=9" title=":frowning:" class="emoji" alt=":frowning:"></p>
+<ol>
+<li>Here whonix .org/wiki/Corridor says that it works only in Qubes</li>
+<li>What should I use?<br>
+github .com/Whonix/whonix-host-firewall<br>
+github .com/Whonix/whonix-firewall<br>
+github .com/rustybird/corridor<br>
+github .com/adrelanos/corridor</li>
+</ol>
+<p>My manual solution is more transparent to me.<br>
+Will WG TOR work correctly if I only allow entrynodes traffic on the host?</p>
+<p>Sorry for the weird URLs above, but the forum doesn’t allow me to post links.</p>
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/3</link>
+        <pubDate>Sun, 22 Mar 2020 17:51:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-3</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://www.whonix.org/wiki/Free_Support_Principle">https://www.whonix.org/wiki/Free_Support_Principle</a> applies.</p>
+<p>See also:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://github.com/rustybird/corridor" target="_blank">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars2.githubusercontent.com/u/6682340?s=400&amp;v=4" class="thumbnail" width="" height="">
+
+<h3><a href="https://github.com/rustybird/corridor" target="_blank">rustybird/corridor</a></h3>
+
+<p>Tor traffic whitelisting gateway. Contribute to rustybird/corridor development by creating an account on GitHub.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p><a href="https://phabricator.whonix.org/T942" class="onebox" target="_blank">https://phabricator.whonix.org/T942</a></p>
+<aside class="quote" data-post="1" data-topic="9151">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar">
+    <a href="https://forums.whonix.org/t/whonix-host-firewall/9151">Whonix-Host Firewall</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    How easy is it to adapt corridor and allow non torrified VMs like Kicksecure to connect too? Think dealing with captive portals. Per vm network granularity may be bluntly possible  by excluding the kvm user group from networking restrictions o ensure no other non tor traffic form the host may happen. This should allow updates via apt-tor to work too.
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/2</link>
+        <pubDate>Sun, 22 Mar 2020 17:16:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-2</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+      <item>
+        <title>Hardening the network on the host</title>
+        <dc:creator><![CDATA[Helia]]></dc:creator>
+        <description><![CDATA[
+            <p>I’m trying to harden my host to not leak anything to clearnet.<br>
+I have an idea to get EntryNodes IP addresses from TorProject site, add them to iptables as allowed, and prohibit other traffic.</p>
+<p>Question:<br>
+Do TOR or WG connect to other IPs except entrynodes during normal operation?<br>
+Any directory services or anything else?<br>
+Can I spoil something with this configuration?</p>
+          <p><a href="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/hardening-the-network-on-the-host/9171/1</link>
+        <pubDate>Sun, 22 Mar 2020 17:02:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9171-1</guid>
+        <source url="http://forums.whonix.org/t/hardening-the-network-on-the-host/9171.rss">Hardening the network on the host</source>
+      </item>
+  </channel>
+</rss>

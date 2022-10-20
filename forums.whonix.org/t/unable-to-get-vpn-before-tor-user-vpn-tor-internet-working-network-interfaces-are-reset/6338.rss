@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+    <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338</link>
+    <description>Hello everyone.
+
+I have some slight trouble getting Whonix with &quot;VPN Before Tor&quot; (User -&gt; VPN -&gt; Tor -&gt; Internet) working.
+
+I have followed this guide https://www.whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor exactly.
+
+My setup is:
+
+Whonix workstation -&gt; Whonix gateway -&gt; Internet.
+
+I am using TUNNEL_FIREWALL inside the Whonix gateway.
+And it works.
+
+However, not for long.
+
+The Whonix gateway starts up and I can see from ifconfig it creates the tun0 interface, gets an IP, there are no errors, this uses the openvpn@openvpn service.
+
+It then connects to Tor with the tor@default service, again this is fine, no errors.
+
+However then, after perhaps 120 to 240 seconds, I can see this:
+
+pcnet32 0000:00:03.0 eth0: link up, 100Mbps, full-duplex
+pcnet32 0000:00:08.0 eth1: link up, 100Mbps, full-duplex
+
+When I see this, at the exact same time, the connection on the Whonix workstation goes down.
+
+The above messages (pcnet32 ..) seem to be similar to what would happen, if you unplugged the network cable and plugged it back in.
+
+However I cannot find any errors, not in the openvpn log, not in the tor log, not in dmesg, ifconfig also seems fine.
+
+I mean, I can see that it can no longer connect in journalctl -xe, both openvpn and tor are unable to connect. But there is nothing in the logs to indicate why the problem occurred, why was the network on eth0 and eth1 reset?
+
+Doing systemctl restart tor@default and systemctl restart openvpn@openvpn restores the connection, but it doesn&#39;t take long before this happens again, that the connection dies. So it is not usable as it is now.
+
+I am at a loss for what I should do about this. I have tried reinstalling. I am following the guide exactly.
+
+I&#39;m using Virtualbox, and I have several other virtual machines that have no network problems.
+
+Any help in debugging this?
+
+Addition:
+
+I did some debugging myself. Still no solution, but perhaps an experienced Whonix user can pinpoint the problem?
+
+If I let it boot, and then immediately run whonixcheck, it tries to do timesync, which it reports as:
+&quot;Timesync status: not done&quot;
+
+This repeats, for around 120 seconds, and then just as it says &quot;Whonixcheck gave up waiting&quot;, the network interfaces are reset, as mentioned above.
+
+The curious part is, that from the Whonix workstation, as I mentioned, everything works fine.
+
+Can I just disable sdwdate? Is that safe? What should I do?</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 20 Dec 2018 00:57:29 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>I cannot reproduce my original problem in version 14.0.0.9.6 (CLI) on the original (“defective”) hardware!</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/57">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/57</link>
+        <pubDate>Thu, 20 Dec 2018 00:57:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-57</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <code>rob75</code></p>
+<aside class="quote no-group" data-post="49" data-topic="6338">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/0/ec9cab/40.png" class="avatar"> 0brand:</div>
+<blockquote>
+<p>Under normal use (<strong>no vpn</strong>) time sync is able to correct this but using a VPN is compounding this issue.</p>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-post="49" data-topic="6338">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/0/ec9cab/40.png" class="avatar"> 0brand:</div>
+<blockquote>
+<p>Even though sdwdate is set to sleep for 70 minutes <strong>try to ignore that</strong> when you look at the rest of your logs.</p>
+</blockquote>
+</aside>
+<p>When using just Tor you will be fine. Its when using both Tor and VPN that you have the problem.  I was using those logs to show what was happening in openvpn.log was not matching up in the sdwdate.log. Its not easy to see unless you compare time stamps and activity line by line. Then you can get a picture as to what is going on.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/56">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/56</link>
+        <pubDate>Thu, 20 Dec 2018 00:53:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-56</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>I have some interesting news.</p>
+<p>On different hardware. I DON’T HAVE THIS ISSUE.</p>
+<p>However, before I get too excited I will note that:</p>
+<p>On working hardware, I’m using the 14.0.0.9.6 CLI version.<br>
+On the “defective” hardware, I’m using 14.0.0.7.4 GUI version.</p>
+<p>I will now try with the same version on my defective hardware.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/55">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/55</link>
+        <pubDate>Thu, 20 Dec 2018 00:33:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-55</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve tested on different hardware now.</p>
+<p>I haven’t actually tested VPN+Tor, but I did test only Tor, and I noticed the same jump in time in sdwdate’s log file.</p>
+<p>The time is 23, then it jumps back to 22! Just as sdwdate performs its /bin/date --set operations!</p>
+<p>Both my host time and guest time (before sdwdate runs!) is not UTC, and I think it is related to that, I’ve also read this:</p>
+<p>“<strong>Warning:</strong> The system clock inside Whonix is set to UTC to prevent against time zone leaks. This means it may be a few hours ahead or behind the user’s host system clock. It is strongly recommended not to change this setting.”</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Network_Time_Synchronization" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/426;"><img src="https://www.whonix.org/w/images/e/e7/TineSynchronization2134234.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Network_Time_Synchronization" target="_blank" rel="nofollow noopener">Network Time Synchronization</a></h3>
+
+<p>Network Time Synchronization</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>So perhaps this behavior is normal, and we’re back to square one?</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/54">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/54</link>
+        <pubDate>Wed, 19 Dec 2018 22:35:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-54</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks.</p>
+<p>I will start with trying on different hardware to rule out hardware issues.</p>
+<p>I wasn’t aware that my clock was jumping around. I’ve never noticed this before and I’m not noticing it now. Why this would be a problem only within a Whonix gateway guest box, is beyond me.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/53">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/53</link>
+        <pubDate>Tue, 18 Dec 2018 16:50:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-53</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="51" data-topic="6338">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/r/d6d6ee/40.png" class="avatar"> rob75:</div>
+<blockquote>
+<p>What should I do?</p>
+</blockquote>
+</aside>
+<p>Unfortunately I don’t have an answer for you. You can try  <a href="https://whonix.org/wiki/Troubleshooting#Clock_Fix">#Clock_Fix</a> but I don’t think that will help. Setting the correct time generally works only if your clock is not jumping. This can only be answered by someone more experienced. To start maybe do a little research to see if your hardware has this problem?</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/52">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/52</link>
+        <pubDate>Sat, 15 Dec 2018 22:56:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-52</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>Awesome work. What should I do? Should I force my clock to be correct? I believe I’ve tried that before using date and then hwclock --systohc.</p>
+<p>I’ll try again in the meantime, while I’m waiting for advice.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/51">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/51</link>
+        <pubDate>Sat, 15 Dec 2018 13:41:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-51</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>2 posts were split to a new topic: <a href="http://forums.whonix.org/t/how-to-route-windows-internal-network-to-whonix/6483">How to route Windows internal network to Whonix?</a></p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/50">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/50</link>
+        <pubDate>Sat, 15 Dec 2018 05:27:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-50</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>The good news, I realized the problem was in the logs all along. The bad news, your system is not keeping the correct time. Meaning your clock is jumping ahead. Under normal use (no vpn) time sync is able to correct this but using a VPN is compounding this issue.</p>
+<p>See how <code>sdwdate</code> is jumping 1 hour ahead of your OpenVPN logs? But this is happening at the same time.(should both have the same time stamps) Take a look at the rest of your logs and pay attention to the time stamps.</p>
+<p>Just to elaborate:  Even though sdwdate is set to sleep for 70 minutes try to ignore that when you look at the rest of your logs. I think its pretty clear because Tor can not be fully bootstrapped when your VPN connection is down. Time problem.</p>
+<p><strong>Openvpn.log</strong></p>
+<blockquote>
+<p>Sat Nov 24 15:26:13 2018 TUN/TAP device tun0 opened</p>
+<p>Sat Nov 24 15:26:13 2018 Note: Cannot set tx queue length on tun0: Operation not permitted (errno=1)</p>
+<p>Sat Nov 24 15:26:13 2018 do_ifconfig, tt-&gt;did_ifconfig_ipv6_setup=0</p>
+<p>Sat Nov 24 15:26:13 2018 /usr/bin/ip_unpriv link set dev tun0 up mtu [redacted]</p>
+<p>Sat Nov 24 15:26:13 2018 /usr/bin/ip_unpriv addr add dev tun0 [redacted]/24 broadcast [redacted]</p>
+<p>Sat Nov 24 15:26:18 2018 /usr/bin/ip_unpriv route add [redacted]/32 via 10.0.2.2</p>
+<p>Sat Nov 24 15:26:18 2018 /usr/bin/ip_unpriv route add 0.0.0.0/1 via [redacted]</p>
+<p>Sat Nov 24 15:26:18 2018 /usr/bin/ip_unpriv route add 128.0.0.0/1 via [redacted]</p>
+<p>Sat Nov 24 15:26:18 2018 UID set to tunnel</p>
+<p>Sat Nov 24 <strong>15:26:18</strong> 2018 Initialization Sequence Completed</p>
+<p>Sat Nov 24 15:30:39 2018 [server] Inactivity timeout (–ping-restart), restarting</p>
+<p>Sat Nov 24 15:30:39 2018 <strong>SIGUSR1[soft,ping-restart]</strong> received, process restarting</p>
+<p>Sat Nov 24 15:30:39 2018 Restart pause, 5 second(s)</p>
+</blockquote>
+<p><strong>sdwdate.log</strong></p>
+<blockquote>
+<p>2018-11-24 15:27:49 - sdwdate - INFO - Success. Sleeping for 70 minutes.</p>
+<p>2018-11-24 15:27:49 - sdwdate - INFO - Running command: sleep 4200.139213678</p>
+<p>2018-11-24 15:27:50 - /usr/bin/whonix-gateway-firewall - OK: Skipping firewall mode detection since already set to ‘full’.</p>
+<p>2018-11-24 15:27:50 - /usr/bin/whonix-gateway-firewall - OK: (Full torified network access allowed.)</p>
+<p>2018-11-24 15:27:50 - /usr/bin/whonix-gateway-firewall - OK: Whonix firewall loaded.</p>
+<p>2018-11-24 <strong>16:37:50</strong> - sdwdate - WARNING - Clock got changed by something other than sdwdate. seconds_to_sleep: 4200 time_delta: 4201</p>
+<p>2018-11-24 16:37:50 - sdwdate - INFO - Running sdwdate main loop. iteration: 2 / 10000</p>
+<p>2018-11-24 16:37:50 - sdwdate - INFO - Running sdwdate main loop. iteration: 2 / 10000</p>
+<p>2018-11-24 16:37:50 - sdwdate - INFO - Prerequisite check: The clock is sane.</p>
+<p>Within build timestamp Sat May 12 16:21:25 UTC 2018 and expiration timestamp Tue May 17 10:00:00 UTC 2033.</p>
+<p>Clock within consensus parameters consensus/valid-after 2018-11-24 14:00:00 and consensus/valid-until 2018-11-24 17:00:00.</p>
+<p>2018-11-24 16:37:50 - sdwdate - INFO - Prerequisite check: <strong>Tor fully bootstrapped.</strong></p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/49">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/49</link>
+        <pubDate>Fri, 14 Dec 2018 01:32:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-49</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve tested it now. I used the approach suggested by Patrick.</p>
+<p>The exact same problem still happens.</p>
+<p>I still get:</p>
+<blockquote>
+<p>pcnet32 0000:00:03.0 eth0: link up, 100Mbps, full-duplex<br>
+pcnet32 0000:00:08.0 eth1: link up, 100Mbps, full-duplex</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/48">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/48</link>
+        <pubDate>Thu, 13 Dec 2018 19:18:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-48</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Disable.</p>
+<pre><code>sudo mv /etc/apparmor.d/usr.lib.sdwdate.url_to_unixtime /root
+</code></pre>
+<p>And reboot.</p>
+<hr>
+<p>Re-enable.</p>
+<pre><code>sudo mv /root/usr.lib.sdwdate.url_to_unixtime /etc/apparmor.d/usr.lib.sdwdate.url_to_unixtime
+</code></pre>
+<p>And reboot.</p>
+<hr>
+<p>Untested.</p>
+<p>I would be beyond surprised if <code>/etc/apparmor.d/usr.lib.sdwdate.url_to_unixtime</code> is the cause, though.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/47">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/47</link>
+        <pubDate>Thu, 13 Dec 2018 01:25:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-47</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <pre><code>sudo aa-disable /etc/apparmor.d/usr.lib.sdwdate.url_to_unixtime
+</code></pre>
+<blockquote>
+<p><code>ERROR: Values added to a non-existing variable @{HOMEDIRS}: /rw/home/ in tunables/home.d/live-mode</code></p>
+</blockquote>
+<aside class="quote quote-modified" data-post="1" data-topic="5868">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar">
+    <a href="https://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/apparmor"><span class="badge-category-bg" style="background-color: #12A89D;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Discussion of Whonix AppArmor Profiles for better security. (devs)">AppArmor</span></a>
+  </div>
+  <blockquote>
+    Continuing the discussion from <a href="https://forums.whonix.org/t/aa-genprof-is-broken-on-whonix/5731/2">aa-genprof is broken on Whonix.</a>: 
+Doesn’t only break aa-genproof. 
+sudo aa-enforce /etc/apparmor.d/home.tor-browser.start-tor-browser ; echo $?
+
+
+ERROR: Values added to a non-existing variable @{HOMEDIRS}: /rw/home/ in tunables/home.d/live-mode
+1
+
+
+
+
+This makes debugging apparmor issues (currently on <a href="https://forums.whonix.org/t/tor-browser-8-wont-launch/5863/3">Tor Browser 8.* won't launch</a>) cumbersome. Any workaround? 
+//cc <a class="mention" href="http://forums.whonix.org/u/algernon">@Algernon</a>
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/46">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/46</link>
+        <pubDate>Thu, 13 Dec 2018 01:23:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-46</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>Sorry to keep pestering people with this, and special thanks to 0brand, but if this is indeed just a matter of disabling apparmor, would anyone know what my error is?</p>
+<p>I am using:</p>
+<p><code>aa-disable /etc/apparmor.d/usr.lib.sdwdate.url_to_unixtime</code></p>
+<p>usr, not user, but I’ve tried both.</p>
+<p>The file (/etc/apparmor.d/usr.lib.sdwdate.url_to_unixtime) exists though. Not sure why this command doesn’t work. The error means nothing to me.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/45">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/45</link>
+        <pubDate>Thu, 13 Dec 2018 00:20:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-45</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks but I tried both usr and user, the error is the same, unfortunately.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/44">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/44</link>
+        <pubDate>Sat, 08 Dec 2018 14:23:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-44</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Sorry, my mistake:</p>
+<p>sudo aa-disable /etc/apparmor.d/<strong>user</strong>.lib.sdwdate.url_to_unixtime</p>
+<p>Try:</p>
+<p><code>sudo aa-disable /etc/apparmor.d/usr.lib.sdwdate.url_to_unixtime</code></p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/43">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/43</link>
+        <pubDate>Thu, 06 Dec 2018 23:12:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-43</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi 0brand,</p>
+<p>I tried your suggestion.</p>
+<p>When I execute the command:</p>
+<p><code>aa-disable /etc/apparmor.d/user.lib.sdwdate.url_to_unixtime</code></p>
+<p>This error is printed:</p>
+<p>ERROR: Invalid or unknown keywords in 'signal  set=(rtmin+*) peer=unconfined</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/42">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/42</link>
+        <pubDate>Thu, 06 Dec 2018 16:20:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-42</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <code>rob75</code></p>
+<p>Could you try unloading the Apparmor sdwdate profile and see if that helps.  <a href="https://whonix.org/wiki/AppArmor#Profile_Unloading">Apparmor profile unload</a>.</p>
+<p>List the apparmor profiles</p>
+<p><code>ls /etc/apparmor.d/</code></p>
+<p>You should see output similar to this:</p>
+<pre><code class="lang-auto">abstractions    local                usr.bin.whonixcheck.dpkg-old
+cache           system_tor           usr.lib.onion-grater
+disable         tunables             usr.lib.sdwdate.url_to_unixtime
+force-complain  usr.bin.whonixcheck  usr.sbin.haveged
+</code></pre>
+<p>Using the  file above, this would unload the <code>sdwdate</code> profile.</p>
+<p><code>sudo aa-disable /etc/apparmor.d/user.lib.sdwdate.url_to_unixtime</code></p>
+<p>Now try running VPN with sdwate enabled.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/41">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/41</link>
+        <pubDate>Thu, 06 Dec 2018 03:05:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-41</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>I want to say thanks for all the help so far.</p>
+<p>However, I still have this problem. Should I file a bug report?</p>
+<p>Could someone else, perhaps, please verify that what I’m doing works on their system?</p>
+<p>I cannot believe that I’m still missing some simple step, which is the cause of all my issues with sdwdate. If I was, and I keep making the same mistake over and over when reinstalling the Whonix gateway, I would say it makes sense to assume others also have made the same mistake as I did.</p>
+<p>It is probably in the interest of the community to point out this crucial step (if this is indeed the problem) that I’m making in the documentation so that others can avoid the same problem.</p>
+<p>I can imagine that many simply give up when they encounter the problem.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/40">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/40</link>
+        <pubDate>Wed, 05 Dec 2018 18:13:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-40</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for your patience and taking the time to help me.</p>
+<p>Your summary is largely accurate.</p>
+<p>1: Yes.</p>
+<p>2: Yes.</p>
+<p>3: Not really, after the pcnet32 issue, then it doesn’t reconnect, at all to my knowledge. However, if I do systemctl restart for both openvpn@openvpn and tor, a few times (back and forth), then things start working again.</p>
+<p>4: Yes.</p>
+<p>Ah, this happens regardless of me running ifconfig or not (between reboots and even between reinstalls of Whonix gateway).</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/39">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/39</link>
+        <pubDate>Thu, 29 Nov 2018 22:11:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-39</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <code>rob75</code></p>
+<p>Just to recap:</p>
+<p><strong>1.</strong> OpenVPN and Tor connect when Whonix-Gateway first starts.<br>
+<strong>2.</strong> ~ 120 to 240 seconds later you see this in <code>dmesg</code> and at the same time the OpenVPN connection goes down.</p>
+<blockquote>
+<p>pcnet32 0000:00:03.0 eth0: link up, 100Mbps, full-duplex<br>
+pcnet32 0000:00:08.0 eth1: link up, 100Mbps, full-duplex</p>
+</blockquote>
+<p><strong>3.</strong> You are able to reconnect the VPN but disconnection continues to happen at the same time interval.<br>
+<strong>4.</strong> This problem is remedied by disabling <code>sdwdate</code></p>
+<hr>
+<p>I wasn’t able to produce any of the same behavior until I saw this.</p>
+<aside class="quote no-group" data-post="17" data-topic="6338">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/r/d6d6ee/40.png" class="avatar"> rob75:</div>
+<blockquote>
+<p><strong>I do:</strong></p>
+<p><strong>ifconfig</strong>, and see tun0 is up and has an IP.</p>
+</blockquote>
+</aside>
+<p>When I run <code>sudo ifconfig</code> I get interesting results.</p>
+<p><a href="https://pastebin.com/RXDJ0ynn">https://pastebin.com/RXDJ0ynn</a></p>
+<p>While I didn’t produce the exact behavior i.e. No VPN connected issue. This issue continued to be a problem on concurrent VM boots.This might be causing an problem with time sync and/or whonix_firewall.</p>
+<p>To be clear, ifconfig shouldn’t cause an issue. But possible running before whonix_firewall is loaded is interfering somehow.</p>
+<p>I’ll have to test more.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/38">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/38</link>
+        <pubDate>Thu, 29 Nov 2018 00:16:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-38</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>Ah of course, no, there is no firewall on the host.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/37">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/37</link>
+        <pubDate>Wed, 28 Nov 2018 08:39:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-37</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="34" data-topic="6338">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/r/d6d6ee/40.png" class="avatar"> rob75:</div>
+<blockquote>
+<p>If by host you mean the Whonix gateway, then not that I’m aware of. It is just a standard Whonix gateway install.</p>
+</blockquote>
+</aside>
+<p><a href="https://www.techopedia.com/definition/15763/host-operating-system">Host</a> OS. Such as Ubuntu,Debian, Windows.</p>
+<p><a href="https://www.techopedia.com/definition/16576/guest-operating-system-guest-os">Guest </a> OS. Such as Whonix-Gateway,Whonix-Workstation.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/36">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/36</link>
+        <pubDate>Wed, 28 Nov 2018 01:31:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-36</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>Here are the new logs.</p>
+<p>OpenVPN: <a href="https://pastebin.com/AVDPFuq9" rel="nofollow noopener">https://pastebin.com/AVDPFuq9</a><br>
+Tor: <a href="https://pastebin.com/SS4hKFWm" rel="nofollow noopener">https://pastebin.com/SS4hKFWm</a></p>
+<p>sdwdate is disabled/masked.</p>
+<p>Nothing happens. I’ve verified with the Whonix gateway that everything is working as it should.</p>
+<p>I let it run for a while just to show that the VPN connection rekeys itself but this is normal behavior.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/35">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/35</link>
+        <pubDate>Tue, 27 Nov 2018 23:51:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-35</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[rob75]]></dc:creator>
+        <description><![CDATA[
+            <p>If by host you mean the Whonix gateway, then not that I’m aware of. It is just a standard Whonix gateway install.</p>
+<p>My Whonix gateway is connected to a typical wireless router, my Whonix gateway is on the LAN side of this, so the whonix gateway performs standard NAT as needed.</p>
+<p>There are no issues with multiple other systems using the same Internet connection.</p>
+<p>I will get the logs you’re asking for.</p>
+<p>I will do it by doing systemctl mask sdwdate, mask tor, mask openvpn, then reboot the system.</p>
+<p>Then I will start openvpn manually as you described before, and then systemctl unmask and start tor.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/34">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/34</link>
+        <pubDate>Tue, 27 Nov 2018 15:28:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-34</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+      <item>
+        <title>Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <code>rob75</code></p>
+<p>Do you have a firewall on you host?</p>
+<p>Could you please provide VPN logs from when sdwdate is disabled. Meaning disable sdwdate then restart Whonix-Gateway then get the logs. Sorry, I know this is a PITA.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/33">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338/33</link>
+        <pubDate>Tue, 27 Nov 2018 11:19:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6338-33</guid>
+        <source url="http://forums.whonix.org/t/unable-to-get-vpn-before-tor-user-vpn-tor-internet-working-network-interfaces-are-reset/6338.rss">Unable to get VPN Before Tor (User -&gt; VPN -&gt; Tor -&gt; Internet) working, network interfaces are reset</source>
+      </item>
+  </channel>
+</rss>

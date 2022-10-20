@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Provision Whonix VPS (GUI) for Onion Services</title>
+    <link>http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807</link>
+    <description>I&#39;ve been very excited by the progress of the OnionJuggler project&#39;s integration into Whonix, which makes administrating an Onion site accessible to individuals without sys admin experience through a TUI. @Patrick @nyxnor
+
+The question remains - how does this user provision and configure Whonix on a VPS, in order to be able to use OnionJuggler? I have a proposal and would love feedback on the design before getting started. In addition to being useful for individuals lacking sys admin experience, the hope with this project is to also provide greater security by reducing user error through an &quot;infrastructure as code&quot; approach. 
+
+# Qubes-Whonix or Whonix KVM? 
+
+The first question is whether the VPS should use Qubes-Whonix or Whonix KVM. Any recommendations on this are greatly appreciated. Neither option is particularly documented. The following assumes Whonix KVM, based on this comment made in Nov &#39;20:
+
+&gt; Can Qubes-Whonix use it as server OS for hosting Tor onion hidden service?
+&gt;
+&gt; If you mean through a remote server (VPS or root server): currently usability for this is still very lacking at time of writing.
+&gt;
+&gt;* SSH into Qubes dom0 is hard
+&gt;* no CLI version
+&gt;* no documentation on how to use with CLI on a remote server as far as I am aware off
+
+With the work on qubes-remote-support, does this change anything? 
+
+# The GUI Design Proposal
+
+The User Experience I am looking for is something like this:
+
+* Prior: use cryptocurrency to anonymously buy a VPS 
+* use GUI to provision Debian on the VPS 
+* use GUI to distromorph Debian to Kicksecure, then configure Whonix KVM on Kicksecure
+* use GUI to launch the Onion Juggler TUI window 
+* use GUI to sync local static website with VPS
+
+I envision a docs website that would guide the user through this process. Perhaps the best way of sharing the proposed design is a description of each envisioned button:
+
+**Button #1: Create VPS**
+
+&#39;Create VPS&#39; links to a documentation website, which provides a step by step guide to provision a Debian VPS at several cloud providers that accept cryptocurrencies, such as:
+
+* RamNode costs about $5 a month for a server with 1GB of memory and two virtual CPU (vCPU) cores. Only accepts Bitcoin.
+* NiceVPS costs about €14.99 a month for a server with 1GB of memory and one vCPU core. Accepts Monero and Zcash.
+* Cinfu costs about $4.79 a month for a server with 2GB of memory and one vCPU core. Supports Monero and Zcash.
+* PiVPS costs about $14.97 a month for a server with 1GB of memory and one vCPU core. Supports Monero and Zcash.
+* SecureDragon costs about $4.99 a month for a server with 1GB of memory and two vCPU cores. Only accepts Bitcoin.
+
+Ideally this button would actually do the provisioning with a technology like Terraform, though from what I can tell all of the Terraform Providers, which use the cloud provider API, don&#39;t accept cryptocurrencies. All major cloud providers—AWS, Google Cloud, Microsoft Azure, Alibaba, and so on—require a credit card before approving your account. I haven&#39;t looked into this closely. 
+
+
+**Button #2: Configure Whonix**
+
+&#39;Configure Whonix&#39; takes a Debian VPS and uses configuration management technology to arrive at Kicksecure running Whonix via KVM. 
+
+I think that Ansible is the right choice for how this is implemented. It is trusted by the Freedom of Press Foundation (see their GitHub, as a new forum member I can&#39;t hyperlink) for configuration management. In my view, the main benefit of Ansible (versus shell scripts) is that it can be &#39;idempotent&#39; - it describes an end state of the system, so no matter how many times the user presses the GUI button, nothing changes if the VPS is already at the desired end state. 
+
+From &quot;UNIX and Linux System Administration Handbook&quot;:
+
+&gt; The traditional approach to sysadmin automation is an intricate complex of home-grown shell scripts supplemented by ad hoc fire fighting when scripts fail. This scheme works about as well as you might expect. Over time, systems managed in this way usually degenerate into a chaotic wreckage of package versions and configurations that can’t be reliably reproduced. It’s sometimes called the snowflake model of system administration because no two systems are ever alike.
+
+An Ansible Playbook would be maintained which
+* Distromorphs Debian to Kicksecure
+* Configures Whonix KVM as per the Wiki
+* Configures an automated update mechanism 
+* Etc.
+
+If Qubes-Whonix was the direction, this button would use Salt rather than Ansible. 
+
+The goal is that the user never needs to interact with a CLI in order for the VPS to be properly configured and up to date. 
+
+
+**Button #3: Onion Juggler**
+
+&#39;Onion Juggler&#39; establishes an SSH connection and launches the Onion Juggler TUI in Whonix-Workstation. 
+
+
+**Button #4: Sync Static Website**
+
+&#39;Sync Static Website&#39; will prompt the user for the directory location of the static website, establish an SSH connection, and syncs the local directory with the files served by Onion Juggler on the VPS. 
+
+The documentation also provides advice on how the user can create a static website. The most user friendly option is the desktop app Publii, though any Static Site Generator is possible of course. 
+
+
+**Button #5: Settings**
+
+Any settings that need to be modified can be done in Settings: local SSH key location, local static website directory location, etc. 
+
+
+What do people think of a project like this? Is there a better approach? Any feedback is very appreciated!</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 15 Oct 2022 09:53:46 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Provision Whonix VPS (GUI) for Onion Services</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="vpsgui" data-post="8" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/v/cc9497/40.png" class="avatar"> vpsgui:</div>
+<blockquote>
+<p>For scenario <strong>1. Whonix KVM on a VPS (nested virtualization)</strong>, could you expand on what testing should cover? I was thinking I would first try a KVM VPS, so KVM in KVM.</p>
+</blockquote>
+</aside>
+<p>Not yet the time to be picky. So if anything works whatsoever then that’s great.</p>
+<p>Note: I am not a maintainer of Whonix KVM.</p>
+          <p><a href="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/9</link>
+        <pubDate>Sat, 15 Oct 2022 09:53:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15807-9</guid>
+        <source url="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807.rss">Provision Whonix VPS (GUI) for Onion Services</source>
+      </item>
+      <item>
+        <title>Provision Whonix VPS (GUI) for Onion Services</title>
+        <dc:creator><![CDATA[vpsgui]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="7" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Yeah. If the VPS is for example based on OpenVZ, then it may not be possible to run any other virtualizer and the inter-VM network communication. Needs testing.</p>
+</blockquote>
+</aside>
+<p>For scenario <strong>1. Whonix KVM on a VPS (nested virtualization)</strong>, could you expand on what testing should cover? I was thinking I would first try a KVM VPS, so KVM in KVM.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="7" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Adding encryption / authentication between the two VMs isn’t implemented at time of writing and also not easy. Needs research and development.</p>
+</blockquote>
+</aside>
+<p>For scenario <strong>2. Whonix-Ws on one VPS and Whonix-Gw on a second VPS</strong>, I would propose using Nebula:</p>
+<blockquote>
+<p>Nebula is a mutually authenticated peer-to-peer software defined network based on the Noise Protocol Framework. Nebula uses certificates to assert a node’s IP address, name, and membership within user-defined groups. Nebula’s user-defined groups allow for provider agnostic traffic filtering between nodes. Discovery nodes allow individual peers to find each other and optionally use UDP hole punching to establish connections from behind most firewalls or NATs. Users can move data between nodes in any number of cloud service providers, datacenters, and endpoints, without needing to maintain a particular addressing scheme.</p>
+<p>Nebula uses Elliptic-curve Diffie-Hellman (<code>ECDH</code>) key exchange and <code>AES-256-GCM</code> in its default configuration.</p>
+<p>Nebula was created to provide a mechanism for groups of hosts to communicate securely, even across the internet, while enabling expressive firewall definitions similar in style to cloud security groups.</p>
+</blockquote>
+<p>To see an example configuration for authenticated and end-to-end encrypted channels between VPS instances see the heading " Nebula Setup" at:<br>
+blog.malicious.group/automating-c2-infrastructure-with-terraform-nebula-caddy-and-cobalt-strike/</p>
+<aside class="quote no-group" data-username="Patrick" data-post="7" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Many root servers don’t cost that much but then probably payment methods don’t offer crypto and/or require KYC. Needs research.</p>
+</blockquote>
+</aside>
+<p>For scenario <strong>4. Whonix KVM on a bare metal server</strong>, I will try to poke around for affordable bare metal servers that are also anonymous. A more affordable use case for this scenario is owning the hardware, but that comes with a different risk model for the event of a successful deanonymization attack on the onion service in that it is likely to lead to your identity. However, given that this could be acceptable to some it is almost certainly a scenario to include in deployment options, given that we know that it works well.</p>
+          <p><a href="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/8</link>
+        <pubDate>Sat, 15 Oct 2022 09:39:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15807-8</guid>
+        <source url="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807.rss">Provision Whonix VPS (GUI) for Onion Services</source>
+      </item>
+      <item>
+        <title>Provision Whonix VPS (GUI) for Onion Services</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I suggest try to get Whonix anything working in the cloud first before we get to far ahead with any implementation details.</p>
+<aside class="quote no-group" data-username="vpsgui" data-post="6" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/v/cc9497/40.png" class="avatar"> vpsgui:</div>
+<blockquote>
+<p><strong>1) Whonix KVM on a VPS (nested virtualization)</strong></p>
+<p>This could be tested for resource use and any other issues. I worry that issues can be specific to a provider and hard to anticipate, depending on what virtualization technology they are using. If anyone has experience with this, I’d love to hear about it.</p>
+</blockquote>
+</aside>
+<p>Yeah. If the VPS is for example based on OpenVZ, then it may not be possible to run any other virtualizer and the inter-VM network communication. Needs testing.</p>
+<aside class="quote no-group" data-username="vpsgui" data-post="6" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/v/cc9497/40.png" class="avatar"> vpsgui:</div>
+<blockquote>
+<ol start="2">
+<li>Whonix-Ws on one VPS and Whonix-Gw on a second VPS</li>
+</ol>
+</blockquote>
+</aside>
+<p>Whonix by default requires a secure connection between the two VMs, Whonix-Gateway and Whonix-Workstation. That’s a given in the supported virtualizers. When separting Whonix-Gateway and Whonix-Workstation in different cloud accounts it would be unencrypted by default. Encryption is not needed if Whonix is used normally, locally since it stays on the local computer only. Adding encryption / authentication between the two VMs isn’t implemented at time of writing and also not easy. Needs research and development.</p>
+<p>Related:</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://www.whonix.org/wiki/Connections_between_Gateway_and_Workstation">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/a/a4/Whonix-home-favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://www.whonix.org/wiki/Connections_between_Gateway_and_Workstation" target="_blank" rel="noopener" title="07:44PM - 13 August 2022">Whonix – 13 Aug 22</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/452;"><img src="https://www.whonix.org/w/images/9/95/Binary-503583640.jpg?version=03962e3f529d58dac15f47d547f03bae" class="thumbnail" width="640" height="452"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Connections_between_Gateway_and_Workstation" target="_blank" rel="noopener">Connections between Whonix-Gateway ™ and Whonix-Workstation ™</a></h3>
+
+  <p>Authenticated / Encrypted Connections between Whonix-Gateway ™ and Whonix-Workstation ™, ARP spoofing defense, SSH, OpenVPN, Using additional (isolated) network interfaces</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-username="vpsgui" data-post="6" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/v/cc9497/40.png" class="avatar"> vpsgui:</div>
+<blockquote>
+<p>€189.99 a month for a bare metal server.</p>
+</blockquote>
+</aside>
+<p>Many root servers don’t cost that much but then probably payment methods don’t offer crypto and/or require KYC. Needs research.</p>
+          <p><a href="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/7</link>
+        <pubDate>Fri, 14 Oct 2022 15:02:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15807-7</guid>
+        <source url="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807.rss">Provision Whonix VPS (GUI) for Onion Services</source>
+      </item>
+      <item>
+        <title>Provision Whonix VPS (GUI) for Onion Services</title>
+        <dc:creator><![CDATA[vpsgui]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="5" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>But is anonymous registration allowed?</p>
+</blockquote>
+</aside>
+<p>The list I provided is from the No Starch Press book “How to Hack Like A Ghost” (Ch 1. Becoming Anonymous Online), so are collected with an eye to KYC policies. For the documentation idea, I’m imagining a more extensive list with a walkthrough of anonymously provisioning a VPS for each VPS service we are aware of that is affordable and anonymous. This list would be maintained to reflect changing policies and would have abundant screenshots to make it easy to follow.</p>
+<p>If automated provisioning with Terraform isn’t an option anyways, another option provided in the book:</p>
+<blockquote>
+<p>Some services, like BitLaunch, can act as a simple intermediary. BitLaunch accepts Bitcoin payments but then spawns servers on DigitalOcean and Linode using its own account (for three times the price, of course, which is downright outrageous). Another intermediary service with a slightly better deal is bithost, which still takes a 50 percent commission. The trade-off, on top of the obvious rip-off, is neither of these providers gives you access to the DigitalOcean API, which can help automate much of the setup.</p>
+</blockquote>
+<aside class="quote no-group" data-username="Patrick" data-post="5" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Can you run Whonix on a VPS?</p>
+<p>If not, maybe this will only be possible on root servers.</p>
+</blockquote>
+</aside>
+<p>I have not actually tried to run Whonix with nested virtualization yet. My understanding is that in the best case scenario, this is inefficient with resources (which I imagine not being a problem to serve a few static websites), and that in a worst case scenario it causes networking and low level processor issues that can be a nightmare to diagnose and resolve.</p>
+<p>Unfortunately it seems that renting a bare metal server is prohibitively expensive for the user base I am imagining. For example, at NiceVPS in the list above, the price jumps from €14.99 a month for a VPS to €189.99 a month for a bare metal server.</p>
+<p>The following options seem possible to pursue:</p>
+<p><strong>1) Whonix KVM on a VPS (nested virtualization)</strong></p>
+<p>This could be tested for resource use and any other issues. I worry that issues can be specific to a provider and hard to anticipate, depending on what virtualization technology they are using. If anyone has experience with this, I’d love to hear about it.</p>
+<p><strong>2) Whonix-Ws on one VPS and Whonix-Gw on a second VPS</strong></p>
+<p>This seems to be the most desirable option to me. We get the benefits of Whonix without nested virtualization for double the price. Networking can be handled by configuration management (Ansible or otherwise).</p>
+<p><strong>3) Kicksecure on a VPS</strong></p>
+<p>OnionJuggler can be run on Kicksecure, though we lose some of the security benefits of hosting an onion service on Whonix, such as " Even if somebody hacks the hidden server software – such as <code>micro-httpd</code>, <code>nginx</code>, or <code>apache</code> – the attacker cannot steal the onion service key or bypass Tor". It would be half the price of option <span class="hashtag">#2</span>.</p>
+<p><strong>4) Whonix KVM on a bare metal server</strong></p>
+<p>Definitely possible but prohibitively expensive for many users.</p>
+<p>Perhaps several of these options could be possible to deploy depending on the user’s budget and threat model.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="5" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Qubes isn’t really designed to be run on a VPS at time of writing since it requires a GUI.</p>
+</blockquote>
+</aside>
+<p>Thanks for the info. Qubes Whonix would also not have options to avoid nested virtualization, so for just that reason seems less desirable.</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="4" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>Would very much be interested in a GUI.</p>
+</blockquote>
+</aside>
+<p>Awesome!</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="4" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>This can only be a doc I believe, it is difficult to find non-KYC VPS and have individual APIs conform build with Terraform for example. But IDK, best to check it.</p>
+</blockquote>
+</aside>
+<p>Agreed it warrants investigating. Terraform would especially simplify option <span class="hashtag">#2</span> above involving two VPS instances.</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="4" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>I believe a GUI for OnionJuggler would facilitate a lot the usage, but then would require VNC instead of SSH as X11 forwarding is a security risk.</p>
+</blockquote>
+</aside>
+<p>I’d like to avoid VNC on the remote server if possible. To be clear, I was imagining the GUI being a desktop GUI running on the user’s local machine (Whonix or Tails depending on user preference), not a GUI running on the remote server. This local GUI would SSH into the remote server behind the scenes. So perhaps the OnionJuggler menu could be in the desktop GUI, and also without needing to use VNC - it would simply run the onionjuggler-cli remotely through SSH. I agree that this would improve usability.</p>
+<p>I agree with all of your comments re the Settings button.</p>
+          <p><a href="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/6</link>
+        <pubDate>Fri, 14 Oct 2022 09:39:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15807-6</guid>
+        <source url="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807.rss">Provision Whonix VPS (GUI) for Onion Services</source>
+      </item>
+      <item>
+        <title>Provision Whonix VPS (GUI) for Onion Services</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Before we go too far… May I suggest some very small steps please? Most importantly:<br>
+VPS implies virtualization. So the server itself is based on virtualization. I.e. nested virtualization.</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://www.kicksecure.com/wiki/Nested_Virtualization">
+  <header class="source">
+      <img src="https://www.kicksecure.com/w/images/4/45/Kicksecure-home-favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://www.kicksecure.com/wiki/Nested_Virtualization" target="_blank" rel="noopener" title="12:27PM - 01 September 2022">Kicksecure – 1 Sep 22</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:625/500;"><img src="https://www.kicksecure.com/w/images/c/c0/Mastomys-332686640.jpg?version=6e5379443148bb8451898b49a23240c9" class="thumbnail" width="625" height="500"></div>
+
+<h3><a href="https://www.kicksecure.com/wiki/Nested_Virtualization" target="_blank" rel="noopener">Nested Virtualization</a></h3>
+
+  <p>It is possible to run Virtual Machines (VMs) inside other VMs. That is called Nested Virtualization.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Before considering a GUI. Can you run Whonix on a VPS?</p>
+<p>If not, maybe this will only be possible on root servers.</p>
+<aside class="quote no-group" data-username="vpsgui" data-post="1" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/v/cc9497/40.png" class="avatar"> vpsgui:</div>
+<blockquote>
+<p>accept cryptocurrencies</p>
+</blockquote>
+</aside>
+<p>But is anonymous registration allowed?<br>
+Accept cryptocurrencies is nice but doesn’t necessarily mean anonymous / pseudonymous registration permitted.</p>
+<aside class="quote no-group quote-modified" data-username="nyxnor" data-post="4" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<blockquote>
+<p>With the work on qubes-remote-support, does this change anything?</p>
+</blockquote>
+<p>Will leave this for Adrelanos to answer but Qubes is not prepared to be a server on VPS for example, but can me managed remotely via qubes-remote-support.</p>
+</blockquote>
+</aside>
+<p>Qubes isn’t really designed to be run on a VPS at time of writing since it requires a GUI. There no Qubes CLI version at time of writing.</p>
+<p>qubes-remote-support is completed, available but also primarily used with a GUI to remote administrate GUI systems.</p>
+          <p><a href="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/5</link>
+        <pubDate>Thu, 13 Oct 2022 14:56:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15807-5</guid>
+        <source url="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807.rss">Provision Whonix VPS (GUI) for Onion Services</source>
+      </item>
+      <item>
+        <title>Provision Whonix VPS (GUI) for Onion Services</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>Would very much be interested in a GUI.</p>
+<blockquote>
+<p>With the work on qubes-remote-support, does this change anything?</p>
+</blockquote>
+<p>Will leave this for Adrelanos to answer but Qubes is not prepared to be a server on VPS for example, but can me managed remotely via qubes-remote-support.</p>
+<blockquote>
+<p><strong>Button <span class="hashtag">#1:</span> Create VPS</strong><br>
+‘Create VPS’ links to a documentation website, which provides a step by step guide to provision a Debian VPS at several cloud providers that accept cryptocurrencies, such as:</p>
+</blockquote>
+<p>This can only be a doc I believe, it is difficult to find non-KYC VPS and have individual APIs conform build with Terraform for example. But IDK, best to check it.</p>
+<blockquote>
+<p><strong>Button <span class="hashtag">#2:</span> Configure Whonix</strong><br>
+‘Configure Whonix’ takes a Debian VPS and uses configuration management technology to arrive at Kicksecure running Whonix via KVM.</p>
+</blockquote>
+<p>This would be cool.</p>
+<blockquote>
+<p><strong>Button <span class="hashtag">#3:</span> Onion Juggler</strong><br>
+‘Onion Juggler’ establishes an SSH connection and launches the Onion Juggler TUI in Whonix-Workstation.</p>
+</blockquote>
+<p>The GUI will &gt; <strong>Button <span class="hashtag">#2:</span> Configure Whonix</strong> but not have GUI for OnionJuggler?<br>
+I believe a GUI for OnionJuggler would facilitate a lot the usage, but then would require VNC instead of SSH as X11 forwarding is a security risk. But if it is out of scope of the GUI, then no problem, I continue the TUI.</p>
+<blockquote>
+<p><strong>Button <span class="hashtag">#4:</span> Sync Static Website</strong><br>
+‘Sync Static Website’ will prompt the user for the directory location of the static website, establish an SSH connection, and syncs the local directory with the files served by Onion Juggler on the VPS.</p>
+</blockquote>
+<p>This would also be cool. Reload the webserver at the end for the changes to be applied.</p>
+<aside class="quote no-group" data-username="vpsgui" data-post="1" data-topic="15807">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/v/cc9497/40.png" class="avatar"> vpsgui:</div>
+<blockquote>
+<p><strong>Button <span class="hashtag">#5:</span> Settings</strong></p>
+<p>Any settings that need to be modified can be done in Settings: local SSH key location, local static website directory location, etc.</p>
+<p>What do people think of a project like this? Is there a better approach? Any feedback is very appreciated!</p>
+</blockquote>
+</aside>
+<p>All relevant settings can be modified in the GUI, then yes.</p>
+<p>Let’s assume onionjuggler.conf is <em>ceteris paribus</em> because there is no need for the user to modify them as they already work, and the end-user is unexperienced, he just needs to setup an onion service. The service name does not matter much, it is just for identification. The ports do matter though, although it is probably gonna be <code>80 127.0.0.1:80</code> something to worry about much.</p>
+<p>The remaining settings are <code>ssh keys location</code>, <code>ssh config</code> to set the VPS block <code>host</code>, <code>hostname</code>, <code>keys</code>, <code>user</code>, etc. The other settings are local directory and remote directory of static website. Plus maybe some authorization code from the VPS. I’ve never seen a GUI for handling this type of actions, should be interesting. Also an option to see logs from the GUI is very useful, see <code>tor-control-panel</code> for example of actions to be done on this new GUI</p><aside class="onebox allowlistedgeneric" data-onebox-src="https://www.whonix.org/wiki/Tor-control-panel">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/a/a4/Whonix-home-favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://www.whonix.org/wiki/Tor-control-panel" target="_blank" rel="noopener" title="01:04AM - 02 December 2021">Whonix – 2 Dec 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:658/493;"><img src="https://www.whonix.org/w/images/b/b2/Tor-control-panel-control.png" class="thumbnail" width="658" height="493"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Tor-control-panel" target="_blank" rel="noopener">Tor Control Panel</a></h3>
+
+  <p>Tor start, stop, control, logs, utilities</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/4</link>
+        <pubDate>Thu, 13 Oct 2022 10:21:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15807-4</guid>
+        <source url="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807.rss">Provision Whonix VPS (GUI) for Onion Services</source>
+      </item>
+      <item>
+        <title>Provision Whonix VPS (GUI) for Onion Services</title>
+        <dc:creator><![CDATA[vpsgui]]></dc:creator>
+        <description><![CDATA[
+            <p>This account represents a team that has development skills in python GUIs, devops, and Ansible. Before we got started we wanted to float the idea to the community for input.</p>
+          <p><a href="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/3</link>
+        <pubDate>Thu, 13 Oct 2022 08:36:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15807-3</guid>
+        <source url="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807.rss">Provision Whonix VPS (GUI) for Onion Services</source>
+      </item>
+      <item>
+        <title>Provision Whonix VPS (GUI) for Onion Services</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Do you have development skills to implement this?</p>
+<p>Or is this a feature request?</p>
+          <p><a href="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/2</link>
+        <pubDate>Thu, 13 Oct 2022 08:34:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15807-2</guid>
+        <source url="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807.rss">Provision Whonix VPS (GUI) for Onion Services</source>
+      </item>
+      <item>
+        <title>Provision Whonix VPS (GUI) for Onion Services</title>
+        <dc:creator><![CDATA[vpsgui]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve been very excited by the progress of the OnionJuggler project’s integration into Whonix, which makes administrating an Onion site accessible to individuals without sys admin experience through a TUI. <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> <a class="mention" href="http://forums.whonix.org/u/nyxnor">@nyxnor</a></p>
+<p>The question remains - how does this user provision and configure Whonix on a VPS, in order to be able to use OnionJuggler? I have a proposal and would love feedback on the design before getting started. In addition to being useful for individuals lacking sys admin experience, the hope with this project is to also provide greater security by reducing user error through an “infrastructure as code” approach.</p>
+<h1>
+<a name="qubes-whonix-or-whonix-kvm-1" class="anchor" href="http://forums.whonix.org#qubes-whonix-or-whonix-kvm-1"></a>Qubes-Whonix or Whonix KVM?</h1>
+<p>The first question is whether the VPS should use Qubes-Whonix or Whonix KVM. Any recommendations on this are greatly appreciated. Neither option is particularly documented. The following assumes Whonix KVM, based on this comment made in Nov '20:</p>
+<blockquote>
+<p>Can Qubes-Whonix use it as server OS for hosting Tor onion hidden service?</p>
+<p>If you mean through a remote server (VPS or root server): currently usability for this is still very lacking at time of writing.</p>
+<ul>
+<li>SSH into Qubes dom0 is hard</li>
+<li>no CLI version</li>
+<li>no documentation on how to use with CLI on a remote server as far as I am aware off</li>
+</ul>
+</blockquote>
+<p>With the work on qubes-remote-support, does this change anything?</p>
+<h1>
+<a name="the-gui-design-proposal-2" class="anchor" href="http://forums.whonix.org#the-gui-design-proposal-2"></a>The GUI Design Proposal</h1>
+<p>The User Experience I am looking for is something like this:</p>
+<ul>
+<li>Prior: use cryptocurrency to anonymously buy a VPS</li>
+<li>use GUI to provision Debian on the VPS</li>
+<li>use GUI to distromorph Debian to Kicksecure, then configure Whonix KVM on Kicksecure</li>
+<li>use GUI to launch the Onion Juggler TUI window</li>
+<li>use GUI to sync local static website with VPS</li>
+</ul>
+<p>I envision a docs website that would guide the user through this process. Perhaps the best way of sharing the proposed design is a description of each envisioned button:</p>
+<p><strong>Button <span class="hashtag">#1:</span> Create VPS</strong></p>
+<p>‘Create VPS’ links to a documentation website, which provides a step by step guide to provision a Debian VPS at several cloud providers that accept cryptocurrencies, such as:</p>
+<ul>
+<li>RamNode costs about $5 a month for a server with 1GB of memory and two virtual CPU (vCPU) cores. Only accepts Bitcoin.</li>
+<li>NiceVPS costs about €14.99 a month for a server with 1GB of memory and one vCPU core. Accepts Monero and Zcash.</li>
+<li>Cinfu costs about $4.79 a month for a server with 2GB of memory and one vCPU core. Supports Monero and Zcash.</li>
+<li>PiVPS costs about $14.97 a month for a server with 1GB of memory and one vCPU core. Supports Monero and Zcash.</li>
+<li>SecureDragon costs about $4.99 a month for a server with 1GB of memory and two vCPU cores. Only accepts Bitcoin.</li>
+</ul>
+<p>Ideally this button would actually do the provisioning with a technology like Terraform, though from what I can tell all of the Terraform Providers, which use the cloud provider API, don’t accept cryptocurrencies. All major cloud providers—AWS, Google Cloud, Microsoft Azure, Alibaba, and so on—require a credit card before approving your account. I haven’t looked into this closely.</p>
+<p><strong>Button <span class="hashtag">#2:</span> Configure Whonix</strong></p>
+<p>‘Configure Whonix’ takes a Debian VPS and uses configuration management technology to arrive at Kicksecure running Whonix via KVM.</p>
+<p>I think that Ansible is the right choice for how this is implemented. It is trusted by the Freedom of Press Foundation (see their GitHub, as a new forum member I can’t hyperlink) for configuration management. In my view, the main benefit of Ansible (versus shell scripts) is that it can be ‘idempotent’ - it describes an end state of the system, so no matter how many times the user presses the GUI button, nothing changes if the VPS is already at the desired end state.</p>
+<p>From “UNIX and Linux System Administration Handbook”:</p>
+<blockquote>
+<p>The traditional approach to sysadmin automation is an intricate complex of home-grown shell scripts supplemented by ad hoc fire fighting when scripts fail. This scheme works about as well as you might expect. Over time, systems managed in this way usually degenerate into a chaotic wreckage of package versions and configurations that can’t be reliably reproduced. It’s sometimes called the snowflake model of system administration because no two systems are ever alike.</p>
+</blockquote>
+<p>An Ansible Playbook would be maintained which</p>
+<ul>
+<li>Distromorphs Debian to Kicksecure</li>
+<li>Configures Whonix KVM as per the Wiki</li>
+<li>Configures an automated update mechanism</li>
+<li>Etc.</li>
+</ul>
+<p>If Qubes-Whonix was the direction, this button would use Salt rather than Ansible.</p>
+<p>The goal is that the user never needs to interact with a CLI in order for the VPS to be properly configured and up to date.</p>
+<p><strong>Button <span class="hashtag">#3:</span> Onion Juggler</strong></p>
+<p>‘Onion Juggler’ establishes an SSH connection and launches the Onion Juggler TUI in Whonix-Workstation.</p>
+<p><strong>Button <span class="hashtag">#4:</span> Sync Static Website</strong></p>
+<p>‘Sync Static Website’ will prompt the user for the directory location of the static website, establish an SSH connection, and syncs the local directory with the files served by Onion Juggler on the VPS.</p>
+<p>The documentation also provides advice on how the user can create a static website. The most user friendly option is the desktop app Publii, though any Static Site Generator is possible of course.</p>
+<p><strong>Button <span class="hashtag">#5:</span> Settings</strong></p>
+<p>Any settings that need to be modified can be done in Settings: local SSH key location, local static website directory location, etc.</p>
+<p>What do people think of a project like this? Is there a better approach? Any feedback is very appreciated!</p>
+          <p><a href="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807/1</link>
+        <pubDate>Thu, 13 Oct 2022 08:25:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15807-1</guid>
+        <source url="http://forums.whonix.org/t/provision-whonix-vps-gui-for-onion-services/15807.rss">Provision Whonix VPS (GUI) for Onion Services</source>
+      </item>
+  </channel>
+</rss>

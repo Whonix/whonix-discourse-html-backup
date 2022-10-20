@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>[SOLVED] tor+vpn and firewall issue</title>
+    <link>http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782</link>
+    <description>Hi
+
+I have tor and vpn on my gateway.
+I have followed theses instructions:
+wiki/Tunnels/Connecting_to_a_VPN_before_Tor
+section: &quot; Inside Whonix-Gateway ™&quot;
+
+service openvpn@openvpn show me this error:
+AUTH: received control message: AUTH_FAILED
+
+if I try to run manually openvpn /etc/openvpn/openvpn.conf, I have this error
+Write UDP: Operation denied
+
+according to iptables, packets are rejected on last rules of iptables -vL
+
+Here is my config files
+
+    cat /etc/whonix_firewall.d/50_user.conf
+    ## Make sure Tor always connects through the VPN.
+    ## Enable: 1
+    ## Disable: 0
+    ## DISABELD BY DEFAULT, because it requires a VPN provider.
+    VPN_FIREWALL=1
+
+    ## For OpenVPN.
+    VPN_INTERFACE=tun0
+
+    ## Destinations you don not want routed through the VPN.
+    ## 10.0.2.2-10.0.2.24: VirtualBox DHCP
+          LOCAL_NET=&quot;\
+             127.0.0.0-127.0.0.24 \
+             192.168.0.0-192.168.0.24 \
+             192.168.1.0-192.168.1.24 \
+             10.152.152.0-10.152.152.24 \
+             10.0.2.2-10.0.2.24 \
+          &quot;
+
+
+
+    ➜  ~ cat /etc/openvpn/openvpn.conf
+    client
+    dev tun
+    proto udp
+    remote 185.145.38.234 1194
+    resolv-retry infinite
+    remote-random
+    nobind
+    tun-mtu 1500
+    tun-mtu-extra 32
+    mssfix 1450
+    persist-key
+    persist-tun
+    ping 15
+    ping-restart 0
+    ping-timer-rem
+    reneg-sec 0
+    comp-lzo no
+
+    remote-cert-tls server
+
+    auth-user-pass /etc/openvpn/auth.txt
+    verb 3
+    pull
+    fast-io
+    cipher AES-256-CBC
+    auth SHA512
+
+    &lt;ca&gt;
+    -----BEGIN CERTIFICATE-----
+    MIIFCjCCAvKgAwIBAgIBATANBgkqhkiG9w0BAQ0FADA5MQswCQYDVQQGEwJQQTEQ
+    MA4GA1UEChMHTm9yZFZQTjEYMBYGA1UEAxMPTm9yZFZQTiBSb290IENBMB4XDTE2
+    ... etc ....
+    -----END CERTIFICATE-----
+    &lt;/ca&gt;
+    key-direction 1
+    &lt;tls-auth&gt;
+    #
+    # 2048 bit OpenVPN static key
+    #
+    -----BEGIN OpenVPN Static key V1-----
+    e685bdaf659a25a200e2b9e39e51ff03
+    0fc72cf1ce07232bd8b2be5e6c670143
+    ... etc ....
+    -----END OpenVPN Static key V1-----
+    &lt;/tls-auth&gt;
+
+    cat /etc/sudoers.d/tunnel_unpriv
+    tunnel ALL=(ALL) NOPASSWD: /bin/ip
+    tunnel ALL=(ALL) NOPASSWD: /usr/sbin/openvpn *
+    Defaults:tunnel !requiretty
+    #Defaults:tunnel env_keep += script_type
+    #Defaults:tunnel env_keep += dev
+
+Other modification I did:
+
+     chown -R tunnel:tunnel /etc/openvpn
+     chown -R tunnel:tunnel /var/run/openvpn
+     cp /lib/systemd/system/openvpn@.service /lib/systemd/system/openvpn@openvpn.service
+
+I also have a /etc/openvpn/auth.txt file with 2 lines. First line is my vpn login and 2nd line is the password
+
+Thank you very much</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 19 Jul 2019 20:49:15 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>[SOLVED] tor+vpn and firewall issue</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Glad I could help. <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=9" title=":wink:" class="emoji" alt=":wink:"></p>
+          <p><a href="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/7</link>
+        <pubDate>Fri, 19 Jul 2019 20:49:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7782-7</guid>
+        <source url="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782.rss">[SOLVED] tor+vpn and firewall issue</source>
+      </item>
+      <item>
+        <title>[SOLVED] tor+vpn and firewall issue</title>
+        <dc:creator><![CDATA[lfen]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you very much.<br>
+I did what you said and … it’s working !<br>
+I checked with tcpdump and I have what I was expecting.<br>
+I spent so much time on something you solved in no time !<br>
+Thank you again</p>
+          <p><a href="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/6</link>
+        <pubDate>Fri, 19 Jul 2019 20:10:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7782-6</guid>
+        <source url="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782.rss">[SOLVED] tor+vpn and firewall issue</source>
+      </item>
+      <item>
+        <title>[SOLVED] tor+vpn and firewall issue</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <code>Ifen</code></p>
+<p>I don’t see the following to your <code>openvpn.conf</code> file which is required.</p>
+<pre><code class="lang-auto">user tunnel
+iproute /usr/bin/ip_unpriv
+</code></pre>
+<hr>
+<p>Do <em>Not</em> use  “<code>dev tun</code>” in your openvpn.conf file. Use <code>"dev tun0</code>". This could cause a miss-match. See below  VPN_INTERFACE=tun0.</p>
+<hr>
+<p>Also you likely don’t need the following</p>
+<p><strong>For OpenVPN.</strong><br>
+VPN_INTERFACE=tun0</p>
+<p><strong>LOCAL_NET="</strong><br>
+[…]</p>
+<hr>
+<p>You might want  forcing Tor to wait for OpenVPN to connect.</p>
+<p><code>sudo mkdir /etc/systemd/system/tor.service.d</code></p>
+<p><code>sudo nano /etc/systemd/system/tor.service.d/50_user.conf</code></p>
+<p>Add</p>
+<p><code>[Unit] After=openvpn.service</code></p>
+<p>Does that help?</p>
+          <p><a href="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/5</link>
+        <pubDate>Fri, 19 Jul 2019 17:40:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7782-5</guid>
+        <source url="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782.rss">[SOLVED] tor+vpn and firewall issue</source>
+      </item>
+      <item>
+        <title>[SOLVED] tor+vpn and firewall issue</title>
+        <dc:creator><![CDATA[lfen]]></dc:creator>
+        <description><![CDATA[
+            <p>thank you for your answer<br>
+I have updated my 1st post.<br>
+Hopefully the post will be more clear, and I provided my config files (including openvpn.conf fille)<br>
+thank you</p>
+          <p><a href="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/4</link>
+        <pubDate>Fri, 19 Jul 2019 10:50:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7782-4</guid>
+        <source url="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782.rss">[SOLVED] tor+vpn and firewall issue</source>
+      </item>
+      <item>
+        <title>[SOLVED] tor+vpn and firewall issue</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <code>Ifen</code></p>
+<p>Welcome to the community.</p>
+<aside class="quote no-group" data-post="1" data-topic="7782">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/6a8cbe/40.png" class="avatar"> lfen:</div>
+<blockquote>
+<p>If I flush the rules with “iptables -F &amp;&amp; iptables -P INPUT ACCEPT &amp;&amp; iptables -P OUTPUT ACCEPT” and then I restart openvpn service, then the whole system is working. but without vpn<br>
+But obviously, for security reason I dont want that.</p>
+</blockquote>
+</aside>
+<p>Never flush the firewall rules in Whonix-Gateway. Thats’ asking for trouble and not necessary when troubleshooting a VPN.</p>
+<p>Please submit a detailed support request as per: <a href="https://whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor#How_to_Submit_a_Support_Request" rel="nofollow noopener">https://whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor#How_to_Submit_a_Support_Request</a></p>
+<p>Also, please provide your <code>openvpn.conf</code> with sensitive information redacted.</p>
+          <p><a href="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/3</link>
+        <pubDate>Thu, 18 Jul 2019 22:47:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7782-3</guid>
+        <source url="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782.rss">[SOLVED] tor+vpn and firewall issue</source>
+      </item>
+      <item>
+        <title>[SOLVED] tor+vpn and firewall issue</title>
+        <dc:creator><![CDATA[lfen]]></dc:creator>
+        <description><![CDATA[
+            <p>I tried to run openvpn manually in background like that:<br>
+openvpn /etc/openvpn/openvpn.conf &amp;</p>
+<p>And now I have both, tor and vpn.</p>
+<p>I can see it with tcpdump on eth1:  I can see my http flow of site I m browsing.<br>
+tcpdump on eth0 show me openvpn flow<br>
+tcpdump on tun0 show tor flow</p>
+<p>So it does work but I had to disable all FW rules … and I have to manually start openvpn</p>
+          <p><a href="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/2</link>
+        <pubDate>Thu, 18 Jul 2019 22:03:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7782-2</guid>
+        <source url="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782.rss">[SOLVED] tor+vpn and firewall issue</source>
+      </item>
+      <item>
+        <title>[SOLVED] tor+vpn and firewall issue</title>
+        <dc:creator><![CDATA[lfen]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi</p>
+<p>I have tor and vpn on my gateway.<br>
+I have followed theses instructions:<br>
+wiki/Tunnels/Connecting_to_a_VPN_before_Tor<br>
+section: " Inside Whonix-Gateway ™"</p>
+<p>service openvpn@openvpn show me this error:<br>
+AUTH: received control message: AUTH_FAILED</p>
+<p>if I try to run manually openvpn /etc/openvpn/openvpn.conf, I have this error<br>
+Write UDP: Operation denied</p>
+<p>according to iptables, packets are rejected on last rules of iptables -vL</p>
+<p>Here is my config files</p>
+<pre><code>cat /etc/whonix_firewall.d/50_user.conf
+## Make sure Tor always connects through the VPN.
+## Enable: 1
+## Disable: 0
+## DISABELD BY DEFAULT, because it requires a VPN provider.
+VPN_FIREWALL=1
+
+## For OpenVPN.
+VPN_INTERFACE=tun0
+
+## Destinations you don not want routed through the VPN.
+## 10.0.2.2-10.0.2.24: VirtualBox DHCP
+      LOCAL_NET="\
+         127.0.0.0-127.0.0.24 \
+         192.168.0.0-192.168.0.24 \
+         192.168.1.0-192.168.1.24 \
+         10.152.152.0-10.152.152.24 \
+         10.0.2.2-10.0.2.24 \
+      "
+
+
+
+➜  ~ cat /etc/openvpn/openvpn.conf
+client
+dev tun
+proto udp
+remote 185.145.38.234 1194
+resolv-retry infinite
+remote-random
+nobind
+tun-mtu 1500
+tun-mtu-extra 32
+mssfix 1450
+persist-key
+persist-tun
+ping 15
+ping-restart 0
+ping-timer-rem
+reneg-sec 0
+comp-lzo no
+
+remote-cert-tls server
+
+auth-user-pass /etc/openvpn/auth.txt
+verb 3
+pull
+fast-io
+cipher AES-256-CBC
+auth SHA512
+
+&lt;ca&gt;
+-----BEGIN CERTIFICATE-----
+MIIFCjCCAvKgAwIBAgIBATANBgkqhkiG9w0BAQ0FADA5MQswCQYDVQQGEwJQQTEQ
+MA4GA1UEChMHTm9yZFZQTjEYMBYGA1UEAxMPTm9yZFZQTiBSb290IENBMB4XDTE2
+... etc ....
+-----END CERTIFICATE-----
+&lt;/ca&gt;
+key-direction 1
+&lt;tls-auth&gt;
+#
+# 2048 bit OpenVPN static key
+#
+-----BEGIN OpenVPN Static key V1-----
+e685bdaf659a25a200e2b9e39e51ff03
+0fc72cf1ce07232bd8b2be5e6c670143
+... etc ....
+-----END OpenVPN Static key V1-----
+&lt;/tls-auth&gt;
+
+cat /etc/sudoers.d/tunnel_unpriv
+tunnel ALL=(ALL) NOPASSWD: /bin/ip
+tunnel ALL=(ALL) NOPASSWD: /usr/sbin/openvpn *
+Defaults:tunnel !requiretty
+#Defaults:tunnel env_keep += script_type
+#Defaults:tunnel env_keep += dev
+</code></pre>
+<p>Other modification I did:</p>
+<pre><code> chown -R tunnel:tunnel /etc/openvpn
+ chown -R tunnel:tunnel /var/run/openvpn
+ cp /lib/systemd/system/openvpn@.service /lib/systemd/system/openvpn@openvpn.service
+</code></pre>
+<p>I also have a /etc/openvpn/auth.txt file with 2 lines. First line is my vpn login and 2nd line is the password</p>
+<p>Thank you very much</p>
+          <p><a href="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782/1</link>
+        <pubDate>Thu, 18 Jul 2019 21:35:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7782-1</guid>
+        <source url="http://forums.whonix.org/t/solved-tor-vpn-and-firewall-issue/7782.rss">[SOLVED] tor+vpn and firewall issue</source>
+      </item>
+  </channel>
+</rss>

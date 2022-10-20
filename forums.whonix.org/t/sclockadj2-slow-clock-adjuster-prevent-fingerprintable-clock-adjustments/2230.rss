@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</title>
+    <link>http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230</link>
+    <description>[sclockadj](https://github.com/Whonix/sdwdate/blob/master/usr/lib/sdwdate/sclockadj) stands for slow clock adjuster.
+
+* preventing clock jumps (bad for all kinds of issues, fingerprintable, generally bad in computing)
+* adjusts time using the same algorithm [as NTP](https://www.whonix.org/wiki/Dev/TimeSync#NTP)
+* using [clock_settime](http://linux.die.net/man/3/clock_settime)
+
+[sclockadj](https://phabricator.whonix.org/tag/sclockadj/) (version 1) is a mess.
+
+* [causes 100% cpu after wake up from suspend](https://forums.whonix.org/t/reopened-sclockadj-stuck-at-100-cpu/732/25)
+* [systemd spams journal due to time changed by sclockadj, rewrite of sclockadj, sclockadj2](https://phabricator.whonix.org/T50)
+* might be fingerprintable specific to Whonix since it uses clock_settime rather than &quot;same as NTP&quot; (adjtime)
+
+sclockadj2 is supposed to fix these issues:
+
+* https://www.whonix.org/wiki/Dev/TimeSync#sclockadj2
+* https://github.com/Whonix/sdwdate/pull/4
+* https://github.com/AvdN might finish development of it
+* using adjtime
+
+current status
+
+* &quot;same as NTP&quot; is hard since it&#39;s a complex software
+
+goal:
+
+* We want to use [sdwdate](https://github.com/Whonix/sdwdate) since that is safer (and working) over Tor.
+* A remote server being connected to (over Tor of course) might see the local VM clock through [local clock leaks](https://www.whonix.org/wiki/Dev/TimeSync#Local_Clock_Leaks). And see it being adjusted. Ideally it would look to the server like:
+ * Could be a normal (Debian or so) host system running Tor.
+ * Running the currently most popular time synchronization software. (NTP?)
+ * Currently being its time adjusted using that popular time sync software.
+ * Not knowing it&#39;s actually sdwdate / slow clock adjuster.
+
+discussion:
+
+The old goal was &quot;make the time adjustments looking the same as NTP while actually using sdwdate&quot;.  Since Debian apparently switched to systemd-timesyncd by default (?), and since &quot;same as NTP&quot; is hard, what about switching the goal to &quot;same as systemd-timesyncd&quot;?</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 16 Mar 2016 14:22:02 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="4" data-topic="2230">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/anthon/40/367_1.png" class="avatar"> anthon:</div>
+<blockquote>
+<p>cronky</p>
+</blockquote>
+</aside>
+<p>I think it’s chrony.</p>
+<aside class="quote" data-post="4" data-topic="2230">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/anthon/40/367_1.png" class="avatar"> anthon:</div>
+<blockquote>
+<p>Given that the alternatives to systemd-timesyncd are probably more stand-alone it might be more difficult to fake systemd-timesyncd behaviour than the behaviour of other tools.</p>
+</blockquote>
+</aside>
+<p>Okay. Let’s go for a non-perfect solution that can be done and that is maintainable.</p>
+<p>If we can emulate/interface with systemd-timesyncd code’s, awesome. If it seems not maintainable, never mind. Or we use ntpd as our second best choice. If that does not work either… Interfacing with chrony, if that works, that is good also. Everything is better than what we have right now.</p>
+<p>Please see what can be done, is maintainable.</p>
+          <p><a href="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230/6</link>
+        <pubDate>Wed, 16 Mar 2016 14:22:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2230-6</guid>
+        <source url="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230.rss">sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</source>
+      </item>
+      <item>
+        <title>sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="4" data-topic="2230">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/anthon/40/367_1.png" class="avatar"> anthon:</div>
+<blockquote>
+<p>we should make sure that the results are only used (if at all) after the clock has been set in a safe way, which is the first thing to solve.</p>
+</blockquote>
+</aside>
+<p>That is a separate project, sdwdate. -&gt; <a href="https://github.com/Whonix/sdwdate">https://github.com/Whonix/sdwdate</a><br>
+sdwdate calls sclockadj. So for the purpose of this thread we can concentrate on sclockadj only.</p>
+          <p><a href="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230/5</link>
+        <pubDate>Wed, 16 Mar 2016 12:36:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2230-5</guid>
+        <source url="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230.rss">sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</source>
+      </item>
+      <item>
+        <title>sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</title>
+        <dc:creator><![CDATA[anthon]]></dc:creator>
+        <description><![CDATA[
+            <p>systemd-timesyncd seems default on Debian, but it is not on CentOS. That doesn’t mean we couldn’t mimic its behaviour (or that of cronky or ntpd) but if we do we should make sure that the results are only used (if at all) after the clock has been set in a safe way, which is the first thing to solve.</p>
+<p>Given that the alternatives to systemd-timesyncd are probably more stand-alone it might be more difficult to fake systemd-timesyncd behaviour than the behaviour of other tools.</p>
+<p>A sclockadj3 should IMO be based on the simplest alternative from ntpd/cronky/systemd-timesyncd/other code that can actually run without doing unsafe NTP protocol based time queries (or if they are done, discard them, or only use them as a check, not as a source). Simplest in the sense of lines of code, because that leads to the smallest package to maintain, iff we have to make changes at all. E.g. chrony (at 32KLOC about a tenth of ntpd), claims that it can run from manual input. In case manual input always makes the clock jump we could probably emulate a GPS receiver without PPS (through <code>gpsd</code>, but then <code>gpsd</code> source is about 52KLOC)<br>
+Going that route, instead of reimplementing the interaction with the kernel as tried in slockadj2 is AFAIKT now much simpler.</p>
+          <p><a href="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230/4</link>
+        <pubDate>Wed, 16 Mar 2016 11:30:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2230-4</guid>
+        <source url="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230.rss">sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</source>
+      </item>
+      <item>
+        <title>sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>As Anton pointed me at…</p>
+<p>Another option worth exploring is chrony - because it already<br>
+(somewhat?) accepts external sources through an interface. I.e. we might<br>
+be able to disable chrony’s own networking and time fetching. Feed<br>
+chrony with sdwdate. Then use chrony’s slow clock adjusting.</p>
+          <p><a href="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230/3</link>
+        <pubDate>Tue, 15 Mar 2016 03:28:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2230-3</guid>
+        <source url="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230.rss">sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</source>
+      </item>
+      <item>
+        <title>sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="2230">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>The old goal was “make the time adjustments looking the same as NTP while actually using sdwdate”.  Since Debian apparently switched to systemd-timesyncd by default (?), and since “same as NTP” is hard, what about switching the goal to “same as systemd-timesyncd”?</p>
+</blockquote>
+</aside>
+<p>+1 for imitating systemd-timesyncd because its becoming the widely used default.</p>
+          <p><a href="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230/2</link>
+        <pubDate>Tue, 15 Mar 2016 02:27:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2230-2</guid>
+        <source url="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230.rss">sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</source>
+      </item>
+      <item>
+        <title>sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://github.com/Whonix/sdwdate/blob/master/usr/lib/sdwdate/sclockadj">sclockadj</a> stands for slow clock adjuster.</p>
+<ul>
+<li>preventing clock jumps (bad for all kinds of issues, fingerprintable, generally bad in computing)</li>
+<li>adjusts time using the same algorithm <a href="https://www.whonix.org/wiki/Dev/TimeSync#NTP">as NTP</a>
+</li>
+<li>using <a href="http://linux.die.net/man/3/clock_settime">clock_settime</a>
+</li>
+</ul>
+<p><a href="https://phabricator.whonix.org/tag/sclockadj/">sclockadj</a> (version 1) is a mess.</p>
+<ul>
+<li><a href="https://forums.whonix.org/t/reopened-sclockadj-stuck-at-100-cpu/732/25">causes 100% cpu after wake up from suspend</a></li>
+<li><a href="https://phabricator.whonix.org/T50">systemd spams journal due to time changed by sclockadj, rewrite of sclockadj, sclockadj2</a></li>
+<li>might be fingerprintable specific to Whonix since it uses clock_settime rather than “same as NTP” (adjtime)</li>
+</ul>
+<p>sclockadj2 is supposed to fix these issues:</p>
+<ul>
+<li><a href="https://www.whonix.org/wiki/Dev/TimeSync#sclockadj2">https://www.whonix.org/wiki/Dev/TimeSync#sclockadj2</a></li>
+<li><a href="https://github.com/Whonix/sdwdate/pull/4">https://github.com/Whonix/sdwdate/pull/4</a></li>
+<li>
+<a href="https://github.com/AvdN">https://github.com/AvdN</a> might finish development of it</li>
+<li>using adjtime</li>
+</ul>
+<p>current status</p>
+<ul>
+<li>“same as NTP” is hard since it’s a complex software</li>
+</ul>
+<p>goal:</p>
+<ul>
+<li>We want to use <a href="https://github.com/Whonix/sdwdate">sdwdate</a> since that is safer (and working) over Tor.</li>
+<li>A remote server being connected to (over Tor of course) might see the local VM clock through <a href="https://www.whonix.org/wiki/Dev/TimeSync#Local_Clock_Leaks">local clock leaks</a>. And see it being adjusted. Ideally it would look to the server like:</li>
+<li>Could be a normal (Debian or so) host system running Tor.</li>
+<li>Running the currently most popular time synchronization software. (NTP?)</li>
+<li>Currently being its time adjusted using that popular time sync software.</li>
+<li>Not knowing it’s actually sdwdate / slow clock adjuster.</li>
+</ul>
+<p>discussion:</p>
+<p>The old goal was “make the time adjustments looking the same as NTP while actually using sdwdate”.  Since Debian apparently switched to systemd-timesyncd by default (?), and since “same as NTP” is hard, what about switching the goal to “same as systemd-timesyncd”?</p>
+          <p><a href="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230/1</link>
+        <pubDate>Mon, 14 Mar 2016 23:19:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2230-1</guid>
+        <source url="http://forums.whonix.org/t/sclockadj2-slow-clock-adjuster-prevent-fingerprintable-clock-adjustments/2230.rss">sclockadj2 - slow clock adjuster - prevent fingerprintable clock adjustments</source>
+      </item>
+  </channel>
+</rss>

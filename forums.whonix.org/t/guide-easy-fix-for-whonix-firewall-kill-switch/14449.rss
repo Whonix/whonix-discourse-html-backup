@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Guide: Easy Fix for Whonix Firewall Kill Switch</title>
+    <link>http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449</link>
+    <description>Hi devs, you&#39;re all doing an incredible job and I&#39;ve donated twice already. Thank you!. :upside_down_face: (I&#39;m alex_tanner but forgot my pw)
+
+There has been a **lot** of debate about a **fail-closed** mechanism or a kill switch for VPN users on Whonix. (Cutting off all traffic to TOR if the VPN drops).
+
+This recommended script VPN-Firewall by adrelanos on Github is fine, but there is a **much** quicker, **safer** and more efficient way to achieve this.
+
+This guide is for VPN that are set up on the host.
+Literally **all** you have to do is modify your Whonix-External.xml to reflect the following:
+
+```
+&lt;network&gt;
+  &lt;name&gt;Whonix-External&lt;/name&gt;
+  &lt;forward dev=&#39;tun0&#39; mode=&#39;nat&#39;/&gt;
+  &lt;bridge name=&#39;virbr1&#39; stp=&#39;on&#39; delay=&#39;0&#39;/&gt;
+  &lt;ip address=&#39;10.0.2.2&#39; netmask=&#39;255.255.255.0&#39;&gt;
+  &lt;/ip&gt;
+&lt;/network&gt;
+```
+This is the key component, specifically telling libvirt to use tun0 for NAT.
+`  &lt;forward dev=&#39;tun0&#39; mode=&#39;nat&#39;/&gt;`
+
+Libvirt will **automatically** create these iptable rules when the Whonix-External Network is started, **only** allowing established forwarded traffic between the Whonix Gateway and the tun0 interface.
+`-A FORWARD -m conntrack --ctstate ESTABLISHED -j ACCEPT`
+`-A FORWARD -s 10.0.2.0/24 -i virbr1 -o tun0 -j ACCEPT`
+
+That&#39;s it. 
+
+If your VPN connection drops, all Whonix connectivity will die instantly, because tun0 is the only target for NAT.
+
+Thus, incoming traffic can&#39;t reach because the the ESTABLISHED connection rule points to the internal IP of your tun0 interface (which is not assigned if the VPN drops) and outgoing doesn&#39;t work either for the same reason.
+
+Hope this helps. :grinning:</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 21 Sep 2022 13:25:53 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Guide: Easy Fix for Whonix Firewall Kill Switch</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox allowlistedgeneric" data-onebox-src="https://www.whonix.org/w/index.php?title=Tunnels%2FConnecting_to_a_VPN_before_Tor#KVM_VPN_Killswitch">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/a/a4/Whonix-home-favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://www.whonix.org/w/index.php?title=Tunnels%2FConnecting_to_a_VPN_before_Tor#KVM_VPN_Killswitch" target="_blank" rel="noopener" title="01:25PM - 21 September 2022">Whonix – 21 Sep 22</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/b/bb/City-427640640.jpg?version=54462e8a8ba35601e42a8bffc7e32dcd" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://www.whonix.org/w/index.php?title=Tunnels%2FConnecting_to_a_VPN_before_Tor#KVM_VPN_Killswitch" target="_blank" rel="noopener">Connecting to a VPN before Tor</a></h3>
+
+  <p>Instructions on how to connect to a VPN before Tor (User → VPN → Tor → Internet)</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449/5</link>
+        <pubDate>Wed, 21 Sep 2022 13:25:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14449-5</guid>
+        <source url="http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449.rss">Guide: Easy Fix for Whonix Firewall Kill Switch</source>
+      </item>
+      <item>
+        <title>Guide: Easy Fix for Whonix Firewall Kill Switch</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="3" data-topic="14449">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>I think it belongs on the VPN page: Whonix → VPN → Tor?</p>
+</blockquote>
+</aside>
+<p><a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_a_VPN_before_Tor" class="inline-onebox">Connecting to a VPN before Tor</a> yes</p>
+          <p><a href="http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449/4</link>
+        <pubDate>Wed, 21 Sep 2022 07:42:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14449-4</guid>
+        <source url="http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449.rss">Guide: Easy Fix for Whonix Firewall Kill Switch</source>
+      </item>
+      <item>
+        <title>Guide: Easy Fix for Whonix Firewall Kill Switch</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks <a class="mention" href="http://forums.whonix.org/u/alexa_tanner">@alexa_tanner</a> for your guide.</p>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> I would like to document this. I think it belongs on the VPN page: Whonix → VPN → Tor?</p>
+          <p><a href="http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449/3</link>
+        <pubDate>Tue, 20 Sep 2022 12:22:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14449-3</guid>
+        <source url="http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449.rss">Guide: Easy Fix for Whonix Firewall Kill Switch</source>
+      </item>
+      <item>
+        <title>Guide: Easy Fix for Whonix Firewall Kill Switch</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you!</p>
+<p>VPN-Firewall covers all host VPN traffic. However, for users who wish to only ensure that traffic originating from Whonix-Gateway goes through a VPN inclusive of a fail-closed mechanism but excluding host traffic from the VPN this seems like a very interesting solution.</p>
+<p>I didn’t look into it because I am not maintaining Whonix KVM.</p>
+          <p><a href="http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449/2</link>
+        <pubDate>Fri, 12 Aug 2022 12:13:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14449-2</guid>
+        <source url="http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449.rss">Guide: Easy Fix for Whonix Firewall Kill Switch</source>
+      </item>
+      <item>
+        <title>Guide: Easy Fix for Whonix Firewall Kill Switch</title>
+        <dc:creator><![CDATA[alexa_tanner]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi devs, you’re all doing an incredible job and I’ve donated twice already. Thank you!. <img src="//forums.whonix.org/images/emoji/twitter/upside_down_face.png?v=12" title=":upside_down_face:" class="emoji" alt=":upside_down_face:"> (I’m alex_tanner but forgot my pw)</p>
+<p>There has been a <strong>lot</strong> of debate about a <strong>fail-closed</strong> mechanism or a kill switch for VPN users on Whonix. (Cutting off all traffic to TOR if the VPN drops).</p>
+<p>This recommended script VPN-Firewall by adrelanos on Github is fine, but there is a <strong>much</strong> quicker, <strong>safer</strong> and more efficient way to achieve this.</p>
+<p>This guide is for VPN that are set up on the host.<br>
+Literally <strong>all</strong> you have to do is modify your Whonix-External.xml to reflect the following:</p>
+<pre><code class="lang-auto">&lt;network&gt;
+  &lt;name&gt;Whonix-External&lt;/name&gt;
+  &lt;forward dev='tun0' mode='nat'/&gt;
+  &lt;bridge name='virbr1' stp='on' delay='0'/&gt;
+  &lt;ip address='10.0.2.2' netmask='255.255.255.0'&gt;
+  &lt;/ip&gt;
+&lt;/network&gt;
+</code></pre>
+<p>This is the key component, specifically telling libvirt to use tun0 for NAT.<br>
+<code>  &lt;forward dev='tun0' mode='nat'/&gt;</code></p>
+<p>Libvirt will <strong>automatically</strong> create these iptable rules when the Whonix-External Network is started, <strong>only</strong> allowing established forwarded traffic between the Whonix Gateway and the tun0 interface.<br>
+<code>-A FORWARD -m conntrack --ctstate ESTABLISHED -j ACCEPT</code><br>
+<code>-A FORWARD -s 10.0.2.0/24 -i virbr1 -o tun0 -j ACCEPT</code></p>
+<p>That’s it.</p>
+<p>If your VPN connection drops, all Whonix connectivity will die instantly, because tun0 is the only target for NAT.</p>
+<p>Thus, incoming traffic can’t reach because the the ESTABLISHED connection rule points to the internal IP of your tun0 interface (which is not assigned if the VPN drops) and outgoing doesn’t work either for the same reason.</p>
+<p>Hope this helps. <img src="//forums.whonix.org/images/emoji/twitter/grinning.png?v=12" title=":grinning:" class="emoji" alt=":grinning:"></p>
+          <p><a href="http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449/1</link>
+        <pubDate>Thu, 11 Aug 2022 15:39:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14449-1</guid>
+        <source url="http://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449.rss">Guide: Easy Fix for Whonix Firewall Kill Switch</source>
+      </item>
+  </channel>
+</rss>

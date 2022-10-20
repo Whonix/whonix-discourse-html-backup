@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Possible to build terminal-only whonix-gw?</title>
+    <link>http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873</link>
+    <description>After searching all around for the correct flavor name to build a terminal-only whonix-gateway I found at least a flag ([`--terminal-only`](https://forums.whonix.org/t/how-to-build-whonix-from-sources/784)). Though I still haven&#39;t found it in the official documentation.
+
+I tried to append it as a flavor to the template name in Qubes builder&#39;s `builder.conf`: `whonix-gateway+terminal-only`. Unsurprisingly that didn&#39;t work. (`whonix-gateway` seems to work fine.)
+
+Is it at all possible to build a terminal-only whonix-gateway template in Qubes builder? If yes, how?</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 21 May 2017 01:11:47 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Possible to build terminal-only whonix-gw?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Right.</p>
+<pre><code>aptInstall whonix-legacy
+aptInstall whonix-workstation-packages-dependencies-pre
+aptInstall anon-shared-packages-dependencies
+aptInstall whonix-shared-packages-dependencies
+aptInstall anon-workstation-packages-dependencies
+aptInstall whonix-workstation-packages-dependencies
+aptInstall qubes-whonix</code></pre>
+          <p><a href="http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873/4</link>
+        <pubDate>Sun, 21 May 2017 01:11:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3873-4</guid>
+        <source url="http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873.rss">Possible to build terminal-only whonix-gw?</source>
+      </item>
+      <item>
+        <title>Possible to build terminal-only whonix-gw?</title>
+        <dc:creator><![CDATA[qubenix]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="2" data-topic="3873">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Replace aptInstall qubes-whonix-gateway with the following.</p>
+<p>aptInstall whonix-legacy<br>
+aptInstall whonix-gateway-packages-dependencies-pre<br>
+aptInstall anon-shared-packages-dependencies<br>
+aptInstall whonix-shared-packages-dependencies<br>
+aptInstall anon-gateway-packages-dependencies<br>
+aptInstall whonix-gateway-packages-dependencies<br>
+aptInstall qubes-whonix</p>
+</blockquote>
+</aside>
+<p>So could one possibly do the same for a minimal workstation (of course replace <code>gateway</code> with <code>workstation</code> from your example)?</p>
+          <p><a href="http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873/3</link>
+        <pubDate>Fri, 19 May 2017 23:31:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3873-3</guid>
+        <source url="http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873.rss">Possible to build terminal-only whonix-gw?</source>
+      </item>
+      <item>
+        <title>Possible to build terminal-only whonix-gw?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[ That switch is broken. That switch won’t work anyhow, since Qubes builder is no longer using Whonix’s build script. That switch would be useless, since Qubes is terminal-only anyhow. No desktop environment packages / display manager get installed in Qubes-Whonix. What you might want instead is no-default-apps switch, but the same applies. ]</p>
+<p>Instead only the small amount of code here <a href="https://github.com/Whonix/qubes-template-whonix">https://github.com/Whonix/qubes-template-whonix</a> is used to build Qubes-Whonix. Installation from Whonix apt repository.</p>
+<p>In <a href="https://github.com/Whonix/qubes-template-whonix/blob/master/whonix-gateway/04_install_qubes_post.sh">https://github.com/Whonix/qubes-template-whonix/blob/master/whonix-gateway/04_install_qubes_post.sh</a> you’d have to hack the following part.</p>
+<pre><code class="lang-auto">if [ "${TEMPLATE_FLAVOR}" = "whonix-gateway" ]; then
+   aptInstall qubes-whonix-gateway
+elif [ "${TEMPLATE_FLAVOR}" = "whonix-workstation" ]; then
+   aptInstall qubes-whonix-workstation
+</code></pre>
+<p>Installing different meta packages.</p>
+<p>(See <a href="https://github.com/Whonix/anon-meta-packages/blob/master/debian/control">https://github.com/Whonix/anon-meta-packages/blob/master/debian/control</a> and look for <code>Package: qubes-whonix-gateway</code> to see the package declaration. You then could use <code>aptInstall</code> multiple times. Here is what I would try (which means this is untested) for a no-default-apps Qubes-Whonix-Gateway.)</p>
+<p>Replace <code>aptInstall qubes-whonix-gateway</code> with the following.</p>
+<pre><code class="lang-auto">aptInstall whonix-legacy
+aptInstall whonix-gateway-packages-dependencies-pre
+aptInstall anon-shared-packages-dependencies
+aptInstall whonix-shared-packages-dependencies
+aptInstall anon-gateway-packages-dependencies
+aptInstall whonix-gateway-packages-dependencies
+aptInstall qubes-whonix
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873/2</link>
+        <pubDate>Fri, 12 May 2017 13:33:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3873-2</guid>
+        <source url="http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873.rss">Possible to build terminal-only whonix-gw?</source>
+      </item>
+      <item>
+        <title>Possible to build terminal-only whonix-gw?</title>
+        <dc:creator><![CDATA[ubestemt]]></dc:creator>
+        <description><![CDATA[
+            <p>After searching all around for the correct flavor name to build a terminal-only whonix-gateway I found at least a flag (<a href="https://forums.whonix.org/t/how-to-build-whonix-from-sources/784"><code>--terminal-only</code></a>). Though I still haven’t found it in the official documentation.</p>
+<p>I tried to append it as a flavor to the template name in Qubes builder’s <code>builder.conf</code>: <code>whonix-gateway+terminal-only</code>. Unsurprisingly that didn’t work. (<code>whonix-gateway</code> seems to work fine.)</p>
+<p>Is it at all possible to build a terminal-only whonix-gateway template in Qubes builder? If yes, how?</p>
+          <p><a href="http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873/1</link>
+        <pubDate>Fri, 12 May 2017 12:20:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3873-1</guid>
+        <source url="http://forums.whonix.org/t/possible-to-build-terminal-only-whonix-gw/3873.rss">Possible to build terminal-only whonix-gw?</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Editing packages when building Whonix-Qubes</title>
+    <link>http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201</link>
+    <description>Hello, I&#39;ve read a lot of whonix build documentation, but I can&#39;t find anywhere how to edit the packages that will be installed during the build.
+
+I would like to try to build a minimal whonix without some GUI programs.
+
+Can you tell me where I can edit the list of programs or where I can read about it?</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 21 Jul 2022 19:16:21 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Editing packages when building Whonix-Qubes</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Then you might have a good chance of doing this here too.</p>
+<p>There are no separate Qubes-Whonix CLI / GUI packages or minimal / full.</p>
+<p>For example for the workstation, it’s probably required to understand the following and emulate.</p>
+<aside class="onebox githubblob" data-onebox-src="https://github.com/Whonix/anon-meta-packages/blob/master/debian/control#L226-L233">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/anon-meta-packages/blob/master/debian/control#L226-L233" target="_blank" rel="noopener">github.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/anon-meta-packages/blob/master/debian/control#L226-L233" target="_blank" rel="noopener">Whonix/anon-meta-packages/blob/master/debian/control#L226-L233</a></h4>
+
+
+
+    <pre class="onebox">      <code class="lang-">
+        <ol class="start lines" start="226" style="counter-reset: li-counter 225 ;">
+            <li>Package: qubes-whonix-workstation</li>
+            <li>Architecture: all</li>
+            <li>Pre-Depends: legacy-dist</li>
+            <li>Depends: whonix-workstation-shared-packages-shared-meta, qubes-whonix,</li>
+            <li> qubes-whonix-shared-packages-recommended,</li>
+            <li> qubes-whonix-workstation-packages-recommended,</li>
+            <li> kicksecure-desktop-applications-xfce,</li>
+            <li> vm-config-dist,</li>
+        </ol>
+      </code>
+    </pre>
+
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Some packages under <code>Depends:</code> are optional. Others might result in a template with broken functionality.</p>
+<p><code>whonix_meta_package_to_install</code> currently doesn’t support multiple space separated packages.</p>
+<p>But that would be quite easy to support by removing the quotes here in the yellow marked line:</p>
+<aside class="onebox githubblob" data-onebox-src="https://github.com/Whonix/qubes-template-whonix/blob/master/whonix-gateway/04_install_qubes_post.sh#L107">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/qubes-template-whonix/blob/master/whonix-gateway/04_install_qubes_post.sh#L107" target="_blank" rel="noopener">github.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/qubes-template-whonix/blob/master/whonix-gateway/04_install_qubes_post.sh#L107" target="_blank" rel="noopener">Whonix/qubes-template-whonix/blob/master/whonix-gateway/04_install_qubes_post.sh#L107</a></h4>
+
+
+
+    <pre class="onebox">      <code class="lang-sh">
+        <ol class="start lines" start="97" style="counter-reset: li-counter 96 ;">
+            <li>
+            </li>
+<li>[ -n "$DEBDEBUG" ] || export DEBDEBUG="1"</li>
+            <li>[ -n "$tpo_downloader_debug" ] || export tpo_downloader_debug="1"</li>
+            <li>
+            </li>
+<li>if [ -n "$WHONIX_TBB_VERSION" ]; then</li>
+            <li>    mkdir -p "${INSTALLDIR}/etc/torbrowser.d"</li>
+            <li>    echo "tbb_version=\"$WHONIX_TBB_VERSION\"" &gt; \</li>
+            <li>        "${INSTALLDIR}/etc/torbrowser.d/80_template_builder_override.conf"</li>
+            <li>fi</li>
+            <li>
+            </li>
+<li class="selected">aptInstall "$whonix_meta_package_to_install"</li>
+            <li>
+            </li>
+<li>uninstallQubesRepo</li>
+            <li>
+            </li>
+<li>rm -f "${INSTALLDIR}/$whonix_repository_temporary_apt_sources_list"</li>
+            <li>
+            </li>
+<li>if [ -e "${INSTALLDIR}/etc/apt/sources.list.d/debian.list" ]; then</li>
+            <li>    info 'Remove original sources.list (Whonix package anon-apt-sources-list \</li>
+            <li>ships /etc/apt/sources.list.d/debian.list)'</li>
+            <li>    rm -f "${INSTALLDIR}/etc/apt/sources.list"</li>
+            <li>fi</li>
+        </ol>
+      </code>
+    </pre>
+
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201/4</link>
+        <pubDate>Thu, 21 Jul 2022 19:16:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14201-4</guid>
+        <source url="http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201.rss">Editing packages when building Whonix-Qubes</source>
+      </item>
+      <item>
+        <title>Editing packages when building Whonix-Qubes</title>
+        <dc:creator><![CDATA[JustinRivm]]></dc:creator>
+        <description><![CDATA[
+            <p>I have some experience in building fedora and arch templates as well as qubes iso with xfce removed from it.</p>
+<p>Thank you for the information, I will look into it and try to build a minimal whonix template to suit my needs</p>
+<p>“Package: whonix-workstation-packages-recommended-gui”.</p>
+<p>This is probably what I need.</p>
+          <p><a href="http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201/3</link>
+        <pubDate>Thu, 21 Jul 2022 19:07:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14201-3</guid>
+        <source url="http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201.rss">Editing packages when building Whonix-Qubes</source>
+      </item>
+      <item>
+        <title>Editing packages when building Whonix-Qubes</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>That is and very most likely will remain <a href="https://www.whonix.org/wiki/Undocumented">undocumented</a>. Qubes-Whonix minimal templates aren’t offered, <a href="https://www.whonix.org/wiki/unsupported">unsupported</a> and neither planned.</p>
+<p>Qubes builder is:</p>
+<ul>
+<li>rather complicated to use,</li>
+<li>last time I checked sparsely documented,</li>
+<li>downloads package from the Qubes (and Qubes-Whonix) binary repository instead of building them during the template build process. What it means to build “from source” in context of a Linux distribution isn’t well defined. More on this point: <a href="https://www.whonix.org/wiki/Trust#Builds_from_Source_Code_versus_Builds_including_Binary_Packages">Builds from Source Code versus Builds including Binary Packages</a>
+</li>
+</ul>
+<p>These issues are specific to Qubes and unspecific to Whonix.</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://www.whonix.org/wiki/Unspecific">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/a/a4/Whonix-home-favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener" title="11:34AM - 26 January 2022">Whonix – 26 Jan 22</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:250/500;"><img src="https://www.whonix.org/w/images/7/74/Booster132.png" class="thumbnail" width="250" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener">Information Booster might be Available!</a></h3>
+
+  <p>Utilizing other resources to help solve questions/issues unspecific to Whonix ™.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Prerequisite skills:</p>
+<ul>
+<li>How to build other templates using Qubes builder.</li>
+<li>How to build Qubes-Whonix using Qubes builder.</li>
+<li>How to set an environment or build config variable (that becomes an environment variable) in Qubes builder.</li>
+</ul>
+<p>Once you know all of the prerequisite skills (which are unrelated to Whonix support), let me know.</p>
+<p>Then the Qubes-Whonix specific part is by comparison rather simple. Hints:</p>
+<ul>
+<li><a href="https://github.com/Whonix/qubes-template-whonix">https://github.com/Whonix/qubes-template-whonix</a></li>
+<li><a href="https://github.com/Whonix/qubes-template-whonix/blob/master/whonix-gateway/04_install_qubes_post.sh#L66-L70">https://github.com/Whonix/qubes-template-whonix/blob/master/whonix-gateway/04_install_qubes_post.sh#L66-L70</a></li>
+<li>environment variable <code>whonix_meta_package_to_install</code>
+</li>
+</ul>
+<hr>
+<ul>
+<li><a href="https://github.com/Whonix/anon-meta-packages/blob/master/debian/control">https://github.com/Whonix/anon-meta-packages/blob/master/debian/control</a></li>
+<li><code>qubes-whonix-gateway</code></li>
+<li><code>qubes-whonix-workstation</code></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201/2</link>
+        <pubDate>Thu, 21 Jul 2022 18:04:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14201-2</guid>
+        <source url="http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201.rss">Editing packages when building Whonix-Qubes</source>
+      </item>
+      <item>
+        <title>Editing packages when building Whonix-Qubes</title>
+        <dc:creator><![CDATA[JustinRivm]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello, I’ve read a lot of whonix build documentation, but I can’t find anywhere how to edit the packages that will be installed during the build.</p>
+<p>I would like to try to build a minimal whonix without some GUI programs.</p>
+<p>Can you tell me where I can edit the list of programs or where I can read about it?</p>
+          <p><a href="http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201/1</link>
+        <pubDate>Thu, 21 Jul 2022 17:17:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-14201-1</guid>
+        <source url="http://forums.whonix.org/t/editing-packages-when-building-whonix-qubes/14201.rss">Editing packages when building Whonix-Qubes</source>
+      </item>
+  </channel>
+</rss>

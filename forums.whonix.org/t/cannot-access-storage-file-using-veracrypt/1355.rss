@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+    <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355</link>
+    <description>Hey guys,
+
+So I&#39;m finally getting back to my New Year&#39;s Resolution of using [i]all[/i] free software (i.e., TRULY free), and decided to switch from Virtualbox to KVM. Unfortunately, I&#39;m having problems. I used Patrick&#39;s instructions alongside those suggested by another member of this forum and ran into problems from the get-go due to having a separate root partition I had allotted just 10 GB  :-\. So you see what happened there.
+
+Anyway, I had a light bulb go off and say, &quot;hey! You know what you could do? Instead of editing the XML files (because you don&#39;t know how to do that, Gregg), you can use a program to mount the directory with the qcow files from my home folder to /var/lib/blahblah!&quot; And so I did. I knew Veracrypt was capable of doing this, so I installed that and boys, [i]I mounted it like a majestic stallion, right where the XML file said to.[/i] You should&#39;ve seen it.
+
+But lo, &#39;twas not to be. Now, every time I hit &quot;play&quot; I get the following: 
+
+[code]Error starting domain: Cannot access storage file &#39;/var/lib/libvirt/images/Whonix-Gateway.qcow2&#39; (as uid:118, gid:128): Permission denied[/code]
+
+Under &quot;Details,&quot; I get this:
+
+[code]Error starting domain: Cannot access storage file &#39;/var/lib/libvirt/images/Whonix-Gateway.qcow2&#39; (as uid:118, gid:128): Permission denied
+
+Traceback (most recent call last):
+  File &quot;/usr/share/virt-manager/virtManager/asyncjob.py&quot;, line 91, in cb_wrapper
+    callback(asyncjob, *args, **kwargs)
+  File &quot;/usr/share/virt-manager/virtManager/asyncjob.py&quot;, line 127, in tmpcb
+    callback(*args, **kwargs)
+  File &quot;/usr/share/virt-manager/virtManager/domain.py&quot;, line 1355, in startup
+    self._backend.create()
+  File &quot;/usr/lib/python2.7/dist-packages/libvirt.py&quot;, line 999, in create
+    if ret == -1: raise libvirtError (&#39;virDomainCreate() failed&#39;, dom=self)
+libvirtError: Cannot access storage file &#39;/var/lib/libvirt/images/Whonix-Gateway.qcow2&#39; (as uid:118, gid:128): Permission denied
+[/code]
+
+&quot;Permission denied.&quot; Pretty clearly a permission problem, right? So I started virt-manager as root (I know, I know--shame on me) and tried to start Whonix that way. Nope. Same exact thing. So is this an issue anyone else has had? My first guess was that this was due to my maverick, out-of-the-box thinking with respect to the Veracrypt thing: I know Veracrypt does, after all, have some permission problems of its own unless one uses NTFS formatting  [url=http://sourceforge.net/p/veracrypt/discussion/technical/thread/e7e51852/]http://sourceforge.net/p/veracrypt/discussion/technical/thread/e7e51852/[/url], but I [i]did[/i] use NTFS formatting, and I&#39;ve never had a problem with it before.
+
+Any and all help would be greatly appreciated.
+
+Oh, I&#39;m also on Debian as host. 
+
+P.S. Just out of curiosity (this isn&#39;t an important enough question to start a new thread over): has anyone had luck getting Whonix to run under a BSD system?</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 25 Jun 2016 01:41:27 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+        <dc:creator><![CDATA[giprotein]]></dc:creator>
+        <description><![CDATA[
+            <p>I had the same problem, this is how I make it work:</p>
+<p>-Edit the final path (the decrypted path) “/run/mount/user/decrypt/Whonix-*.qcow2”</p>
+<blockquote>
+<p>EDITOR=vi virsh edit Whonix-Workstation<br>
+EDITOR=vi virsh edit Whonix-Gateway</p>
+</blockquote>
+<p>-Now decrypt the images and set permissions:</p>
+<blockquote>
+<p>cryptsetup open --type tcrypt /run/mount/user/usb/encrypteddisk decrypted &amp;&amp; chmod +x /run/mount/user</p>
+</blockquote>
+<p>And thats all</p>
+<p>Cheers</p>
+          <p><a href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/12</link>
+        <pubDate>Sat, 25 Jun 2016 01:41:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1355-12</guid>
+        <source url="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss">&quot;Cannot access storage file&quot; using Veracrypt?</source>
+      </item>
+      <item>
+        <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>I don’t know why you insist on mounting your other drive thru /var/lib/libvirt you can use the image even if its in any other location. For problems with mounting I can’t really help with that and its out of scope of KVM - its a general Linux question that you will need assistance with elsewhere.</p>
+<p>Your setup seems to work but the kernel panic could be a sign of image corruption. I suggest you untar the .xz archives straight in your new location instead of moving around the qcow2 images directly.</p>
+          <p><a href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/11</link>
+        <pubDate>Thu, 03 Sep 2015 00:57:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1355-11</guid>
+        <source url="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss">&quot;Cannot access storage file&quot; using Veracrypt?</source>
+      </item>
+      <item>
+        <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+        <dc:creator><![CDATA[jimmy]]></dc:creator>
+        <description><![CDATA[
+            <p>I do not have this problem using Truecrypt 7.1a. So this is a Veracrypt problem.</p>
+<aside class="quote" data-post="9" data-topic="1355">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/praedor/40/21_1.png" class="avatar"> praedor:</div>
+<blockquote>
+<p>I looked at Qubes but it’s a nonstarter because it cannot be run from within linux, instead requiring a full re-install on my system first of Qubes, THEN linux into Qubes, THEN Whonix into Qubes.  Then if you want to run Whonix for a quick session, you have to leave linux (or windows) and start Whonix, do your thing, leave Whonix, restart linux (or windows).  Same as having each separately installed via a normal bootloader, just with more security but greater incompatibility issues vis a vis hardware.</p>
+</blockquote>
+</aside>
+<p>That’s not correct. You can install Qubes to partition and dual boot. Once in Qubes you simply download Whonix. You then boot Qubes and run Whonix and that’s it. One my SSD the entire process takes less than a minute. One doesn’t install Linux into Qubes.</p>
+          <p><a href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/10</link>
+        <pubDate>Wed, 02 Sep 2015 15:25:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1355-10</guid>
+        <source url="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss">&quot;Cannot access storage file&quot; using Veracrypt?</source>
+      </item>
+      <item>
+        <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+        <dc:creator><![CDATA[praedor]]></dc:creator>
+        <description><![CDATA[
+            <p>I do not have space to resize my root partition without having to do an entire system install from scratch.  I’m simply not willing to do that so I used the free space on another HDD to create a mountpoint at /usr/local/VMs for holding any/all virtual machine images.  I then deleted the images subdirectory from /var/lib/libvirt and created a symlink to /usr/local/VMs.  I ALMOST get the whole thing working - I can get both workstation and gateway to START to boot (I get past the bootloader) but after a certain point in the process, long before any X session is possible (before any internet connection is made too, I believe) I get a kernel panic for both.</p>
+<p>I cp’d the two qcow2 files to /usr/local/VMs using the --sparse=always switch too.  Is this setup simply impossible?  Why would it allow the kernels to START to boot only to fail after a certain point rather than bar any bootup at all if the described setup is not valid/workable?</p>
+<p>I’m thinking of changing the mount point from /usr/local/VMs to /var/lib/libvert/images directly but if I can avoid it I will.  It’s the only way I can use such huge images (100gb each is massive - much bigger than the Virtualbox images.  Isn’t there a way to make kvm more efficient spacewize than it is?</p>
+<p>I looked at Qubes but it’s a nonstarter because it cannot be run from within linux, instead requiring a full re-install on my system first of Qubes, THEN linux into Qubes, THEN Whonix into Qubes.  Then if you want to run Whonix for a quick session, you have to leave linux (or windows) and start Whonix, do your thing, leave Whonix, restart linux (or windows).  Same as having each separately installed via a normal bootloader, just with more security but greater incompatibility issues vis a vis hardware.</p>
+          <p><a href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/9</link>
+        <pubDate>Wed, 02 Sep 2015 14:39:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1355-9</guid>
+        <source url="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss">&quot;Cannot access storage file&quot; using Veracrypt?</source>
+      </item>
+      <item>
+        <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+        <dc:creator><![CDATA[Gregg]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for the reply! I’ll post results as soon as I’ve had a chance to give this a go.</p>
+          <p><a href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/8</link>
+        <pubDate>Tue, 01 Sep 2015 19:34:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1355-8</guid>
+        <source url="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss">&quot;Cannot access storage file&quot; using Veracrypt?</source>
+      </item>
+      <item>
+        <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>OK let’s try something else. First move the images to your home folder or preferred location then edit your machines’ XML by typing:</p>
+<p>sudo su</p>
+<h1>EDITOR=nano virsh edit Whonix-Workstation</h1>
+<p>Go down to where it describes the file path of the qcow2 image and change it from /var/lib/libvirt/images to the new location in the home folder.</p>
+<p>Save changes</p>
+<p>Ctrl x<br>
+Ctrl m</p>
+<p>Repeat steps for the gateway VM.</p>
+<p>Try to boot the VMs.</p>
+          <p><a href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/7</link>
+        <pubDate>Sun, 30 Aug 2015 18:48:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1355-7</guid>
+        <source url="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss">&quot;Cannot access storage file&quot; using Veracrypt?</source>
+      </item>
+      <item>
+        <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+        <dc:creator><![CDATA[Gregg]]></dc:creator>
+        <description><![CDATA[
+            <p>Ok. I probably should have added in my original post that I’m not actually all that sophisticated with things like this. I don’t actually seem to have a pool right now. I do <code>virsh pool-list</code> and I got nothin’. And when I do <code>virsh pool-dumpxml default &gt; pool.xml
+</code> I get <code>error: failed to get pool 'default'
+error: Storage pool not found: no storage pool with matching name 'default'</code>.</p>
+<p>Any ideas (other than my being an idiot)?</p>
+          <p><a href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/6</link>
+        <pubDate>Sun, 30 Aug 2015 01:33:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1355-6</guid>
+        <source url="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss">&quot;Cannot access storage file&quot; using Veracrypt?</source>
+      </item>
+      <item>
+        <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+        <dc:creator><![CDATA[Gregg]]></dc:creator>
+        <description><![CDATA[
+            <p>Hmmm…looks promising! I will try it out and report back with my results.</p>
+          <p><a href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/5</link>
+        <pubDate>Sat, 29 Aug 2015 22:31:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1355-5</guid>
+        <source url="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss">&quot;Cannot access storage file&quot; using Veracrypt?</source>
+      </item>
+      <item>
+        <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>It is possible. Try the solution in the last answer on here:</p>
+<p><a href="https://ask.fedoraproject.org/en/question/9584/while-using-libvirt-how-can-i-use-a-location-other-than-varliblibvirtimages-to-store-my-images/" class="onebox" target="_blank">https://ask.fedoraproject.org/en/question/9584/while-using-libvirt-how-can-i-use-a-location-other-than-varliblibvirtimages-to-store-my-images/</a></p>
+          <p><a href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/4</link>
+        <pubDate>Sat, 29 Aug 2015 03:53:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1355-4</guid>
+        <source url="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss">&quot;Cannot access storage file&quot; using Veracrypt?</source>
+      </item>
+      <item>
+        <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+        <dc:creator><![CDATA[Gregg]]></dc:creator>
+        <description><![CDATA[
+            <p>That’s depressing. One of the reasons I stuck with VirtualBox for so long is that I could keep the VMs folder encrypted using Truecrypt. But that isn’t possible with KVM, I’m guessing?</p>
+          <p><a href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/3</link>
+        <pubDate>Fri, 28 Aug 2015 21:50:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1355-3</guid>
+        <source url="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss">&quot;Cannot access storage file&quot; using Veracrypt?</source>
+      </item>
+      <item>
+        <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Symlinking the directories messed up the permissions in ways difficult to figure out. There are many reasons why images should be moved under the proper libvirt directory - anything else will give you problems because of the way libvirt isolation works. My suggestion for you is to resize your root partition to something sensible with gparted. Backup your data first!</p>
+          <p><a href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/2</link>
+        <pubDate>Fri, 28 Aug 2015 14:09:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1355-2</guid>
+        <source url="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss">&quot;Cannot access storage file&quot; using Veracrypt?</source>
+      </item>
+      <item>
+        <title>&quot;Cannot access storage file&quot; using Veracrypt?</title>
+        <dc:creator><![CDATA[Gregg]]></dc:creator>
+        <description><![CDATA[
+            <p>Hey guys,</p>
+<p>So I’m finally getting back to my New Year’s Resolution of using <span class="bbcode-i">all</span> free software (i.e., TRULY free), and decided to switch from Virtualbox to KVM. Unfortunately, I’m having problems. I used Patrick’s instructions alongside those suggested by another member of this forum and ran into problems from the get-go due to having a separate root partition I had allotted just 10 GB  :-. So you see what happened there.</p>
+<p>Anyway, I had a light bulb go off and say, “hey! You know what you could do? Instead of editing the XML files (because you don’t know how to do that, Gregg), you can use a program to mount the directory with the qcow files from my home folder to /var/lib/blahblah!” And so I did. I knew Veracrypt was capable of doing this, so I installed that and boys, <span class="bbcode-i">I mounted it like a majestic stallion, right where the XML file said to.</span> You should’ve seen it.</p>
+<p>But lo, 'twas not to be. Now, every time I hit “play” I get the following:</p>
+<pre><code class="lang-auto"></code></pre>
+<p>Under “Details,” I get this:</p>
+<p>[code]Error starting domain: Cannot access storage file ‘/var/lib/libvirt/images/Whonix-Gateway.qcow2’ (as uid:118, gid:128): Permission denied</p>
+<p>Traceback (most recent call last):<br>
+File “/usr/share/virt-manager/virtManager/asyncjob.py”, line 91, in cb_wrapper<br>
+callback(asyncjob, *args, **kwargs)<br>
+File “/usr/share/virt-manager/virtManager/asyncjob.py”, line 127, in tmpcb<br>
+callback(*args, **kwargs)<br>
+File “/usr/share/virt-manager/virtManager/domain.py”, line 1355, in startup<br>
+self._backend.create()<br>
+File “/usr/lib/python2.7/dist-packages/libvirt.py”, line 999, in create<br>
+if ret == -1: raise libvirtError (‘virDomainCreate() failed’, dom=self)<br>
+libvirtError: Cannot access storage file ‘/var/lib/libvirt/images/Whonix-Gateway.qcow2’ (as uid:118, gid:128): Permission denied<br>
+[/code]</p>
+<p>“Permission denied.” Pretty clearly a permission problem, right? So I started virt-manager as root (I know, I know–shame on me) and tried to start Whonix that way. Nope. Same exact thing. So is this an issue anyone else has had? My first guess was that this was due to my maverick, out-of-the-box thinking with respect to the Veracrypt thing: I know Veracrypt does, after all, have some permission problems of its own unless one uses NTFS formatting  <a href="http://sourceforge.net/p/veracrypt/discussion/technical/thread/e7e51852/" data-bbcode="true" rel="nofollow noopener">http://sourceforge.net/p/veracrypt/discussion/technical/thread/e7e51852/</a>, but I <span class="bbcode-i">did</span> use NTFS formatting, and I’ve never had a problem with it before.</p>
+<p>Any and all help would be greatly appreciated.</p>
+<p>Oh, I’m also on Debian as host.</p>
+<p>P.S. Just out of curiosity (this isn’t an important enough question to start a new thread over): has anyone had luck getting Whonix to run under a BSD system?</p>
+          <p><a href="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355/1</link>
+        <pubDate>Thu, 27 Aug 2015 21:45:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1355-1</guid>
+        <source url="http://forums.whonix.org/t/cannot-access-storage-file-using-veracrypt/1355.rss">&quot;Cannot access storage file&quot; using Veracrypt?</source>
+      </item>
+  </channel>
+</rss>

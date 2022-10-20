@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Running corridor on sys-net?</title>
+    <link>http://forums.whonix.org/t/running-corridor-on-sys-net/8531</link>
+    <description>I followed the instructions in the Whonix docs for corridor
+and I setup corridor on the sys-net VM instead of a seperate sys-corridor VM. 
+
+It works just fine but I am wondering whether this is actually &quot;safe&quot; in comparison to running it as sys-corridor?
+
+Sys-net should be treated as an unsafe VM but the reason why I run it on sys-net is that I want to have a fail-safe mechanism in case I accidently choose sys-firewall or sys-net as NetVM. I want everything on my system to be tunneled through tor. Always.
+
+Are there settings on sys-net that could interfere with the corridor service that are not on a seperate sys-corridor VM? I am using debian 10 as template for sys-net. I disabled IPv6, installed wifi drivers and setup corridor. That&#39;s it.
+
+And last question: Can I install onion-grater on the sys-net VM to filter the GETINFO address command? Are there other possibilities for malware to get the clearnet IP if the system is connected to sys-net with corridor running?</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 23 Nov 2019 12:26:09 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/running-corridor-on-sys-net/8531.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Running corridor on sys-net?</title>
+        <dc:creator><![CDATA[swisspal441]]></dc:creator>
+        <description><![CDATA[
+            <p>Ok, I understand. So using corridor for this purpose doesn’t really make sense.</p>
+<p>I feel stupid now. I just realised that there’s probably a solution that’s much easier to achieve what I want.</p>
+<p>I can just drop incoming packets on sys-net that are not coming from sys-firewall. And then do the same thing on sys-firewall for sys-whonix.</p>
+<p>But I’m not sure if I can just flush the old input chain and if this configuration would interfere with anything else on qubes.</p>
+<p>I guess that is not whonix related though. Therefore I will send a message to the qubes users mailing list.</p>
+<p>Thanks for answering my questions</p>
+          <p><a href="http://forums.whonix.org/t/running-corridor-on-sys-net/8531/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/running-corridor-on-sys-net/8531/5</link>
+        <pubDate>Sat, 23 Nov 2019 12:26:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8531-5</guid>
+        <source url="http://forums.whonix.org/t/running-corridor-on-sys-net/8531.rss">Running corridor on sys-net?</source>
+      </item>
+      <item>
+        <title>Running corridor on sys-net?</title>
+        <dc:creator><![CDATA[Patrick_mobile]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="3" data-topic="8531">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/db5fbb/40.png" class="avatar"> swisspal441:</div>
+<blockquote>
+<p>And just double checking: By that you mean that even if the control port on sys-net (in this case) is not accessible by a directly connected AppVMs then it wouldn’t matter because the AppVM could’ve run the command on its own tor process/control port (if it created one)?</p>
+</blockquote>
+</aside>
+<p>Yes.</p>
+          <p><a href="http://forums.whonix.org/t/running-corridor-on-sys-net/8531/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/running-corridor-on-sys-net/8531/4</link>
+        <pubDate>Sat, 23 Nov 2019 09:09:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8531-4</guid>
+        <source url="http://forums.whonix.org/t/running-corridor-on-sys-net/8531.rss">Running corridor on sys-net?</source>
+      </item>
+      <item>
+        <title>Running corridor on sys-net?</title>
+        <dc:creator><![CDATA[swisspal441]]></dc:creator>
+        <description><![CDATA[
+            <p>Ok, thank you.</p>
+<aside class="quote no-group" data-post="2" data-topic="8531">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>In theory, yes. But unsupported.</p>
+<p>Likely not needed. Tor control protocol access could be limited to localhost only. Tor might be using Tor unix domain socket files by default nowadays. Check your open ports. No open port reachable from other VMs, then no control protocol filtering (onion-grater) required.</p>
+<p>Any other (real or malware internal) Tor process in any other VM that isn’t protected by onion-grater (Whonix-Gateway) could still be using GETINFO address.</p>
+</blockquote>
+</aside>
+<p>Can you maybe explain me how to do so?</p>
+<p>I mean, I can of course see open ports with netstat -pln on sys-net. But how do I make sure that no outside AppVM can connect to them?</p>
+<p>In the default qubes configuration it shouldn’t be possible, right?</p>
+<p>Edit:<br>
+I connected a fresh VM directly to sys-net and ran “telnet ip port” with the ip of sys-net and the tor control port.</p>
+<p>Response was: telnet: Unable to connect to remote host: No route to host</p>
+<p>Is there anything else I can do to make sure that there is not connection possible to the port?</p>
+<aside class="quote no-group" data-post="2" data-topic="8531">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Any other (real or malware internal) Tor process in any other VM that isn’t protected by onion-grater (Whonix-Gateway) could still be using GETINFO address.</p>
+</blockquote>
+</aside>
+<p>And just double checking: By that you mean that even if the control port on sys-net (in this case) is not accessible by a directly connected AppVMs then it wouldn’t matter because the AppVM could’ve run the command on its own tor process/control port (if it created one)?</p>
+<p>Sorry, it’s a bit difficult for me to understand all of this. But I am trying</p>
+          <p><a href="http://forums.whonix.org/t/running-corridor-on-sys-net/8531/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/running-corridor-on-sys-net/8531/3</link>
+        <pubDate>Sat, 23 Nov 2019 07:54:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8531-3</guid>
+        <source url="http://forums.whonix.org/t/running-corridor-on-sys-net/8531.rss">Running corridor on sys-net?</source>
+      </item>
+      <item>
+        <title>Running corridor on sys-net?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I didn’t research that. Wasn’t considered during development. Therefore unsupported.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Unsupported" target="_blank" title="09:29AM - 01 December 2017">Whonix – 1 Dec 17</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:120/80;"><img src="https://www.whonix.org/w/images/0/0a/Unsupported.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Unsupported" target="_blank">Unsupported</a></h3>
+
+<p>What do you mean by unsupported?</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>You could try asking upstream or Qubes support.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.qubes-os.org/attachment/icons/512x512/apps/qubes-logo-icon.png" class="site-icon" width="16" height="16">
+      <a href="https://www.qubes-os.org/support/" target="_blank">Qubes OS</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://www.qubes-os.org/attachment/icons/qubes-logo-icon-name-slogan-fb.png" class="thumbnail" width="" height="">
+
+<h3><a href="https://www.qubes-os.org/support/" target="_blank">Help, Support, and Mailing Lists</a></h3>
+
+<p>Help, Support, and Mailing Lists Help and support for Qubes OS is available from the documentation and the mailing lists, which are explained below. The Qubes OS Project does not offer paid support services. If you’re looking for known issues or...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-post="1" data-topic="8531">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/db5fbb/40.png" class="avatar"> swisspal441:</div>
+<blockquote>
+<p>Are there other possibilities for malware to get the clearnet IP if the system is connected to sys-net with corridor running?</p>
+</blockquote>
+</aside>
+<p>Yes. Malware could set up a Tor relay and connect to it.</p>
+<aside class="quote no-group" data-post="1" data-topic="8531">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/db5fbb/40.png" class="avatar"> swisspal441:</div>
+<blockquote>
+<p>Can I install onion-grater on the sys-net VM to filter the GETINFO address command?</p>
+</blockquote>
+</aside>
+<p>In theory, yes. But unsupported.</p>
+<p>Likely not needed. Tor control protocol access could be limited to localhost only. Tor might be using Tor unix domain socket files by default nowadays. Check your open ports. No open port reachable from other VMs, then no control protocol filtering (onion-grater) required.</p>
+<p>Any other (real or malware internal) Tor process in any other VM that isn’t protected by onion-grater (Whonix-Gateway) could still be using GETINFO address.</p>
+          <p><a href="http://forums.whonix.org/t/running-corridor-on-sys-net/8531/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/running-corridor-on-sys-net/8531/2</link>
+        <pubDate>Sat, 23 Nov 2019 06:38:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8531-2</guid>
+        <source url="http://forums.whonix.org/t/running-corridor-on-sys-net/8531.rss">Running corridor on sys-net?</source>
+      </item>
+      <item>
+        <title>Running corridor on sys-net?</title>
+        <dc:creator><![CDATA[swisspal441]]></dc:creator>
+        <description><![CDATA[
+            <p>I followed the instructions in the Whonix docs for corridor<br>
+and I setup corridor on the sys-net VM instead of a seperate sys-corridor VM.</p>
+<p>It works just fine but I am wondering whether this is actually “safe” in comparison to running it as sys-corridor?</p>
+<p>Sys-net should be treated as an unsafe VM but the reason why I run it on sys-net is that I want to have a fail-safe mechanism in case I accidently choose sys-firewall or sys-net as NetVM. I want everything on my system to be tunneled through tor. Always.</p>
+<p>Are there settings on sys-net that could interfere with the corridor service that are not on a seperate sys-corridor VM? I am using debian 10 as template for sys-net. I disabled IPv6, installed wifi drivers and setup corridor. That’s it.</p>
+<p>And last question: Can I install onion-grater on the sys-net VM to filter the GETINFO address command? Are there other possibilities for malware to get the clearnet IP if the system is connected to sys-net with corridor running?</p>
+          <p><a href="http://forums.whonix.org/t/running-corridor-on-sys-net/8531/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/running-corridor-on-sys-net/8531/1</link>
+        <pubDate>Sat, 23 Nov 2019 05:51:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8531-1</guid>
+        <source url="http://forums.whonix.org/t/running-corridor-on-sys-net/8531.rss">Running corridor on sys-net?</source>
+      </item>
+  </channel>
+</rss>

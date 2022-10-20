@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+    <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020</link>
+    <description>Hello!
+As per the title, Tor is not running anymore on a debian-10 template with security-misc 3:7.7-1 installed from Whonix&#39;s buster-proposed-updates repo. This is the output of my syslog when I restart Tor daemon.
+
+&gt; localhost Tor[789]: Directory /run/tor cannot be read: Permission denied
+&gt; localhost Tor[789]: Before Tor can create a control socket in &quot;/run/tor/control&quot;, the directory &quot;/run/tor&quot; needs to exist, and to be accessible only by the user and group account that is running Tor.
+
+I am running another version of security-misc (3:3.5-1) on another debian-10 template which I use for sys-corridor and I am not experiencing any problem there. Also, everything is working well on Whoinx templates.
+
+Could somebody give me a suggestion in order to fix this problem, please?
+Cheers.</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 09 Sep 2019 14:54:42 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+        <dc:creator><![CDATA[minimal]]></dc:creator>
+        <description><![CDATA[
+            <p>It is kind of weird but finally I managed to make Tor working on the debian-10 template with security-misc installed. What I did?</p>
+<blockquote>
+<p>apt purge tor vanguards</p>
+</blockquote>
+<p>Then I reinstalled everything. Magic, it worked! So I changed again my torrc and added the two options that I have been used for ages:</p>
+<blockquote>
+<p>Sandbox 1<br>
+ConnectionPadding 1</p>
+</blockquote>
+<p>I restarted Tor and Vanguards. Nothing was working again and when I run</p>
+<blockquote>
+<p>sudo -u debian-tor nyx</p>
+</blockquote>
+<p>the output was:</p>
+<blockquote>
+<p>Unable to connect to tor. Maybe it’s running without a ControlPort?</p>
+</blockquote>
+<p>Initially I have tried to change vanguards.conf as follow:</p>
+<blockquote>
+<p><span class="hashtag">#control_ip</span> = 127.0.0.1<br>
+<span class="hashtag">#control_port</span> = 9051<br>
+control_socket = /var/run/tor/control</p>
+</blockquote>
+<p>But nothing was working. Then I just commented out</p>
+<blockquote>
+<p><span class="hashtag">#Sandbox</span> 1</p>
+</blockquote>
+<p>And everything is working fine again. Not sure why.</p>
+<p>I have been using this option with vanguards for months, even before the Debian Buster release. I honestly have no idea if the culprit of this is related to Tor 4.1, security-misc 3:7 or what else. However, it SEEMS that now everything is working again.</p>
+          <p><a href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/12</link>
+        <pubDate>Mon, 09 Sep 2019 14:54:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8020-12</guid>
+        <source url="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss">Tor not running on debian-10 template with security-misc 3:7.7-1 installed</source>
+      </item>
+      <item>
+        <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Also managed to <code>sudo apt purge tor</code> and reinstall of Tor while <code>security-misc</code> was installed.</p>
+          <p><a href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/11</link>
+        <pubDate>Mon, 09 Sep 2019 12:33:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8020-11</guid>
+        <source url="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss">Tor not running on debian-10 template with security-misc 3:7.7-1 installed</source>
+      </item>
+      <item>
+        <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Works for me in debian-10 TemplateVM.</p>
+<hr>
+<p>dpkg -l | grep security-misc</p>
+<blockquote>
+<p>ii  security-misc                        3:8.2-1                         all          enhances misc security settings</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>ii  tor                                  0.4.1.5-1~d10.buster+1          amd64        anonymizing overlay network for TCP</p>
+</blockquote>
+<hr>
+<p>I am not familiar with vanguards.</p>
+<aside class="quote" data-post="1" data-topic="8064">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/vanguards-additional-protections-for-tor-onion-services/8064">vanguards - Additional protections for Tor Onion Services</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    <a href="https://packages.debian.org/buster/vanguards" class="onebox" target="_blank" rel="nofollow noopener">https://packages.debian.org/buster/vanguards</a> 
+
+vanguards 
+
+
+vanguards uses the Stem Tor control port library to connect to a Tor control port. It has three defense subsystems: Vanguards, Rendguard, and Bandguards. All three subsystems apply to both service-side and client-side onion service activity, but NOT to any client traffic that exits the Tor network to the normal Internet.
+  </blockquote>
+</aside>
+
+<p>The mix with it may be the cause. However, even that works for me.</p>
+<pre><code>sudo systemctl status vanguards
+● vanguards.service - Additional protections for Tor onion services
+   Loaded: loaded (/lib/systemd/system/vanguards.service; disabled; vendor preset: enabled)
+   Active: active (running) since Mon 2019-09-09 08:28:08 EDT; 20s ago
+     Docs: man:vanguards(1)
+ Main PID: 4485 (vanguards)
+    Tasks: 3 (limit: 4667)
+   Memory: 84.7M
+   CGroup: /system.slice/vanguards.service
+           └─4485 /usr/bin/pypy /usr/bin/vanguards
+
+Sep 09 08:28:08 atest-debian-10-based systemd[1]: vanguards.service: Main process exited, code=killed, status=15/TERM
+Sep 09 08:28:08 atest-debian-10-based systemd[1]: vanguards.service: Succeeded.
+Sep 09 08:28:08 atest-debian-10-based systemd[1]: Stopped Additional protections for Tor onion services.
+Sep 09 08:28:08 atest-debian-10-based systemd[1]: Started Additional protections for Tor onion services.
+Sep 09 08:28:08 atest-debian-10-based vanguards[4485]: NOTICE[Mon Sep 09 08:28:08 2019]: Creating new vanguard state file at: /var/lib/tor/vanguards.state
+Sep 09 08:28:08 atest-debian-10-based vanguards[4485]: NOTICE[Mon Sep 09 08:28:08 2019]: Vanguards 0.3.0 connected to Tor 0.4.1.5 using stem 1.7.1</code></pre>
+          <p><a href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/10</link>
+        <pubDate>Mon, 09 Sep 2019 12:29:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8020-10</guid>
+        <source url="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss">Tor not running on debian-10 template with security-misc 3:7.7-1 installed</source>
+      </item>
+      <item>
+        <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+        <dc:creator><![CDATA[minimal]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi, thanks for your answer.<br>
+Here are my outputs:</p>
+<blockquote>
+<p>sudo ls -la /run/ | grep tor</p>
+</blockquote>
+<p>Output:</p>
+<blockquote>
+<p>drwxr-sr-x  2 debian-tor debian-tor  100 Sep  X XX:XX to</p>
+</blockquote>
+<p>And</p>
+<blockquote>
+<blockquote>
+<p>sudo ls -la /run/tor/</p>
+</blockquote>
+</blockquote>
+<p>Output:</p>
+<blockquote>
+<p>total 8<br>
+drwxr-sr-x  2 debian-tor debian-tor 100 Sep  X XX:XX .<br>
+drwxr-xr-x 27 root       root       740 Sep  X XX:XX …<br>
+-rw-r-----  1 debian-tor debian-tor  32 Sep  X XX:XX control.authcookie<br>
+srw-rw-rw-  1 debian-tor debian-tor   0 Sep  X XX:XX socks<br>
+-rw-r–r--  1 debian-tor debian-tor   4 Sep  X XX:XX tor.pid</p>
+</blockquote>
+<p>That’s it.</p>
+<p>I am using <a href="http://deb.torproject.org" rel="nofollow noopener">deb.torproject.org</a> repos. As I specified in my first post, I am experiencing this problem only in a debian-10 template with security-misc installed. Whonix-ws or whonix-gw templates are not affected by such issue.</p>
+          <p><a href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/9</link>
+        <pubDate>Mon, 09 Sep 2019 10:27:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8020-9</guid>
+        <source url="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss">Tor not running on debian-10 template with security-misc 3:7.7-1 installed</source>
+      </item>
+      <item>
+        <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="7" data-topic="8020">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/d2c977/40.png" class="avatar"> minimal:</div>
+<blockquote>
+<p>localhost Tor[783]: Directory /run/tor cannot be read: Permission denied</p>
+</blockquote>
+</aside>
+<p>Check permissions using the following two commands. Then post output here.</p>
+<p>Run:</p>
+<pre><code>sudo ls -la /run/ | grep tor
+</code></pre>
+<p>Expected output:</p>
+<blockquote>
+<p>drwxr-sr-x  2 debian-tor  debian-tor   140 Sep  9 08:22 tor</p>
+</blockquote>
+<p>Run:</p>
+<pre><code>sudo ls -la /run/tor
+</code></pre>
+<p>Expected output:</p>
+<blockquote>
+<p>total 88<br>
+drwxr-sr-x  2 debian-tor debian-tor   140 Sep  9 08:22 .<br>
+drwxr-xr-x 31 root       root         780 Sep  9 08:22 …<br>
+srw-rw----  1 debian-tor debian-tor     0 Sep  9 08:22 control<br>
+-rw-r-----  1 debian-tor debian-tor    32 Sep  9 08:22 control.authcookie<br>
+-rw-r-----  1 debian-tor debian-tor 78493 Sep  9 08:20 log<br>
+srw-rw-rw-  1 debian-tor debian-tor     0 Sep  9 08:22 socks<br>
+-rw-r–r--  1 debian-tor debian-tor     4 Sep  9 08:22 tor.pid</p>
+</blockquote>
+<p>Also how did you install Tor?</p>
+<pre><code>sudo apt install tor
+</code></pre>
+<p>Whonix uses Tor from buster repository from <a href="http://deb.torproject.org" rel="nofollow noopener">deb.torproject.org</a>, not from <a href="http://packages.debian.org" rel="nofollow noopener">packages.debian.org</a>. Downoaded from there and uploaded to <a href="http://deb.whonix.org" rel="nofollow noopener">deb.whonix.org</a>. (<a href="https://www.whonix.org/wiki/Dev/Tor" rel="nofollow noopener">https://www.whonix.org/wiki/Dev/Tor</a>) That might make a difference.</p>
+<p>security-misc package isn’t tested with Tor from <a href="http://packages.debian.org" rel="nofollow noopener">packages.debian.org</a>. Only with <a href="http://deb.torproject.org" rel="nofollow noopener">deb.torproject.org</a>. But by using <a href="http://deb.whonix.org" rel="nofollow noopener">deb.whonix.org</a>, you’d also get the same Tor version.</p>
+<p>(See also: <a href="https://github.com/Whonix/anon-shared-build-apt-sources-tpo" rel="nofollow noopener">https://github.com/Whonix/anon-shared-build-apt-sources-tpo</a> might be convenient.)</p>
+          <p><a href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/8</link>
+        <pubDate>Mon, 09 Sep 2019 09:07:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8020-8</guid>
+        <source url="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss">Tor not running on debian-10 template with security-misc 3:7.7-1 installed</source>
+      </item>
+      <item>
+        <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+        <dc:creator><![CDATA[minimal]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for your answer and apologies for the late reply.</p>
+<p>I updated again security-misc to the last version on the buster-proposed-repo (3:8.2-1) Then I have chowned the dir and restarted Tor as suggested in the link you posted above. Tor is still not working, but the output has changed a bit.</p>
+<blockquote>
+<p>tail-f /var/log/syslog<br>
+localhost Tor[783]: Directory /run/tor cannot be read: Permission denied<br>
+localhost Tor[783]: Before Tor can create a control socket in “/run/tor/control”, the directory “/run/tor” needs to exist, and to be accessible only by the user and group account that is running Tor.  (On some Unix systems, anybody who can list a socket can connect to it, so Tor is being careful.)<br>
+localhost Tor[783]: New control connection opened from 127.0.0.1</p>
+</blockquote>
+<p>and</p>
+<blockquote>
+<p>tail -f /var/log/vanguards<br>
+NOTICE: Tor needs descriptors: Cannot read /var/lib/tor/cached-microdesc-consensus: [Errno 2] No such file or directory: ‘/var/lib/tor/cached-microdesc-consensus’. Trying again…</p>
+</blockquote>
+<p>Indeed, the file is not present.</p>
+<p>If I</p>
+<blockquote>
+<p>sudo touch /var/lib/tor/cached-microdesc-consensus &amp;&amp; sudo chown debian-tor:debian-tor /var/lib/tor/cached-microdesc-consensus</p>
+</blockquote>
+<p>then</p>
+<blockquote>
+<p>tail -f /var/log/vanguards.lorg<br>
+NOTICE: Tor needs descriptors: Descriptor information is unavailable, tor might still be downloading it. Trying again…</p>
+</blockquote>
+<p>and</p>
+<blockquote>
+<p>tail-f /var/log/syslog<br>
+localhost Tor[783]: Directory /run/tor cannot be read: Permission denied<br>
+localhost Tor[783]: Before Tor can create a control socket in “/run/tor/control”, the directory “/run/tor” needs to exist, and to be accessible only by the user and group account that is running Tor.  (On some Unix systems, anybody who can list a socket can connect to it, so Tor is being careful.)<br>
+localhost Tor[783]: New control connection opened from 127.0.0.1.<br>
+localhost Tor[783]: Problem bootstrapping. Stuck at 10% (conn_done): Connected to a relay. (Connection timed out; TIMEOUT; count 22; recommendation warn; host XXXXXXXXXXXXXXXXX at YYYYYYY:443)<br>
+localhost Tor[783]: 21 connections have failed:<br>
+localhost Tor[783]:  21 connections died in state connect()ing with SSL state (No SSL object)</p>
+</blockquote>
+<p>Cheers</p>
+          <p><a href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/7</link>
+        <pubDate>Sat, 07 Sep 2019 10:48:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8020-7</guid>
+        <source url="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss">Tor not running on debian-10 template with security-misc 3:7.7-1 installed</source>
+      </item>
+      <item>
+        <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="3" data-topic="8020">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/d2c977/40.png" class="avatar"> minimal:</div>
+<blockquote>
+<p>localhost Tor[776]: Directory /run/tor cannot be read: Permission denied</p>
+</blockquote>
+</aside>
+<p>Try this:</p>
+<p><a href="https://www.whonix.org/wiki/Tor#Permissions_Fix" rel="nofollow noopener">https://www.whonix.org/wiki/Tor#Permissions_Fix</a></p>
+<aside class="quote no-group" data-post="3" data-topic="8020">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/d2c977/40.png" class="avatar"> minimal:</div>
+<blockquote>
+<p>/usr/lib/security-misc/permission-lockdown failed: exit code 2</p>
+</blockquote>
+</aside>
+<p>Please create a separate thread for that.</p>
+          <p><a href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/6</link>
+        <pubDate>Fri, 06 Sep 2019 12:53:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8020-6</guid>
+        <source url="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss">Tor not running on debian-10 template with security-misc 3:7.7-1 installed</source>
+      </item>
+      <item>
+        <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+        <dc:creator><![CDATA[minimal]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi awokd,<br>
+yes if no solution comes up I will be forced to uninstall the broken debian-10-template and completely reconfigure (gosh) a new one.</p>
+          <p><a href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/5</link>
+        <pubDate>Fri, 06 Sep 2019 11:56:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8020-5</guid>
+        <source url="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss">Tor not running on debian-10 template with security-misc 3:7.7-1 installed</source>
+      </item>
+      <item>
+        <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+        <dc:creator><![CDATA[awokd]]></dc:creator>
+        <description><![CDATA[
+            <p>I wonder if there’s an undefined dependency on something specific to<br>
+Whonix templates. “Bruce force” way to fix it is to uninstall the broken<br>
+debian-10 template, and reinstall a new one.</p>
+          <p><a href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/4</link>
+        <pubDate>Fri, 06 Sep 2019 10:38:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8020-4</guid>
+        <source url="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss">Tor not running on debian-10 template with security-misc 3:7.7-1 installed</source>
+      </item>
+      <item>
+        <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+        <dc:creator><![CDATA[minimal]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi and thanks for your answer.<br>
+Yes, I have just tried and Tor is not working. Here are my logs:</p>
+<blockquote>
+<p>$ tail -f /var/log/syslog<br>
+localhost Tor[776]: Directory /run/tor cannot be read: Permission denied<br>
+localhost Tor[776]: Before Tor can create a control socket in “/run/tor/control”, the directory “/run/tor” needs to exist, and to be accessible only by the user and group account that is running Tor.  (On some Unix systems, anybody who can list a socket can connect to it, so Tor is being careful.<br>
+localhost Tor[776]: New control connection opened from 127.0.0.1.</p>
+</blockquote>
+<p>and</p>
+<blockquote>
+<p>$ tail -f /var/log/vanguards<br>
+NOTICE: Vanguards 0.3.1 connected to Tor 0.4.1.5 using stem 1.7.1<br>
+NOTICE: Tor needs descriptors: Cannot read /var/lib/tor/cached-microdesc-consensus: [Errno 2] No such file or directory: ‘/var/lib/tor/cached-microdesc-consensus’. Trying again…</p>
+</blockquote>
+<p>I don’t think this is relevant but if I</p>
+<blockquote>
+<p>sudo su<br>
+/usr/lib/security-misc/permission-lockdown failed: exit code 2</p>
+</blockquote>
+<p>And I become root.</p>
+<p>Thanks.</p>
+          <p><a href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/3</link>
+        <pubDate>Fri, 06 Sep 2019 09:30:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8020-3</guid>
+        <source url="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss">Tor not running on debian-10 template with security-misc 3:7.7-1 installed</source>
+      </item>
+      <item>
+        <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+        <dc:creator><![CDATA[awokd]]></dc:creator>
+        <description><![CDATA[
+            <p>Have you tried to rollback to security-misc 3:3.5-1?</p>
+          <p><a href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/2</link>
+        <pubDate>Thu, 05 Sep 2019 19:04:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8020-2</guid>
+        <source url="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss">Tor not running on debian-10 template with security-misc 3:7.7-1 installed</source>
+      </item>
+      <item>
+        <title>Tor not running on debian-10 template with security-misc 3:7.7-1 installed</title>
+        <dc:creator><![CDATA[minimal]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello!<br>
+As per the title, Tor is not running anymore on a debian-10 template with security-misc 3:7.7-1 installed from Whonix’s buster-proposed-updates repo. This is the output of my syslog when I restart Tor daemon.</p>
+<blockquote>
+<p>localhost Tor[789]: Directory /run/tor cannot be read: Permission denied<br>
+localhost Tor[789]: Before Tor can create a control socket in “/run/tor/control”, the directory “/run/tor” needs to exist, and to be accessible only by the user and group account that is running Tor.</p>
+</blockquote>
+<p>I am running another version of security-misc (3:3.5-1) on another debian-10 template which I use for sys-corridor and I am not experiencing any problem there. Also, everything is working well on Whoinx templates.</p>
+<p>Could somebody give me a suggestion in order to fix this problem, please?<br>
+Cheers.</p>
+          <p><a href="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020/1</link>
+        <pubDate>Wed, 04 Sep 2019 10:16:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8020-1</guid>
+        <source url="http://forums.whonix.org/t/tor-not-running-on-debian-10-template-with-security-misc-3-7-7-1-installed/8020.rss">Tor not running on debian-10 template with security-misc 3:7.7-1 installed</source>
+      </item>
+  </channel>
+</rss>

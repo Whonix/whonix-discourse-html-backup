@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>systemd-analyze security</title>
+    <link>http://forums.whonix.org/t/systemd-analyze-security/10395</link>
+    <description>Nice.
+
+BTW running:
+
+&gt; systemd-analyze security
+
+in a terminal looks horrible in Whonix-WS and Whonix-GW (Qubes), with basically 80-90% of services listed as UNSAFE or EXPOSED.
+
+This command doesn&#39;t consider security-enforced policies like SELinux or AppArmor though, so possibly/probably a lot of false positives, particularly for non-Qubes-Whonix thanks to @madaidan AppArmor hardening.
+
+But I do wonder if there are some easy wins in the long scary lists i.e. can anything be disabled entirely (if not really a necessary service), or maybe there are some systemd security directives that can be used?
+
+See also:
+
+https://www.freedesktop.org/software/systemd/man/systemd-analyze.html
+
+https://www.ctrl.blog/entry/systemd-service-hardening.html
+
+PS Pity about the shitty forum software that has borked our logins via v3 onion again. @mig5 ... you&#39;re our only hope ;-)
+
+PPS @0brand you still about? We should get the wiki thing happening again (bit short on time myself)</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 09 Oct 2020 13:51:44 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/systemd-analyze-security/10395.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>systemd-analyze security</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="torjunkie" data-post="1" data-topic="10395">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<p>in a terminal looks horrible in Whonix-WS and Whonix-GW (Qubes), with basically 80-90% of services listed as UNSAFE or EXPOSED.</p>
+</blockquote>
+</aside>
+<p>Most services with larger attack surface (e.g. sdwdate, onion-grater etc.) are sandboxed well. There’s plenty of services there that don’t really need sandboxing.</p>
+<p>If we really wanted to, I could maintain a bunch of drop-in config folders containing sandboxing for these.</p>
+<aside class="quote no-group" data-username="torjunkie" data-post="1" data-topic="10395">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<p>This command doesn’t consider security-enforced policies like SELinux or AppArmor though, so possibly/probably a lot of false positives</p>
+</blockquote>
+</aside>
+<p>SELinux/AppArmor can’t do the same as systemd sandboxing. AppArmor can’t do namespaces or seccomp for example so they aren’t really false positives.</p>
+<aside class="quote no-group" data-username="torjunkie" data-post="1" data-topic="10395">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<p>But I do wonder if there are some easy wins in the long scary lists i.e. can anything be disabled entirely</p>
+</blockquote>
+</aside>
+<p>Not all things in the list are enabled anyway.</p>
+          <p><a href="http://forums.whonix.org/t/systemd-analyze-security/10395/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-analyze-security/10395/3</link>
+        <pubDate>Tue, 11 Feb 2020 18:14:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10395-3</guid>
+        <source url="http://forums.whonix.org/t/systemd-analyze-security/10395.rss">systemd-analyze security</source>
+      </item>
+      <item>
+        <title>systemd-analyze security</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Welcome back! <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<p>See also:</p>
+<p><a href="https://forums.whonix.org/t/apply-systemd-sandboxing-by-default-to-some-services/7590" class="inline-onebox">Apply systemd sandboxing by default to some services</a></p>
+<aside class="quote no-group quote-modified" data-username="torjunkie" data-post="1" data-topic="10395">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<blockquote>
+<p>systemd-analyze security</p>
+</blockquote>
+<p>in a terminal looks horrible in Whonix-WS and Whonix-GW (Qubes), with basically 80-90% of services listed as UNSAFE or EXPOSED.</p>
+</blockquote>
+</aside>
+<p>I don’t think it is useful to look at that as a whole and without context.</p>
+<ul>
+<li>Context: compare with other distributions</li>
+<li>as a whole: It lists services which aren’t even active. For some services it doesn’t make sense to add systemd hardening. That would only lead to higher system instability / more bugs. For some services it would be up to upstream to add systemd hardening. Each service needs to be looked at individually for attack surface and possible containment.</li>
+</ul>
+<p>I wonder what systemd would say “add systemd hardening to systemd-fsckd.service / rescue.service”. Might not make sense.</p>
+<p>Maybe it would make sense to contain for example <code>qubes-updates-proxy.service</code> but that’s upstream. I cannot add systemd hardening to every upstream which Whonix relies on. Probably enough work to keep 10 people full time busy…</p>
+<aside class="quote no-group" data-username="torjunkie" data-post="1" data-topic="10395">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<p>Pity about the shitty forum software that has borked our logins via v3 onion again.</p>
+</blockquote>
+</aside>
+<p><a href="https://forums.whonix.org/t/onion-forum-broken/8870">https://forums.whonix.org/t/onion-forum-broken/8870</a></p>
+          <p><a href="http://forums.whonix.org/t/systemd-analyze-security/10395/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-analyze-security/10395/2</link>
+        <pubDate>Tue, 11 Feb 2020 11:12:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10395-2</guid>
+        <source url="http://forums.whonix.org/t/systemd-analyze-security/10395.rss">systemd-analyze security</source>
+      </item>
+      <item>
+        <title>systemd-analyze security</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>Nice.</p>
+<p>BTW running:</p>
+<blockquote>
+<p>systemd-analyze security</p>
+</blockquote>
+<p>in a terminal looks horrible in Whonix-WS and Whonix-GW (Qubes), with basically 80-90% of services listed as UNSAFE or EXPOSED.</p>
+<p>This command doesn’t consider security-enforced policies like SELinux or AppArmor though, so possibly/probably a lot of false positives, particularly for non-Qubes-Whonix thanks to <a class="mention" href="http://forums.whonix.org/u/madaidan">@madaidan</a> AppArmor hardening.</p>
+<p>But I do wonder if there are some easy wins in the long scary lists i.e. can anything be disabled entirely (if not really a necessary service), or maybe there are some systemd security directives that can be used?</p>
+<p>See also:</p>
+<p><a href="https://www.freedesktop.org/software/systemd/man/systemd-analyze.html" class="onebox" target="_blank">https://www.freedesktop.org/software/systemd/man/systemd-analyze.html</a></p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.ctrl.blog/entry/systemd-service-hardening.html/../favicon.ico" class="site-icon" width="64" height="64">
+      <a href="https://www.ctrl.blog/entry/systemd-service-hardening.html" target="_blank">Ctrl blog</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/388;"><img src="https://www.ctrl.blog/media/hero/systemd-keys.1088x612.jpeg" class="thumbnail" width="690" height="388"></div>
+
+<h3><a href="https://www.ctrl.blog/entry/systemd-service-hardening.html" target="_blank">systemd service sandboxing and security hardening 101</a></h3>
+
+<p>The systemd-analyze security command gives your systemd service units an automated security rating. This is a good starting point for security hardening.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>PS Pity about the shitty forum software that has borked our logins via v3 onion again. <a class="mention" href="http://forums.whonix.org/u/mig5">@mig5</a> … you’re our only hope <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=9" title=":wink:" class="emoji" alt=":wink:"></p>
+<p>PPS <a class="mention" href="http://forums.whonix.org/u/0brand">@0brand</a> you still about? We should get the wiki thing happening again (bit short on time myself)</p>
+          <p><a href="http://forums.whonix.org/t/systemd-analyze-security/10395/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/systemd-analyze-security/10395/1</link>
+        <pubDate>Tue, 11 Feb 2020 10:13:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10395-1</guid>
+        <source url="http://forums.whonix.org/t/systemd-analyze-security/10395.rss">systemd-analyze security</source>
+      </item>
+  </channel>
+</rss>

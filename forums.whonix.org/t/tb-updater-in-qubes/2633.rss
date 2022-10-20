@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>tb-updater (in Qubes)</title>
+    <link>http://forums.whonix.org/t/tb-updater-in-qubes/2633</link>
+    <description>From https://www.whonix.org/wiki/Tor_Browser#Qubes_specific:
+
+&gt; When a Qubes-Whonix-Workstation AppVM is booted for the first time, in essence, the systemd unit file /lib/systemd/system/tb-updater-first-boot.service runs /usr/lib/tb-updater/first-boot-home-population. That script copies /var/cache/tb-binary to /home/user.
+
+IIUC if I 
+1. create new AppVM
+2. rm -r /home/user/.tb
+3. reboot
+then, /home/user/.tb should not exist on next boot.
+
+But it keeps coming back even though `/rw/srv/whonix/var/cache/tb-updater/first-boot-home-population.done` exists. What am I missing?</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 21 Jun 2016 18:03:44 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/tb-updater-in-qubes/2633.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>tb-updater (in Qubes)</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="2" data-topic="2633">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>The done / lock file mechanism is broken due to limitations in bind-dirs and due to a bug that is now fixed in tb-updater git master.</p>
+</blockquote>
+</aside>
+<p>(Aha, Dir didn’t exist in template!) Sorry to bring it up. Hate to add legacy code for non-essential functionality that will be obsolete in 3.2 anyway…</p>
+<aside class="quote" data-post="2" data-topic="2633">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Please test.</p>
+</blockquote>
+</aside>
+<p>Working!</p>
+          <p><a href="http://forums.whonix.org/t/tb-updater-in-qubes/2633/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tb-updater-in-qubes/2633/3</link>
+        <pubDate>Tue, 21 Jun 2016 18:03:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2633-3</guid>
+        <source url="http://forums.whonix.org/t/tb-updater-in-qubes/2633.rss">tb-updater (in Qubes)</source>
+      </item>
+      <item>
+        <title>tb-updater (in Qubes)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Your steps are correct.</p>
+<p>Bug confirmed.</p>
+<p>The done / lock file mechanism is broken due to limitations in bind-dirs and due to a bug that is now fixed in tb-updater git master.</p>
+<p>( <a href="https://groups.google.com/forum/#!msg/qubes-devel/tcYQ4eV-XX4/J89DRLzOBQAJ">https://groups.google.com/forum/#!msg/qubes-devel/tcYQ4eV-XX4/J89DRLzOBQAJ</a> )</p>
+<hr>
+<p>To fix, you could try this…</p>
+<p>In AppVM.</p>
+<pre><code>sudo rm -r /rw/srv/whonix/var/cache/tb-updater
+</code></pre>
+<p>Shut down AppVM.</p>
+<p>Start whonix-ws TemplateVM.</p>
+<p>Then emulate the following git commit in the whonix-ws TemplateVM.</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/tb-updater/commit/de83d94a16b4554d08e70ad9e868f2aeadeabde9" target="_blank" rel="nofollow noopener">github.com/Whonix/tb-updater</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">
+    <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="https://github.com/Whonix/tb-updater/commit/de83d94a16b4554d08e70ad9e868f2aeadeabde9" target="_blank" rel="nofollow noopener">fix tb-updater first boot population service done / lock file mechanism</a>
+</h4>
+
+  <pre class="message" style="white-space: pre-wrap;">Thanks to entr0py for the bug report!
+https://forums.whonix.org/t/tb-updater-in-qubes</pre>
+
+<div class="date">
+  by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+  on <a href="https://github.com/Whonix/tb-updater/commit/de83d94a16b4554d08e70ad9e868f2aeadeabde9" target="_blank" rel="nofollow noopener">10:38AM - 21 Jun 16</a>
+</div>
+
+<div class="github-commit-stats">
+  changed <strong>2 files</strong>
+  with <strong>12 additions</strong>
+  and <strong>0 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>From then, your steps should work. Please test.</p>
+          <p><a href="http://forums.whonix.org/t/tb-updater-in-qubes/2633/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tb-updater-in-qubes/2633/2</link>
+        <pubDate>Tue, 21 Jun 2016 10:44:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2633-2</guid>
+        <source url="http://forums.whonix.org/t/tb-updater-in-qubes/2633.rss">tb-updater (in Qubes)</source>
+      </item>
+      <item>
+        <title>tb-updater (in Qubes)</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>From <a href="https://www.whonix.org/wiki/Tor_Browser#Qubes_specific:">https://www.whonix.org/wiki/Tor_Browser#Qubes_specific:</a></p>
+<blockquote>
+<p>When a Qubes-Whonix-Workstation AppVM is booted for the first time, in essence, the systemd unit file /lib/systemd/system/tb-updater-first-boot.service runs /usr/lib/tb-updater/first-boot-home-population. That script copies /var/cache/tb-binary to /home/user.</p>
+</blockquote>
+<p>IIUC if I</p>
+<ol>
+<li>create new AppVM</li>
+<li>rm -r /home/user/.tb</li>
+<li>reboot<br>
+then, /home/user/.tb should not exist on next boot.</li>
+</ol>
+<p>But it keeps coming back even though <code>/rw/srv/whonix/var/cache/tb-updater/first-boot-home-population.done</code> exists. What am I missing?</p>
+          <p><a href="http://forums.whonix.org/t/tb-updater-in-qubes/2633/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tb-updater-in-qubes/2633/1</link>
+        <pubDate>Mon, 20 Jun 2016 21:52:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2633-1</guid>
+        <source url="http://forums.whonix.org/t/tb-updater-in-qubes/2633.rss">tb-updater (in Qubes)</source>
+      </item>
+  </channel>
+</rss>

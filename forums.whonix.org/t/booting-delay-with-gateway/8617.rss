@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Booting delay with Gateway</title>
+    <link>http://forums.whonix.org/t/booting-delay-with-gateway/8617</link>
+    <description>
+I just wanted to report a delay that happens when Whonix Gateway is booted. The hang is about 25 seconds long, and then boot continues without error and everything is working fine.
+user@host:~$ systemd-analyze critical-chain
+graphical.target @13.502s
+└─multi-user.target @13.502s
+  └─sdwdate.service @11.828s +1.673s
+    └─tor@default.service @8.453s +3.370s
+      └─network.target @8.446s
+        └─networking.service @8.230s +214ms
+          └─network-pre.target @8.228s
+
+from syslog:
+Dec 11 16:20:35 host kernel: [    2.642136] cdrom: Uniform CD-ROM driver Revision: 3.20
+Dec 11 16:20:35 host kernel: [    2.645047] sr 1:0:0:0: Attached scsi CD-ROM sr0
+Dec 11 16:20:35 host kernel: [   34.891101] EXT4-fs (sda1): mounted filesystem with ordered data mode. Opts: (null)
+Dec 11 16:20:35 host kernel: [   34.938866] systemd-udevd: 37 output lines suppressed due to ratelimiting
+Dec 11 16:20:35 host augenrules[450]: failure 1
+
+user@host:~$ systemd-analyze time
+Startup finished in 36.024s (kernel) + 13.515s (userspace) = 49.539s 
+graphical.target reached after 13.502s in userspace
+
+Edit: tty and time error messages were not relevant. see final reply for solution</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 01 Jan 2020 07:33:13 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/booting-delay-with-gateway/8617.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Booting delay with Gateway</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Solution is really simple. See here:</p>
+<aside class="quote quote-modified" data-post="7" data-topic="4951">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/initramfs-tools-begin-running-scripts-local-block-done-takes-a-long-time-during-boot-resume-none/4951/7">initramfs-tools - Begin: Running /scripts/local-block ... done. - takes a long time during boot - RESUME=none</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/booting-delay-with-gateway/8617/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/booting-delay-with-gateway/8617/11</link>
+        <pubDate>Wed, 01 Jan 2020 07:33:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8617-11</guid>
+        <source url="http://forums.whonix.org/t/booting-delay-with-gateway/8617.rss">Booting delay with Gateway</source>
+      </item>
+      <item>
+        <title>Booting delay with Gateway</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Here are my observations; I cloned my machines and decided to experiment a bit;<br>
+System host: Debian Buster, fully up to date<br>
+Virtualizer: Vbox version 6.0.14 from Oracle site<br>
+Settings: default 768M Gateway Ram and 2048K Workstation Ram<br>
+Findings: With the removal of xdg-dbus-proxy bubblewrap swap-file-creator, cryptsetup-initramfs  and all the suggestions through the apt-get purge command and then rebuilding and updating  the initramfs, I have the Gateway booting properly without delay. I used an older snapshot  version of Whonix (15.0.0.4.9) so the apt-get dist-upgrade could be tested. No issue reported and it updated without issue<br>
+An important note is this may not be ideal because 2 meta packages were removed and we may use bubblewrap in the future. But as far as functionality, with the removal of those packages and rebuild of initramfs, the booting issue disappears.<br>
+I have not tested other virtualizers, just this specific virtualbox version so far.</p>
+          <p><a href="http://forums.whonix.org/t/booting-delay-with-gateway/8617/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/booting-delay-with-gateway/8617/10</link>
+        <pubDate>Tue, 31 Dec 2019 21:59:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8617-10</guid>
+        <source url="http://forums.whonix.org/t/booting-delay-with-gateway/8617.rss">Booting delay with Gateway</source>
+      </item>
+      <item>
+        <title>Booting delay with Gateway</title>
+        <dc:creator><![CDATA[Patrick_mobile]]></dc:creator>
+        <description><![CDATA[
+            <p>It was removed completely before.</p>
+<p>But then it was fully reproducible that the gateway hangs with 768 MB RAM without any swap. See:</p>
+<aside class="quote quote-modified" data-post="1" data-topic="8317">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/swap-swap-file-whonix-gateway-freezing-during-apt-get-dist-upgrade-encrypted-swap-file-creator/8317">swap - swap file - Whonix-Gateway freezing during apt-get dist-upgrade - encrypted swap-file-creator</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    Whonix-Gateway default RAM is currently set to 768 MB. 
+(Whonix-Workstation default RAM is currently set to 2048 MB.) 
+During upgrade Whonix-Gateway freezes. Not totally. But it looks frozen. The seconds on the clock stay at the same number for several minutes. This happens during module building (VirtualBox guest additions) as well as kernel header package upgrade. During that time, Tor running on Whonix-Gateway is not accessible from Whonix-Workstation. 
+Hence, I plan to re-vitalize swap-file-…
+  </blockquote>
+</aside>
+
+<p>When there’s enough RAM (2000 MB or more), swap-file-creator will do nothing at all.</p>
+          <p><a href="http://forums.whonix.org/t/booting-delay-with-gateway/8617/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/booting-delay-with-gateway/8617/9</link>
+        <pubDate>Tue, 31 Dec 2019 18:09:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8617-9</guid>
+        <source url="http://forums.whonix.org/t/booting-delay-with-gateway/8617.rss">Booting delay with Gateway</source>
+      </item>
+      <item>
+        <title>Booting delay with Gateway</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Maybe remove the swap-file-creator package completely? Or if it is possible, have it be an opt-in for those who may need it?<br>
+For my uses, I have not really touched the defaults that the machines ship with. A couple times I tried 1024K for Gateway’s RAM, but it was not necessary. I found the default 768M to be quite enough. I have not had a situation where swap was needed on either machine.</p>
+          <p><a href="http://forums.whonix.org/t/booting-delay-with-gateway/8617/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/booting-delay-with-gateway/8617/8</link>
+        <pubDate>Tue, 31 Dec 2019 17:32:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8617-8</guid>
+        <source url="http://forums.whonix.org/t/booting-delay-with-gateway/8617.rss">Booting delay with Gateway</source>
+      </item>
+      <item>
+        <title>Booting delay with Gateway</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="6" data-topic="4951">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/initramfs-tools-begin-running-scripts-local-block-done-takes-a-long-time-during-boot-resume-none/4951/6">initramfs-tools - Begin: Running /scripts/local-block ... done. - takes a long time during boot - RESUME=none</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    swap-file-creator is back. 
+
+
+And this issue is back too.
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/booting-delay-with-gateway/8617/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/booting-delay-with-gateway/8617/7</link>
+        <pubDate>Tue, 31 Dec 2019 12:30:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8617-7</guid>
+        <source url="http://forums.whonix.org/t/booting-delay-with-gateway/8617.rss">Booting delay with Gateway</source>
+      </item>
+      <item>
+        <title>Booting delay with Gateway</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Final Update: Success!</p>
+<p>The “solution” was simply purging the current copy of V-box via apt. The actual delay was caused by the swap-file-creator application. It takes some time to start which is completely normal. In this particular case, there was some issue with the vbox software that was resolved after a purge and re-download.<br>
+Thank you to Patrick for the suggestions</p>
+          <p><a href="http://forums.whonix.org/t/booting-delay-with-gateway/8617/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/booting-delay-with-gateway/8617/6</link>
+        <pubDate>Thu, 12 Dec 2019 04:51:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8617-6</guid>
+        <source url="http://forums.whonix.org/t/booting-delay-with-gateway/8617.rss">Booting delay with Gateway</source>
+      </item>
+      <item>
+        <title>Booting delay with Gateway</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>see final update at bottom for solution</p>
+          <p><a href="http://forums.whonix.org/t/booting-delay-with-gateway/8617/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/booting-delay-with-gateway/8617/5</link>
+        <pubDate>Thu, 12 Dec 2019 01:48:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8617-5</guid>
+        <source url="http://forums.whonix.org/t/booting-delay-with-gateway/8617.rss">Booting delay with Gateway</source>
+      </item>
+      <item>
+        <title>Booting delay with Gateway</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Patrick,<br>
+Thank you for the awesome reply! I will try the serial-console-enable package.</p>
+          <p><a href="http://forums.whonix.org/t/booting-delay-with-gateway/8617/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/booting-delay-with-gateway/8617/4</link>
+        <pubDate>Wed, 11 Dec 2019 21:24:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8617-4</guid>
+        <source url="http://forums.whonix.org/t/booting-delay-with-gateway/8617.rss">Booting delay with Gateway</source>
+      </item>
+      <item>
+        <title>Booting delay with Gateway</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Add 2 GB or more RAM. Does that help?</p>
+<p>Reason: Whonix-Gateway VirtualBox by default comes with 768 MB RAM.<br>
+(Whonix-Workstation with 2048 MB RAM.)</p>
+<p>That works great most of the time but Whonix-Gateway happened to freeze during apt (kernel) upgrades due to low RAM. Adding more default RAM to Whonix-Gateway wasn’t an option since that would break Whonix by default for many users who don’t have that much RAM.</p>
+<p>As solution <a href="https://github.com/Whonix/swap-file-creator">swap-file-creator</a> was created. If there is less than (default, configureable) 1950 MB RAM, it will create an encrypted swap file. If more than that, it will not create a swap file. Swap file creation at boot takes some time. This makes Whonix-Gateway boot slower than Whonix-Workstation.</p>
+<aside class="quote no-group" data-post="1" data-topic="8617">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> anontor:</div>
+<blockquote>
+<p>host kernel: [ 43.955834] 16:22:44.781340 timesync Error: vgsvcTimeSyncWorker: VbglR3GetHostTime failed; rc2=VERR_NOT_SUPPORTED</p>
+</blockquote>
+</aside>
+<aside class="quote quote-modified" data-post="1" data-topic="8053">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/letter_avatar_proxy/v4/letter/i/0ea827/40.png" class="avatar">
+    <a href="https://forums.whonix.org/t/timesync-error-vgsvctimesyncworker-vbglr3gethosttime-failed/8053">timesync Error: vgsvcTimeSyncWorker: VbglR3GetHostTime failed</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/virtualbox"><span class="badge-category-bg" style="background-color: #283890;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Everything specific to Whonix VirtualBox. (devs)">VirtualBox</span></a>
+  </div>
+  <blockquote>
+    I just installed from Whonix-CLI-15.0.0.3.3.ova 
+I get spam on the current tty, 20 times after boot: 
+timesync Error: vgsvcTimeSyncWorker: VbglR3GetHostTime failed; rc2=VERR_NOT_SUPPORTED 
+I’m using VirtualBox 5.2.32 is that a problem? 
+It seems to know what time it is even without a network connection. So I’m not sure what it means but if it’s not supported the first time it probably won’t be supported the next 19 times 
+I’m using VirtualBox because that’s what the download page points to but I…
+  </blockquote>
+</aside>
+
+<aside class="quote no-group" data-post="1" data-topic="8617">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> anontor:</div>
+<blockquote>
+<p>serial-getty@ttyS0.service: Scheduled restart job, restart counter is at 48.<br>
+Dec 11 16:28:09 host systemd[1]: Stopped Serial Getty on ttyS0.<br>
+Dec 11 16:28:09 host systemd[1]: Started Serial Getty on ttyS0.</p>
+</blockquote>
+</aside>
+<aside class="quote quote-modified" data-post="1" data-topic="8021">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/serial-console-in-virtualbox/8021">Serial Console in VirtualBox</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/virtualbox"><span class="badge-category-bg" style="background-color: #283890;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Everything specific to Whonix VirtualBox. (devs)">VirtualBox</span></a>
+  </div>
+  <blockquote>
+    Serial console works for Whonix KVM. 
+Package <a href="https://github.com/Whonix/serial-console-enable" rel="nofollow noopener">serial-console-enable</a> might help / simplify setting up the kernel boot parameters inside the VM. 
+sudo apt-get install serial-console-enable
+
+See also: 
+
+
+Serial console may be possible with VirtualBox too. See: 
+<a href="https://www.gonwan.com/2014/04/07/setting-up-serial-console-on-virtualbox/" class="onebox" target="_blank" rel="nofollow noopener">https://www.gonwan.com/2014/04/07/setting-up-serial-console-on-virtualbox/</a> 
+I didn’t manage to set it up yet. 
+Note of carefulness during experimentation: trying to set it up might brick that VM that you tried to set it up with. Undoing the …
+  </blockquote>
+</aside>
+
+<ul>
+<li><a href="https://www.whonix.org/wiki/Recovery#Serial_Console">https://www.whonix.org/wiki/Recovery#Serial_Console</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/booting-delay-with-gateway/8617/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/booting-delay-with-gateway/8617/3</link>
+        <pubDate>Wed, 11 Dec 2019 21:12:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8617-3</guid>
+        <source url="http://forums.whonix.org/t/booting-delay-with-gateway/8617.rss">Booting delay with Gateway</source>
+      </item>
+      <item>
+        <title>Booting delay with Gateway</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>see last reply for solution</p>
+          <p><a href="http://forums.whonix.org/t/booting-delay-with-gateway/8617/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/booting-delay-with-gateway/8617/2</link>
+        <pubDate>Wed, 11 Dec 2019 20:55:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8617-2</guid>
+        <source url="http://forums.whonix.org/t/booting-delay-with-gateway/8617.rss">Booting delay with Gateway</source>
+      </item>
+      <item>
+        <title>Booting delay with Gateway</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>I just wanted to report a delay that happens when Whonix Gateway is booted. The hang is about 25 seconds long, and then boot continues without error and everything is working fine.<br>
+user@host:~$ systemd-analyze critical-chain<br>
+graphical.target <span class="mention">@13.502s</span><br>
+└─multi-user.target <span class="mention">@13.502s</span><br>
+└─sdwdate.service <span class="mention">@11.828s</span> +1.673s<br>
+└─tor@default.service <span class="mention">@8.453s</span> +3.370s<br>
+└─network.target <span class="mention">@8.446s</span><br>
+└─networking.service <span class="mention">@8.230s</span> +214ms<br>
+└─network-pre.target <span class="mention">@8.228s</span></p>
+<p>from syslog:<br>
+Dec 11 16:20:35 host kernel: [    2.642136] cdrom: Uniform CD-ROM driver Revision: 3.20<br>
+Dec 11 16:20:35 host kernel: [    2.645047] sr 1:0:0:0: Attached scsi CD-ROM sr0<br>
+Dec 11 16:20:35 host kernel: [   34.891101] EXT4-fs (sda1): mounted filesystem with ordered data mode. Opts: (null)<br>
+Dec 11 16:20:35 host kernel: [   34.938866] systemd-udevd: 37 output lines suppressed due to ratelimiting<br>
+Dec 11 16:20:35 host augenrules[450]: failure 1</p>
+<p>user@host:~$ systemd-analyze time<br>
+Startup finished in 36.024s (kernel) + 13.515s (userspace) = 49.539s<br>
+graphical.target reached after 13.502s in userspace</p>
+<p>Edit: tty and time error messages were not relevant. see final reply for solution</p>
+          <p><a href="http://forums.whonix.org/t/booting-delay-with-gateway/8617/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/booting-delay-with-gateway/8617/1</link>
+        <pubDate>Wed, 11 Dec 2019 17:25:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8617-1</guid>
+        <source url="http://forums.whonix.org/t/booting-delay-with-gateway/8617.rss">Booting delay with Gateway</source>
+      </item>
+  </channel>
+</rss>

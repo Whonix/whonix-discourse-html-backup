@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Kicksecure /etc/hostname /etc/hosts</title>
+    <link>http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919</link>
+    <description>whenever you type sudo something it says: 
+
+`sudo: unable to resolve host localhost.localdomain: Name or service not known`</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 19 Aug 2022 12:56:57 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Kicksecure /etc/hostname /etc/hosts</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This will be fixed after updates.</p>
+<p>(The following file will solve it.)</p>
+<aside class="onebox githubblob" data-onebox-src="https://github.com/Kicksecure/kicksecure-network-conf/blob/master/etc/NetworkManager/conf.d/20_kicksecure-network-conf.conf">
+  <header class="source">
+
+      <a href="https://github.com/Kicksecure/kicksecure-network-conf/blob/master/etc/NetworkManager/conf.d/20_kicksecure-network-conf.conf" target="_blank" rel="noopener">github.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Kicksecure/kicksecure-network-conf/blob/master/etc/NetworkManager/conf.d/20_kicksecure-network-conf.conf" target="_blank" rel="noopener">Kicksecure/kicksecure-network-conf/blob/master/etc/NetworkManager/conf.d/20_kicksecure-network-conf.conf</a></h4>
+
+
+      <pre><code class="lang-conf">## Copyright (C) 2022 - 2022 ENCRYPTED SUPPORT LP &lt;adrelanos@whonix.org&gt;
+## See the file COPYING for copying conditions.
+
+## fixes `hostname` showing `localhost.localdomain` instead of `localhost`
+## which can lead to issues.
+##
+## The hostname is set to `localhost` in `/etc/hostname` already in VMs anyhow.
+## However, NetworkManager considers that an invalid hostname and therefore changes it.
+## Therefore NetworkManager hostname management is disabled here.
+##
+## There is no indication that this is security critical.
+## The user is free to undo this setting.
+##
+## This is useful in redistributed (downloadable) Kicksecure VMs.
+## This might not be needed or useful in different VMs (such as on a VPS) or
+## the host operating system.
+##
+## https://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919
+[main]
+hostname-mode=none
+</code></pre>
+
+
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/11</link>
+        <pubDate>Fri, 19 Aug 2022 12:56:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10919-11</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919.rss">Kicksecure /etc/hostname /etc/hosts</source>
+      </item>
+      <item>
+        <title>Kicksecure /etc/hostname /etc/hosts</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Related to network manager…</p>
+<p>Quote <a href="https://manpages.debian.org/NetworkManager.conf" class="inline-onebox">NetworkManager.conf(5) — network-manager — Debian bullseye-backports — Debian Manpages</a></p>
+<blockquote>
+<p><em>hostname-mode</em></p>
+<p>Set the management mode of the hostname. This parameter will affect only the transient hostname. If a valid static hostname is set, NetworkManager will skip the update of the hostname despite the value of this option. An hostname empty or equal to ‘localhost’, ‘localhost6’, ‘localhost.localdomain’ or ‘localhost6.localdomain’ is considered invalid.</p>
+</blockquote>
+<p>Bingo.</p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/10</link>
+        <pubDate>Fri, 19 Aug 2022 12:41:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10919-10</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919.rss">Kicksecure /etc/hostname /etc/hosts</source>
+      </item>
+      <item>
+        <title>Kicksecure /etc/hostname /etc/hosts</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Inside a Kicksecure VM…</p>
+<pre><code>cat /etc/hostname
+</code></pre>
+<blockquote>
+<p>localhost</p>
+</blockquote>
+<p>Looks correct.</p>
+<pre><code>cat /etc/hosts
+</code></pre>
+<blockquote>
+<p>127.0.0.1       localhost<br>
+::1             localhost ip6-localhost ip6-loopback<br>
+ff02::1         ip6-allnodes<br>
+ff02::2         ip6-allrouters</p>
+</blockquote>
+<p>Looks also correct.</p>
+<pre><code>dsudo test
+</code></pre>
+<p>No output as expected (no error message), also ok.</p>
+<pre><code>hostname
+</code></pre>
+<blockquote>
+<p>localhost.localdomain</p>
+</blockquote>
+<p>This is wrong.</p>
+<p>Why is that? Related to network manager, DHCP?</p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/9</link>
+        <pubDate>Fri, 19 Aug 2022 12:38:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10919-9</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919.rss">Kicksecure /etc/hostname /etc/hosts</source>
+      </item>
+      <item>
+        <title>Kicksecure /etc/hostname /etc/hosts</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I see. I didn’t notice or overlooked that. Good to know.</p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/8</link>
+        <pubDate>Sun, 03 Jan 2021 06:47:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10919-8</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919.rss">Kicksecure /etc/hostname /etc/hosts</source>
+      </item>
+      <item>
+        <title>Kicksecure /etc/hostname /etc/hosts</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>But many of the VPS now providing freedom of uploading your own distro<br>
+ISO, So not really every host provider this applies to it.</p>
+<p>Patrick via Whonix Forum:</p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/7</link>
+        <pubDate>Sat, 02 Jan 2021 15:00:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10919-7</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919.rss">Kicksecure /etc/hostname /etc/hosts</source>
+      </item>
+      <item>
+        <title>Kicksecure /etc/hostname /etc/hosts</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Now I remember why I didn’t want to add files /etc/hostname and /etc/hosts into packages. This is because for Kicksecure we’ll be needing to rely distro morphing installation method for the server use case for a while. Users using VPS will probably have no other chance than telling their VPS provider to install Debian and then sudo apt install kicksecure-cli. In that case, the installed packages shouldn’t modify the server’s existing /etc/hostname and /etc/hosts. Therefore for Kicksecure builds, these files need to be auto generated during the build process so that these aren’t managed by any packages.</p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/6</link>
+        <pubDate>Fri, 01 Jan 2021 21:02:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10919-6</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919.rss">Kicksecure /etc/hostname /etc/hosts</source>
+      </item>
+      <item>
+        <title>Kicksecure /etc/hostname /etc/hosts</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I don’t want to add this by default. Not sure you suggested that but in case if anyone interprets it as such as suggestion, here’s why.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="3" data-topic="10919">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>I wonder where Debian is getting the <code>.localdomain</code> part from anyhow? It is nowhere to be found in folder <code>/etc</code>.</p>
+</blockquote>
+</aside>
+<p>This long thread and who knows where it even started looks rather complicated:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <a href="https://lists.debian.org/debian-devel/2005/10/threads.html#00194" target="_blank" rel="noopener">lists.debian.org</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="20" height="20">
+
+<h3><a href="https://lists.debian.org/debian-devel/2005/10/threads.html#00194" target="_blank" rel="noopener">debian-devel Oct 2005 by thread</a></h3>
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Might argue somewhere against <code>.localdomain</code> such as here:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <a href="https://lists.debian.org/debian-devel/2005/10/msg00387.html" target="_blank" rel="noopener">lists.debian.org</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="20" height="20">
+
+<h3><a href="https://lists.debian.org/debian-devel/2005/10/msg00387.html" target="_blank" rel="noopener">Re: localhost.localdomain</a></h3>
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Since some modification must be shipped anyhow, and since there is no generic default / convention for default host name, can as well as also add a “proper” hostname, i.e. not <code>localhost</code>.</p>
+<p>Will probably use same settings in Kicksecure as in Whonix. I.e. default hostname <code>host</code>.</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonix-base-files/blob/master/etc/hostname.whonix" target="_blank" rel="noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonix-base-files/blob/master/etc/hostname.whonix" target="_blank" rel="noopener">Whonix/whonix-base-files/blob/master/etc/hostname.whonix</a></h4>
+<pre><code class="lang-whonix">host
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonix-base-files/blob/master/etc/hosts.whonix" target="_blank" rel="noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonix-base-files/blob/master/etc/hosts.whonix" target="_blank" rel="noopener">Whonix/whonix-base-files/blob/master/etc/hosts.whonix</a></h4>
+<pre><code class="lang-whonix">## Copyright (C) 2012 - 2020 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+#### meta start
+#### project Whonix
+#### category networking and dns
+#### description
+## Debian default /etc/hosts + Anonymity Distribution specific additions.
+##
+## Currently only &lt;code&gt;127.0.0.1 host.localdomain host&lt;/code&gt; gets added.
+#### meta end
+
+## Anonymity Distribution /etc/hosts
+
+## Defaults
+127.0.0.1       localhost
+::1             localhost ip6-localhost ip6-loopback
+fe00::0         ip6-localnet
+ff00::0         ip6-mcastprefix
+ff02::1         ip6-allnodes
+</code></pre>
+
+  This file has been truncated. <a href="https://github.com/Whonix/whonix-base-files/blob/master/etc/hosts.whonix" target="_blank" rel="noopener">show original</a>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>I.e. package <code>kicksecure-base-files</code> effectively shipping files:</p>
+<ul>
+<li><code>/etc/hostname</code></li>
+<li><code>/etc/hosts</code></li>
+</ul>
+<p>Unless there are better suggestions for default hostname / hosts file / implementation details.</p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/5</link>
+        <pubDate>Wed, 30 Dec 2020 14:37:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10919-5</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919.rss">Kicksecure /etc/hostname /etc/hosts</source>
+      </item>
+      <item>
+        <title>Kicksecure /etc/hostname /etc/hosts</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>solved (message gone) by:</p>
+<p>go to /etc/hosts</p>
+<p>change:</p>
+<p><code>127.0.0.1  localhost</code></p>
+<p>to</p>
+<p><code>127.0.0.1  localhost.localdomain  localhost</code></p>
+<p>[Ref]<br>
+</p><aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://askubuntu.com/questions/412269/sudo-unable-to-resolve-host-localhost-localdomain" target="_blank" rel="noopener nofollow ugc">askubuntu.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://askubuntu.com/users/241110/user241110" target="_blank" rel="noopener nofollow ugc">
+    <img alt="user241110" src="https://www.gravatar.com/avatar/eaaf0a770247ac55ac16b11dd16fa676?s=128&amp;d=identicon&amp;r=PG&amp;f=1" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://askubuntu.com/questions/412269/sudo-unable-to-resolve-host-localhost-localdomain" target="_blank" rel="noopener nofollow ugc">sudo unable to resolve host localhost.localdomain</a>
+</h4>
+
+<div class="tags">
+  <strong>12.04, ftp</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://askubuntu.com/users/241110/user241110" target="_blank" rel="noopener nofollow ugc">
+    user241110
+  </a>
+  on <a href="https://askubuntu.com/questions/412269/sudo-unable-to-resolve-host-localhost-localdomain" target="_blank" rel="noopener nofollow ugc">08:37PM - 28 Jan 14 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/4</link>
+        <pubDate>Wed, 30 Dec 2020 03:28:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10919-4</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919.rss">Kicksecure /etc/hostname /etc/hosts</source>
+      </item>
+      <item>
+        <title>Kicksecure /etc/hostname /etc/hosts</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Apparently there is no real default hostname. By Debian default, <code>/etc/hostname</code> and <code>/etc/hosts</code> is not managed by any package. For Debian installations that file is generated by Debian installer.</p>
+<aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://serverfault.com/questions/407974/where-can-i-get-the-default-etc-hosts-file-for-debian-sid" target="_blank" rel="noopener">serverfault.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://serverfault.com/users/34662/eugene-yarmash" target="_blank" rel="noopener">
+    <img alt="Eugene Yarmash" src="https://www.gravatar.com/avatar/0e726125e86b084ffec695e845b360b7?s=128&amp;d=identicon&amp;r=PG" class="thumbnail onebox-avatar" width="60" height="60">
+  </a>
+<h4>
+  <a href="https://serverfault.com/questions/407974/where-can-i-get-the-default-etc-hosts-file-for-debian-sid" target="_blank" rel="noopener">Where can I get the default /etc/hosts file for Debian Sid?</a>
+</h4>
+
+<div class="tags">
+  <strong>debian, sid</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://serverfault.com/users/34662/eugene-yarmash" target="_blank" rel="noopener">
+    Eugene Yarmash
+  </a>
+  on <a href="https://serverfault.com/questions/407974/where-can-i-get-the-default-etc-hosts-file-for-debian-sid" target="_blank" rel="noopener">11:00PM - 15 Jul 12 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://salsa.debian.org/uploads/-/system/appearance/favicon/1/gitlabian_32.png" class="site-icon" width="16" height="16">
+      <a href="https://salsa.debian.org/installer-team/netcfg/blob/1.158/netcfg-common.c#L1157" target="_blank" rel="noopener">GitLab</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://salsa.debian.org/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png" class="thumbnail onebox-avatar" width="128" height="128">
+
+<h3><a href="https://salsa.debian.org/installer-team/netcfg/blob/1.158/netcfg-common.c#L1157" target="_blank" rel="noopener">netcfg-common.c · 1.158 · Debian Installer / netcfg</a></h3>
+
+<p>Repository imported from https://anonscm.debian.org/git/d-i/netcfg.git/</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://salsa.debian.org/uploads/-/system/appearance/favicon/1/gitlabian_32.png" class="site-icon" width="16" height="16">
+      <a href="https://salsa.debian.org/installer-team/netcfg/blob/1.158/netcfg.h#L40" target="_blank" rel="noopener">GitLab</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://salsa.debian.org/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png" class="thumbnail onebox-avatar" width="128" height="128">
+
+<h3><a href="https://salsa.debian.org/installer-team/netcfg/blob/1.158/netcfg.h#L40" target="_blank" rel="noopener">netcfg.h · 1.158 · Debian Installer / netcfg</a></h3>
+
+<p>Repository imported from https://anonscm.debian.org/git/d-i/netcfg.git/</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>I thought by writing <code>localhost</code> into <code>/etc/hostname</code> during Kicksecure build process could be avoided to have /etc/hostname or /etc/hosts managed by any package in Kicksecure. And then later user can just customize it if needed. But that does not work…</p>
+<aside class="quote no-group" data-username="TNT_BOM_BOM" data-post="1" data-topic="10919">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tnt_bom_bom/40/2148_2.png" class="avatar"> TNT_BOM_BOM:</div>
+<blockquote>
+<p><code>sudo: unable to resolve host localhost.localdomain: Name or service not known</code></p>
+</blockquote>
+</aside>
+<p>Even though <code>/etc/hosts</code> by default (as created by <code>grml-debootstrap</code>)…</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/grml/grml-debootstrap/blob/master/chroot-script#L430" target="_blank" rel="noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/grml/grml-debootstrap/blob/master/chroot-script#L430" target="_blank" rel="noopener">grml/grml-debootstrap/blob/master/chroot-script#L430</a></h4>
+<pre class="onebox"><code class="lang-"><ol class="start lines" start="420" style="counter-reset: li-counter 419 ;">
+<li>       else</li><li>         echo root:"$a" | chpasswd $CHPASSWD_OPTION</li><li>         unset a</li><li>         unset b</li><li>       fi</li><li>     done</li><li>  fi</li><li>}</li><li># }}}</li><li></li><li class="selected"># set up /etc/hosts {{{</li><li>hosts() {</li><li>  if ! [ -f /etc/hosts ] ; then</li><li>     cat &gt; /etc/hosts &lt;&lt; EOF</li><li>127.0.0.1       localhost</li><li>::1             localhost ip6-localhost ip6-loopback</li><li>ff02::1         ip6-allnodes</li><li>ff02::2         ip6-allrouters</li><li>EOF</li><li>  fi</li><li>}</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Already contains:</p>
+<pre><code>127.0.0.1       localhost 
+</code></pre>
+<p>Other VM creation tools (example: <a href="https://grml.org/grml-debootstrap/">https://grml.org/grml-debootstrap/</a>) set <code>/etc/hostname</code> to something (example: grml).</p>
+<p>I wonder where Debian is getting the <code>.localdomain</code> part from anyhow? It is nowhere to be found in folder <code>/etc</code>.</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <a href="https://lists.debian.org/debian-devel/2005/10/msg00387.html" target="_blank" rel="noopener">lists.debian.org</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="60" height="60">
+
+<h3><a href="https://lists.debian.org/debian-devel/2005/10/msg00387.html" target="_blank" rel="noopener">Re: localhost.localdomain</a></h3>
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Related:</p>
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/grml/grml-debootstrap/issues/67" target="_blank" rel="noopener">github.com/grml/grml-debootstrap</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/grml/grml-debootstrap/issues/67" target="_blank" rel="noopener">Git HEAD: Host's hostname leaks into system being installed</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2015-02-20" data-time="18:51:53" data-timezone="UTC">06:51PM - 20 Feb 15 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="https://github.com/hartwork" target="_blank" rel="noopener">
+          <img alt="hartwork" src="https://avatars1.githubusercontent.com/u/1577132?v=4" class="onebox-avatar-inline" width="20" height="20">
+          hartwork
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="github-row">
+  <p class="github-content">Even without custom pre/chroot/post scripts, there are places where the host's hostname (i.e. the one of the machine executing grml-deboostrap) leaks...</p>
+</div>
+
+<div class="labels">
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">help wanted</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/3</link>
+        <pubDate>Tue, 29 Dec 2020 15:17:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10919-3</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919.rss">Kicksecure /etc/hostname /etc/hosts</source>
+      </item>
+      <item>
+        <title>Kicksecure /etc/hostname /etc/hosts</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Confirmed bug. Workaround:</p>
+<pre><code>sudo hostname localhost</code></pre>
+          <p><a href="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/2</link>
+        <pubDate>Sun, 27 Dec 2020 09:37:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10919-2</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919.rss">Kicksecure /etc/hostname /etc/hosts</source>
+      </item>
+      <item>
+        <title>Kicksecure /etc/hostname /etc/hosts</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>whenever you type sudo something it says:</p>
+<p><code>sudo: unable to resolve host localhost.localdomain: Name or service not known</code></p>
+          <p><a href="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919/1</link>
+        <pubDate>Sat, 26 Dec 2020 17:33:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10919-1</guid>
+        <source url="http://forums.whonix.org/t/kicksecure-etc-hostname-etc-hosts/10919.rss">Kicksecure /etc/hostname /etc/hosts</source>
+      </item>
+  </channel>
+</rss>

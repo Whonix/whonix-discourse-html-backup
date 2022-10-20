@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>bug: not all files form /etc/skel are copied to /home/user</title>
+    <link>http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778</link>
+    <description>Not all files from `/etc/skel` are currently copied to `/home/user`.
+
+This is because package `anon-base-files` which creates user `user` and thereby runs `useradd` which copies `/etc/skel` is installed before usability-misc.
+
+In result folder `/home/user/Downloads` is no longer created by default in Whonix 14.
+
+(A long standing, non-critical, non-release-blocking bug.)
+
+Installing any packages shipping any /etc/skel files before anon-base-files in build-steps.d/ [1700_install-packages](https://github.com/Whonix/Whonix/blob/master/build-steps.d/1700_install-packages) would not be a great solution because that wouldn&#39;t work for Qubes-Whonix builds or &quot;sudo apt-get install whonix&quot; builds.
+
+Is there some linux command to copy from /etc/skel to user home for already existing users?
+
+How to implement this best? Triggers? [whonix-initializer](https://github.com/Whonix/whonix-initializer), similar to:
+
+* https://github.com/Whonix/tb-updater/blob/master/lib/systemd/system/tb-updater-first-boot.service
+* https://github.com/Whonix/tb-updater/blob/master/usr/lib/tb-updater/first-boot-home-population
+
+----
+
+    ./xchat-improved-privacy/etc/skel/.config/hexchat/servlist.conf
+    ./xchat-improved-privacy/etc/skel/.config/hexchat/hexchat.conf
+    ./xchat-improved-privacy/etc/skel/.config/hexchat/ignore.conf
+    ./xchat-improved-privacy/etc/skel/.config/hexchat/ctcpreply.conf
+    ./xchat-improved-privacy/etc/skel/.xchat2/xchat.conf
+    ./xchat-improved-privacy/etc/skel/.xchat2/ignore.conf
+    ./xchat-improved-privacy/etc/skel/.xchat2/servlist_.conf
+    ./xchat-improved-privacy/etc/skel/.xchat2/ctcpreply.conf
+    ./whonix-base-files/etc/skel/.bashrc.whonix
+    ./usability-misc/etc/skel/Pictures/.placeholder_usability-misc
+    ./usability-misc/etc/skel/Downloads/.placeholder_usability-misc
+    ./anon-mixmaster/etc/skel/.Mix/mix.cfg
+    ./anon-gpg-tweaks/etc/skel/.gnupg/gpg.conf
+    ./anon-gpg-tweaks/etc/skel/.gnupg/dirmngr.conf
+    ./anon-apps-config/etc/skel/.config/tox/qtox.ini
+    ./anon-apps-config/etc/skel/.config/vlc/vlcrc</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 16 Aug 2019 14:24:29 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>bug: not all files form /etc/skel are copied to /home/user</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This is sorted thanks to pam_mkhomedir (Create home directory on login (by package security-misc)) and using adduser/useradd with --no-create-home.</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/security-misc/blob/master/usr/share/pam-configs/mkhomedir-security-misc" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/security-misc/blob/master/usr/share/pam-configs/mkhomedir-security-misc" target="_blank" rel="nofollow noopener">Whonix/security-misc/blob/master/usr/share/pam-configs/mkhomedir-security-misc</a></h4>
+<pre><code class="lang-">Name: Create home directory on login (by package security-misc)
+Default: yes
+Priority: 100
+Session-Type: Additional
+Session-Interactive-Only: yes
+Session:
+	optional	pam_mkhomedir.so umask=006
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Since user is created at first login, i.e. at first boot, copying from /etc/skel now working flawlessly.</p>
+          <p><a href="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/6</link>
+        <pubDate>Fri, 16 Aug 2019 14:24:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6778-6</guid>
+        <source url="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778.rss">bug: not all files form /etc/skel are copied to /home/user</source>
+      </item>
+      <item>
+        <title>bug: not all files form /etc/skel are copied to /home/user</title>
+        <dc:creator><![CDATA[onion_knight]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="4" data-topic="6778">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Somewhere in <a href="http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/whonix-desktop-installer-with-calamares-field-report/7350" rel="nofollow noopener">Whonix Desktop Installer with Calamares - field report</a> we learned that calamares gets confused with already created user <code>user</code> during live boot.</p>
+<p>Therefore it would be best if user <code>user</code> would be created at first boot, however not when booting in live mode, no user would be created. This would also fix this very bug.</p>
+<p>//cc <a class="mention" href="http://forums.whonix.org/u/onion_knight">@onion_knight</a></p>
+</blockquote>
+</aside>
+<p>Hi <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a>!<br>
+Catching up after a couple week of holidays <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"><br>
+Just to avoid confusion, are we talking about the Whonix-Desktop-Calamares-ISO build? If yes, then to the best of my knowledge it doesn’t require a user, as the live-user is created upon boot in live-mode. The “final” user on the installed system is chosen during the install with Calamares. Don’t know if it sounds clear enough?</p>
+          <p><a href="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/5</link>
+        <pubDate>Mon, 03 Jun 2019 09:48:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6778-5</guid>
+        <source url="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778.rss">bug: not all files form /etc/skel are copied to /home/user</source>
+      </item>
+      <item>
+        <title>bug: not all files form /etc/skel are copied to /home/user</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Somewhere in <a href="https://forums.whonix.org/t/whonix-desktop-installer-with-calamares-field-report/7350" class="inline-onebox">Whonix Desktop Installer with Calamares - field report</a> we learned that calamares gets confused with already created user <code>user</code> during live boot.</p>
+<p>Therefore it would be best if user <code>user</code> would be created at first boot, however not when booting in live mode, no user would be created. This would also fix this very bug.</p>
+<p>//cc <a class="mention" href="http://forums.whonix.org/u/onion_knight">@onion_knight</a></p>
+          <p><a href="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/4</link>
+        <pubDate>Mon, 27 May 2019 21:42:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6778-4</guid>
+        <source url="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778.rss">bug: not all files form /etc/skel are copied to /home/user</source>
+      </item>
+      <item>
+        <title>bug: not all files form /etc/skel are copied to /home/user</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Fixed a related, but not this very bug.</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/usability-misc/commit/63c1ba7cae2914bd3bcfe5d7d2e5edf495a79c02" target="_blank" rel="nofollow noopener">github.com/Whonix/usability-misc</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">
+    <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="https://github.com/Whonix/usability-misc/commit/63c1ba7cae2914bd3bcfe5d7d2e5edf495a79c02" target="_blank" rel="nofollow noopener">fix etc/.skel -&gt; etc/skel/Downloads</a>
+</h4>
+
+  <pre class="message" style="white-space: normal;">https://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778</pre>
+
+<div class="date">
+  by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+  on <a href="https://github.com/Whonix/usability-misc/commit/63c1ba7cae2914bd3bcfe5d7d2e5edf495a79c02" target="_blank" rel="nofollow noopener">09:20PM - 27 May 19 UTC</a>
+</div>
+
+<div class="github-commit-stats">
+  changed <strong>2 files</strong>
+  with <strong>0 additions</strong>
+  and <strong>0 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/3</link>
+        <pubDate>Mon, 27 May 2019 21:34:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6778-3</guid>
+        <source url="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778.rss">bug: not all files form /etc/skel are copied to /home/user</source>
+      </item>
+      <item>
+        <title>bug: not all files form /etc/skel are copied to /home/user</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="1" data-topic="6778">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Is there some linux command to copy from /etc/skel to user home for already existing users?</p>
+</blockquote>
+</aside>
+<p>Maybe something useful here:<br>
+</p><aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://superuser.com/questions/61611/how-to-copy-with-cp-to-include-hidden-files-and-hidden-directories-and-their-con" target="_blank" rel="nofollow noopener">superuser.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://superuser.com/users/8544/eleven81" target="_blank" rel="nofollow noopener">
+    <img alt="eleven81" src="https://www.gravatar.com/avatar/ef985e2036e444ee597486c0f5af99e9?s=128&amp;d=identicon&amp;r=PG" class="thumbnail onebox-avatar" width="60" height="60">
+  </a>
+<h4>
+  <a href="https://superuser.com/questions/61611/how-to-copy-with-cp-to-include-hidden-files-and-hidden-directories-and-their-con" target="_blank" rel="nofollow noopener">How to copy with cp to include hidden files and hidden directories and their contents?</a>
+</h4>
+
+<div class="tags">
+  <strong>unix, cp, recursive</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://superuser.com/users/8544/eleven81" target="_blank" rel="nofollow noopener">
+    eleven81
+  </a>
+  on <a href="https://superuser.com/questions/61611/how-to-copy-with-cp-to-include-hidden-files-and-hidden-directories-and-their-con" target="_blank" rel="nofollow noopener">07:46PM - 27 Oct 09 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Though you will want to ignore the part about copying over to new user folders.</p>
+<aside class="quote no-group" data-post="1" data-topic="6778">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>How to implement this best? Triggers? <a href="https://github.com/Whonix/whonix-initializer" rel="nofollow noopener">whonix-initializer</a></p>
+</blockquote>
+</aside>
+<p>I concur</p>
+          <p><a href="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/2</link>
+        <pubDate>Mon, 04 Feb 2019 12:23:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6778-2</guid>
+        <source url="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778.rss">bug: not all files form /etc/skel are copied to /home/user</source>
+      </item>
+      <item>
+        <title>bug: not all files form /etc/skel are copied to /home/user</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Not all files from <code>/etc/skel</code> are currently copied to <code>/home/user</code>.</p>
+<p>This is because package <code>anon-base-files</code> which creates user <code>user</code> and thereby runs <code>useradd</code> which copies <code>/etc/skel</code> is installed before usability-misc.</p>
+<p>In result folder <code>/home/user/Downloads</code> is no longer created by default in Whonix 14.</p>
+<p>(A long standing, non-critical, non-release-blocking bug.)</p>
+<p>Installing any packages shipping any /etc/skel files before anon-base-files in build-steps.d/ <a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/1700_install-packages" rel="nofollow noopener">1700_install-packages</a> would not be a great solution because that wouldn’t work for Qubes-Whonix builds or “sudo apt-get install whonix” builds.</p>
+<p>Is there some linux command to copy from /etc/skel to user home for already existing users?</p>
+<p>How to implement this best? Triggers? <a href="https://github.com/Whonix/whonix-initializer" rel="nofollow noopener">whonix-initializer</a>, similar to:</p>
+<ul>
+<li><a href="https://github.com/Whonix/tb-updater/blob/master/lib/systemd/system/tb-updater-first-boot.service" rel="nofollow noopener">https://github.com/Whonix/tb-updater/blob/master/lib/systemd/system/tb-updater-first-boot.service</a></li>
+<li><a href="https://github.com/Whonix/tb-updater/blob/master/usr/lib/tb-updater/first-boot-home-population" rel="nofollow noopener">https://github.com/Whonix/tb-updater/blob/master/usr/lib/tb-updater/first-boot-home-population</a></li>
+</ul>
+<hr>
+<pre><code>./xchat-improved-privacy/etc/skel/.config/hexchat/servlist.conf
+./xchat-improved-privacy/etc/skel/.config/hexchat/hexchat.conf
+./xchat-improved-privacy/etc/skel/.config/hexchat/ignore.conf
+./xchat-improved-privacy/etc/skel/.config/hexchat/ctcpreply.conf
+./xchat-improved-privacy/etc/skel/.xchat2/xchat.conf
+./xchat-improved-privacy/etc/skel/.xchat2/ignore.conf
+./xchat-improved-privacy/etc/skel/.xchat2/servlist_.conf
+./xchat-improved-privacy/etc/skel/.xchat2/ctcpreply.conf
+./whonix-base-files/etc/skel/.bashrc.whonix
+./usability-misc/etc/skel/Pictures/.placeholder_usability-misc
+./usability-misc/etc/skel/Downloads/.placeholder_usability-misc
+./anon-mixmaster/etc/skel/.Mix/mix.cfg
+./anon-gpg-tweaks/etc/skel/.gnupg/gpg.conf
+./anon-gpg-tweaks/etc/skel/.gnupg/dirmngr.conf
+./anon-apps-config/etc/skel/.config/tox/qtox.ini
+./anon-apps-config/etc/skel/.config/vlc/vlcrc</code></pre>
+          <p><a href="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778/1</link>
+        <pubDate>Mon, 04 Feb 2019 07:54:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6778-1</guid>
+        <source url="http://forums.whonix.org/t/bug-not-all-files-form-etc-skel-are-copied-to-home-user/6778.rss">bug: not all files form /etc/skel are copied to /home/user</source>
+      </item>
+  </channel>
+</rss>

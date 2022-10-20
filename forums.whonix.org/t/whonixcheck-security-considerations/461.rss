@@ -1,0 +1,748 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonixcheck security considerations</title>
+    <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461</link>
+    <description>
+I try to think like an attacker constantly when looking at Whonix&#39;s design and I factor in knowledge about sidechannel attacks to lead me to accurate conclusions. Please understand that I am not criticizing Whonix by any means, but hope to give constructive advice.
+
+-Part of whonixcheck relies on curl to query the clearnet for certain information
+-curl has a troubling history of [url=https://security-tracker.debian.org/tracker/source-package/curl]security holes[/url], some remotely exploitable.
+-https connections  are subject to MITM this includes requests made by whonixcheck/curl to the clearnet.
+-having a massive 0day arsenal at their disposal, its highly probable that the adversary is capable of exploiting curl.
+- This could lead to both Whonix vms being compromised through these channels out of the gate.
+
+
+
+Recommendation:
+TBB already does the checks curl does but in a more secure way. Taking the points above into consideration, the hypothetical benefits of redundant checks for Tor usage does not justify the increased attack surface area.
+
+For tor specific checks we can either rely on a mechanism that bootstraps off Torbutton* somehow or completely remove these specific operations that depend on curl from whonixcheck:
+
++Tor Bootstrap Status (if it only queries the gateway, then no risk)
++downloads https://check.torproject.org with curl through extra SocksPort
++downloads https://check.torproject.org with curl through TransPort 
++Tor Browser version 
++Whonix version and Whonix news 
+
+++ Pretty much anything curl/clearnet related that does not connect to Tor directory authorities/ signed Debian repos.
+
+ref: https://www.whonix.org/wiki/Whonixcheck
+
+
+
+* TBB never checks check.tpo directly but relies on the small, vetted code of Torbutton to do so. Its definitely safer than curl&#39;s code.</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 05 Sep 2014 20:20:20 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Overlooked that sdwdate uses curl too, so that was pointles. Back to the drawing board…</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/19</link>
+        <pubDate>Fri, 05 Sep 2014 20:20:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-19</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Since you’re open to suggestions let me put this out there and see what you think.</p>
+<p>-The purpose of whonixcheck is to help the user know if they done a grave misconfiguration and to provide information about the whonix environment in general.</p>
+<p>-whonixcheck is not a diagnostic tool to detect any hypothetical misconfiguration made by you in the codebase. (Not implying your skill is any less than excellent, just discussing hypotheticals)</p>
+<p>Good security practice dictates that no functionality more than necessary should be enabled or used. And the remaining tools that are needed are hardened to the maximum extent possible. Even if the tools used have a high security assurance, its always best to not use anything in the first place when not needed - the enemy cannot exploit what is not there.</p>
+<hr>
+<p>With these points in mind I suggest:</p>
+<p>-Disabling the all cURL based requests on the gateway and here’s why:</p>
+<ol>
+<li>TBB checks for the  gateway are unnecessary as there is no TBB supposed to be on there.</li>
+<li>While useful in the workstation, because the user might shoot themselves in the foot by configuring it to connect directly to the internet, checking that traffic goes through Tor on the gateway is of little utility as no user caused misconfiguration is relevant in that context.</li>
+<li>Whonixnews could be checked for and fetched via the Whonix repos, alleviating the need for cURL in this usecase. (Maybe this can be used for the ws version too)</li>
+</ol>
+<p>-Even in the event that a trusted pinning system is figured out and deployed, it would not be good to have it on the gateway in case the user mistakenly runs Iceweasel on there.</p>
+<ul>
+<li>Whonixcheck and its curl based functionality is vital and necessary to keep users safe from themselves. Therefore I am not advocating removing this needed functionality in its workstation counterpart.</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/18</link>
+        <pubDate>Fri, 05 Sep 2014 19:58:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-18</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>The worst that could happen [s]to[/s] [s]whonixcheck[/s] is that a MITM deceives [s]curl[/s] whonixcheck/tb-updater in knowing if there is a / there is no new TBB version. Remote exploitation is a risk that you have considered and hardened [s]curl[/s] whonixcheck/tb-updater against. Pinning is an upstream issue [s]that is being addressed gradually but surely in the coming times.[/s]</blockquote>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/17</link>
+        <pubDate>Thu, 04 Sep 2014 21:49:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-17</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Please let me know if this is how things are, because I’m trying to make an accurate assessment.</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/16</link>
+        <pubDate>Thu, 04 Sep 2014 20:01:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-16</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Summary of concerns. Please comment on this</p>
+<blockquote>-The worst that could happen to whonixcheck is that a MITM deceives curl in knowing if there is a new TBB version. Remote exploitation is a risk that you have considered and hardened curl against. Pinning is an upstream issue that is being addressed gradually but surely in the coming times.</blockquote>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/15</link>
+        <pubDate>Thu, 04 Sep 2014 15:42:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-15</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group quote-modified" data-username="HulaHoop" data-post="13" data-topic="461">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>[quote]What specifically are you referring to? curl’s output is parsed right after running curl. If it fails, nothing gets parsed, user is informed. No idea how TOCTOU is relevant here. We’re not running curl on boot and parse it minutes later were things could be much different or something like that.</p>
+</blockquote>
+</aside>
+<p>I see. It was something I stumbled upon earlier but its of no relevance since you made it clear we are not relying on wget.</p>
+<aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://askubuntu.com/questions/156620/how-to-verify-the-ssl-fingerprint-by-command-line-wget-curl" target="_blank">askubuntu.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://askubuntu.com/users/72629/james-mitch" target="_blank">
+    <img alt="James Mitch" src="https://www.gravatar.com/avatar/7f945b5fe8bcab1598dd1653cb4243ab?s=128&amp;d=identicon&amp;r=PG" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://askubuntu.com/questions/156620/how-to-verify-the-ssl-fingerprint-by-command-line-wget-curl" target="_blank">How to verify the SSL fingerprint by command line? (wget, curl, ...)</a>
+</h4>
+
+<div class="tags">
+  <strong>security, ssl, wget, curl</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://askubuntu.com/users/72629/james-mitch" target="_blank">
+    James Mitch
+  </a>
+  on <a href="https://askubuntu.com/questions/156620/how-to-verify-the-ssl-fingerprint-by-command-line-wget-curl" target="_blank">08:16AM - 27 Jun 12 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>It was th eOP’s complaint about script implmentations that made openssl and wget collaborate.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>It’s vulnerable to TOCTOU. [1] The MITM could let return a valid fingerprint for the openssl client request and tamper with the following wget request. [/quote]</p>
+</blockquote>
+</aside>
+<p>Yeah, that really doesn’t apply to curl. In that link, someone suggested “use openssl cmd line tool to check the fingerprint, then use wget to fetch”, but wget doesn’t look at the fingerprint. So a clever attacker could show the correct fingerprint to openssl cmd line tool, then use another fingerprint for wget. TOCTOU applies there, because it was suggested to use one tool that understands fingerprints combined with another one that does not understand fingerprints.</p>
+<p>Doesn’t apply to curl, because curl understands this, and internally first checks the certificate, and if it works doesn’t work out, it stops, and if it works out, it continues to re-use the very same connection session, I assume [otherwise it would be a grave bug].</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/14</link>
+        <pubDate>Wed, 03 Sep 2014 05:56:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-14</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>What specifically are you referring to? curl's output is parsed right after running curl. If it fails, nothing gets parsed, user is informed. No idea how TOCTOU is relevant here. We're not running curl on boot and parse it minutes later were things could be much different or something like that.</blockquote>
+<p>I see. It was something I stumbled upon earlier but its of no relevance since you made it clear we are not relying on wget.</p>
+<aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://askubuntu.com/questions/156620/how-to-verify-the-ssl-fingerprint-by-command-line-wget-curl" target="_blank">askubuntu.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://askubuntu.com/users/72629/james-mitch" target="_blank">
+    <img alt="James Mitch" src="https://www.gravatar.com/avatar/7f945b5fe8bcab1598dd1653cb4243ab?s=128&amp;d=identicon&amp;r=PG" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://askubuntu.com/questions/156620/how-to-verify-the-ssl-fingerprint-by-command-line-wget-curl" target="_blank">How to verify the SSL fingerprint by command line? (wget, curl, ...)</a>
+</h4>
+
+<div class="tags">
+  <strong>security, ssl, wget, curl</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://askubuntu.com/users/72629/james-mitch" target="_blank">
+    James Mitch
+  </a>
+  on <a href="https://askubuntu.com/questions/156620/how-to-verify-the-ssl-fingerprint-by-command-line-wget-curl" target="_blank">08:16AM - 27 Jun 12 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>It was th eOP’s complaint about script implmentations that made openssl and wget collaborate.</p>
+<blockquote>It's vulnerable to TOCTOU. [1] The MITM could let return a valid fingerprint for the openssl client request and tamper with the following wget request.</blockquote>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/13</link>
+        <pubDate>Tue, 02 Sep 2014 04:28:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-13</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="10" data-topic="461">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>I’ll reply to your suggestions on git. One last thing I wanted to ask about is how do you handle TOCTOU for curl?</p>
+</blockquote>
+</aside>
+<p>(As per <a href="http://en.wikipedia.org/wiki/Time_of_check_to_time_of_use.)">http://en.wikipedia.org/wiki/Time_of_check_to_time_of_use.)</a></p>
+<p>What specifically are you referring to? curl’s output is parsed right after running curl. If it fails, nothing gets parsed, user is informed. No idea how TOCTOU is relevant here. We’re not running curl on boot and parse it minutes later were things could be much different or something like that.</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/12</link>
+        <pubDate>Tue, 02 Sep 2014 03:12:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-12</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“HulaHoop, post:9, topic:461”][quote][quote]    -Our only current option is the older idea.<br>
+[/quote] Why?[/quote]</p>
+<p>Because TPO shutdown their hs. I reaaly don’t get why. It could have been a simple workaround for this SSL pinning scheme.[/quote]<br>
+Sorry, there is a bit confusion here.</p>
+<p>Old idea: wget.<br>
+New idea: hidden service.<br>
+Newer idea: curl</p>
+<p>The curl / cert pinning implementation wouldn’t require a hidden service.</p>
+<p>PIN Certificate Authority:<br>
+not using</p>
+<p>PIN Certificate Directly - curl method:<br>
+current favorite as per <a href="https://www.whonix.org/wiki/Dev/SSL_Certificate_Pinning#curl_method">https://www.whonix.org/wiki/Dev/SSL_Certificate_Pinning#curl_method</a></p>
+<p>It’s not the CA. This is how this was found out:<br>
+<a href="http://sourceforge.net/p/curl/feature-requests/64/" class="onebox" target="_blank">http://sourceforge.net/p/curl/feature-requests/64/</a></p>
+<p>I just was confused myself by <a href="https://www.whonix.org/wiki/Dev/SSL_Certificate_Pinning#curl_method">https://www.whonix.org/wiki/Dev/SSL_Certificate_Pinning#curl_method</a> because the instructions use “-CAfile”, I thought, “damn it, it’s just CA pinning, not cert pinning”, but wrong. It really is cert pinning. It is downloading torproject’s cert while pinning torproject’s CA for better security. “-CAfile” is only used for better security. It would work without and you’d end up with the same file unless another CA runs an attack at this moment. Updated <a href="https://www.whonix.org/wiki/Dev/SSL_Certificate_Pinning#curl_method">https://www.whonix.org/wiki/Dev/SSL_Certificate_Pinning#curl_method</a>, documented this a bit better to make this clear by showing the (non-)difference of using/not using “-CAfile”.</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/11</link>
+        <pubDate>Tue, 02 Sep 2014 03:09:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-11</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ll reply to your suggestions on git. One last thing I wanted to ask about is how do you handle TOCTOU for curl?</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/10</link>
+        <pubDate>Tue, 02 Sep 2014 02:23:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-10</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>[quote]    -Our only current option is the older idea.
+[/quote] Why?</blockquote>
+<p>Because TPO shutdown their hs. I reaaly don’t get why. It could have been a simple workaround for this SSL pinning scheme.</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/9</link>
+        <pubDate>Tue, 02 Sep 2014 02:17:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-9</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Status update why there is no certificate pinning yet:<br>
+</p><aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/Whonix/Whonix/issues/24#issuecomment-54101846" target="_blank">github.com/Whonix/Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/Whonix/issues/24#issuecomment-54101846" target="_blank">Pin check.torproject.org and torproject.org SSL certificates</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2013-05-24" data-time="17:36:44" data-timezone="UTC">05:36PM - 24 May 13 UTC</span>
+      </div>
+
+        <div class="date">
+          closed <span class="discourse-local-date" data-format="ll" data-date="2015-01-14" data-time="16:20:08" data-timezone="UTC">04:20PM - 14 Jan 15 UTC</span>
+        </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="github-row">
+  <p class="github-content">#3555 not even Tor Browser does pin the Certificate yet. Mike also says "low priority", where I disagree. Tor Browser does...</p>
+</div>
+
+<div class="labels">
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">enhancement</span>
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">security</span>
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">wait</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/8</link>
+        <pubDate>Tue, 02 Sep 2014 01:47:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-8</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>[quote]Distributed not implemented yet:
+https://www.whonix.org/wiki/Dev/ptt[/quote]
+<p>That was a typo, but that looks interesting. Would you say that you have metadata distribution all figured out but it needs time to materialize?</p>
+</blockquote><br>
+It’s a lot implementation and probably maintenance effort. Maybe some day.
+<blockquote>-Our only current option is the older idea.</blockquote>
+Why?
+<blockquote>-Have you found a successful way to do pinning? : https://www.whonix.org/wiki/Dev/SSL_Certificate_Pinning</blockquote>
+Yes, the curl method on that page.
+<blockquote>-I'll assume you:
+a. figured out that a local CA is needed since we want to not rely on a third-party</blockquote>
+No local CA required.
+<blockquote>b. don't know how to parse only the cert fingerprint using wget from the data fetched by openssl</blockquote>
+No issue.
+<blockquote>c. still need some way to sign a key with no private key known or CSR available.</blockquote>
+Don't need that when using curl cert pinning.
+<blockquote>-wget cannot deal directly with SSL fingerprints but takes in certificates as a whole.</blockquote>
+Nevermind wget. Curl works fine for cert pinning.
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/7</link>
+        <pubDate>Tue, 02 Sep 2014 01:26:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-7</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Found a useful list of OpenSSL commands, some dealing with validation:<br>
+<a href="http://redkestrel.co.uk/articles/openssl-commands/" class="onebox" target="_blank">http://redkestrel.co.uk/articles/openssl-commands/</a></p>
+<p>Most probably you don’t need them but here they are.</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/6</link>
+        <pubDate>Mon, 01 Sep 2014 23:30:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-6</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/Whonix/Whonix/issues/24" target="_blank">github.com/Whonix/Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/Whonix/issues/24" target="_blank">Pin check.torproject.org and torproject.org SSL certificates</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2013-05-24" data-time="17:36:44" data-timezone="UTC">05:36PM - 24 May 13 UTC</span>
+      </div>
+
+        <div class="date">
+          closed <span class="discourse-local-date" data-format="ll" data-date="2015-01-14" data-time="16:20:08" data-timezone="UTC">04:20PM - 14 Jan 15 UTC</span>
+        </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="github-row">
+  <p class="github-content">#3555 not even Tor Browser does pin the Certificate yet. Mike also says "low priority", where I disagree. Tor Browser does...</p>
+</div>
+
+<div class="labels">
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">enhancement</span>
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">security</span>
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">wait</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>-Our only current option is the older idea.<br>
+-Have you found a successful way to do pinning? : <a href="https://www.whonix.org/wiki/Dev/SSL_Certificate_Pinning">https://www.whonix.org/wiki/Dev/SSL_Certificate_Pinning</a><br>
+-I’ll assume you:<br>
+a. figured out that a local CA is needed since we want to not rely on a third-party<br>
+b. don’t know how to parse only the cert fingerprint using wget from the data fetched by openssl<br>
+c. still need some way to sign a key with no private key known or CSR available.<br>
+-The last part is what I concentrated on finding answers for since it may help solve the problem in <span class="bbcode-b">b.</span><br>
+-wget cannot deal directly with SSL fingerprints but takes in certificates as a whole.<br>
+-I took a closer look at Monkeysphere and believe its relevant to this specific usecase. As it allows you to sign a the certificate with your keys and this information could be checked against the PKI and fed to wget in a way it readily understands when fecthing data from TPO.</p>
+<p>web.monkeysphere.info/validation-agent/</p>
+<blockquote>The Monkeysphere Validation Agent (msva) is a daemon that provides a simple interface for any program to check the validity of an offered public key (or cryptographic certificate).</blockquote>
+<blockquote>The Monkeysphere Validation Agent offers a local service for systems to validate certificates (both X.509 and OpenPGP) and other public keys in their proper contexts.
+<p>Among other reasons, having a validation agent is a good thing because:</p>
+<pre><code>Multiple tools can rely on the same PKI (e.g. the user's web browser and the user's ssh client).
+A single validation agent can present a consistent UI to the user (when used in an end-user context), or provide a unified trust model to various services (when used in a server-side context).
+Authentication/certificate validation code can potentially be isolated to a protected environment.&lt;/blockquote&gt;
+</code></pre>
+<p>Details on how to use msva to query and validate the certificate in the local CA: <a href="http://web.monkeysphere.info/validation-agent/clients/">http://web.monkeysphere.info/validation-agent/clients/</a></p>
+<p>signing service keys you don’t have access to:<br>
+<a href="http://web.monkeysphere.info/doc/signing-service-keys/" class="onebox" target="_blank">http://web.monkeysphere.info/doc/signing-service-keys/</a></p>
+<blockquote>If you are the person (or persons) that actually setup the service and configured Monkeysphere on the host, then you should sign the service key as part of that process. When the service is first set up, the administrators who set it up are the only ones who can actually vouch for the service key, so their signatures are necessary to get things going. Their signatures are also necessary so that they can validate the host key themselves.
+<p>If you did not set up the service initially, you do not have an accumulated full trust of the person(s) who did, or you do not have console access to the server directly, it’s hard to confidently verify the service identity and key ownership. You would like to be able to walk up to the server, log in at the console, and get the fingerprint of the service key directly, but this is usually impossible.</p>
+<p><span class="bbcode-b">However, it is still possible to verify the service identity and service ownership of the key, even in this case.</span></p>
+</blockquote>
+<br>
+It goes on to describe how this can be done with SSH keys as an example but is possible with x.509 certs.
+<blockquote>Distributed not implemented yet:
+https://www.whonix.org/wiki/Dev/ptt</blockquote>
+<p>That was a typo, but that looks interesting. Would you say that you have metadata distribution all figured out but it needs time to materialize?</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/5</link>
+        <pubDate>Mon, 01 Sep 2014 23:13:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-5</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Using curl and results of curl with care:</p>
+<ul>
+<li>using curl --max-time to defeat endless data attack</li>
+<li>quoting variables</li>
+<li>enforcing maximum string length</li>
+<li>using shellcheck</li>
+<li>making sure nothing is executed</li>
+</ul>
+<p>SSL pinning:<br>
+</p><aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/Whonix/Whonix/issues/25" target="_blank">github.com/Whonix/Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/Whonix/issues/25" target="_blank">Pin check.torproject.org and torproject.org CA SSL certificates</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2013-05-24" data-time="17:43:41" data-timezone="UTC">05:43PM - 24 May 13 UTC</span>
+      </div>
+
+        <div class="date">
+          closed <span class="discourse-local-date" data-format="ll" data-date="2015-01-13" data-time="23:19:30" data-timezone="UTC">11:19PM - 13 Jan 15 UTC</span>
+        </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="github-row">
+  <p class="github-content">In meanwhile until pinning the SSL certificate directly (#24) gets solved we could also pin the certificate authority.
+curl --verbose --tlsv1 --proto...</p>
+</div>
+
+<div class="labels">
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">enhancement</span>
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">security</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/Whonix/Whonix/issues/24" target="_blank">github.com/Whonix/Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/Whonix/issues/24" target="_blank">Pin check.torproject.org and torproject.org SSL certificates</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2013-05-24" data-time="17:36:44" data-timezone="UTC">05:36PM - 24 May 13 UTC</span>
+      </div>
+
+        <div class="date">
+          closed <span class="discourse-local-date" data-format="ll" data-date="2015-01-14" data-time="16:20:08" data-timezone="UTC">04:20PM - 14 Jan 15 UTC</span>
+        </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="github-row">
+  <p class="github-content">#3555 not even Tor Browser does pin the Certificate yet. Mike also says "low priority", where I disagree. Tor Browser does...</p>
+</div>
+
+<div class="labels">
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">enhancement</span>
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">security</span>
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">wait</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="3" data-topic="461">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Is there a way to distributed “signed” news text files that curl can fetch?</p>
+</blockquote>
+</aside>
+<p>Not sure what you mean. Maybe this is implemented:<br>
+Whonix News is gpg signed. When verification of Whonix News fails, user will be informed and the news will be rejected (not be shown).</p>
+<p>Distributed not implemented yet:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/ptt" target="_blank" title="12:06PM - 07 February 2020">Whonix – 7 Feb 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:385/500;"><img src="https://www.whonix.org/w/images/6/67/Resistance-1832389640.jpg" class="thumbnail" width="385" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Dev/ptt" target="_blank">Dev/Permanent Takedown Attack Defender - Whonix</a></h3>
+
+<p>This is a proposal to defend a permanent takedown attack. A mechanism to securely download project metadata, which includes censor resistance, defeating rollback and infinite freeze attacks.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/4</link>
+        <pubDate>Mon, 01 Sep 2014 13:55:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-4</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Where I think "well, thanks for reporting, thanks for fixing, most interesting, but no immediate danger for Whonix". I mean, using this very CVE as argument would be like saying "[hypothetical] don't use Whonix Linux version because there was x CVE's Whonix Windows version [/hypothetical]".</blockquote>
+<p>You are right there is a number of them that apply to curl on other OSs and proprietary security protocols like NTLM.</p>
+<blockquote>whonixcheck has this in mind and uses results from these requests with care.</blockquote>
+<p>Please tell me more about this. I think using SSL pinning would really go a long way in protecting users. The less curl features used the better too.</p>
+<blockquote>These are usability and security features. Those are diagnosing, that connectivity is functional, check that the user has not shoot its own feet (by doing stuff like adding extra network adapters to Whonix-Gateway etc.) and inform the user about urgent news. I don't think we'd be better off by disabling them by default.</blockquote>
+<p>Exactly. That’s why I’m not so eager to disable them by default an instead am looking at ways it can be hardened. Is there a way to distributed “signed” news text files that curl can fetch?</p>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/3</link>
+        <pubDate>Mon, 01 Sep 2014 13:06:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-3</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="461">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>I try to think like an attacker constantly when looking at Whonix’s design and I factor in knowledge about sidechannel attacks to lead me to accurate conclusions. Please understand that I am not criticizing Whonix by any means, but hope to give constructive advice.</p>
+</blockquote>
+</aside>
+<p>Great!</p>
+<blockquote>-curl has a troubling history of [url=https://security-tracker.debian.org/tracker/source-package/curl]security holes[/url], some remotely exploitable.</blockquote>
+Any of that list that would have owned Whonix?
+<p>There are a lot ones such as this one…</p>
+<blockquote>CVE-2014-1263
+<p>curl and libcurl 7.27.0 through 7.35.0, when using the SecureTransport/Darwinssl backend, as used in in Apple OS X 10.9.x before 10.9.2, does not verify that the server hostname matches a domain name in the subject’s Common Name (CN) or subjectAltName field of the X.509 certificate when accessing a URL that uses a numerical IP address, which allows man-in-the-middle attackers to spoof servers via an arbitrary valid certificate.</p>
+</blockquote>
+<p>Where I think “well, thanks for reporting, thanks for fixing, most interesting, but no immediate danger for Whonix”. I mean, using this very CVE as argument would be like saying “[hypothetical] don’t use Whonix Linux version because there was x CVE’s Whonix Windows version [/hypothetical]”.</p>
+<p>I haven’t looked through the whole list of curl CVE’s if any of them would have applied to Whonix. Would you like to do this?</p>
+<blockquote>-https connections  are subject to MITM this includes requests made by whonixcheck/curl to the clearnet.</blockquote>
+whonixcheck has this in mind and uses results from these requests with care.
+<blockquote>-having a massive 0day arsenal at their disposal, its highly probable that the adversary is capable of exploiting curl.</blockquote>
+But with the 0 day it's getting very speculative.
+<blockquote>rely on a mechanism that bootstraps off Torbutton* somehow</blockquote>
+That sounds interesting, but this would require using Tor Browser + Tor Button because Tor Button is not supposed/supported to be run as standalone without Tor Browser. (It's a firefox add-on.) Seems also quite difficult. Perhaps it would require using some automation API such as http://www.seleniumhq.org to access Tor Browser using a program and perhaps would also require getting some patches merged into Tor Button.
+<blockquote>+downloads https://check.torproject.org with curl through extra SocksPort
++downloads https://check.torproject.org with curl through TransPort 
++Tor Browser version 
++Whonix version and Whonix news</blockquote>
+<p>These are usability and security features. Those are diagnosing, that connectivity is functional, check that the user has not shoot its own feet (by doing stuff like adding extra network adapters to Whonix-Gateway etc.) and inform the user about urgent news. I don’t think we’d be better off by disabling them by default.</p>
+<p>By the way, any function of whonixcheck can be disabled using config:<br>
+<a href="https://github.com/Whonix/whonixcheck/blob/master/etc/whonix.d/30_whonixcheck_default#L90" class="onebox" target="_blank">https://github.com/Whonix/whonixcheck/blob/master/etc/whonix.d/30_whonixcheck_default#L90</a></p>
+<p>So what could be done would be creating an optional settings file and package, that disables these features once applied, and document this in <a href="https://www.whonix.org/wiki/Security_Guide">https://www.whonix.org/wiki/Security_Guide</a>. Want to do this?</p>
+<blockquote>* TBB never checks check.tpo directly but relies on the small, vetted code of Torbutton to do so. Its definitely safer than curl's code.</blockquote>
+That uses Firefox's code, which is not necessarily safer than curl's code?
+So rather than the unequal match curl vs Tor Button, this is rather a whonixcheck+curl vs TorButton+TorBrowser(Firefox) thing.
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/2</link>
+        <pubDate>Mon, 01 Sep 2014 11:54:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-2</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+      <item>
+        <title>Whonixcheck security considerations</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>I try to think like an attacker constantly when looking at Whonix’s design and I factor in knowledge about sidechannel attacks to lead me to accurate conclusions. Please understand that I am not criticizing Whonix by any means, but hope to give constructive advice.</p>
+<p>-Part of whonixcheck relies on curl to query the clearnet for certain information<br>
+-curl has a troubling history of <a href="https://security-tracker.debian.org/tracker/source-package/curl" data-bbcode="true">security holes</a>, some remotely exploitable.<br>
+-https connections  are subject to MITM this includes requests made by whonixcheck/curl to the clearnet.<br>
+-having a massive 0day arsenal at their disposal, its highly probable that the adversary is capable of exploiting curl.</p>
+<ul>
+<li>This could lead to both Whonix vms being compromised through these channels out of the gate.</li>
+</ul>
+<p>Recommendation:<br>
+TBB already does the checks curl does but in a more secure way. Taking the points above into consideration, the hypothetical benefits of redundant checks for Tor usage does not justify the increased attack surface area.</p>
+<p>For tor specific checks we can either rely on a mechanism that bootstraps off Torbutton* somehow or completely remove these specific operations that depend on curl from whonixcheck:</p>
+<p>+Tor Bootstrap Status (if it only queries the gateway, then no risk)<br>
++downloads <a href="https://check.torproject.org">https://check.torproject.org</a> with curl through extra SocksPort<br>
++downloads <a href="https://check.torproject.org">https://check.torproject.org</a> with curl through TransPort<br>
++Tor Browser version<br>
++Whonix version and Whonix news</p>
+<p>++ Pretty much anything curl/clearnet related that does not connect to Tor directory authorities/ signed Debian repos.</p>
+<p>ref: <a href="https://www.whonix.org/wiki/Whonixcheck">https://www.whonix.org/wiki/Whonixcheck</a></p>
+<ul>
+<li>TBB never checks check.tpo directly but relies on the small, vetted code of Torbutton to do so. Its definitely safer than curl’s code.</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonixcheck-security-considerations/461/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonixcheck-security-considerations/461/1</link>
+        <pubDate>Mon, 01 Sep 2014 03:40:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-461-1</guid>
+        <source url="http://forums.whonix.org/t/whonixcheck-security-considerations/461.rss">Whonixcheck security considerations</source>
+      </item>
+  </channel>
+</rss>

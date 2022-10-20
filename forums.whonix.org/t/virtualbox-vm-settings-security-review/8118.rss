@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>VirtualBox VM Settings Security Review</title>
+    <link>http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118</link>
+    <description>See this file:
+
+https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 19 Apr 2020 18:46:07 +0000</lastBuildDate>
+    <category>VirtualBox</category>
+    <atom:link href="http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>VirtualBox VM Settings Security Review</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Check this:</p>
+<hr>
+<pre><code>vboxmanage showvminfo Whonix-Gateway-XFCE
+</code></pre>
+<hr>
+<pre><code>vboxmanage getextradata Whonix-Gateway-XFCE
+</code></pre>
+<hr>
+<pre><code>vboxmanage showvminfo Whonix-Workstation-XFCE
+</code></pre>
+<hr>
+<pre><code>vboxmanage getextradata Whonix-Workstation-XFCE</code></pre>
+          <p><a href="http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118/4</link>
+        <pubDate>Sun, 19 Apr 2020 18:46:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8118-4</guid>
+        <source url="http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118.rss">VirtualBox VM Settings Security Review</source>
+      </item>
+      <item>
+        <title>VirtualBox VM Settings Security Review</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            
+          <p><a href="http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118/3</link>
+        <pubDate>Fri, 25 Oct 2019 00:07:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8118-3</guid>
+        <source url="http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118.rss">VirtualBox VM Settings Security Review</source>
+      </item>
+      <item>
+        <title>VirtualBox VM Settings Security Review</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Highlights important to review:</p>
+<hr>
+<pre><code>   ## REVIEW
+   ## ACPI speeds up the VM boot process. It has not been reviewed if this is good or bad for security.
+   sudo $SUDO_OPTS VBoxManage modifyvm "$VMNAME" --acpi on
+</code></pre>
+<hr>
+<pre><code class="lang-auto">   ## REVIEW
+   ## It has not been reviewed if this is good or bad for security.
+   ##
+   ## VirtualBox documentation can be found on:
+   ## https://www.virtualbox.org/manual/ch03.html
+   ##
+   ## Quote VirtualBox documentation:
+   ## "[...] Enabling the I/O APIC is required for 64-bit guest operating
+   ## systems, especially Windows Vista; it is also required if you want to use
+   ## more than one virtual CPU in a virtual machine. [...]"
+   ## Conclusion: it is better to leave it enabled to avoid support requests by
+   ## users who wish to use more than one virtual CPU, who install an amd64
+   ## kernel or create their own Custom-Whonix-Workstation.
+   ##
+   ## Quote VirtualBox documentation:
+   ## "[...] Advanced Configuration and Power Interface (ACPI) which VirtualBox
+   ## presents to the guest operating system by default. ACPI is the current
+   ## industry standard to allow operating systems to recognize hardware,
+   ## configure motherboards and other devices and manage power. As all modern
+   ## PCs contain this feature and Windows and Linux have been supporting it
+   ## for years, it is also enabled by default in VirtualBox. [...]"
+   ## Conclusion: The linux kernel is better tested with I/O APIC enabled
+   ## rather than I/O APIC disabled.
+   sudo $SUDO_OPTS VBoxManage modifyvm "$VMNAME" --ioapic on
+</code></pre>
+<hr>
+<p>Spectre/Meltdown defenses not enabled by default.</p>
+<p>Possibly not worth it due to huge performance penalty and unclear security benefits. Despite:</p>
+<ul>
+<li>host microcode upgrade</li>
+<li>host kernel upgrade</li>
+<li>VM kernel upgrade</li>
+<li>spectre-meltdown-checker on the host showing “not vulnerable”</li>
+<li>latest VirtualBox version</li>
+<li>all spectre/meltdown related VirtualBox settings tuned for better security as documented below</li>
+</ul>
+<p>VirtualBox is likely still vulnerable to spectre/meltdown. For reference see VirtualBox bug report / forum discussion.</p>
+<ul>
+<li><a href="https://www.whonix.org/wiki/Spectre_Meltdown#VirtualBox" rel="nofollow noopener">https://www.whonix.org/wiki/Spectre_Meltdown#VirtualBox</a></li>
+<li><a href="https://www.virtualbox.org/ticket/17987" rel="nofollow noopener">https://www.virtualbox.org/ticket/17987</a></li>
+<li><a href="https://forums.virtualbox.org/viewtopic.php?f=7&amp;t=89395" rel="nofollow noopener">https://forums.virtualbox.org/viewtopic.php?f=7&amp;t=89395</a></li>
+<li><a href="https://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages/5739/22" class="inline-onebox">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</a></li>
+</ul>
+<hr>
+<pre><code>hardware_obfuscation() {
+   # This code is no longer in use!
+   # remove attempts to hide CPU information from VM in VirtualBox
+   # https://phabricator.whonix.org/T881
+   # It could be enabled through an optional build option if there is interest.
+</code></pre>
+<hr>
+<pre><code class="lang-auto">dns_specific() {
+   ## https://serverfault.com/questions/453185/vagrant-virtualbox-dns-10-0-2-3-not-working
+
+   ## Prevents leaking DNS info from the host into the guest.
+   ## Also useful in other cases.
+   ## https://www.virtualbox.org/manual/ch09.html#nat-adv-dns
+   ##
+   ## '--natdnsproxy1 on' might cause issues:
+   ## https://forums.virtualbox.org/viewtopic.php?f=6&amp;t=94671&amp;p=457620#p457620
+   ##
+   ## Probably not both required 'natdnsproxy1 on' and 'natdnshostresolver1 on'.
+   ##
+   ## Both enabled at the same time causes an error in VirtualBox VM log:
+   ## 00:00:00.933430 NAT: Host Resolver conflicts with DNS proxy, the last one was forcely ignored
+   sudo $SUDO_OPTS VBoxManage modifyvm "$VMNAME" --natdnsproxy1 off
+
+   ## Prevents leaking DNS info from the host into the guest.
+   ## Also useful in other cases.
+   ## https://www.virtualbox.org/manual/ch09.html#nat_host_resolver_proxy
+   sudo $SUDO_OPTS VBoxManage modifyvm "$VMNAME" --natdnshostresolver1 on
+
+   ## Do not pass the domain name for network name resolution to the VM.
+   sudo $SUDO_OPTS VBoxManage modifyvm "$VMNAME" --natdnspassdomain1 off
+}
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118/2</link>
+        <pubDate>Sat, 14 Sep 2019 13:07:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8118-2</guid>
+        <source url="http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118.rss">VirtualBox VM Settings Security Review</source>
+      </item>
+      <item>
+        <title>VirtualBox VM Settings Security Review</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>See this file:</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm" target="_blank" rel="nofollow noopener">Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm</a></h4>
+<pre><code class="lang-d/2600_create-vbox-vm">#!/bin/bash
+
+## Copyright (C) 2012 - 2018 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+set -x
+set -e
+
+true "INFO: Currently running script: $BASH_SOURCE $@"
+
+MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &amp;&amp; pwd )"
+
+cd "$MYDIR"
+cd ..
+cd help-steps
+
+source pre
+source colors
+source variables
+
+</code></pre>
+
+  This file has been truncated. <a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm" target="_blank" rel="nofollow noopener">show original</a>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118/1</link>
+        <pubDate>Sat, 14 Sep 2019 13:02:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8118-1</guid>
+        <source url="http://forums.whonix.org/t/virtualbox-vm-settings-security-review/8118.rss">VirtualBox VM Settings Security Review</source>
+      </item>
+  </channel>
+</rss>

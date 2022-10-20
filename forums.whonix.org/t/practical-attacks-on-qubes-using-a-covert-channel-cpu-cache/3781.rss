@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Practical Attacks on Qubes Using a Covert Channel (CPU Cache)</title>
+    <link>http://forums.whonix.org/t/practical-attacks-on-qubes-using-a-covert-channel-cpu-cache/3781</link>
+    <description>As noted here (my emphasis):
+
+[https://www.qubes-os.org/doc/data-leaks/]
+
+&gt; For example, suppose you have an email AppVM. You have set the firewall rules for email such that it can communicate only with your email server. Now suppose that an attacker sends you a GPG-encrypted message which exploits a hypothetical bug in the GnuPG process. There are now multiple ways the attacker could proceed to leak data (such as confidential email messages) from email. The most obvious way is by simply emailing the data to himself.
+
+&gt; **Another possibility is that the attacker has also compromised another one of your AppVMs, such as your netvm, which is normally assumed to be untrusted and has unrestricted access to the network. In this case, the attacker might move data from email to the netvm via a covert channel, such as the CPU cache. Such covert channels through the CPU cache have been described and even implemented in some “lab environments” and might allow for bandwidths of even a few tens of bits/sec. It is unclear whether such channels could be implemented in a real world system, where multiple VMs execute at the same time, each running tens or hundreds of processes, all using the same cache memory, but it is worth keeping in mind.** Of course, this would require special malware written specifically to attack Qubes OS, and perhaps even a specific Qubes OS version and perhaps a specific Qubes OS configuration. Nevertheless, it might be possible.
+
+&quot;It might be possible?&quot;. Sorry @adw, it is now possible. :wink:
+
+This research paper below exfiltrated data via two VMs in the Amazon cloud using the CPU cache, which was very, very noisy (loads of threads) &amp; did the same with a KVM hypervisor in a lab scenario:
+
+[https://cmaurice.fr/pdf/ndss17_maurice.pdf]
+
+&gt; Caches are an ideal shared resource to establish covert channels between multiple virtual machines to exfiltrate sensitive data, as they are fast and shared by all tenants in public clouds. However, cache covert channels are prone to  noise due to cache activity and scheduling, impairing their  direct applicability in a real-world public cloud scenario.
+
+&gt; In this paper we characterized the sources of noise and errors in cache covert channels comprehensively. We consequently  designed a protocol that handles the physical layer and the data-link layer of a cache covert channel. We evaluated the performance of our covert channel in different scenarios in native and virtualized environments. Even in the presence of extraordinarily high system activity, we can maintain a transmission rate between 34.27 KBps and 45.09 KBps with an error rate of 0% on Amazon EC2 virtual machines, which is three orders of magnitude higher than previous covert channels on Amazon EC2. Based on this error-free covert channel, we built the first implementation of TCP through a cache covert channel. We verified the practical applicability of our error-free TCP connection by tunneling SSH and telnet connections reliably between two colocated Amazon EC2 virtual machines.
+
+&gt; The possibility to establish reliable SSH connections and telnet sessions through the cache, moves cache covert channels beyond typical academic use cases, emphasizing the crucial importance of finding effective countermeasures.
+
+**Logical Conclusion:**
+
+Qubes users are screwed if an advanced adversary infects the Net-VM (or potentially others like an Email VM), and then proceeds to use the CPU cache attack described in the research paper. They can apparently exfiltrate data from other VMs despite very noisy system operations e.g. the OS, hypervisor and applications all running frequent operations. Further, they were able to create a persistent and stable communications channel using an encrypted SSH channel.
+
+The icing on the cake was managing this at a near 0% error rate, with the bandwidth rate being pretty high too (&gt;45 KBps) and the working code being available on Github. 
+
+So, this is definitely &quot;worth keeping in mind&quot;.</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 18 Apr 2017 17:51:01 +0000</lastBuildDate>
+    <category>General Tor and Anonymity Talk</category>
+    <atom:link href="http://forums.whonix.org/t/practical-attacks-on-qubes-using-a-covert-channel-cpu-cache/3781.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Practical Attacks on Qubes Using a Covert Channel (CPU Cache)</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>As noted here (my emphasis):</p>
+<p>[<a href="https://www.qubes-os.org/doc/data-leaks/">https://www.qubes-os.org/doc/data-leaks/</a>]</p>
+<blockquote>
+<p>For example, suppose you have an email AppVM. You have set the firewall rules for email such that it can communicate only with your email server. Now suppose that an attacker sends you a GPG-encrypted message which exploits a hypothetical bug in the GnuPG process. There are now multiple ways the attacker could proceed to leak data (such as confidential email messages) from email. The most obvious way is by simply emailing the data to himself.</p>
+</blockquote>
+<blockquote>
+<p><strong>Another possibility is that the attacker has also compromised another one of your AppVMs, such as your netvm, which is normally assumed to be untrusted and has unrestricted access to the network. In this case, the attacker might move data from email to the netvm via a covert channel, such as the CPU cache. Such covert channels through the CPU cache have been described and even implemented in some “lab environments” and might allow for bandwidths of even a few tens of bits/sec. It is unclear whether such channels could be implemented in a real world system, where multiple VMs execute at the same time, each running tens or hundreds of processes, all using the same cache memory, but it is worth keeping in mind.</strong> Of course, this would require special malware written specifically to attack Qubes OS, and perhaps even a specific Qubes OS version and perhaps a specific Qubes OS configuration. Nevertheless, it might be possible.</p>
+</blockquote>
+<p>“It might be possible?”. Sorry <a class="mention" href="http://forums.whonix.org/u/adw">@adw</a>, it is now possible. <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=5" title=":wink:" class="emoji" alt=":wink:"></p>
+<p>This research paper below exfiltrated data via two VMs in the Amazon cloud using the CPU cache, which was very, very noisy (loads of threads) &amp; did the same with a KVM hypervisor in a lab scenario:</p>
+<p>[<a href="https://cmaurice.fr/pdf/ndss17_maurice.pdf">https://cmaurice.fr/pdf/ndss17_maurice.pdf</a>]</p>
+<blockquote>
+<p>Caches are an ideal shared resource to establish covert channels between multiple virtual machines to exfiltrate sensitive data, as they are fast and shared by all tenants in public clouds. However, cache covert channels are prone to  noise due to cache activity and scheduling, impairing their  direct applicability in a real-world public cloud scenario.</p>
+</blockquote>
+<blockquote>
+<p>In this paper we characterized the sources of noise and errors in cache covert channels comprehensively. We consequently  designed a protocol that handles the physical layer and the data-link layer of a cache covert channel. We evaluated the performance of our covert channel in different scenarios in native and virtualized environments. Even in the presence of extraordinarily high system activity, we can maintain a transmission rate between 34.27 KBps and 45.09 KBps with an error rate of 0% on Amazon EC2 virtual machines, which is three orders of magnitude higher than previous covert channels on Amazon EC2. Based on this error-free covert channel, we built the first implementation of TCP through a cache covert channel. We verified the practical applicability of our error-free TCP connection by tunneling SSH and telnet connections reliably between two colocated Amazon EC2 virtual machines.</p>
+</blockquote>
+<blockquote>
+<p>The possibility to establish reliable SSH connections and telnet sessions through the cache, moves cache covert channels beyond typical academic use cases, emphasizing the crucial importance of finding effective countermeasures.</p>
+</blockquote>
+<p><strong>Logical Conclusion:</strong></p>
+<p>Qubes users are screwed if an advanced adversary infects the Net-VM (or potentially others like an Email VM), and then proceeds to use the CPU cache attack described in the research paper. They can apparently exfiltrate data from other VMs despite very noisy system operations e.g. the OS, hypervisor and applications all running frequent operations. Further, they were able to create a persistent and stable communications channel using an encrypted SSH channel.</p>
+<p>The icing on the cake was managing this at a near 0% error rate, with the bandwidth rate being pretty high too (&gt;45 KBps) and the working code being available on Github.</p>
+<p>So, this is definitely “worth keeping in mind”.</p>
+          <p><a href="http://forums.whonix.org/t/practical-attacks-on-qubes-using-a-covert-channel-cpu-cache/3781/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/practical-attacks-on-qubes-using-a-covert-channel-cpu-cache/3781/1</link>
+        <pubDate>Tue, 18 Apr 2017 17:43:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3781-1</guid>
+        <source url="http://forums.whonix.org/t/practical-attacks-on-qubes-using-a-covert-channel-cpu-cache/3781.rss">Practical Attacks on Qubes Using a Covert Channel (CPU Cache)</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>Fixing Whonix boot issue after securing Qubes root auth - Qubes-Whonix - Whonix Forum</title>
+    <meta name="description" content="Using the vpn-sudo doc, I&amp;#39;ve been experimenting with securing root access in my Qubes templates. This works OK for Debian, but Whonix templates apparently run some boot scripts as regular user interspersed with a few &amp;#39;su&amp;hellip;">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="3155.html" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../c/news/21.html">NEWS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;Fixing Whonix boot issue after securing Qubes root auth&#39;" href="3155.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/fixing-whonix-boot-issue-after-securing-qubes-root-auth/3155" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/fixing-whonix-boot-issue-after-securing-qubes-root-auth/3155" />
+<meta property="og:title" content="Fixing Whonix boot issue after securing Qubes root auth" />
+<meta name="twitter:title" content="Fixing Whonix boot issue after securing Qubes root auth" />
+<meta property="og:description" content="Using the vpn-sudo doc, I’ve been experimenting with securing root access in my Qubes templates. This works OK for Debian, but Whonix templates apparently run some boot scripts as regular user interspersed with a few ‘sudo’ commands. The result is that Whonix VMs don’t start cleanly because the Qubes auth prompt pops up a few times.  Instead of relying entirely on an access control tool like apparmor (which I’m also using in Whonix now) I think it would be best to secure the root user as well. S..." />
+<meta name="twitter:description" content="Using the vpn-sudo doc, I’ve been experimenting with securing root access in my Qubes templates. This works OK for Debian, but Whonix templates apparently run some boot scripts as regular user interspersed with a few ‘sudo’ commands. The result is that Whonix VMs don’t start cleanly because the Qubes auth prompt pops up a few times.  Instead of relying entirely on an access control tool like apparmor (which I’m also using in Whonix now) I think it would be best to secure the root user as well. S..." />
+<meta name="twitter:label1" value="Reading time" />
+<meta name="twitter:data1" value="1 mins 🕑" />
+<meta name="twitter:label2" value="Likes" />
+<meta name="twitter:data2" value="4 ❤" />
+<meta property="article:published_time" content="2016-11-17T10:53:49+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../index.html">
+          <img src="../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="3155.html">Fixing Whonix boot issue after securing Qubes root auth</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../c/qubes-whonix/12.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #63a0ff'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>Qubes-Whonix</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tasket'><span itemprop='name'>tasket</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="3155.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2016-11-17T10:53:49Z' class='post-time'>
+                November 17, 2016, 10:53am
+              </time>
+              <meta itemprop='dateModified' content='2016-11-17T10:53:49Z'>
+          <span itemprop='position'>#1</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Using the vpn-sudo doc, I’ve been experimenting with securing root access in my Qubes templates. This works OK for Debian, but Whonix templates apparently run some boot scripts as regular user interspersed with a few ‘sudo’ commands. The result is that Whonix VMs don’t start cleanly because the Qubes auth prompt pops up a few times.</p>
+<p>Instead of relying entirely on an access control tool like apparmor (which I’m also using in Whonix now) I think it would be best to secure the root user as well. So I’d like to propose that we track down and eliminate the use of ‘sudo’ in the Whonix-specific startup scripts.</p>
+<p>Chris</p>
+        </div>
+
+        <meta itemprop='headline' content='Fixing Whonix boot issue after securing Qubes root auth'>
+          <meta itemprop='keywords' content=''>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="3155.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2016-11-17T16:28:05Z' class='post-time'>
+                November 17, 2016,  4:28pm
+              </time>
+              <meta itemprop='dateModified' content='2016-11-17T16:28:05Z'>
+          <span itemprop='position'>#2</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p><a href="../../../external.html?link=https://www.whonix.org/wiki/Unsupported">Unsupported</a>. See my comment here:</p>
+<p><a href="../../../external.html?link=https://github.com/QubesOS/qubes-doc/pull/176#issuecomment-242894132">https://github.com/QubesOS/qubes-doc/pull/176#issuecomment-242894132</a></p>
+<p>That ticket may also contain information to actually answer your question and someone else who got this solved (I guess) as well.</p>
+        </div>
+
+        <meta itemprop='headline' content='Fixing Whonix boot issue after securing Qubes root auth'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tasket'><span itemprop='name'>tasket</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="3155.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2016-11-17T21:35:19Z' class='post-time'>
+                November 17, 2016,  9:35pm
+              </time>
+              <meta itemprop='dateModified' content='2016-11-17T21:35:19Z'>
+          <span itemprop='position'>#3</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Thanks for the link.</p>
+<p>I’m interested in this because Qubes security is based on the rationale:</p>
+<pre><code># Because, really, if somebody could find and exploit a bug in the Xen
+# hypervisor -- so far there has been only one (!) publicly disclosed
+# exploitable bug in the Xen hypervisor from a VM, found in 2008,
+</code></pre>
+<p>(From /etc/sudoers.d/qubes)</p>
+<p>Many more than one XSA has washed under the bridge since then, and there are no less than <strong>eight</strong> coming out on Tuesday!</p>
+<p>ITL also ignores the real possibility of having many VMs where less-skilled attackers are running amok and launching attacks on other targets–even if they are contained.</p>
+<p>So the hypervisor-only philosophy of Qubes security is wearing thin. If one is going to use a guest OS with all its features and peculiarities, the least one can do is keep its security scheme intact.</p>
+        </div>
+
+        <meta itemprop='headline' content='Fixing Whonix boot issue after securing Qubes root auth'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tasket'><span itemprop='name'>tasket</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="3155.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2016-11-18T00:07:07Z' class='post-time'>
+                November 18, 2016, 12:07am
+              </time>
+              <meta itemprop='dateModified' content='2016-11-18T00:07:07Z'>
+          <span itemprop='position'>#4</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>BTW, the simplest solution in the near-term is to execute:</p>
+<p>cp -a /etc/sudoers.d/power-savings-disable-in-vms /etc/sudoers.d/zz99</p>
+<p>…which makes the rule for virt-what command come last.</p>
+        </div>
+
+        <meta itemprop='headline' content='Fixing Whonix boot issue after securing Qubes root auth'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="3155.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2016-11-18T01:11:00Z' class='post-time'>
+                November 18, 2016,  1:11am
+              </time>
+              <meta itemprop='dateModified' content='2016-11-18T01:11:00Z'>
+          <span itemprop='position'>#5</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Tasket:</p>
+<blockquote>
+<p>I’m interested in this because Qubes security is based on the rationale:</p>
+<pre><code># Because, really, if somebody could find and exploit a bug in the Xen
+# hypervisor -- so far there has been only one (!) publicly disclosed
+# exploitable bug in the Xen hypervisor from a VM, found in 2008,
+</code></pre>
+<p>(From /etc/sudoers.d/qubes)</p>
+<p>Many more than one XSA has washed under the bridge since then, and there are no less than <strong>eight</strong> coming out on Tuesday!</p>
+<p>ITL also ignores the real possibility of having many VMs where less-skilled attackers are running amok and launching attacks on other targets–even if they are contained.</p>
+<p>So the hypervisor-only philosophy of Qubes security is wearing thin. If one is going to use a guest OS with all its features and peculiarities, the least one can do is keep its security scheme intact.</p>
+</blockquote>
+<p>Please bring this up at Qubes.</p>
+        </div>
+
+        <meta itemprop='headline' content='Fixing Whonix boot issue after securing Qubes root auth'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/entr0py'><span itemprop='name'>entr0py</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="3155.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2016-11-18T06:26:19Z' class='post-time'>
+                November 18, 2016,  6:26am
+              </time>
+              <meta itemprop='dateModified' content='2016-11-18T06:26:19Z'>
+          <span itemprop='position'>#6</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote" data-post="3" data-topic="3155">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v2/letter/t/6bbea6/40.png" class="avatar"> tasket:</div>
+<blockquote>
+<p>So the hypervisor-only philosophy of Qubes security is wearing thin. If one is going to use a guest OS with all its features and peculiarities, the least one can do is keep its security scheme intact.</p>
+</blockquote>
+</aside>
+<p>Chris, I made some of these points in this back-and-forth that starts here: <a href="../if-not-going-to-change-the-password/2873/3.html">If not going to change the password?</a></p>
+<p>But I thought Marek’s <a href="../../../external.html?link=https://groups.google.com/d/msg/qubes-users/KW4rWE2SC6g/1GFgD2yCBgAJ">reply on qubes-users</a> was quite convincing:</p>
+<pre><code>The point is _if_ someone is able to run arbitrary code as user, he/she
+can easily run it also as root, because of tremendous attack surface of
+linux kernel and all the services running as root. In the worst case one
+needs some patience and simply wait for you to authorize some command to
+be ran as root (regardless of authorization method - password, qrexec
+confirmation as described on https://www.qubes-os.org/doc/vm-sudo/ or
+anything else).  In the simplest case one may alias 'sudo' to for
+example 'sudo /tmp/my-evil-script'.
+
+On the other hand, making it harder to execute arbitrary code in the VM
+(reducing attack surface) makes sense. Things like SELinux, AppArmor,
+seecomp filters etc.
+</code></pre>
+<p>Certainly, there’s a psychological comfort in clicking off root authorizations. Feels like I’m in control… maybe that peace of mind is worth it even if the security posture is largely unchanged. Guess as long as that comfort doesn’t lead to more risky behavior, no harm done.</p>
+        </div>
+
+        <meta itemprop='headline' content='Fixing Whonix boot issue after securing Qubes root auth'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tasket'><span itemprop='name'>tasket</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="3155.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2016-11-18T14:58:56Z' class='post-time'>
+                November 18, 2016,  2:58pm
+              </time>
+              <meta itemprop='dateModified' content='2016-11-18T14:58:56Z'>
+          <span itemprop='position'>#7</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Looking at Marek’s response a second time, I feel like the concern over root is still being short-changed.</p>
+<ol>
+<li>
+<p>No obstacle to root means that malware can persist far more easily after a vulnerability has been patched. This makes Qubes VMs ‘juicy targets’ and negates some of the security bonus that read-only templates provide.</p>
+</li>
+<li>
+<p>Even if the root prompt isn’t perfect from a psychological standpoint, there are more ways to grant access. It may even be best to set the default to ‘deny’ while setting template VMs to ‘allow’.</p>
+</li>
+<li>
+<p>The root prompt shouldn’t come up in normal use anyway. Displaying strong language and having “NO” as the default action when hitting Enter should be a substantial improvement in security.</p>
+</li>
+</ol>
+<p>I’ll bring these points up in a new thread on a Qubes list.</p>
+        </div>
+
+        <meta itemprop='headline' content='Fixing Whonix boot issue after securing Qubes root auth'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/tasket'><span itemprop='name'>tasket</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="3155.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2016-11-18T15:01:51Z' class='post-time'>
+                November 18, 2016,  3:01pm
+              </time>
+              <meta itemprop='dateModified' content='2016-11-18T15:01:51Z'>
+          <span itemprop='position'>#8</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I had one remaining prompt in sys-whonix that didn’t show up when starting the template itself. To resolve it, /etc/sudoers.d/zz99 now contains both these lines:</p>
+<p>ALL ALL=NOPASSWD: /usr/sbin/virt-what<br>
+ALL ALL=NOPASSWD: /usr/sbin/service whonixcheck *</p>
+        </div>
+
+        <meta itemprop='headline' content='Fixing Whonix boot issue after securing Qubes root auth'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="3155.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2016-11-18T16:22:00Z' class='post-time'>
+                November 18, 2016,  4:22pm
+              </time>
+              <meta itemprop='dateModified' content='2016-11-18T16:22:00Z'>
+          <span itemprop='position'>#9</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Please check when Whonix 14 testers-only versions are released if any<br>
+sudoers entries are missing so these can find their way into the stable<br>
+version of Whonix 14.</p>
+        </div>
+
+        <meta itemprop='headline' content='Fixing Whonix boot issue after securing Qubes root auth'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

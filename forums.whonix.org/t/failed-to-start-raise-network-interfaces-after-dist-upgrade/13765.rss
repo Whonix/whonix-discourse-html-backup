@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Failed to start Raise network interfaces after dist-upgrade</title>
+    <link>http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765</link>
+    <description>Hello. I have two Workstations. On the second Workstation I did `upgrade-nonroot` and installed a huge upgrade (it seems like it&#39;s a new version of Whonix).
+
+But after installation completed, I&#39;ve done autoremove and then rebooted. And I see `ERROR: Failed to start Raise network interfaces` on boot screen. Even though this error appears, Internet works fine.
+
+I have the following systemd log:
+
+```
+systemd[1]: Starting Raise network interfaces...
+ifup[623]: RTNETLINK answers: File exists
+ifup[578]: ifup: failed to bring up eth0
+systemd[1]: networking.service: Main process exited, code=exited, status=1/FAILURE
+systemd[1]: networking.service: Failed with result &#39;exit-code&#39;.
+systemd[1]: Failed to start Raise network interfaces.
+
+```
+
+I typed `ip a` and I noticed strange things: both 10.152.152.11 and 10.152.152.12 hardcoded adresses are binded:
+
+```
+inet 10.152.152.12/18 brd 10.152.191.255 scope global eth0
+       valid_lft forever preferred_lft forever
+inet 10.152.152.11/18 brd 10.152.191.255 scope global secondary eth0
+
+```
+**That is wrong!** 10.152.152.11 should belong only to the first Workstation, not to the second!!!
+
+On `/etc/network/interfaces.d/30_non-qubes-whonix` I incremented address number
+
+```
+iface eth0 inet static
+       ## Increment last octet of address
+       ## on optional additional workstations.
+       ## IP HARDCODED unfortunately.
+       address 10.152.152.12
+       netmask 255.255.192.0
+       gateway 10.152.152.10
+
+       ## Out commented.
+       ## For what do we require the network and broadcast
+       ## instances anyway?
+       #network 192.168.0.0
+       #broadcast 192.168.0.255
+
+```
+
+Well, I need help. How to solve the problem `Failed to start Raise network interfaces` ?</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 12 Jun 2022 14:30:36 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Failed to start Raise network interfaces after dist-upgrade</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Debian bug report:<br>
+<a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1012707"><code>/etc/network/interfaces</code>:<br>
+only source configuration files using with <code>*.conf</code><br>
+use<br>
+<code>source /etc/network/interfaces.d/*.conf</code><br>
+instead of<br>
+<code>source /etc/network/interfaces.d/*</code></a></p>
+          <p><a href="http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765/4</link>
+        <pubDate>Sun, 12 Jun 2022 14:30:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13765-4</guid>
+        <source url="http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765.rss">Failed to start Raise network interfaces after dist-upgrade</source>
+      </item>
+      <item>
+        <title>Failed to start Raise network interfaces after dist-upgrade</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Delete <code>/etc/network/interfaces.d/30_non-qubes-whonix.dpkg-dist</code>.</p>
+<pre><code>sudo rm /etc/network/interfaces.d/30_non-qubes-whonix.dpkg-dist</code></pre>
+          <p><a href="http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765/3</link>
+        <pubDate>Sat, 11 Jun 2022 16:15:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13765-3</guid>
+        <source url="http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765.rss">Failed to start Raise network interfaces after dist-upgrade</source>
+      </item>
+      <item>
+        <title>Failed to start Raise network interfaces after dist-upgrade</title>
+        <dc:creator><![CDATA[helpmeok]]></dc:creator>
+        <description><![CDATA[
+            <p>Well, I found out<br>
+<code>/etc/network/interfaces.d/30_non-qubes-whonix.dpkg-dist</code> file near the main<br>
+<code>/etc/network/interfaces.d/30_non-qubes-whonix</code></p>
+<p>Well, I noticed:</p>
+<pre><code class="lang-auto">iface eth0 inet static
+       ## Increment last octet of address
+       ## on optional additional workstations.
+       ## IP HARDCODED unfortunately.
+       address 10.152.152.11
+       netmask 255.255.192.0
+       gateway 10.152.152.10
+
+       ## Out commented.
+       ## For what do we require the network and broadcast
+       ## instances anyway?
+       #network 192.168.0.0
+       #broadcast 192.168.0.255
+
+</code></pre>
+<p>There on that file. Should I just delete<br>
+<code>/etc/network/interfaces.d/30_non-qubes-whonix.dpkg-dist</code></p>
+<p>And restart networking service? I need help. Thank you.</p>
+          <p><a href="http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765/2</link>
+        <pubDate>Sat, 11 Jun 2022 16:12:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13765-2</guid>
+        <source url="http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765.rss">Failed to start Raise network interfaces after dist-upgrade</source>
+      </item>
+      <item>
+        <title>Failed to start Raise network interfaces after dist-upgrade</title>
+        <dc:creator><![CDATA[helpmeok]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello. I have two Workstations. On the second Workstation I did <code>upgrade-nonroot</code> and installed a huge upgrade (it seems like it’s a new version of Whonix).</p>
+<p>But after installation completed, I’ve done autoremove and then rebooted. And I see <code>ERROR: Failed to start Raise network interfaces</code> on boot screen. Even though this error appears, Internet works fine.</p>
+<p>I have the following systemd log:</p>
+<pre><code class="lang-auto">systemd[1]: Starting Raise network interfaces...
+ifup[623]: RTNETLINK answers: File exists
+ifup[578]: ifup: failed to bring up eth0
+systemd[1]: networking.service: Main process exited, code=exited, status=1/FAILURE
+systemd[1]: networking.service: Failed with result 'exit-code'.
+systemd[1]: Failed to start Raise network interfaces.
+
+</code></pre>
+<p>I typed <code>ip a</code> and I noticed strange things: both 10.152.152.11 and 10.152.152.12 hardcoded adresses are binded:</p>
+<pre><code class="lang-auto">inet 10.152.152.12/18 brd 10.152.191.255 scope global eth0
+       valid_lft forever preferred_lft forever
+inet 10.152.152.11/18 brd 10.152.191.255 scope global secondary eth0
+
+</code></pre>
+<p><strong>That is wrong!</strong> 10.152.152.11 should belong only to the first Workstation, not to the second!!!</p>
+<p>On <code>/etc/network/interfaces.d/30_non-qubes-whonix</code> I incremented address number</p>
+<pre><code class="lang-auto">iface eth0 inet static
+       ## Increment last octet of address
+       ## on optional additional workstations.
+       ## IP HARDCODED unfortunately.
+       address 10.152.152.12
+       netmask 255.255.192.0
+       gateway 10.152.152.10
+
+       ## Out commented.
+       ## For what do we require the network and broadcast
+       ## instances anyway?
+       #network 192.168.0.0
+       #broadcast 192.168.0.255
+
+</code></pre>
+<p>Well, I need help. How to solve the problem <code>Failed to start Raise network interfaces</code> ?</p>
+          <p><a href="http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765/1</link>
+        <pubDate>Sat, 11 Jun 2022 16:03:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13765-1</guid>
+        <source url="http://forums.whonix.org/t/failed-to-start-raise-network-interfaces-after-dist-upgrade/13765.rss">Failed to start Raise network interfaces after dist-upgrade</source>
+      </item>
+  </channel>
+</rss>

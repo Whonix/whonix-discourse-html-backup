@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix Gateway - NAT network</title>
+    <link>http://forums.whonix.org/t/whonix-gateway-nat-network/6470</link>
+    <description>So I have two connections on my pc, one Wifi (Will be used for Host) and one wired USB internet(only for quest), I can set it up to work on other VMS but not with whonix gateway.
+
+To alow the VM to get connection I changed it to Virtual Host-Only adapter in the VM Virtual box settings which is then bridged to USB WIFI Adapter.
+
+Also another way is to change settings of the VM in virtual box and select the USB Wifi adapter under bridge adapters.
+
+I assume Whonix has a check on it to see if the VM setting is sat to &quot;NAT&quot;
+
+Is there way to change this? I believe there must be a setting I must change in Whonix since this setup works for other VMS
+
+** Note **
+On the adapter properties I have unchecked everything except VirtualBox NDIS6 Bridged Networking Driver.
+This is to stop Windows from using the connection.
+![image|362x471](upload://xFveHpn9mQoIUaRHKijfh6dJnUE.png) 
+
+Thanks Devs</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 14 Dec 2018 21:55:38 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-gateway-nat-network/6470.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix Gateway - NAT network</title>
+        <dc:creator><![CDATA[cjay]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks you were very helpful.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-nat-network/6470/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-nat-network/6470/7</link>
+        <pubDate>Fri, 14 Dec 2018 21:55:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6470-7</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-nat-network/6470.rss">Whonix Gateway - NAT network</source>
+      </item>
+      <item>
+        <title>Whonix Gateway - NAT network</title>
+        <dc:creator><![CDATA[Algernon]]></dc:creator>
+        <description><![CDATA[
+            <p>It looks like you attached the wifi adapter to the VM and not the USB ethernet adapter. Also the first interface is still enabled. Unless there is a driver issue the wifi adapter should still come up in the VM, but since you don’t want to use wifi in the VM anyways …<br>
+I just gave it a try on a linux host and the USB interface comes up as eth1 which makes things more complicated …</p>
+<p>If you want to use the bridge and it works for other VMs then in theory you just need to change the network address. I don’t know your local network config so easiest is to either check on the host or maybe better on the Windows VM where the bridge works, for the network address. If it is something like 192.168.1.44 in Windows, then for example make the Whonix config look like:<br>
+auto eth0<br>
+iface eth0 inet static<br>
+address 192.168.1.46<br>
+netmask 255.255.255.0<br>
+gateway 192.168.1.1</p>
+<p>restart networking, and it should work.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-nat-network/6470/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-nat-network/6470/6</link>
+        <pubDate>Wed, 12 Dec 2018 10:20:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6470-6</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-nat-network/6470.rss">Whonix Gateway - NAT network</source>
+      </item>
+      <item>
+        <title>Whonix Gateway - NAT network</title>
+        <dc:creator><![CDATA[Algernon]]></dc:creator>
+        <description><![CDATA[
+            <p>When you attach the USB to the VM there should be nothing to change on the host network. I can’t test it atm, but when you attach the USB you should get a new network interface. So first remove the first network interface of the VM, then connect the USB adapter and boot it. You should have two interfaces in the VM then with eth0 hopefully being the USB adapter. Then change the static address for eth0 in /etc/network/interfaces.d/30_non-qubes-whonix as well as the gateway.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-nat-network/6470/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-nat-network/6470/4</link>
+        <pubDate>Tue, 11 Dec 2018 22:27:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6470-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-nat-network/6470.rss">Whonix Gateway - NAT network</source>
+      </item>
+      <item>
+        <title>Whonix Gateway - NAT network</title>
+        <dc:creator><![CDATA[cjay]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for the Reply,</p>
+<p>I was just saying both ways work with a windows VM.</p>
+<p>After looking at the config file im still not quite sure what to do since the adapter  USBWIFI doesnt<br>
+have those settings.</p>
+<p><img src="//forums.whonix.org/uploads/default/original/2X/0/012b1775c8b6f6f7c3136e90c77cd2e629ec5b0c.png" alt="image" width="534" height="94"></p>
+<p>This is because I have unchecked the IPv4.<br>
+So what settings would I replace on eth0 config section in the /etc/network/interfaces.d/30_non-qubes-whonix file.</p>
+<p>As for the USB Attached to the VM I have tried that route and attached it in VM setting on virtualbox, but not sure what I would to activate that in Whonix.</p>
+<p>Thanks, I Appreciate the help.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-nat-network/6470/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-nat-network/6470/3</link>
+        <pubDate>Tue, 11 Dec 2018 22:10:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6470-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-nat-network/6470.rss">Whonix Gateway - NAT network</source>
+      </item>
+      <item>
+        <title>Whonix Gateway - NAT network</title>
+        <dc:creator><![CDATA[Algernon]]></dc:creator>
+        <description><![CDATA[
+            <p>In the first paragraph you write that wired  USB ethernet is used but later on you say you bridge the USB wifi adapter to the VM ??<br>
+Anyways, the network configuration is hard coded under /etc/network/interfaces.d/30_non-qubes-whonix. You should configure a static address there corresponding to your local network config.<br>
+You could also just attach the USB ethernet adapter to the VM in the VirtualBox config.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-nat-network/6470/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-nat-network/6470/2</link>
+        <pubDate>Tue, 11 Dec 2018 21:42:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6470-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-nat-network/6470.rss">Whonix Gateway - NAT network</source>
+      </item>
+      <item>
+        <title>Whonix Gateway - NAT network</title>
+        <dc:creator><![CDATA[cjay]]></dc:creator>
+        <description><![CDATA[
+            <p>So I have two connections on my pc, one Wifi (Will be used for Host) and one wired USB internet(only for quest), I can set it up to work on other VMS but not with whonix gateway.</p>
+<p>To alow the VM to get connection I changed it to Virtual Host-Only adapter in the VM Virtual box settings which is then bridged to USB WIFI Adapter.</p>
+<p>Also another way is to change settings of the VM in virtual box and select the USB Wifi adapter under bridge adapters.</p>
+<p>I assume Whonix has a check on it to see if the VM setting is sat to “NAT”</p>
+<p>Is there way to change this? I believe there must be a setting I must change in Whonix since this setup works for other VMS</p>
+<p>** Note **<br>
+On the adapter properties I have unchecked everything except VirtualBox NDIS6 Bridged Networking Driver.<br>
+This is to stop Windows from using the connection.<br>
+<img src="//forums.whonix.org/uploads/default/original/2X/e/ebf8ca6916c1fc6062b0cf82c0642250b0f8d87c.png" alt="image" width="362" height="471"></p>
+<p>Thanks Devs</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-nat-network/6470/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-nat-network/6470/1</link>
+        <pubDate>Tue, 11 Dec 2018 15:41:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6470-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-nat-network/6470.rss">Whonix Gateway - NAT network</source>
+      </item>
+  </channel>
+</rss>

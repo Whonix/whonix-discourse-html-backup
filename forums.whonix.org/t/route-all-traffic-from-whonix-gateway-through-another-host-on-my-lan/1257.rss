@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Route all traffic from Whonix Gateway through another host on my LAN?</title>
+    <link>http://forums.whonix.org/t/route-all-traffic-from-whonix-gateway-through-another-host-on-my-lan/1257</link>
+    <description>Hi,
+
+I&#39;ve got both Whonix hosts set up on my host Windows workstation (would use a dedicated machine if I could afford it) and I&#39;ve also got a secondary router on my LAN which has a &quot;more anonymous&quot; way to access the Internet, than my private ISP connection. I would like [u]all[/u] traffic from Whonix Gateway to be routed through that router, rather than through my residential ISP connection.
+
+This is how the relevant parts of my L3-topology looks today:
+
+[pre]
+(6.6.6.1) Internet
+ |
+(6.6.6.10) Residential gateway (NAT) (10.100.10.1/24) - (10.100.10.10/24) Windows workstation (10.0.2.2) - (10.0.2.15/24) Whonix Gateway (10.152.152.10/18) - (10.152.152.11/18) Whonix Workstation
+ |
+ --- (10.100.10.100/24) Secondary router with NAT inside on 10.100.10.100 and NAT outside on a public IP (5.5.5.10/x) - (5.5.5.1) Internet[/pre]
+
+I&#39;ve got the secondary router able to route traffic to and from the Internet, back to my internal network. So if I ping a public address from my Windows workstation it will pass through my RGW to the internet and then back again. If I set its default gateway to 10.100.10.100, it will work just fine too, but the traffic will pass through my secondary router and never touch my RGW.
+
+So I want the Whonix Gateway to use 10.100.10.100 as its default gateway, instead of 10.100.10.1 which the Windows workstation uses. Since the Windows workstation (which I host Whonix on) uses NAT to translate the Whonix traffic to the LAN, I can&#39;t just change the default gateway on the Whonix gateway. I suppose I could use a VirtualBox bridge instead of a NAT interface, but what security implications would that have? Also, I could probably set up source routing on the Windows workstation, but I doubt that&#39;s possible. How would you solve this? The best solution would be adding another box with two network interfaces which hosts Whonix gateway, with one interface in my LAN and its default gateway out its public facing interface, but that&#39;s not possible until I can buy another box in the future.
+
+Also, what would I have to do on the Whonix Gateway iptables to get this to work? I would be grateful for any help!</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 05 Aug 2015 12:50:38 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/route-all-traffic-from-whonix-gateway-through-another-host-on-my-lan/1257.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Route all traffic from Whonix Gateway through another host on my LAN?</title>
+        <dc:creator><![CDATA[tnrbmc]]></dc:creator>
+        <description><![CDATA[
+            <p>I ended up solving this by using a bridged interface on my Whonix Gateway VM instead of a NAT interface, and changing the default route of the Gateway to my secondary router. Except for isolating the gateway traffic behind my host (and making the gateway see my entire LAN) I don’t think it’s enough of a security risk this far. Really, it puts my VM in the same position as it would be if I were running the Gateway on its own physical host.</p>
+          <p><a href="http://forums.whonix.org/t/route-all-traffic-from-whonix-gateway-through-another-host-on-my-lan/1257/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/route-all-traffic-from-whonix-gateway-through-another-host-on-my-lan/1257/2</link>
+        <pubDate>Wed, 05 Aug 2015 12:50:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1257-2</guid>
+        <source url="http://forums.whonix.org/t/route-all-traffic-from-whonix-gateway-through-another-host-on-my-lan/1257.rss">Route all traffic from Whonix Gateway through another host on my LAN?</source>
+      </item>
+      <item>
+        <title>Route all traffic from Whonix Gateway through another host on my LAN?</title>
+        <dc:creator><![CDATA[tnrbmc]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi,</p>
+<p>I’ve got both Whonix hosts set up on my host Windows workstation (would use a dedicated machine if I could afford it) and I’ve also got a secondary router on my LAN which has a “more anonymous” way to access the Internet, than my private ISP connection. I would like <span class="bbcode-u">all</span> traffic from Whonix Gateway to be routed through that router, rather than through my residential ISP connection.</p>
+<p>This is how the relevant parts of my L3-topology looks today:</p>
+<p>[pre]<br>
+(6.6.6.1) Internet<br>
+|<br>
+(6.6.6.10) Residential gateway (NAT) (10.100.10.1/24) - (10.100.10.10/24) Windows workstation (10.0.2.2) - (10.0.2.15/24) Whonix Gateway (10.152.152.10/18) - (10.152.152.11/18) Whonix Workstation<br>
+|<br>
+— (10.100.10.100/24) Secondary router with NAT inside on 10.100.10.100 and NAT outside on a public IP (5.5.5.10/x) - (5.5.5.1) Internet[/pre]</p>
+<p>I’ve got the secondary router able to route traffic to and from the Internet, back to my internal network. So if I ping a public address from my Windows workstation it will pass through my RGW to the internet and then back again. If I set its default gateway to 10.100.10.100, it will work just fine too, but the traffic will pass through my secondary router and never touch my RGW.</p>
+<p>So I want the Whonix Gateway to use 10.100.10.100 as its default gateway, instead of 10.100.10.1 which the Windows workstation uses. Since the Windows workstation (which I host Whonix on) uses NAT to translate the Whonix traffic to the LAN, I can’t just change the default gateway on the Whonix gateway. I suppose I could use a VirtualBox bridge instead of a NAT interface, but what security implications would that have? Also, I could probably set up source routing on the Windows workstation, but I doubt that’s possible. How would you solve this? The best solution would be adding another box with two network interfaces which hosts Whonix gateway, with one interface in my LAN and its default gateway out its public facing interface, but that’s not possible until I can buy another box in the future.</p>
+<p>Also, what would I have to do on the Whonix Gateway iptables to get this to work? I would be grateful for any help!</p>
+          <p><a href="http://forums.whonix.org/t/route-all-traffic-from-whonix-gateway-through-another-host-on-my-lan/1257/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/route-all-traffic-from-whonix-gateway-through-another-host-on-my-lan/1257/1</link>
+        <pubDate>Wed, 29 Jul 2015 11:46:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-1257-1</guid>
+        <source url="http://forums.whonix.org/t/route-all-traffic-from-whonix-gateway-through-another-host-on-my-lan/1257.rss">Route all traffic from Whonix Gateway through another host on my LAN?</source>
+      </item>
+  </channel>
+</rss>

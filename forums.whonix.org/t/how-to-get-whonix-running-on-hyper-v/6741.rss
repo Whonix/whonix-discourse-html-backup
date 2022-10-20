@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>How to get Whonix running on Hyper-V</title>
+    <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741</link>
+    <description>I really appreciated [Krystical&#39;s original post ](https://forums.whonix.org/t/hyper-v-and-whonix/267)with instructions on how to convert Whonix images to run in Microsoft&#39;s Hyper-V so I wanted to provide updated instructions that work with Whonix 14 in case anyone else desires such a setup. We already use Hyper-V so installing a second Hypervisor like VirtualBox was undesirable.  I have updated the original instructions so they work in 2019.
+
+ **_Step 1)_** Download, extract, and install everything you need: [Whonix images](https://www.whonix.org/wiki/VirtualBox), [dsfok tools](http://members.ozemail.com.au/~nulifetv/freezip/freeware/dsfok.zip ), 7zip, [Notepad++](https://notepad-plus-plus.org/), [Microsoft Virtual Machine Converter 3.0](https://www.microsoft.com/en-us/download/details.aspx?id=42497)
+
+**_Step 2)_** Open Whonix 14 images (`Whonix-Gateway-XFCE-14.0.0.9.9.ova` and `Whonix-Workstation-XFCE-14.0.0.9.9.ova`) using 7zip and extract the `.vmdk` files somewhere like c:\temp\ 
+
+_**Step 3)**_ Extract `dsfok tools` to some location like c:\temp\ 
+
+_**Step 4)**_ Using PowerShell or CMD prompt, enter a command like: `c:\temp\dsfo.exe &quot;c:\temp\Whonix-Gateway-XFCE-14.0.0.9.9-disk001.vmdk&quot; 512 1024 descriptor.txt` to extract the descriptor files from the VMDK file 
+
+_**Step 5)**_ Use Notepad++ or similar to edit `descriptor.txt`, and comment out (Put # in front of) all lines starting with &quot;ddb.uuid&quot; and &quot;ddb.comment&quot; and save the file. 
+
+_**Step 6)**_ Use a command like: `c:\temp\dsfi.exe &quot;c:\temp\Whonix-Gateway-XFCE-14.0.0.9.9-disk001.vmdk&quot; 512 1024 descriptor.txt` to inject the descriptor back into the VMDK file 
+
+_**Step 7)**_ Repeat steps 4-6 using Whonix-Workstation-XFCE-14.0.0.9.9-disk001.vmdk so that **you have two VMDK files with modified descriptors**
+
+_**Step 8)**_ Install Microsoft&#39;s VM Converter 3.0 (or newer) which you downloaded in step 1
+
+_**Step 9)**_ Open PowerShell (as administrator) and enter commands like this if you used c:\temp\
+_**1) Import converter module to powershell:**_ `Import-Module &quot;C:\Program Files\Microsoft Virtual Machine Converter\MvmcCmdlet.psd1&quot;` 
+_**2) Convert the Gateway VMDK file to VHDX:**_ `ConvertTo-MvmcVirtualHardDisk -SourceLiteralPath &quot;c:\temp\Whonix-Gateway-XFCE-14.0.0.9.9-disk001.vmdk&quot; -DestinationLiteralPath &quot;c:\temp\Whonix-Gateway-XFCE-14.0.0.9.9.vhdx&quot; -VhdType DynamicHardDisk -VhdFormat Vhdx` 
+_**3) Convert the Workstation VMDK file to VHDX:**_ `ConvertTo-MvmcVirtualHardDisk -SourceLiteralPath &quot;c:\temp\Whonix-Workstation -XFCE-14.0.0.9.9-disk001.vmdk&quot; -DestinationLiteralPath &quot;c:\temp\Whonix-Workstation -XFCE-14.0.0.9.9.vhdx&quot; -VhdType DynamicHardDisk -VhdFormat Vhdx` 
+
+_**Step 10)**_ In Microsoft&#39;s Hyper-V Manager, create a Generation 1 (Not a GEN 2 EFI) Hyper-V virtual machine to use as the Whonix Gateway and use the option for selecting an existing hard drive. Then select the newly created VHDX file. Add 2 legacy network adapters to the virtual machine; the first legacy network adapter should be connected to a virtual switch which has external connectivity to your LAN. The second legacy network adapter should be connected to a private virtual switch; this switch will let your Whonix Workstation connect to the internet through your Gateway&#39;s private network connection.
+
+_**Step 11)**_ The first time you boot the Whonix Gateway, you will need to &quot;cancel&quot; out of the **Anon Connection Wizard** and configure your network settings through the console. We need to change your ‘eth0’ to connect to your network via DHCP rather than use VirtualBox’s network settings (which are typically on a different subnet).
+
+_**Step 12)**_ In console, enter the command `sudo nano /etc/network/interfaces.d/30_non-qubes-whonix` to open the configuration file and uncomment the two lines which contain `auto eth0` and `iface eth0 inet dhcp` by removing the # in front of them. Then exit and save the changes you made.
+![eth0|690x221](upload://iV1FPO6u3djP1npBt8kIuofKAhv.png) 
+
+_**Step 13)**_ We still need to make one more configuration change to avoid getting a big ugly warning about Hyper-V not being a supported virtualizer. Open the configuration file for editing with the following command `sudo nano /etc/whonix.d/30_whonixcheck_default.conf` and then change the 0 to a 1 in the line to stop on the detection of an unsupported virtualizer. Reboot the virtual machine after you have saved these changes. 
+
+_**Step 14)**_ In Microsoft&#39;s Hyper-V Manager, create a Generation 1 (Not a GEN 2 EFI) Hyper-V virtual machine to use as the Whonix Workstation and use the option for selecting an existing hard drive. Then select the newly created Workstation VHDX file. Add 1 legacy network adapters to the virtual machine; and connect it to the same private virtual switch as you connected to the 2nd interface of the Gateway virtual machine. The Whonix workstation should not need any additional configuration and should work correctly when you start it.
+
+_**Step 15)**_ If you have followed these steps correctly and you didn&#39;t encounter any problems, you should now be able to enjoy Whonix 14 on Hyper-V!
+
+----
+
+Edit by Patrick:
+User @akcryptoguy and only user @akcryptoguy is responsible for this. This is a community project. [Unsupported](https://www.whonix.org/wiki/Unsupported) by Whonix developers. Whonix developers are delighted that Whonix can be modified and useful for others since this is in the [spirit of Whonix](https://www.whonix.org/wiki/Why_Whonix_is_Free_Software).
+
+At time of writing, `Hyper-V` is non-freedom software. Therefore the following Whonix policy is related:
+
+https://www.whonix.org/wiki/Policy_On_Nonfreedom_Software
+
+Changed title from `How to get Whonix 14 running on Hyper-V` to `How to get Whonix running on Hyper-V`.</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 14 Jan 2022 19:03:27 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[carbonPsyChan]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <a class="mention" href="http://forums.whonix.org/u/ryanrambharose">@ryanrambharose</a>, with a bit of effort I got it running based on the bare-metal approach… There are a few gotchas. If you are still interested let me know and I’ll send some details along.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/19</link>
+        <pubDate>Fri, 14 Jan 2022 19:03:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-19</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="lolliholli" data-post="17" data-topic="6741">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/2acd7d/40.png" class="avatar"> lolliholli:</div>
+<blockquote>
+<p>You know, even if you’re a developer</p>
+</blockquote>
+</aside>
+<p>What does that imply?</p>
+<aside class="quote no-group" data-username="lolliholli" data-post="17" data-topic="6741">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/2acd7d/40.png" class="avatar"> lolliholli:</div>
+<blockquote>
+<p>people here are asking for a solution</p>
+</blockquote>
+</aside>
+<p>And since I don’t plan on working on it, the right thing is to communicate that clearly, which was done. Very likely follow-up question “why not” is also answered.</p>
+<aside class="quote no-group" data-username="lolliholli" data-post="17" data-topic="6741">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/2acd7d/40.png" class="avatar"> lolliholli:</div>
+<blockquote>
+<p>The somewhat savvy user would already know these things that you are posting here in the chat.</p>
+</blockquote>
+</aside>
+<p>Answers are written with general readers in mind, not for technical users only.</p>
+<aside class="quote no-group" data-username="lolliholli" data-post="17" data-topic="6741">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/l/2acd7d/40.png" class="avatar"> lolliholli:</div>
+<blockquote>
+<p>but you are decreasing their security, if you say to them they have to deactivate core isolation and other Hyper-V things on their windows machine, just to be able to run Virtualbox.</p>
+</blockquote>
+</aside>
+<p>No, wiki page on <a href="https://www.whonix.org/wiki/Windows_Hosts" class="inline-onebox">Microsoft Windows Hosts</a> clearly discourages any use of Windows. Related: <a href="https://www.whonix.org/wiki/Dev/VirtualBox#Arguments_for_keeping_VirtualBox_Support">Arguments for keeping VirtualBox Support</a></p>
+<p>From that position, any huge investment (porting to an additional non-freedom virtualizer running on top of a non-freedom, privacy intrusive operating system) is out of scope.</p>
+<p>As from a time management perspective, existing Qubes-Whonix for Qubes R4.0 users are also asking for Qubes-Whonix support for Qubes R4.1. Doing that all at once is just impossible. Therefore project directions are defined, limited and out of scope feature request are declined so users know they don’t need to wait and should consider finding a different solution.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/18</link>
+        <pubDate>Wed, 17 Nov 2021 09:27:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-18</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[lolliholli]]></dc:creator>
+        <description><![CDATA[
+            <p>You know, even if you’re a developer – people here are asking for a solution. The somewhat savvy user would already know these things that you are posting here in the chat. I know, this is again the politics of free Software… but you are decreasing their security, if you say to them they have to deactivate core isolation and other Hyper-V things on their windows machine, just to be able to run Virtualbox. Because this is basically what you are actually doing here.</p>
+<p>See it as a propose for harm reaction.</p>
+<p>Best regards</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/17</link>
+        <pubDate>Tue, 16 Nov 2021 15:15:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-17</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Windows_Hosts" target="_blank" rel="noopener" title="03:47PM - 28 April 2021">Whonix – 28 Apr 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/c/c7/Windows23231.png" class="thumbnail onebox-avatar" width="60" height="60">
+
+<h3><a href="https://www.whonix.org/wiki/Windows_Hosts" target="_blank" rel="noopener">Microsoft Windows Hosts</a></h3>
+
+  <p>Microsoft Windows as Malware, Windows Insecurity, Windows Backdoors, Windows User Freedoms Restrictions, Windows Surveillance, Other Windows Abuses, Inescapable Telemetry</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/16</link>
+        <pubDate>Sat, 13 Nov 2021 00:44:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-16</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[ryanrambharose]]></dc:creator>
+        <description><![CDATA[
+            <p>I would like to use Hyper-V since its integrated into Windows and has better performance.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/15</link>
+        <pubDate>Sat, 13 Nov 2021 00:16:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-15</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Non-freedom software.</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Policy_On_Nonfreedom_Software" target="_blank" rel="noopener" title="11:46AM - 17 March 2021">Whonix – 17 Mar 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/8/8e/Shield123123213.png" class="thumbnail onebox-avatar" width="60" height="60">
+
+<h3><a href="https://www.whonix.org/wiki/Policy_On_Nonfreedom_Software" target="_blank" rel="noopener">Whonix ™ Policy On Non-Freedom Software</a></h3>
+
+  <p>Permitted / Prohibited Discussions, Project Philosophy on Non-Freedom Software</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Avoid_nonfreedom_software" target="_blank" rel="noopener" title="07:48PM - 26 March 2021">Whonix – 26 Mar 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/b/b8/No-admittance-98806-640.png" class="thumbnail onebox-avatar" width="60" height="60">
+
+<h3><a href="https://www.whonix.org/wiki/Avoid_nonfreedom_software" target="_blank" rel="noopener">Avoid Non-Freedom Software</a></h3>
+
+  <p>Why you should avoid Non-Freedom Software</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Therefore:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Declined" target="_blank" rel="noopener" title="05:29AM - 31 May 2021">Whonix – 31 May 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/76;"><img src="https://www.whonix.org/w/images/3/3c/Declined1231242.png" class="thumbnail" width="131" height="76"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Declined" target="_blank" rel="noopener">Declined Feature Requests</a></h3>
+
+  <p>Declined feature requests. Out-of-scope feature suggestions that are not on the Whonix ™ development roadmap.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Updated the download page accordingly just now:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Download" target="_blank" rel="noopener" title="11:48PM - 12 November 2021">Whonix – 12 Nov 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/5/5f/Download-1019956-640.jpg" class="thumbnail onebox-avatar" width="60" height="60">
+
+<h3><a href="https://www.whonix.org/wiki/Download" target="_blank" rel="noopener">FREE Whonix ™ Download for Windows, macOS, Linux and Others</a></h3>
+
+  <p>FREE Download Whonix ™. Privacy Protection. Anonymity Online. For Windows, macOS, Linux.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/14</link>
+        <pubDate>Fri, 12 Nov 2021 23:58:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-14</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[ryanrambharose]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello, I am trying to run Whonix in Hyper-V I am following duck’s guide found on github.<br>
+After getting to grub I get:<br>
+_</p>
+<p>on a black screen. I tried switching ttys but its very slow.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/13</link>
+        <pubDate>Fri, 12 Nov 2021 22:49:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-13</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[lolliholli]]></dc:creator>
+        <description><![CDATA[
+            <p>What alternative is available for microsoft virtual machine converter? it is not available anymore.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/12</link>
+        <pubDate>Mon, 01 Nov 2021 17:37:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-12</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[informer]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/moreevilthanyou">@moreevilthanyou</a></p>
+<p>i had the same issue, it was because dhclient was not found, can just install by copying the .deb installer (and dependencies) over</p>
+<p>here is how i did:<br>
+shut down vm, right click on whonix .vhd file, and click mount<br>
+it will show some error on mount, just press ok<br>
+windows can not browse ext partition natively, many tools available for this, i used paragon linuxfs<br>
+after install paragon linuxfs, you will see new disk partition with size 99 gb in windows explorer<br>
+download these (sorry it didn’t allow links, i rot13 ciphered them, these are links to debian official site)<br>
+uggcf://cnpxntrf.qrovna.bet/ohfgre/nzq64/vfp-qupc-pbzzba/qbjaybnq<br>
+uggcf://cnpxntrf.qrovna.bet/ohfgre/nzq64/yvovfp-rkcbeg1100/qbjaybnq<br>
+uggcf://cnpxntrf.qrovna.bet/ohfgre/nzq64/yvoqaf-rkcbeg1104/qbjaybnq<br>
+uggcf://cnpxntrf.qrovna.bet/ohfgre/nzq64/vfp-qupc-pyvrag/qbjaybnq<br>
+and put .deb files in somewhere in the linux partition<br>
+if used paragon linuxfs like me, open paragon linuxfs, choose unmount (otherwise changes do not get saved i think)<br>
+open diskmgmt.msc, find 100 gb linux vdisk, and unmount<br>
+(need to right click on the disk in the lower pane of diskmgmt.msc, on the left side, where “disk x, basic, 100.00 GB, Online” is written)<br>
+it will ask you to specify path on unmount, leave it as is and press ok<br>
+boot up vm<br>
+login and then run:<br>
+sudo apt-get install /path/to/file.deb<br>
+for each .deb file<br>
+install in the same order as i posted the download links<br>
+after each install, it will show something which goes “N: Download is performed unsandboxed as root as file…”,<br>
+just ignore that message, it installs just fine<br>
+now finally run:<br>
+sudo whonixsetup<br>
+and it should be working now</p>
+<p>hope it was helpful</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/8</link>
+        <pubDate>Wed, 03 Feb 2021 02:38:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-8</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[moreevilthanyou]]></dc:creator>
+        <description><![CDATA[
+            <p>I am unable to make the DHCP work on the whonix gateway. Both methods (dsfok OR copying the image as VHD) work for me, but for some reason I can’t make the gateway connect to the internet. I have uncommented<br>
+auto eth0<br>
+iface eth0 inet dhcp<br>
+but I never get an IP from my host machine network.The hyper-v virtual switch is set to ‘External’, even though I also tried ‘Internal’ but it did not help.</p>
+<p>Did someone had a similar issue? Or maybe you can share the virtual switch settings that must be used with this method?</p>
+<p>Any help will be appreciated, thanks!</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/7</link>
+        <pubDate>Mon, 27 Jan 2020 16:01:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-7</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[Aquinas]]></dc:creator>
+        <description><![CDATA[
+            <p>There is a slightly easier way to do this, especially since I couldn’t find dsfok anywhere anymore.</p>
+<p>Install Whonix using the default installer. When you start it, click advanced (don’t click start, because if you have hyper-v running virtual box will not function).</p>
+<p>Advanced will open the virtualbox interface, where you can click file &gt; virtual media manager from the manager. Select each whonix drive in turn and click ‘copy’, then save somewhere in VHD format.</p>
+<p>After that, uninstall whonix (also go to your users/username directory and nuke the virtualbox folders to free up the drive space).</p>
+<p>At this point, you can resume these instructions from step 10) onwards. The VHD images you saved work fine. I’ve tested this with Whonix 15 on Windows 10 1903.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/6</link>
+        <pubDate>Sat, 25 Jan 2020 05:28:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-6</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[akcryptoguy]]></dc:creator>
+        <description><![CDATA[
+            <p>Phoenyx33 I believe the problem with your default switch not getting an IP address is resolved in step 12 by directing the interface eth0 to user dhcp and receive it’s address.  You may need to restart the VM after saving that change.  Also you’ll need to be sure that in step 10 you added legacy network adapters instead of just network adapters.  I have been using Whonix 14 in Hyper-V and everything is working correctly.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/5</link>
+        <pubDate>Mon, 24 Jun 2019 17:29:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-5</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[Phoenyx33]]></dc:creator>
+        <description><![CDATA[
+            <p>I did notice that step 14 does require the whonixcheck set to “1” as well. I’ve got it setup but I have issues with the default switch not getting an ip for the outside of the gateway so it’s not talking to the outside world at the moment. Desktop and Gateway don’t have an issue with each other so that works. I’ll get it working yet and I’ll let you know when I do.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/4</link>
+        <pubDate>Sun, 23 Jun 2019 00:58:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-4</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[akcryptoguy]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="2" data-topic="6741">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/i/5f9b8f/40.png" class="avatar"> Ishcadore:</div>
+<blockquote>
+<p>‘/boot/grub/1386-pc/normal.mod’</p>
+</blockquote>
+</aside>
+<p>I’m not sure how that could have happened.  I presume we both started with the same image.  I used the image for Whonix with XFCE and have not tested it yet with the CLI version.  Did you encounter this error on the Gateway or Workstation, and did it happen the first time you booted the Hyper-V Guest or was it a subsequent reboot?  Searching Google for problem you mentioned yields a large number of how-tos and fixes for it.  This one looked promising: <a href="https://medium.com/@froositadwi/how-i-fixed-error-file-grub-i386-pc-normal-mod-not-found-b44c5ac7ff31" rel="nofollow noopener">https://medium.com/@froositadwi/how-i-fixed-error-file-grub-i386-pc-normal-mod-not-found-b44c5ac7ff31</a>. Please let me know if it works or if you encountered any troubles or errors during the conversion steps above.  Also, are you running Hyper-V on Windows 10 or another operating system?</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/3</link>
+        <pubDate>Tue, 29 Jan 2019 05:49:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-3</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[Ishcadore]]></dc:creator>
+        <description><![CDATA[
+            <p>A very comprehensive instructable for someone very new to Whonix<br>
+However, I keep getting the error:</p>
+<blockquote>
+<p>error: file ‘/boot/grub/1386-pc/normal.mod’ not found.<br>
+Entering rescue mode…<br>
+grub rescue&gt;</p>
+</blockquote>
+<p>And I do not know what is causing this, which step in this process could have lead to this?</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/2</link>
+        <pubDate>Tue, 29 Jan 2019 05:25:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-2</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+      <item>
+        <title>How to get Whonix running on Hyper-V</title>
+        <dc:creator><![CDATA[akcryptoguy]]></dc:creator>
+        <description><![CDATA[
+            <p>I really appreciated <a href="https://forums.whonix.org/t/hyper-v-and-whonix/267">Krystical’s original post </a>with instructions on how to convert Whonix images to run in Microsoft’s Hyper-V so I wanted to provide updated instructions that work with Whonix 14 in case anyone else desires such a setup. We already use Hyper-V so installing a second Hypervisor like VirtualBox was undesirable.  I have updated the original instructions so they work in 2019.</p>
+<p><strong><em>Step 1)</em></strong> Download, extract, and install everything you need: <a href="https://www.whonix.org/wiki/VirtualBox" rel="noopener nofollow ugc">Whonix images</a>, <a href="http://members.ozemail.com.au/~nulifetv/freezip/freeware/dsfok.zip" rel="noopener nofollow ugc">dsfok tools</a>, 7zip, <a href="https://notepad-plus-plus.org/" rel="noopener nofollow ugc">Notepad++</a>, <a href="https://www.microsoft.com/en-us/download/details.aspx?id=42497" rel="noopener nofollow ugc">Microsoft Virtual Machine Converter 3.0</a></p>
+<p><strong><em>Step 2)</em></strong> Open Whonix 14 images (<code>Whonix-Gateway-XFCE-14.0.0.9.9.ova</code> and <code>Whonix-Workstation-XFCE-14.0.0.9.9.ova</code>) using 7zip and extract the <code>.vmdk</code> files somewhere like c:\temp\</p>
+<p><em><strong>Step 3)</strong></em> Extract <code>dsfok tools</code> to some location like c:\temp\</p>
+<p><em><strong>Step 4)</strong></em> Using PowerShell or CMD prompt, enter a command like: <code>c:\temp\dsfo.exe "c:\temp\Whonix-Gateway-XFCE-14.0.0.9.9-disk001.vmdk" 512 1024 descriptor.txt</code> to extract the descriptor files from the VMDK file</p>
+<p><em><strong>Step 5)</strong></em> Use Notepad++ or similar to edit <code>descriptor.txt</code>, and comment out (Put # in front of) all lines starting with “ddb.uuid” and “ddb.comment” and save the file.</p>
+<p><em><strong>Step 6)</strong></em> Use a command like: <code>c:\temp\dsfi.exe "c:\temp\Whonix-Gateway-XFCE-14.0.0.9.9-disk001.vmdk" 512 1024 descriptor.txt</code> to inject the descriptor back into the VMDK file</p>
+<p><em><strong>Step 7)</strong></em> Repeat steps 4-6 using Whonix-Workstation-XFCE-14.0.0.9.9-disk001.vmdk so that <strong>you have two VMDK files with modified descriptors</strong></p>
+<p><em><strong>Step 8)</strong></em> Install Microsoft’s VM Converter 3.0 (or newer) which you downloaded in step 1</p>
+<p><em><strong>Step 9)</strong></em> Open PowerShell (as administrator) and enter commands like this if you used c:\temp<br>
+<em><strong>1) Import converter module to powershell:</strong></em> <code>Import-Module "C:\Program Files\Microsoft Virtual Machine Converter\MvmcCmdlet.psd1"</code><br>
+<em><strong>2) Convert the Gateway VMDK file to VHDX:</strong></em> <code>ConvertTo-MvmcVirtualHardDisk -SourceLiteralPath "c:\temp\Whonix-Gateway-XFCE-14.0.0.9.9-disk001.vmdk" -DestinationLiteralPath "c:\temp\Whonix-Gateway-XFCE-14.0.0.9.9.vhdx" -VhdType DynamicHardDisk -VhdFormat Vhdx</code><br>
+<em><strong>3) Convert the Workstation VMDK file to VHDX:</strong></em> <code>ConvertTo-MvmcVirtualHardDisk -SourceLiteralPath "c:\temp\Whonix-Workstation -XFCE-14.0.0.9.9-disk001.vmdk" -DestinationLiteralPath "c:\temp\Whonix-Workstation -XFCE-14.0.0.9.9.vhdx" -VhdType DynamicHardDisk -VhdFormat Vhdx</code></p>
+<p><em><strong>Step 10)</strong></em> In Microsoft’s Hyper-V Manager, create a Generation 1 (Not a GEN 2 EFI) Hyper-V virtual machine to use as the Whonix Gateway and use the option for selecting an existing hard drive. Then select the newly created VHDX file. Add 2 legacy network adapters to the virtual machine; the first legacy network adapter should be connected to a virtual switch which has external connectivity to your LAN. The second legacy network adapter should be connected to a private virtual switch; this switch will let your Whonix Workstation connect to the internet through your Gateway’s private network connection.</p>
+<p><em><strong>Step 11)</strong></em> The first time you boot the Whonix Gateway, you will need to “cancel” out of the <strong>Anon Connection Wizard</strong> and configure your network settings through the console. We need to change your ‘eth0’ to connect to your network via DHCP rather than use VirtualBox’s network settings (which are typically on a different subnet).</p>
+<p><em><strong>Step 12)</strong></em> In console, enter the command <code>sudo nano /etc/network/interfaces.d/30_non-qubes-whonix</code> to open the configuration file and uncomment the two lines which contain <code>auto eth0</code> and <code>iface eth0 inet dhcp</code> by removing the # in front of them. Then exit and save the changes you made.<br>
+</p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/8/849965497329b1d3d69b69fcf1ef2ae56fc2a0cd.png" data-download-href="//forums.whonix.org/uploads/default/849965497329b1d3d69b69fcf1ef2ae56fc2a0cd" title="eth0"><img src="//forums.whonix.org/uploads/default/original/2X/8/849965497329b1d3d69b69fcf1ef2ae56fc2a0cd.png" alt="eth0" data-base62-sha1="iV1FPO6u3djP1npBt8kIuofKAhv" width="690" height="221" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/8/849965497329b1d3d69b69fcf1ef2ae56fc2a0cd_2_10x10.png"></a></div><p></p>
+<p><em><strong>Step 13)</strong></em> We still need to make one more configuration change to avoid getting a big ugly warning about Hyper-V not being a supported virtualizer. Open the configuration file for editing with the following command <code>sudo nano /etc/whonix.d/30_whonixcheck_default.conf</code> and then change the 0 to a 1 in the line to stop on the detection of an unsupported virtualizer. Reboot the virtual machine after you have saved these changes.</p>
+<p><em><strong>Step 14)</strong></em> In Microsoft’s Hyper-V Manager, create a Generation 1 (Not a GEN 2 EFI) Hyper-V virtual machine to use as the Whonix Workstation and use the option for selecting an existing hard drive. Then select the newly created Workstation VHDX file. Add 1 legacy network adapters to the virtual machine; and connect it to the same private virtual switch as you connected to the 2nd interface of the Gateway virtual machine. The Whonix workstation should not need any additional configuration and should work correctly when you start it.</p>
+<p><em><strong>Step 15)</strong></em> If you have followed these steps correctly and you didn’t encounter any problems, you should now be able to enjoy Whonix 14 on Hyper-V!</p>
+<hr>
+<p>Edit by Patrick:<br>
+User <a class="mention" href="http://forums.whonix.org/u/akcryptoguy">@akcryptoguy</a> and only user <a class="mention" href="http://forums.whonix.org/u/akcryptoguy">@akcryptoguy</a> is responsible for this. This is a community project. <a href="https://www.whonix.org/wiki/Unsupported" rel="noopener nofollow ugc">Unsupported</a> by Whonix developers. Whonix developers are delighted that Whonix can be modified and useful for others since this is in the <a href="https://www.whonix.org/wiki/Why_Whonix_is_Free_Software" rel="noopener nofollow ugc">spirit of Whonix</a>.</p>
+<p>At time of writing, <code>Hyper-V</code> is non-freedom software. Therefore the following Whonix policy is related:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Policy_On_Nonfreedom_Software" target="_blank" rel="noopener nofollow ugc" title="11:46AM - 17 March 2021">Whonix – 17 Mar 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/8/8e/Shield123123213.png" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://www.whonix.org/wiki/Policy_On_Nonfreedom_Software" target="_blank" rel="noopener nofollow ugc">Whonix ™ Policy On Non-Freedom Software</a></h3>
+
+  <p>Permitted / Prohibited Discussions, Project Philosophy on Non-Freedom Software</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Changed title from <code>How to get Whonix 14 running on Hyper-V</code> to <code>How to get Whonix running on Hyper-V</code>.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741/1</link>
+        <pubDate>Sat, 26 Jan 2019 00:07:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6741-1</guid>
+        <source url="http://forums.whonix.org/t/how-to-get-whonix-running-on-hyper-v/6741.rss">How to get Whonix running on Hyper-V</source>
+      </item>
+  </channel>
+</rss>

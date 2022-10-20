@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>very long systemd journal log breaks systemcheck</title>
+    <link>http://forums.whonix.org/t/very-long-systemd-journal-log-breaks-systemcheck/13732</link>
+    <description>
+`sudo systemcheck --gui --cli --verbose --debug`
+
+```
+INFO: Check sudo Result: OK 
+INFO: Whonix build version: 3:8.1-1 
+INFO: whonix-workstation-packages-dependencies-cli: 22.5-1 
+INFO: derivative_major_release_version /etc/whonix_version: 16 
+INFO: Whonix Support Status of this Major Version: Ok. 
+INFO: Hardened Malloc: Hardened Malloc Light version enabled. 
+INFO: Spectre Meltdown Test: skipping since spectre_meltdown_check=false, ok. 
+INFO: Package Manager Consistency Check Result: Output of command dpkg --audit was empty, ok. 
+ERROR: ############################################################################### 
+## systemcheck script bug. 
+## No panic. Nothing is broken. Just some rare condition has been hit. 
+## Try again later. There is likely a solution for this problem. 
+## Please see Whonix News, Whonix Blog and Whonix User Help Forum. 
+## Please report this bug! 
+## 
+## who_ami: systemcheck 
+## identifier: 
+## IDENTIFIER: systemcheck 
+## exit_code: 126 
+## error_cause: error_handler signal ERR detected with BASH_COMMAND: $output_tool --identifier &quot;$IDENTIFIER&quot; --whoami &quot;$who_ami&quot; &quot;$@&quot; 
+## 
+## Experts only: 
+## bash -x systemcheck --verbose 
+## for verbose output. Clean the output and report to Whonix developers. 
+#########################################################################
+```
+Got same error message in whonix-ws</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 01 Jun 2022 20:33:47 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/very-long-systemd-journal-log-breaks-systemcheck/13732.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>very long systemd journal log breaks systemcheck</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This was happening because the systemd journal log was very long and containing a large amount of unrelated error. systemcheck attempted to show these errors in its results window, which failed because msgcollector (the GUI/CLI toolkit library that systemcheck is using) didn’t check ARG_MAX. Hence, it was automatically rejected by the shell. This has been fixed in git:</p>
+<aside class="onebox githubcommit" data-onebox-src="https://github.com/Kicksecure/msgcollector/commit/418b551e7eaa9f7862baf6a8e809cf326d6d233e">
+  <header class="source">
+
+      <a href="https://github.com/Kicksecure/msgcollector/commit/418b551e7eaa9f7862baf6a8e809cf326d6d233e" target="_blank" rel="noopener">github.com/Kicksecure/msgcollector</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Kicksecure/msgcollector/commit/418b551e7eaa9f7862baf6a8e809cf326d6d233e" target="_blank" rel="noopener">better error message if ARG_MAX is exceeded</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2022-06-01" data-time="19:54:19" data-timezone="UTC">07:54PM - 01 Jun 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+
+      <div class="lines" title="changed 1 files with 36 additions and 2 deletions">
+        <a href="https://github.com/Kicksecure/msgcollector/commit/418b551e7eaa9f7862baf6a8e809cf326d6d233e" target="_blank" rel="noopener">
+          <span class="added">+36</span>
+          <span class="removed">-2</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Also implemented a new check in systemcheck (only to be run manually):</p>
+<aside class="onebox githubcommit" data-onebox-src="https://github.com/Kicksecure/systemcheck/commit/ccefa210292e14e20a79678d9e6619c5f843eb6a">
+  <header class="source">
+
+      <a href="https://github.com/Kicksecure/systemcheck/commit/ccefa210292e14e20a79678d9e6619c5f843eb6a" target="_blank" rel="noopener">github.com/Kicksecure/systemcheck</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Kicksecure/systemcheck/commit/ccefa210292e14e20a79678d9e6619c5f843eb6a" target="_blank" rel="noopener">add new test check_arg_max</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2022-06-01" data-time="19:36:03" data-timezone="UTC">07:36PM - 01 Jun 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+
+      <div class="lines" title="changed 1 files with 13 additions and 0 deletions">
+        <a href="https://github.com/Kicksecure/systemcheck/commit/ccefa210292e14e20a79678d9e6619c5f843eb6a" target="_blank" rel="noopener">
+          <span class="added">+13</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<pre><code>systemcheck --function check_arg_max</code></pre>
+          <p><a href="http://forums.whonix.org/t/very-long-systemd-journal-log-breaks-systemcheck/13732/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/very-long-systemd-journal-log-breaks-systemcheck/13732/3</link>
+        <pubDate>Wed, 01 Jun 2022 20:33:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13732-3</guid>
+        <source url="http://forums.whonix.org/t/very-long-systemd-journal-log-breaks-systemcheck/13732.rss">very long systemd journal log breaks systemcheck</source>
+      </item>
+      <item>
+        <title>very long systemd journal log breaks systemcheck</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="TNT_BOM_BOM" data-post="1" data-topic="13732">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tnt_bom_bom/40/2148_2.png" class="avatar"> TNT_BOM_BOM:</div>
+<blockquote>
+<p><code>bash -x systemcheck --verbose</code></p>
+</blockquote>
+</aside>
+<p>Cant paste it here nor on online bins, But i think this should be reproducible on your end. cc <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a></p>
+<p>Here i have uploaded the output as a text file:</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://gofile.io/d/cCN2aE">
+  <header class="source">
+      <img src="https://gofile.io/dist/img/favicon16.png" class="site-icon" width="16" height="16">
+
+      <a href="https://gofile.io/d/cCN2aE" target="_blank" rel="noopener nofollow ugc">gofile.io</a>
+  </header>
+
+  <article class="onebox-body">
+    
+
+<h3><a href="https://gofile.io/d/cCN2aE" target="_blank" rel="noopener nofollow ugc">Gofile - Free file sharing and storage platform</a></h3>
+
+  <p>Gofile is a free file sharing and storage platform.  You can store and share your content of any type without any limit.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/very-long-systemd-journal-log-breaks-systemcheck/13732/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/very-long-systemd-journal-log-breaks-systemcheck/13732/2</link>
+        <pubDate>Wed, 01 Jun 2022 00:53:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13732-2</guid>
+        <source url="http://forums.whonix.org/t/very-long-systemd-journal-log-breaks-systemcheck/13732.rss">very long systemd journal log breaks systemcheck</source>
+      </item>
+      <item>
+        <title>very long systemd journal log breaks systemcheck</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p><code>sudo systemcheck --gui --cli --verbose --debug</code></p>
+<pre><code class="lang-auto">INFO: Check sudo Result: OK 
+INFO: Whonix build version: 3:8.1-1 
+INFO: whonix-workstation-packages-dependencies-cli: 22.5-1 
+INFO: derivative_major_release_version /etc/whonix_version: 16 
+INFO: Whonix Support Status of this Major Version: Ok. 
+INFO: Hardened Malloc: Hardened Malloc Light version enabled. 
+INFO: Spectre Meltdown Test: skipping since spectre_meltdown_check=false, ok. 
+INFO: Package Manager Consistency Check Result: Output of command dpkg --audit was empty, ok. 
+ERROR: ############################################################################### 
+## systemcheck script bug. 
+## No panic. Nothing is broken. Just some rare condition has been hit. 
+## Try again later. There is likely a solution for this problem. 
+## Please see Whonix News, Whonix Blog and Whonix User Help Forum. 
+## Please report this bug! 
+## 
+## who_ami: systemcheck 
+## identifier: 
+## IDENTIFIER: systemcheck 
+## exit_code: 126 
+## error_cause: error_handler signal ERR detected with BASH_COMMAND: $output_tool --identifier "$IDENTIFIER" --whoami "$who_ami" "$@" 
+## 
+## Experts only: 
+## bash -x systemcheck --verbose 
+## for verbose output. Clean the output and report to Whonix developers. 
+#########################################################################
+</code></pre>
+<p>Got same error message in whonix-ws</p>
+          <p><a href="http://forums.whonix.org/t/very-long-systemd-journal-log-breaks-systemcheck/13732/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/very-long-systemd-journal-log-breaks-systemcheck/13732/1</link>
+        <pubDate>Tue, 31 May 2022 18:18:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13732-1</guid>
+        <source url="http://forums.whonix.org/t/very-long-systemd-journal-log-breaks-systemcheck/13732.rss">very long systemd journal log breaks systemcheck</source>
+      </item>
+  </channel>
+</rss>

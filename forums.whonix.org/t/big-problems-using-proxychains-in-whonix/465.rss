@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Big Problems using Proxychains in Whonix!</title>
+    <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465</link>
+    <description>Ok, I&#39;ve been trying to get it work for about a week now and I&#39;ve been incredibly frustrated, probably close to beating my laptop against the wall. I&#39;ve tried seemingly everything so I&#39;m sure it&#39;s got to be something really small and obvious. As it stands I&#39;m willing to send someone a couple bucks worth of BTC for fixing my problem for me since it&#39;s been driving me absolutely nuts. I appreciate all helpful comments, here goes:
+
+I get proxychains via &quot;sudo apt-get install proxychains&quot;
+
+open /etc/proxychains.config with either nano or kdeseudo
+
+comment out dynamic
+
+Here&#39;s where the problem&#39;s got to be:
+
+[ProxyList]
+# add proxy here ...
+# meanwile
+# defaults set to &quot;tor&quot;
+socks4 127.0.0.1 9050
+
+I tried commenting out &quot;socks4 127.0.0.1&quot;
+
+tried erasing &quot;socks5 127.0.0.1&quot;
+
+tried added &quot;socks5 127.0.0.1&quot;
+
+tried adding proxies (socks-proxy.net only socks5) directly below socks4 127.0.0.1 9050
+
+tried adding after commenting out socks4
+
+tried changing the custom settings in torbrowser to &quot;9050&quot;
+
+after everything I change I&#39;ll just hit control O, enter, control X, open up a new konsole and type &quot;proxychains torbrowser&quot; and EVERY SINGLE TIME I&#39;ll get timedout, no matter how long I set the timeouts for. Tried strict chain, tried seemingly everything
+
+All help is appreciated and like I said, if it works for me I&#39;ll send you some BTC</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 09 Sep 2014 16:50:57 +0000</lastBuildDate>
+    <category>General Tor and Anonymity Talk</category>
+    <atom:link href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Everything need to be done in Whonix-Workstation indeed.</p>
+<p>[quote=“nestea, post:13, topic:465”]# proxychains.conf  VER<br>
+3.1[/quote]<br>
+This is a mistake in config.<br>
+“3.1” has no # in front. That will probably break proxychains from working.</p>
+<blockquote>dynamic_chain</blockquote>
+This is probably a mistake. If the proxy is unreachable - which might be very well be the case - you haven't debugged this - proxychains would simply skip it.
+<p>I advice to comment it out and to use:</p>
+<blockquote>strict_chain</blockquote>
+<blockquote>Any help?</blockquote>
+Debug this issue as advised in earlier posts.
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/14</link>
+        <pubDate>Tue, 09 Sep 2014 16:50:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-14</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[nestea]]></dc:creator>
+        <description><![CDATA[
+            <p>sorry, I bungled my last post spectacularly by trying to post it from android. There was no problem with typing “socks5” and I think having torbrowser shut off was one problem. I think there are some others though. For one, is the stream isolation supposed to be in gateway? If so that’s something I’ve been doing wrong, I’ve been doing everything in workstation so far. Basically:</p>
+<h1>proxychains.conf  VER</h1>
+<p>3.1</p>
+<h1></h1>
+<h1>HTTP, SOCKS4, SOCKS5 tunneling proxifier with DNS.</h1>
+<h1></h1>
+<h1>The option below identifies how the ProxyList is treated.</h1>
+<h1>only one option should be uncommented at time,</h1>
+<h1>otherwise the last appearing option will be accepted</h1>
+<h1></h1>
+<p>dynamic_chain</p>
+<h1></h1>
+<p><span class="hashtag">#Dynamic</span> - Each connection will be done via chained proxies</p>
+<h1>all proxies chained in the order as they appear in the list</h1>
+<h1>at least one proxy must be online to play in chain</h1>
+<h1>(dead proxies are skipped)</h1>
+<h1>otherwise EINTR is returned to the app</h1>
+<h1></h1>
+<p><span class="hashtag">#strict_chain</span></p>
+<h1></h1>
+<h1>Strict - Each connection will be done via chained proxies</h1>
+<h1>all proxies chained in the order as they appear in the list</h1>
+<h1>all proxies must be online to play in chain</h1>
+<h1>otherwise EINTR is returned to the app</h1>
+<h1></h1>
+<p><span class="hashtag">#random_chain</span></p>
+<h1></h1>
+<h1>Random - Each connection will be done via random proxy</h1>
+<h1>(or proxy chain, see  chain_len) from the list.</h1>
+<h1>this option is good to test your IDS <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:">
+</h1>
+<h1>Make sense only if random_chain</h1>
+<p><span class="hashtag">#chain_len</span> = 2</p>
+<h1>Quiet mode (no output from library)</h1>
+<p><span class="hashtag">#quiet_mode</span></p>
+<h1>Proxy DNS requests - no leak for DNS data</h1>
+<p>proxy_dns</p>
+<h1>Some timeouts in milliseconds</h1>
+<p>tcp_read_time_out 55000<br>
+tcp_connect_time_out 80000</p>
+<h1>ProxyList format</h1>
+<h1>type  host  port [user pass]</h1>
+<h1>(values separated by ‘tab’ or ‘blank’)</h1>
+<h1></h1>
+<h1></h1>
+<h1>Examples:</h1>
+<h1></h1>
+<h1>socks5	192.168.67.78	1080	lamer	secret</h1>
+<h1>http	192.168.89.3	8080	justu	hidden</h1>
+<h1>socks4	192.168.1.49	1080</h1>
+<h1>http	192.168.39.93	8080</h1>
+<h1></h1>
+<h1></h1>
+<h1>proxy types: http, socks4, socks5</h1>
+<h1>( auth types supported: “basic”-http  “user/pass”-socks )</h1>
+<h1></h1>
+<p>[ProxyList]</p>
+<h1>add proxy here …</h1>
+<h1>meanwile</h1>
+<h1>defaults set to “tor”</h1>
+<p><span class="hashtag">#socks4</span> 127.0.0.1 9050<br>
+socks5 192.168.0.10 9152<br>
+socks5 123.45.678.90 1111 (for example)</p>
+<p>Input all this, save, close kwrite. Close Browser after making sure transparent proxying is on.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>then</p>
+<pre><code class="lang-auto"></code></pre>
+<p>still getting tor exit nodes! Log is saying “ok” though</p>
+<p>I’ve tried with the stream (socks5 192.168.0.10 9152) taken out as well and no difference. Any help? You must be getting frustrated but I appreciate the help. I’ll be sure to have my donation reflect this</p>
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/13</link>
+        <pubDate>Tue, 09 Sep 2014 16:26:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-13</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Try with /usr/bin/wget.whonix-orig first, otherwise you won’t even know if it’s your proxy(ies) that aren’t working or</p>
+<blockquote>socks5 socks5 192.168.0.10 9152</blockquote>
+Using two times socks5 (socks5 socks5) is a mistake.
+<blockquote>socks5 xxx.xx.xxx.xx          xxxxx
+socks xxx.xx.xxx.xx          xxxx</blockquote>
+Don't try with so many for start. It could very well be the case that one proxy is offline. Then it wouldn't be a configuration fault, but wouldn't work nevertheless.
+<blockquote>socks xxx.xx.xxx.xx          xxxx</blockquote>
+This probably is another mistake. Simply using "socks" but not "socks4" or "socks5" probably won't work.
+<blockquote>I know it's supposed to show a warning (was getting it before) saying I was exiting from a non-tor node (as it's supposed to) but now I'm not getting anything different.</blockquote>
+Used default homepage about:tor by chance? The about:tor page probably won't know about.
+<p><a href="https://check.torproject.org/">https://check.torproject.org/</a> should be able to figure out.</p>
+<blockquote>just opens up a new browser, doesn't seem to reset connection.</blockquote>
+Not sure what you mean by "doesn't seem to reset connection" - Maybe it's this: you must make sure, that Tor Browser isn't running before trying to run Tor Browser using proxychains.
+<pre><code class="lang-auto"></code></pre>
+<p>This is because proxychains won’t be able to proxyfy already running applications. It can only bend applications it will start itself.</p>
+<blockquote>is there any way you could make it step by step and I try all over again?</blockquote>
+Instructions
+https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#proxychains
+are step by step and I tested them as per my last post.
+If they're not working for you, they need to be debugged by you as per my last post.
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/12</link>
+        <pubDate>Mon, 08 Sep 2014 22:58:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-12</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[nestea]]></dc:creator>
+        <description><![CDATA[
+            <p>I haven’t tried with wget yet but so far just the standard</p>
+<p>[ProxyList]</p>
+<h2>add proxy here …</h2>
+<h2>meanwile</h2>
+<h2>defaults set to “tor”</h2>
+<p><span class="hashtag">#socks4</span> 127.0.0.1 9050<br>
+socks5 socks5 192.168.0.10 9152<br>
+socks5 xxx.xx.xxx.xx          xxxxx<br>
+socks xxx.xx.xxx.xx          xxxx</p>
+<p>Isn’t working.</p>
+<p>I know it’s supposed to show a warning (was getting it before) saying I was exiting from a non-tor node (as it’s supposed to) but now I’m not getting anything different.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>just opens up a new browser, doesn’t seem to reset connection. Tried running a whole new browser to no avail. What could I be doing wrong? It seems like I tried everything, is there any way you could make it step by step and I try all over again? Thanks again</p>
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/11</link>
+        <pubDate>Mon, 08 Sep 2014 22:37:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-11</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve set to /etc/proxychains.conf to non-existing proxy for testing purposes.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>As expected doesn’t work as opposed to.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>So I guess, once you have a working proxy, and it works with wget, it should also work with Tor Browser.</p>
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/10</link>
+        <pubDate>Sun, 07 Sep 2014 03:46:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-10</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve got Tor Browser working through proxychains.<br>
+Did set Tor Button to transparent proxyfication. Which means “no proxy”, but that is fine, since you are going to use proxychains to enforce proxy settings. So setting up a proxy in two places, as in Tor Button as well as in proxychains would fail.<br>
+Restarted Tor Browser.</p>
+<p>My /etc/proxychains.conf is a bit lame, though.</p>
+<pre><code class="lang-auto">[ProxyList]
+# add proxy here ...
+# meanwile
+# defaults set to "tor"
+socks4  127.0.0.1 9050</code></pre>
+<p>127.0.0.1 9050 is redirected to Whonix-Gateway by rinetd [/etc/rinetd.conf], so I am still just using Tor. Because I do not know any proxies that I could use legally. I guess there are some, but it takes some time finding them. (Perhaps JonDo could help out.)</p>
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/9</link>
+        <pubDate>Sun, 07 Sep 2014 03:42:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-9</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Later when you got /usr/bin/wget.whonix-orig working… Don’t wonder if Tor Browser will say.</p>
+<blockquote>Something Went Wrong!
+<p>Tor is not working in this browser.</p>
+</blockquote>
+<p>This means, that Tor Button is not able to access Tor’s ControlPort. And I am not surprised about that. proxychains forces the browser through a chain of proxies. Naturally, 127.0.0.1 9150 (Tor Button default Tor ControlPort) can no longer be accessed. Accessing <a href="https://check.torproject.org">https://check.torproject.org</a> however should work (if the other issues are sorted out).</p>
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/8</link>
+        <pubDate>Sun, 07 Sep 2014 03:37:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-8</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>/usr/bin/wget.whonix-orig is best for testing. Tor Browser comes with its own issues.</p>
+<p>Comment updated, because The Tor Project chagned the paths.</p>
+<pre><code class="lang-auto"></code></pre>
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/7</link>
+        <pubDate>Sun, 07 Sep 2014 03:34:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-7</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I am also on IRC at the moment.</p>
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/6</link>
+        <pubDate>Sun, 07 Sep 2014 03:30:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-6</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[nestea]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:4, topic:465”]You overlooked some points in documentation.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>tried changing the custom settings in torbrowser to “9050”</p>
+</blockquote>
+</aside>
+<p>Mistake. -&gt; Do not forget to Remove Proxy Settings from Tor Browser:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Tor_Browser#Change.2FRemove_Proxy_Settings" target="_blank" rel="nofollow noopener" title="05:27PM - 03 May 2020">Whonix – 3 May 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:666/500;"><img src="https://www.whonix.org/w/images/1/19/Torbrowser.png" class="thumbnail" width="666" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Tor_Browser#Change.2FRemove_Proxy_Settings" target="_blank" rel="nofollow noopener">Tor Browser Basics</a></h3>
+
+<p>Using Tor Browser in Whonix ™. Anonymity vs Pseudonymity, HTTPS Everywhere, Torbutton, Protection against dangerous JavaScript, NoScript, Tips, Update Tor Browser, Browser Plugins, Change Language</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group">
+<blockquote>
+<p>[ProxyList]</p>
+<h1>add proxy here …</h1>
+<h1>meanwile</h1>
+<h1>defaults set to “tor”</h1>
+<p>socks4 127.0.0.1 9050</p>
+<p>I tried commenting out “socks4 127.0.0.1”</p>
+<p>tried erasing “socks5 127.0.0.1”</p>
+<p>tried added “socks5 127.0.0.1”</p>
+<p>tried adding proxies (<a href="http://socks-proxy.net" rel="nofollow noopener">socks-proxy.net</a> only socks5) directly below socks4 127.0.0.1 9050</p>
+<p>tried adding after commenting out socks4</p>
+</blockquote>
+</aside>
+<p>Documentation advises otherwise.</p>
+<p>The first test it supposed to do is this:</p>
+<p>Go to the bottom of the settings file. Comment out “socks4 127.0.0.1 9050” and add for example “socks5 192.168.0.10 9152” (for Tor stream isolation) or “socks5 ip port” with an IP and port of your choice to set the proxy settings.</p>
+<p>[ProxyList]</p>
+<h2>add proxy here …</h2>
+<h2>meanwhile</h2>
+<h2>defaults set to “tor”</h2>
+<p><span class="hashtag">#socks4</span> 127.0.0.1 9050<br>
+socks5 192.168.0.10 9152</p>
+<h1>socks5 x.x.x.x xxxx</h1>
+<p>When that worked, you can replace that IP with your actual proxy. You’re probably better off using IP rather than some.host.name.</p>
+<aside class="quote no-group">
+<blockquote>
+<p>open up a new konsole and type “proxychains torbrowser”</p>
+</blockquote>
+</aside>
+<p>Mistake. -&gt; Documentation suggests.</p>
+<pre><code class="lang-auto">proxychains ~/tor-browser_en-US/App/Firefox/firefox --profile ~/tor-browser_en-US/Data/profile</code></pre>
+<p>You somehow missed the <a href="https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#proxychains" rel="nofollow noopener">https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#proxychains</a> chapter which also contains advice to test non-Tor Browser applications (wget.whonix-orig) with proxychains first.</p>
+<p>There also is a chapter “required knowledge”:<br>
+<a href="https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#Required_Knowledge%5B/quote%5D" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#Required_Knowledge[/quote]</a></p>
+<p>Thanks for the help, I did mess up the browser settings but I still can’t get a proxy IP!</p>
+<p>With the stream isolation IP the chain “works” according to konsole (didn’t remove the wrapper though) and still an exit node as IP, put up a few proxies and I’m still getting tor exit nodes! Commented out stream and still getting exit nodes.</p>
+<pre><code class="lang-auto">proxychains ~/tor-browser_en-US/App/Firefox/firefox --profile ~/tor-browser_en-US/Data/profile</code></pre>
+<p>This code doesn’t work either, I’ve been testing with</p>
+<pre><code class="lang-auto">proxychains /usr/bin/wget.whonix-orig https://check.torproject.org</code></pre>
+<p>and it says |D-chain|-&lt;&gt;-192.168.0.10:9152-&lt;&gt;&lt;&gt;-xx.xxx.x.xxx:xxx-&lt;&gt;&lt;&gt;-OK</p>
+<p>but still giving me an exit node</p>
+<p>I’m gonna keep playing around but it’s getting kinda frustrating. I’ll be sure to make a good size donation if this works out, thanks</p>
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/5</link>
+        <pubDate>Sun, 07 Sep 2014 03:01:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-5</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>You overlooked some points in documentation.</p>
+<blockquote>tried changing the custom settings in torbrowser to "9050"</blockquote>
+Mistake. -&gt; Do not forget to Remove Proxy Settings from Tor Browser:
+https://www.whonix.org/wiki/Tor_Browser#Change.2FRemove_Proxy_Settings
+<blockquote>[ProxyList]
+# add proxy here ...
+# meanwile
+# defaults set to "tor"
+socks4 127.0.0.1 9050
+<p>I tried commenting out “socks4 127.0.0.1”</p>
+<p>tried erasing “socks5 127.0.0.1”</p>
+<p>tried added “socks5 127.0.0.1”</p>
+<p>tried adding proxies (<a href="http://socks-proxy.net">socks-proxy.net</a> only socks5) directly below socks4 127.0.0.1 9050</p>
+<p>tried adding after commenting out socks4</p>
+</blockquote><br>
+Documentation advises otherwise.
+<p>The first test it supposed to do is this:</p>
+<p>Go to the bottom of the settings file. Comment out “socks4 127.0.0.1 9050” and add for example “socks5 192.168.0.10 9152” (for Tor stream isolation) or “socks5 ip port” with an IP and port of your choice to set the proxy settings.</p>
+<p>[ProxyList]</p>
+<h2>add proxy here …</h2>
+<h2>meanwhile</h2>
+<h2>defaults set to “tor”</h2>
+<p><span class="hashtag">#socks4</span> 127.0.0.1 9050<br>
+socks5 192.168.0.10 9152</p>
+<h1>socks5 x.x.x.x xxxx</h1>
+<p>When that worked, you can replace that IP with your actual proxy. You’re probably better off using IP rather than some.host.name.</p>
+<blockquote>open up a new konsole and type "proxychains torbrowser"</blockquote>
+Mistake. -&gt; Documentation suggests.
+<pre><code class="lang-auto">proxychains ~/tor-browser_en-US/App/Firefox/firefox --profile ~/tor-browser_en-US/Data/profile</code></pre>
+<p>You somehow missed the <a href="https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#proxychains">https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#proxychains</a> chapter which also contains advice to test non-Tor Browser applications (wget.whonix-orig) with proxychains first.</p>
+<p>There also is a chapter “required knowledge”:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#Required_Knowledge" target="_blank" title="10:04AM - 08 April 2020">Whonix – 8 Apr 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/452;"><img src="https://www.whonix.org/w/images/8/86/Beyond-1087922640.jpg" class="thumbnail" width="640" height="452"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#Required_Knowledge" target="_blank">Combining Tunnels with Tor</a></h3>
+
+<p>Information on whether Tor gets more or less secure when combining Tor with tunnels such as VPN, SSH, proxies. (User → Tor → proxy/VPN/SSH → Internet) (User → proxy/VPN/SSH → Tor → Internet)</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/4</link>
+        <pubDate>Thu, 04 Sep 2014 12:50:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-4</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[nestea]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:2, topic:465”]Have you seen our documentation on the topic already? proxychains is possible and documented.<br>
+Check out:<br>
+<a href="https://www.whonix.org/wiki/Features#VPN_.2F_Tunnel_support%5B/quote%5D" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/wiki/Features#VPN_.2F_Tunnel_support[/quote]</a></p>
+<p>of course, I’m still getting timeouts for seemingly no reason. Given what I described could you suggest what the problem might be?</p>
+<p>Edit: will of course make a nice donation to the project if I get this working, thanks</p>
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/3</link>
+        <pubDate>Thu, 04 Sep 2014 06:05:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-3</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Have you seen our documentation on the topic already? proxychains is possible and documented.<br>
+Check out:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Features#VPN_.2F_Tunnel_support" target="_blank" title="03:02AM - 19 April 2020">Whonix – 19 Apr 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/426;"><img src="https://www.whonix.org/w/images/9/9c/Drip-1037807-640.jpg" class="thumbnail" width="640" height="426"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Features#VPN_.2F_Tunnel_support" target="_blank">Features and Advantages</a></h3>
+
+<p>Whonix ™ Feature List</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/2</link>
+        <pubDate>Wed, 03 Sep 2014 05:27:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-2</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+      <item>
+        <title>Big Problems using Proxychains in Whonix!</title>
+        <dc:creator><![CDATA[nestea]]></dc:creator>
+        <description><![CDATA[
+            <p>Ok, I’ve been trying to get it work for about a week now and I’ve been incredibly frustrated, probably close to beating my laptop against the wall. I’ve tried seemingly everything so I’m sure it’s got to be something really small and obvious. As it stands I’m willing to send someone a couple bucks worth of BTC for fixing my problem for me since it’s been driving me absolutely nuts. I appreciate all helpful comments, here goes:</p>
+<p>I get proxychains via “sudo apt-get install proxychains”</p>
+<p>open /etc/proxychains.config with either nano or kdeseudo</p>
+<p>comment out dynamic</p>
+<p>Here’s where the problem’s got to be:</p>
+<p>[ProxyList]</p>
+<h1>add proxy here …</h1>
+<h1>meanwile</h1>
+<h1>defaults set to “tor”</h1>
+<p>socks4 127.0.0.1 9050</p>
+<p>I tried commenting out “socks4 127.0.0.1”</p>
+<p>tried erasing “socks5 127.0.0.1”</p>
+<p>tried added “socks5 127.0.0.1”</p>
+<p>tried adding proxies (<a href="http://socks-proxy.net" rel="nofollow noopener">socks-proxy.net</a> only socks5) directly below socks4 127.0.0.1 9050</p>
+<p>tried adding after commenting out socks4</p>
+<p>tried changing the custom settings in torbrowser to “9050”</p>
+<p>after everything I change I’ll just hit control O, enter, control X, open up a new konsole and type “proxychains torbrowser” and EVERY SINGLE TIME I’ll get timedout, no matter how long I set the timeouts for. Tried strict chain, tried seemingly everything</p>
+<p>All help is appreciated and like I said, if it works for me I’ll send you some BTC</p>
+          <p><a href="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465/1</link>
+        <pubDate>Tue, 02 Sep 2014 19:39:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-465-1</guid>
+        <source url="http://forums.whonix.org/t/big-problems-using-proxychains-in-whonix/465.rss">Big Problems using Proxychains in Whonix!</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Disable qrexec between Whonix and non-Whonix VMs</title>
+    <link>http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652</link>
+    <description>I recently made a stuff up and copy pasted from anon-whonix into a debian-11 VM. It got me thinking, why the hell is Qubes RPC even allowed between Whonix and non-Whonix VMs? 
+
+I added some initial rules to prevent the Filecopy case:
+qubes.Filecopy * @tag:anon-vm @tag:anon-vm allow
+qubes.Filecopy * @tag:anyvm @tag:anon-vm deny
+qubes.Filecopy * @tag:anon-vm @anyvm deny
+qubes.Filecopy * @tag:anon-vm @tag:whonix-updatevm allow
+qubes.Filecopy * @anyvm @tag:whonix-updatevm deny
+
+I am not certain this covers every case but it is a good enough start. 
+
+I then got to thinking, I don&#39;t really want ANY Qubes RPC touching my whonix vms other than what is absolutely necessary. I guess this includes anything initiated by dom0 and the sdwdate GUI stuff. Coming up with the appropriate rules for this isn&#39;t exactly straightforward without intricate knowledge of Qubes and Whonix. Is this something that has been looked into? If not, why not?</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 01 Oct 2022 09:59:14 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Disable qrexec between Whonix and non-Whonix VMs</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="kurdubirdo" data-post="1" data-topic="15652">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/k/3d9bf3/40.png" class="avatar"> kurdubirdo:</div>
+<blockquote>
+<p>Is this something that has been looked into?</p>
+</blockquote>
+</aside>
+<p>Not that I know.</p>
+<aside class="quote no-group" data-username="kurdubirdo" data-post="1" data-topic="15652">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/k/3d9bf3/40.png" class="avatar"> kurdubirdo:</div>
+<blockquote>
+<p>If not, why not?</p>
+</blockquote>
+</aside>
+<p><a href="https://www.whonix.org/wiki/Reporting_Bugs#Community_Feedback">https://www.whonix.org/wiki/Reporting_Bugs#Community_Feedback</a></p>
+          <p><a href="http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652/4</link>
+        <pubDate>Sat, 01 Oct 2022 09:59:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15652-4</guid>
+        <source url="http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652.rss">Disable qrexec between Whonix and non-Whonix VMs</source>
+      </item>
+      <item>
+        <title>Disable qrexec between Whonix and non-Whonix VMs</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox allowlistedgeneric" data-onebox-src="https://www.qubes-os.org/news/2020/06/22/new-qrexec-policy-system/">
+  <header class="source">
+      <img src="https://www.qubes-os.org/attachment/icons/512x512/apps/qubes-logo-icon.png" class="site-icon" width="500" height="500">
+
+      <a href="https://www.qubes-os.org/news/2020/06/22/new-qrexec-policy-system/" target="_blank" rel="noopener" title="12:00AM - 22 June 2020">Qubes OS – 22 Jun 20</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/362;"><img src="https://www.qubes-os.org/attachment/icons/qubes-logo-icon-name-slogan-fb.png" class="thumbnail" width="690" height="362"></div>
+
+<h3><a href="https://www.qubes-os.org/news/2020/06/22/new-qrexec-policy-system/" target="_blank" rel="noopener">Qubes Architecture Next Steps: The New Qrexec Policy System</a></h3>
+
+  <p>This is the second article in the “What’s new in Qubes 4.1?” series. You can find the previous one (about GUI Domains) here. While the introduction of GUI domains is a big, singular feature, the changes to qrexec are more complex and varied — but...</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>
+<p>You could also deny all calls from <code>work</code> except for calls to <code>work-pub</code>:</p>
+</blockquote>
+<pre><code class="lang-auto">* * work work-pub allow
+* * work * deny
+</code></pre>
+<p>I didn’t test, but from this, you can try:</p>
+<pre><code class="lang-auto">* * @tag:anon-vm @tag:anon-vm ask
+* * @tag:anon-vm * deny
+</code></pre>
+<p>But the second rule might break some things.</p>
+<pre><code class="lang-auto">[user@dom0 /etc/qubes/policy.d]$ grep -i filecopy *
+90-default.policy:qubes.Filecopy          *           @anyvm          @anyvm      ask
+grep: include: Is a directory
+[user@dom0 /etc/qubes/policy.d]$ grep anon-vm *
+80-whonix.policy:whonix.SdwdateStatus +         @tag:anon-gateway @tag:anon-vm      allow  autostart=no notify=no
+80-whonix.policy:whonix.NewStatus     *         @tag:anon-vm      @tag:anon-gateway allow  autostart=no
+80-whonix.policy:whonix.GatewayCommand +restart @tag:anon-gateway @tag:anon-vm      allow  autostart=no
+80-whonix.policy:whonix.GatewayCommand +stop    @tag:anon-gateway @tag:anon-vm      allow  autostart=no
+80-whonix.policy:whonix.GatewayCommand +showlog @tag:anon-gateway @tag:anon-vm      allow  autostart=no
+90-default.policy:qubes.GetDate           *           @tag:anon-vm    @anyvm      deny
+</code></pre>
+<p>you need to allow those rules also before the deny rule.</p>
+          <p><a href="http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652/3</link>
+        <pubDate>Sat, 01 Oct 2022 09:58:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15652-3</guid>
+        <source url="http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652.rss">Disable qrexec between Whonix and non-Whonix VMs</source>
+      </item>
+      <item>
+        <title>Disable qrexec between Whonix and non-Whonix VMs</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="kurdubirdo" data-post="1" data-topic="15652">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/k/3d9bf3/40.png" class="avatar"> kurdubirdo:</div>
+<blockquote>
+<p>why the hell is Qubes RPC even allowed between Whonix and non-Whonix VMs?</p>
+</blockquote>
+</aside>
+<ol>
+<li>Usability</li>
+<li>Doesn’t violate proxy rules</li>
+</ol>
+<aside class="quote no-group" data-username="kurdubirdo" data-post="1" data-topic="15652">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/k/3d9bf3/40.png" class="avatar"> kurdubirdo:</div>
+<blockquote>
+<p>I then got to thinking, I don’t really want ANY Qubes RPC touching my whonix vms other than what is absolutely necessary. I guess this includes anything initiated by dom0 and the sdwdate GUI stuff. Coming up with the appropriate rules for this isn’t exactly straightforward without intricate knowledge of Qubes and Whonix</p>
+</blockquote>
+</aside>
+<p>What are you trying to accomplish? How does this violate Qubes-Whonix isolation? You still have to authorize with dom0 popup everytime, and <code>Ctrl+Shift+V</code> is made by dom0 to allow pasting from global clipboard to qube.</p>
+<aside class="quote no-group" data-username="kurdubirdo" data-post="1" data-topic="15652">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/k/3d9bf3/40.png" class="avatar"> kurdubirdo:</div>
+<blockquote>
+<p>Is this something that has been looked into?</p>
+</blockquote>
+</aside>
+<p>Only if you find other threads on this forum or qubes forum. Never saw on documentation.</p>
+<aside class="quote no-group" data-username="kurdubirdo" data-post="1" data-topic="15652">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/k/3d9bf3/40.png" class="avatar"> kurdubirdo:</div>
+<blockquote>
+<p>If not, why not?</p>
+</blockquote>
+</aside>
+<p>Because protecting against information leaks that only dom0 dialogs and commands can authorize is no protecting against anything?</p>
+<p>I am not saying you shouldn’t do it, I just want to see if the points are valid.</p>
+          <p><a href="http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652/2</link>
+        <pubDate>Sat, 01 Oct 2022 09:12:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15652-2</guid>
+        <source url="http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652.rss">Disable qrexec between Whonix and non-Whonix VMs</source>
+      </item>
+      <item>
+        <title>Disable qrexec between Whonix and non-Whonix VMs</title>
+        <dc:creator><![CDATA[kurdubirdo]]></dc:creator>
+        <description><![CDATA[
+            <p>I recently made a stuff up and copy pasted from anon-whonix into a debian-11 VM. It got me thinking, why the hell is Qubes RPC even allowed between Whonix and non-Whonix VMs?</p>
+<p>I added some initial rules to prevent the Filecopy case:<br>
+qubes.Filecopy * <span class="mention">@tag</span>:anon-vm <span class="mention">@tag</span>:anon-vm allow<br>
+qubes.Filecopy * <span class="mention">@tag</span>:anyvm <span class="mention">@tag</span>:anon-vm deny<br>
+qubes.Filecopy * <span class="mention">@tag</span>:anon-vm <span class="mention">@anyvm</span> deny<br>
+qubes.Filecopy * <span class="mention">@tag</span>:anon-vm <span class="mention">@tag</span>:whonix-updatevm allow<br>
+qubes.Filecopy * <span class="mention">@anyvm</span> <span class="mention">@tag</span>:whonix-updatevm deny</p>
+<p>I am not certain this covers every case but it is a good enough start.</p>
+<p>I then got to thinking, I don’t really want ANY Qubes RPC touching my whonix vms other than what is absolutely necessary. I guess this includes anything initiated by dom0 and the sdwdate GUI stuff. Coming up with the appropriate rules for this isn’t exactly straightforward without intricate knowledge of Qubes and Whonix. Is this something that has been looked into? If not, why not?</p>
+          <p><a href="http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652/1</link>
+        <pubDate>Sat, 01 Oct 2022 01:16:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15652-1</guid>
+        <source url="http://forums.whonix.org/t/disable-qrexec-between-whonix-and-non-whonix-vms/15652.rss">Disable qrexec between Whonix and non-Whonix VMs</source>
+      </item>
+  </channel>
+</rss>

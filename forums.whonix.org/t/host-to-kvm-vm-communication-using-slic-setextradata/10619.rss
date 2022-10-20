@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+    <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619</link>
+    <description>Could you try research this one please https://www.whonix.org/wiki/Dev/KVM#Host_to_VM_Communication?</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 20 Nov 2020 09:12:23 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>An easier alternative is to set a pre-chosen disk UUID in the xml file host-side when an action is taken. This data should be readable in the guest and doesn’t need any extra files.</p>
+<p>You can customize it so that it is a bitmasking system of sorts. Predefined actions symbolized by patterns three characters long trigger another action in the guest, for example guest daemon recognizes that 3e3 means disabling ACW notification</p>
+<p><strong>3e3</strong>fce45-4f53-4fa7-bb32-11f34168b82b</p>
+<p>However if a different string is set and read by grep, it can be interpreted as disable ACW notification AND enforce sandbox profiles:</p>
+<p><strong>3e3pme</strong>45-4f53-4fa7-bb32-11f34168b82b</p>
+<p>while</p>
+<p>gth<strong>pme</strong>45-4f53-4fa7-bb32-11f34168b82b</p>
+<p>just means enforce sandbox profiles for example.</p>
+<p>You potentially have 10/11 custom actions you can run simultaneously using the entire UUID string length.  I don’t know if there is a more efficient use of the string to increase the number of actions.</p>
+<p>EDIT:</p>
+<p>UUID is readily obtainable with <code>sudo dmidecode</code></p>
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/13</link>
+        <pubDate>Mon, 27 Apr 2020 14:03:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-13</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Documentation for this feature is almost non-existent. However from a user support thread I infer you need:</p>
+<ol>
+<li>a binary SLIC data file extracted from a baremetal machine (probably not a good idea to run a random one from the web so you’ll need to extract one from a trusted machine and include that in the build tarball).</li>
+<li>The data must be compliant to the SLIC Format or else it reverts to the default QEMU values. This means no possibility of using arbitrary data. I’m guessing you want to include a value that some daemon in the VM reads somehow and reacts based on it. In that case you can write the guest daemon to accept some proper value included in the custom table. So the host side would modify a VM to use a SLIC Table if ACW  has been run for example and the guest side would react accordingly. Convoluted but I guess this is what you’re looking for?</li>
+</ol>
+<p><a href="https://qemu.weilnetz.de/doc/qemu-doc.html" class="onebox" target="_blank">https://qemu.weilnetz.de/doc/qemu-doc.html</a></p>
+<p><a href="https://lists.nongnu.org/archive/html/qemu-devel/2009-03/msg01549.html" class="onebox" target="_blank">https://lists.nongnu.org/archive/html/qemu-devel/2009-03/msg01549.html</a></p>
+<aside class="quote no-group" data-username="Patrick" data-post="11" data-topic="10619">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Do you think (ab)using SILC is sane?</p>
+</blockquote>
+</aside>
+<p>There’s no added security attack surface. It should be alright and maybe even the guest daemon can be extended to do a variety of more actions based on it.</p>
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/12</link>
+        <pubDate>Mon, 27 Apr 2020 13:39:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-12</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>What are the SILC fields that we can (re)write?</p>
+<p>What’s the difference of</p>
+<pre><code class="lang-auto">    &lt;qemu:arg value='type=0
+</code></pre>
+<p>vs</p>
+<pre><code class="lang-auto">    &lt;qemu:arg value='type=1
+</code></pre>
+<p>type 2, 3, 4 etc.?</p>
+<p>Any more examples of which values can be set?</p>
+<p>Can this be</p>
+<pre><code class="lang-auto">    &lt;qemu:arg value='type=0,vendor=arbitrary,version=something/&gt;
+</code></pre>
+<p>or</p>
+<pre><code class="lang-auto">    &lt;qemu:arg value='type=0,arbitrary-one=arbitrary-value,arbitrary-two=something-else/&gt;
+</code></pre>
+<p>?</p>
+<p>Do you think (ab)using SILC is sane?</p>
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/11</link>
+        <pubDate>Mon, 27 Apr 2020 12:04:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-11</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="9" data-topic="10619">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Settings done on the host don’t need to be repeat inside guest VM. Examples:</p>
+</blockquote>
+</aside>
+<p>As I said though, this can’t be used for anything else other than spoofing the appearance of the BIOS for the guest by populating the SLIC Table.</p>
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/10</link>
+        <pubDate>Sun, 26 Apr 2020 13:51:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-10</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="8" data-topic="10619">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Yes, but what is the usecase we need this for though?</p>
+</blockquote>
+</aside>
+<p>Settings done on the host don’t need to be repeat inside guest VM. Examples:</p>
+<p>disclaimer=done<br>
+or<br>
+bridges=no</p>
+<p>Finishing ACW on the host saying “no bridges” could result in using the same for ACW in gateway vm.</p>
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/9</link>
+        <pubDate>Sat, 25 Apr 2020 20:11:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-9</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="7" data-topic="10619">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Still the case?</p>
+</blockquote>
+</aside>
+<p>Yes</p>
+<aside class="quote no-group" data-username="Patrick" data-post="7" data-topic="10619">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>If SLIC empty, we could use that QEMU argument (from KVM XML file) similar to <code>&lt;qemu:arg value='type=0,vendor=LENOVO,version=FBKTB4AUS,date=07/01/2015,release=1.180'/&gt;</code> to generate SILC table pretty much regression risk free?</p>
+</blockquote>
+</aside>
+<p>Yes, but what is the usecase we need this for though?</p>
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/8</link>
+        <pubDate>Sat, 25 Apr 2020 15:58:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-8</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>KVM default SILC table is still empty?<br>
+This question came up in context of <a href="https://www.whonix.org/wiki/Protocol-Leak-Protection_and_Fingerprinting-Protection">https://www.whonix.org/wiki/Protocol-Leak-Protection_and_Fingerprinting-Protection</a></p>
+<blockquote>
+<p>Hidden <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/hh673514.aspx">SLIC table</a> says for KVM <code>Yes, not present</code></p>
+</blockquote>
+<p>Still the case?</p>
+<p>If SLIC empty, we could use that QEMU argument (from KVM XML file) similar to <code>&lt;qemu:arg value='type=0,vendor=LENOVO,version=FBKTB4AUS,date=07/01/2015,release=1.180'/&gt;</code> to generate SILC table pretty much regression risk free?</p>
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/7</link>
+        <pubDate>Sat, 25 Apr 2020 13:29:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-7</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick_mobile" data-post="5" data-topic="10619">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/p/898d66/40.png" class="avatar"> Patrick_mobile:</div>
+<blockquote>
+<p>Can we pass arbitrary information there or have to change existing fields?</p>
+</blockquote>
+</aside>
+<p>In this specific case the contents of the SLIC table is being defined in the QEMU argument, instead of pointing to a .dat file like libvirt uses. It cannot bye used to pass arbitrary info to the guest.</p>
+<p>What you are looking for is something like Ansible for VM provisioning (modifying guest environments for any purpose), but IMO this is over kill for the task needed,</p>
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/6</link>
+        <pubDate>Sat, 25 Apr 2020 13:19:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-6</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[Patrick_mobile]]></dc:creator>
+        <description><![CDATA[
+            <p>Given is some information on the host such as<br>
+disclaimer=done<br>
+or<br>
+bridges=no</p>
+<p>This shall be added to host KVM XML file.</p>
+<p>Once guest is started there should be a way to read that information from inside guest VM. Host writes it before VM starts. Once. Then guest can read it using some tool.</p>
+<p>in <a href="https://serverfault.com/a/807687">https://serverfault.com/a/807687</a></p>
+<p>they use</p>
+<pre><code class="lang-auto">&lt;qemu:arg value='type=0,vendor=LENOVO,version=FBKTB4AUS,date=07/01/2015,release=1.180'/&gt;
+</code></pre>
+<p>to pass information from host to a software running inside VM which reads it. (example information passed: vendor=LENOVO) Previously nonworking software could be made to work. Related to licenses, copy protection. We don’t care about copy protection here but (ab)using the same mechanism to pass information from host to guest in a stable, simple way.</p>
+<p>What is <code>type=0</code> vs <code>type=1</code> etc?<br>
+Can we pass arbitrary information there or have to change existing fields?<br>
+How to read it inside VM?</p>
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/5</link>
+        <pubDate>Fri, 24 Apr 2020 18:00:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-5</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>acpi tables are very specific types of info relevant to guest bios info. I was confused by calling it “host to guest comms”. Can you reword it to what you are trying to accomplish?</p>
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/4</link>
+        <pubDate>Fri, 24 Apr 2020 17:08:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-4</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="2" data-topic="10619">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>The right way to execute arbitrary commands from the host on the guest is via <code>virsh console</code> .</p>
+</blockquote>
+</aside>
+<p>It’s not about running commands. Just about passing information in a simple way. Not involving networking for simplicity / robustness of implementation.<br>
+Ideally something could be set on the host in the KVM xml file which would then be readable from inside the KVM VM.</p>
+<p>acpi table: maybe also not great since it opens questions: what’s the default acpi table, how to create/expand the acpi table, how to not mess up something in the acpi table.</p>
+<p>[1] <a href="https://serverfault.com/questions/727347/solidworks-activation-license-mode-is-not-supported-in-this-virtual-environment">https://serverfault.com/questions/727347/solidworks-activation-license-mode-is-not-supported-in-this-virtual-environment</a> uses it for something else (license stuff). Couldn’t we use that to pass some arbitrary information too?</p>
+<p><code>virsh console</code> is similar complex as networking. How would the script know that a VM was started, how to automate script of <code>virsh console</code>, and how to know when it’s safe (VM boot didn’t fail/in progress) to execute. It may be possible to solve all of that but it’s more complex than [1].</p>
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/3</link>
+        <pubDate>Fri, 24 Apr 2020 15:52:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-3</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><code>&lt;qemu:commandline&gt;</code> is about using QEMU features not yet supported through Libvirt XML syntax.</p>
+<p>Libvirt/KVM supports SLIC tables described in their manual:</p>
+<blockquote>
+<p>acpi<br>
+The table element contains a fully-qualified path to the ACPI table. The type attribute contains the ACPI table type (currently only slic is supported) Since 1.3.5 (QEMU) Since 5.9.0 (Xen)</p>
+</blockquote>
+<p>The right way to execute arbitrary commands from the host on the guest is via <code>virsh console</code>. The SE Example is for using perl or python in a guest. An alternative is  a virtual network interface with sshd, but I don’t recommend it for attack surface reasons.</p>
+<aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://unix.stackexchange.com/questions/279127/execute-command-inside-guest-vm-libvirt" target="_blank">unix.stackexchange.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://unix.stackexchange.com/users/160600/arpit-joshi" target="_blank">
+    <img alt="arpit joshi" src="https://i.stack.imgur.com/lVcu7.jpg?s=128&amp;g=1" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://unix.stackexchange.com/questions/279127/execute-command-inside-guest-vm-libvirt" target="_blank">Execute command inside guest vm Libvirt</a>
+</h4>
+
+<div class="tags">
+  <strong>virtual-machine, kvm, qemu, iostat</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://unix.stackexchange.com/users/160600/arpit-joshi" target="_blank">
+    arpit joshi
+  </a>
+  on <a href="https://unix.stackexchange.com/questions/279127/execute-command-inside-guest-vm-libvirt" target="_blank">09:56AM - 26 Apr 16 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/2</link>
+        <pubDate>Fri, 24 Apr 2020 14:26:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-2</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+      <item>
+        <title>Host to KVM VM Communication using SLIC (setextradata)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Could you try research this one please <a href="https://www.whonix.org/wiki/Dev/KVM#Host_to_VM_Communication">https://www.whonix.org/wiki/Dev/KVM#Host_to_VM_Communication</a>?</p>
+          <p><a href="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619/1</link>
+        <pubDate>Thu, 23 Apr 2020 18:36:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10619-1</guid>
+        <source url="http://forums.whonix.org/t/host-to-kvm-vm-communication-using-slic-setextradata/10619.rss">Host to KVM VM Communication using SLIC (setextradata)</source>
+      </item>
+  </channel>
+</rss>

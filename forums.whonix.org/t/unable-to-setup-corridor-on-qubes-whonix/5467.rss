@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Unable to setup Corridor on Qubes-Whonix</title>
+    <link>http://forums.whonix.org/t/unable-to-setup-corridor-on-qubes-whonix/5467</link>
+    <description>Hi, fist time here : )
+
+Since I&#39;m pretty paranoid about possible DNS leaks, I would still like to use Corridor on top of Qubes-Whonix though I frequently hear Whonix is very secure when it comes to DNS leak protection.
+
+So I have been conforming the following manual,
+https://www.whonix.org/wiki/Corridor
+
+ but I get totally stuck in &quot;test corridor&quot; stage before I can go ahead and actually set it up for sys-whonix.
+I use Tor Browser Bundle for testing, but the Tor Browser can never goes further than,
+
+
+Bootstrapped 85%: Finishing handshake with first hop
+
+ followed with
+ [WARN] Proxy Client: unable to connect to X.X.X.X:AAAA (&quot;general SOCKS server failure&quot;) 
+[NOTICE] Delaying directory fetches: No running bridges
+
+(I hope to configure Corridor to connect to bridges)
+
+
+ and &quot;general socks failure&quot; warning goes continuing over and over.
+
+When I go capture and observe packets in Wireshark, all those I can see are two kinds: TCP packets sent from &quot;corridor-client&quot;VM to Tor bridge nodes, and ICMP packets sent from sys-corridor to corridor-client, saying &quot;Destination unreachable (Host administratively prohibited)&quot;.
+
+And typing 
+sudo systemctl status corridor-data corridor-init-forwarding corridor-init-logged corridor-init-snat 
+ in terminal shows the following,
+ 
+
+● corridor-data.service - corridor&#39;s relay list
+   Loaded: loaded (/lib/systemd/system/corridor-data.service; enabled)
+  Drop-In: /lib/systemd/system/corridor-data.service.d
+           └─qubes-service.conf, qubes.conf
+   Active: inactive (dead) since Tue 2018-07-10 16:32:22 JST; 3h 17min ago
+  Process: 667 ExecStart=/usr/sbin/corridor-data (code=exited, status=0/SUCCESS)
+ Main PID: 667 (code=exited, status=0/SUCCESS)
+
+Jul 10 16:32:22 sys-corridor systemd[1]: Starting corridor&#39;s relay list...
+Jul 10 16:32:22 sys-corridor systemd[1]: Started corridor&#39;s relay list.
+Jul 10 16:32:22 sys-corridor corridor-data[667]: corridor_relays updated.
+
+● corridor-init-forwarding.service - corridor&#39;s forwarding
+   Loaded: loaded (/lib/systemd/system/corridor-init-forwarding.service; enabled)
+  Drop-In: /lib/systemd/system/corridor-init-forwarding.service.d
+           └─qubes-service.conf, qubes.conf
+   Active: active (exited) since Tue 2018-07-10 16:32:19 JST; 3h 17min ago
+  Process: 418 ExecStart=/bin/rm -f /var/run/qubes-service/qubes-firewall (code=exited, status=0/SUCCESS)
+  Process: 360 ExecStart=/usr/sbin/corridor-init-forwarding (code=exited, status=0/SUCCESS)
+ Main PID: 418 (code=exited, status=0/SUCCESS)
+   CGroup: /system.slice/corridor-init-forwarding.service
+
+Jul 10 16:32:19 localhost corridor-init-forwarding[360]: net.ipv4.ip_forward = 1
+Jul 10 16:32:19 localhost corridor-init-forwarding[360]: net.ipv6.conf.all.forwarding = 0
+Jul 10 16:32:19 localhost systemd[1]: Started corridor&#39;s forwarding.
+
+● corridor-init-logged.service - corridor&#39;s logging
+   Loaded: loaded (/lib/systemd/system/corridor-init-logged.service; enabled)
+  Drop-In: /lib/systemd/system/corridor-init-logged.service.d
+           └─qubes-service.conf, qubes.conf
+   Active: activating (start) since Tue 2018-07-10 16:32:22 JST; 3h 17min ago
+ Main PID: 689 (corridor-init-l)
+   CGroup: /system.slice/corridor-init-logged.service
+           ├─ 689 /bin/sh -e /usr/sbin/corridor-init-logged
+           └─4172 sleep 1
+
+Jul 10 16:32:22 sys-corridor systemd[1]: Starting corridor&#39;s logging...
+
+● corridor-init-snat.service - corridor&#39;s source NAT
+   Loaded: loaded (/lib/systemd/system/corridor-init-snat.service; enabled)
+  Drop-In: /lib/systemd/system/corridor-init-snat.service.d
+           └─qubes-service.conf, qubes.conf
+   Active: active (exited) since Tue 2018-07-10 16:32:22 JST; 3h 17min ago
+  Process: 688 ExecStart=/usr/sbin/corridor-init-snat (code=exited, status=0/SUCCESS)
+ Main PID: 688 (code=exited, status=0/SUCCESS)
+   CGroup: /system.slice/corridor-init-snat.service
+
+Jul 10 16:32:22 sys-corridor systemd[1]: Starting corridor&#39;s source NAT...
+Jul 10 16:32:22 sys-corridor systemd[1]: Started corridor&#39;s source NAT.
+
+
+  unfortunately I have no idea about what&#39;s happening and very little luck on proceeding further...
+I use Qubes4.0 and whonix-gw3.4.2-1, I have my ethernet and AWUS036NHA attached to sys-net.
+Done installing tor and obfs4proxy on sys-corridor so ready to use  bridges...
+Also I&#39;ve tried things like changing sys-corridor&#39;s NetVM from sys-firewall to sys-net and creating sys-whonix as debian-9 based, but neither have worked effectively.
+
+Could someone help me with this?
+Any advice will be appreciated. : )  Sorry for the long post.</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 10 Jul 2018 16:10:06 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/unable-to-setup-corridor-on-qubes-whonix/5467.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Unable to setup Corridor on Qubes-Whonix</title>
+        <dc:creator><![CDATA[yoo0aNie]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi, fist time here : )</p>
+<p>Since I’m pretty paranoid about possible DNS leaks, I would still like to use Corridor on top of Qubes-Whonix though I frequently hear Whonix is very secure when it comes to DNS leak protection.</p>
+<p>So I have been conforming the following manual,<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="" height="">
+      <a href="https://www.whonix.org/wiki/Corridor" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/411;"><img src="https://www.whonix.org/w/images/9/9b/Corridor.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Corridor" target="_blank" rel="nofollow noopener">Corridor</a></h3>
+
+<p>Using corridor, a Tor traffic whitelisting gateway with Whonix</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>but I get totally stuck in “test corridor” stage before I can go ahead and actually set it up for sys-whonix.<br>
+I use Tor Browser Bundle for testing, but the Tor Browser can never goes further than,</p>
+<p>Bootstrapped 85%: Finishing handshake with first hop</p>
+<p>followed with<br>
+[WARN] Proxy Client: unable to connect to X.X.X.X:AAAA (“general SOCKS server failure”)<br>
+[NOTICE] Delaying directory fetches: No running bridges</p>
+<p>(I hope to configure Corridor to connect to bridges)</p>
+<p>and “general socks failure” warning goes continuing over and over.</p>
+<p>When I go capture and observe packets in Wireshark, all those I can see are two kinds: TCP packets sent from "corridor-client"VM to Tor bridge nodes, and ICMP packets sent from sys-corridor to corridor-client, saying “Destination unreachable (Host administratively prohibited)”.</p>
+<p>And typing<br>
+sudo systemctl status corridor-data corridor-init-forwarding corridor-init-logged corridor-init-snat<br>
+in terminal shows the following,</p>
+<p>● corridor-data.service - corridor’s relay list<br>
+Loaded: loaded (/lib/systemd/system/corridor-data.service; enabled)<br>
+Drop-In: /lib/systemd/system/corridor-data.service.d<br>
+└─qubes-service.conf, qubes.conf<br>
+Active: inactive (dead) since Tue 2018-07-10 16:32:22 JST; 3h 17min ago<br>
+Process: 667 ExecStart=/usr/sbin/corridor-data (code=exited, status=0/SUCCESS)<br>
+Main PID: 667 (code=exited, status=0/SUCCESS)</p>
+<p>Jul 10 16:32:22 sys-corridor systemd[1]: Starting corridor’s relay list…<br>
+Jul 10 16:32:22 sys-corridor systemd[1]: Started corridor’s relay list.<br>
+Jul 10 16:32:22 sys-corridor corridor-data[667]: corridor_relays updated.</p>
+<p>● corridor-init-forwarding.service - corridor’s forwarding<br>
+Loaded: loaded (/lib/systemd/system/corridor-init-forwarding.service; enabled)<br>
+Drop-In: /lib/systemd/system/corridor-init-forwarding.service.d<br>
+└─qubes-service.conf, qubes.conf<br>
+Active: active (exited) since Tue 2018-07-10 16:32:19 JST; 3h 17min ago<br>
+Process: 418 ExecStart=/bin/rm -f /var/run/qubes-service/qubes-firewall (code=exited, status=0/SUCCESS)<br>
+Process: 360 ExecStart=/usr/sbin/corridor-init-forwarding (code=exited, status=0/SUCCESS)<br>
+Main PID: 418 (code=exited, status=0/SUCCESS)<br>
+CGroup: /system.slice/corridor-init-forwarding.service</p>
+<p>Jul 10 16:32:19 localhost corridor-init-forwarding[360]: net.ipv4.ip_forward = 1<br>
+Jul 10 16:32:19 localhost corridor-init-forwarding[360]: net.ipv6.conf.all.forwarding = 0<br>
+Jul 10 16:32:19 localhost systemd[1]: Started corridor’s forwarding.</p>
+<p>● corridor-init-logged.service - corridor’s logging<br>
+Loaded: loaded (/lib/systemd/system/corridor-init-logged.service; enabled)<br>
+Drop-In: /lib/systemd/system/corridor-init-logged.service.d<br>
+└─qubes-service.conf, qubes.conf<br>
+Active: activating (start) since Tue 2018-07-10 16:32:22 JST; 3h 17min ago<br>
+Main PID: 689 (corridor-init-l)<br>
+CGroup: /system.slice/corridor-init-logged.service<br>
+├─ 689 /bin/sh -e /usr/sbin/corridor-init-logged<br>
+└─4172 sleep 1</p>
+<p>Jul 10 16:32:22 sys-corridor systemd[1]: Starting corridor’s logging…</p>
+<p>● corridor-init-snat.service - corridor’s source NAT<br>
+Loaded: loaded (/lib/systemd/system/corridor-init-snat.service; enabled)<br>
+Drop-In: /lib/systemd/system/corridor-init-snat.service.d<br>
+└─qubes-service.conf, qubes.conf<br>
+Active: active (exited) since Tue 2018-07-10 16:32:22 JST; 3h 17min ago<br>
+Process: 688 ExecStart=/usr/sbin/corridor-init-snat (code=exited, status=0/SUCCESS)<br>
+Main PID: 688 (code=exited, status=0/SUCCESS)<br>
+CGroup: /system.slice/corridor-init-snat.service</p>
+<p>Jul 10 16:32:22 sys-corridor systemd[1]: Starting corridor’s source NAT…<br>
+Jul 10 16:32:22 sys-corridor systemd[1]: Started corridor’s source NAT.</p>
+<p>unfortunately I have no idea about what’s happening and very little luck on proceeding further…<br>
+I use Qubes4.0 and whonix-gw3.4.2-1, I have my ethernet and AWUS036NHA attached to sys-net.<br>
+Done installing tor and obfs4proxy on sys-corridor so ready to use  bridges…<br>
+Also I’ve tried things like changing sys-corridor’s NetVM from sys-firewall to sys-net and creating sys-whonix as debian-9 based, but neither have worked effectively.</p>
+<p>Could someone help me with this?<br>
+Any advice will be appreciated. : )  Sorry for the long post.</p>
+          <p><a href="http://forums.whonix.org/t/unable-to-setup-corridor-on-qubes-whonix/5467/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/unable-to-setup-corridor-on-qubes-whonix/5467/1</link>
+        <pubDate>Tue, 10 Jul 2018 16:10:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5467-1</guid>
+        <source url="http://forums.whonix.org/t/unable-to-setup-corridor-on-qubes-whonix/5467.rss">Unable to setup Corridor on Qubes-Whonix</source>
+      </item>
+  </channel>
+</rss>

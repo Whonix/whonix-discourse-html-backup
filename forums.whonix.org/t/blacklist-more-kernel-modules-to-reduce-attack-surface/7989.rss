@@ -1,0 +1,783 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Blacklist more kernel modules to reduce attack surface</title>
+    <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989</link>
+    <description>Instead of creating a bunch of different threads for different kernel modules, we can just use this one.
+
+We can blacklist more kernel modules to reduce attack surface further. This can include a bunch of uncommon modules or things unlikely to be used.
+
+We can blacklist a bunch of uncommon filesystems by creating a file in /etc/modprobe.d with
+
+```
+install cramfs /bin/true
+install freevxfs /bin/true
+install jffs2 /bin/true
+install hfs /bin/true
+install hfsplus /bin/true
+install squashfs /bin/true
+install udf /bin/true
+```
+
+This blacklists cramfs, freevxfs, jffs2, hfs, hfsplus, squashfs and udf.
+
+We can blacklist the CD-ROM kernel modules with
+
+```
+install cdrom /bin/true
+install sr_mod /bin/true
+```
+
+I doubt CD-ROMs would be used within Whonix and the CD-ROM kernel driver has had some vulnerabilities before such as [CVE-2018-11506](https://nvd.nist.gov/vuln/detail/CVE-2018-11506).
+
+We can blacklist the PC speaker module with
+
+`install pcspkr /bin/true`
+
+This will mostly be helpful for discretion purpose. This can cause the computer to make various beeps or other noises.
+
+Tails also blacklists this.
+
+https://git-tails.immerda.ch/tails/plain/config/chroot_local-includes/etc/modprobe.d/no-pc-speaker.conf
+
+ https://redmine.tails.boum.org/code/issues/5724
+
+The [MEI](https://www.kernel.org/doc/html/latest/driver-api/mei/mei.html) is the interface between the Intel ME and the OS. The Intel ME is dangerous as it has access to basically everything and the MEI may have some vulnerability that allows exploitation of the ME.
+
+It can be disabled with
+
+```
+install mei /bin/true
+install mei-me /bin/true
+```
+
+Tails [also blacklists this](https://git-tails.immerda.ch/tails/plain/config/chroot_local-includes/etc/modprobe.d/no-mei.conf) although it seems to be because of a bug that [messed up shutdown](https://redmine.tails.boum.org/code/issues/6460).
+
+ https://forums.whonix.org/t/allow-loading-signed-kernel-modules-by-default-disallow-kernel-module-loading-by-default/7880 won&#39;t make this pointless as many of these can be loaded at boot, before `kernel.modules_disabled=1` is set and some users may revert that (if it is ever implemented).</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 09 Jul 2022 19:13:14 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[raja]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubpullrequest" data-onebox-src="https://github.com/Kicksecure/security-misc/pull/110">
+  <header class="source">
+
+      <a href="https://github.com/Kicksecure/security-misc/pull/110" target="_blank" rel="noopener nofollow ugc">github.com/Kicksecure/security-misc</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Kicksecure/security-misc/pull/110" target="_blank" rel="noopener nofollow ugc">Incorporated Ubuntu’s kernel module blacklists</a>
+    </h4>
+
+    <div class="branches">
+      <code>Kicksecure:master</code> ← <code>raja-grewal:master</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2022-07-09" data-time="18:59:19" data-timezone="UTC">06:59PM - 09 Jul 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/raja-grewal" target="_blank" rel="noopener nofollow ugc">
+          <img alt="raja-grewal" src="https://avatars.githubusercontent.com/u/79781370?v=4" class="onebox-avatar-inline" width="20" height="20">
+          raja-grewal
+        </a>
+      </div>
+
+      <div class="lines" title="2 commits changed 1 files with 67 additions and 11 deletions">
+        <a href="https://github.com/Kicksecure/security-misc/pull/110/files" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+67</span>
+          <span class="removed">-11</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">Building on the successfully merged PR [#109](https://github.com/Kicksecure/secu<span class="show-more-container"><a href="https://github.com/Kicksecure/security-misc/pull/110" target="_blank" rel="noopener nofollow ugc" class="show-more">…</a></span><span class="excerpt hidden">rity-misc/pull/109), goal is to add a plethora of more kernel modules to be blacklisted by default based largely on the Ubuntu defaults.
+
+https://git.launchpad.net/ubuntu/+source/kmod/tree/debian/modprobe.d?h=ubuntu/disco 
+https://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/13
+ 
+Overall, this blacklists their automatic loading but does NOT permanently disable them  in order to reduce the likelihood of compatibility issues. 
+
+I am not deeply familiar with the intricacies of each of these modules and so if others in the community are more knowledgeable, maybe we could begin permanently disabling them over time just to be safe. 
+
+Furthermore, due to intended future compatibility with ISOs, we [decided](https://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/30) not to disable CD-ROM by default. Instead what if we simply blacklist the modules so they are only loaded on demand?
+
+Also as there is a strict distinction between “disable” permanently and “blacklist” automatic loading, the comments were also correspondingly updated. Perhaps we should make is difference clearer throughout the whole project?</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Added more kernel modules to the blacklist. Currently they are all prevented from automatically loading rather than being permanently disabled. We can then potentially begin the process of disabling them once compatibility is understood.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="32" data-topic="7989" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Modules <code>cdrom</code> / <code>sr_mod</code> probably also required to boot a live / installer ISO inside a VM?</p>
+</blockquote>
+</aside>
+<p>Perhaps simply blocking them from automatically loading for the time being would be an acceptable middle-ground until this can be investigated further?</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/33">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/33</link>
+        <pubDate>Sat, 09 Jul 2022 19:13:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-33</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Modules <code>cdrom</code> / <code>sr_mod</code> probably also required to boot a live / installer ISO inside a VM?</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/32">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/32</link>
+        <pubDate>Thu, 07 Jul 2022 19:42:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-32</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I am not sure blacklisting CD-ROM is a good idea yet. Therefore commented out for now.</p>
+<p>There will be a Kicksecure ISO live / installer at some point as well as the same for Whonix-Host. As implemented now, that ISO might be broken by default when booting from DVD.</p>
+<p>poll:</p>
+<aside class="onebox twitterstatus" data-onebox-src="https://twitter.com/Whonix/status/1545129062057840641">
+  <header class="source">
+
+      <a href="https://twitter.com/Whonix/status/1545129062057840641" target="_blank" rel="noopener">twitter.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://pbs.twimg.com/profile_images/1477222846287994884/yAUo8Yvp_400x400.jpg" class="thumbnail onebox-avatar" width="400" height="400">
+<h4><a href="https://twitter.com/Whonix/status/1545129062057840641" target="_blank" rel="noopener">Whonix ™</a></h4>
+<div class="twitter-screen-name"><a href="https://twitter.com/Whonix/status/1545129062057840641" target="_blank" rel="noopener">@Whonix</a></div>
+
+<div class="tweet">
+  <span class="tweet-description">Are you still using CD/DVD discs to install/run Linux distributions?</span>
+</div>
+
+<div class="date">
+  <a href="https://twitter.com/Whonix/status/1545129062057840641" class="timestamp" target="_blank" rel="noopener">7:34 PM - 7 Jul 2022</a>
+
+
+</div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>There might be be a way to un-blacklist CD-ROM / DVD for ISO only.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/31">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/31</link>
+        <pubDate>Thu, 07 Jul 2022 19:37:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-31</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Merged, thank you!</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/30">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/30</link>
+        <pubDate>Thu, 07 Jul 2022 19:35:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-30</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[raja]]></dc:creator>
+        <description><![CDATA[
+            <p>Good point, I reverted that commit.</p>
+<p>I also agree that having a unique error for blacklisted modules would be easier to trace and have implemented your suggestion.</p>
+<p>Will test more thoroughly soon.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/29">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/29</link>
+        <pubDate>Thu, 07 Jul 2022 19:14:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-29</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>Finally, the use of /bin/false should perhaps be replaced with /bin/true.<br>
+<a href="https://github.com/Kicksecure/security-misc/pull/109/commits/f0511635a9725f79863c41a7b8d9f8a077ba8788" class="inline-onebox">Blacklist more kernel modules by raja-grewal · Pull Request #109 · Kicksecure/security-misc · GitHub</a></p>
+</blockquote>
+<p>I prefer module load failures to produce error messages that can be investigated over silent breakage that is hard to track down what is causing it.</p>
+<p>Could you please revert that specific commit?</p>
+<p>Instead of <code>/bin/false</code> perhaps the following would be even easier to investigate?</p>
+<p><code>/bin/disabled-by-security-misc</code></p>
+<pre><code class="lang-auto">#!/bin/bash
+echo "$0: ERROR: This kernel module is disabled by package security-misc by default. Most likely by configuration file /etc/modprobe.d/30_security-misc.conf | args: $@" &gt;&amp;2
+exit 1
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/28">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/28</link>
+        <pubDate>Thu, 07 Jul 2022 13:44:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-28</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubpullrequest" data-onebox-src="https://github.com/Kicksecure/security-misc/pull/109">
+  <header class="source">
+
+      <a href="https://github.com/Kicksecure/security-misc/pull/109" target="_blank" rel="noopener">github.com/Kicksecure/security-misc</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Kicksecure/security-misc/pull/109" target="_blank" rel="noopener">Blacklist more kernel modules</a>
+    </h4>
+
+    <div class="branches">
+      <code>Kicksecure:master</code> ← <code>raja-grewal:master</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2022-07-07" data-time="09:43:42" data-timezone="UTC">09:43AM - 07 Jul 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/raja-grewal" target="_blank" rel="noopener">
+          <img alt="raja-grewal" src="https://avatars.githubusercontent.com/u/79781370?v=4" class="onebox-avatar-inline" width="20" height="20">
+          raja-grewal
+        </a>
+      </div>
+
+      <div class="lines" title="3 commits changed 2 files with 63 additions and 29 deletions">
+        <a href="https://github.com/Kicksecure/security-misc/pull/109/files" target="_blank" rel="noopener">
+          <span class="added">+63</span>
+          <span class="removed">-29</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">Further increased quantity and type of modules blacklisted. The majority are unl<span class="show-more-container"><a href="https://github.com/Kicksecure/security-misc/pull/109" target="_blank" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">ikely to be used by the typical user and in cumulative represent a large attack surface reduction especially against more legacy approaches.
+
+Open to feedback.
+
+In summary:
+- Increased protections against DMA attacks using more obscure firewire modules,
+- Disabled more uncommon file systems that should not conflict with whonix requirements,
+- Disabled a variety of uncommon network file systems,
+- Disabled use of CD-ROM by default as the technology seems to be all but disappearing, and
+- Intel CPUs might glow less brightly in the dark with some ME blocking (https://www.kernel.org/doc/html/latest/driver-api/mei/mei.html).
+
+https://madaidans-insecurities.github.io/guides/linux-hardening.html#kasr-kernel-modules
+https://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989
+https://security.stackexchange.com/questions/4098/how-to-disable-firewire-in-openbsd-linux-to-prevent-attacks-through-firewire
+https://linux-audit.com/kernel-hardening-disable-and-blacklist-linux-modules/
+
+Finally, the use of /bin/false should perhaps be replaced with /bin/true.
+
+This does not appear to impact whonix users but users from other distributions could benefit from this increased compatibility by avoiding log errors when using this code.
+
+https://github.com/ComplianceAsCode/content/issues/539</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/27">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/27</link>
+        <pubDate>Thu, 07 Jul 2022 13:37:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-27</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubcommit">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/security-misc/commit/3756016f42d97c6bf32c9bf5fed02904a63f4a5c" target="_blank" rel="noopener">github.com/Whonix/security-misc</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/security-misc/commit/3756016f42d97c6bf32c9bf5fed02904a63f4a5c" target="_blank" rel="noopener">`lintian --suppress-tags obsolete-command-in-modprobe.d-file`</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-08-03" data-time="17:04:34" data-timezone="UTC">05:04PM - 03 Aug 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+
+      <div class="lines" title="changed 1 files with 7 additions and 0 deletions">
+        <a href="https://github.com/Whonix/security-misc/commit/3756016f42d97c6bf32c9bf5fed02904a63f4a5c" target="_blank" rel="noopener">
+          <span class="added">+7</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">
+https://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surf<span class="show-more-container"><a href="https://github.com/Whonix/security-misc/commit/3756016f42d97c6bf32c9bf5fed02904a63f4a5c" target="_blank" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">ace/7989/24</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/26">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/26</link>
+        <pubDate>Tue, 03 Aug 2021 17:05:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-26</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <ul>
+<li><a href="https://github.com/Whonix/security-misc/blob/master/etc/modprobe.d/30_security-misc.conf" class="inline-onebox">security-misc/30_security-misc.conf at master · Whonix/security-misc · GitHub</a></li>
+</ul>
+<p>I don’t think <code>softdep</code> would replace security-misc use case of <code>install msr /bin/false</code> etc.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/25">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/25</link>
+        <pubDate>Tue, 03 Aug 2021 17:01:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-25</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <pre><code>W: security-misc: obsolete-command-in-modprobe.d-file etc/modprobe.d/30_security-misc.conf install
+N:
+W: obsolete-command-in-modprobe.d-file
+N:
+N:   Use of 'install' and 'remove' commands in module files in
+N:   /etc/modprobe.d and /etc/modules-load.d is deprecated and should be
+N:   replaced with 'softdep' commands.
+N:   
+N:   Severity: warning
+N:   
+N:   Check: modprobe
+N:</code></pre>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/24">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/24</link>
+        <pubDate>Tue, 03 Aug 2021 16:58:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-24</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="1" data-topic="10397">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/disabling-cpu-msrs-breaks-cpu-temperature-control/10397">disabling CPU MSRs breaks CPU temperature control</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development/8"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    Disabling CPU MSRs is OK in VMs (where it probably does nothing except getting rid of a kernel module) but problematic on the host in context of a host running Kicksecure or Whonix-Host. 
+It breaks CPU temperature control. A high(er) than expected CPU temperature might wear down the CPU more quickly. Also spend more energy than expected (this might be more important in large scale deployments such as servers farms). 
+<a href="https://packages.debian.org/bullseye/powercap-utils" class="onebox" target="_blank">https://packages.debian.org/bullseye/powercap-utils</a> 
+sudo apt install linux-cpu…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/23</link>
+        <pubDate>Sat, 10 Oct 2020 11:48:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-23</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="21" data-topic="7989">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p><a href="https://github.com/Whonix/security-misc/pull/47">Blacklist CPU MSRs</a></p>
+</blockquote>
+</aside>
+<p>Merged.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/22</link>
+        <pubDate>Sun, 22 Dec 2019 15:36:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-22</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="https://github.com/Whonix/security-misc/pull/47" target="_blank">github.com/Whonix/security-misc</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/security-misc/pull/47" target="_blank">Blacklist CPU MSRs</a>
+    </h4>
+
+    <div class="branches">
+      <code>Whonix:master</code> ← <code>madaidan:msr</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2019-12-22" data-time="13:54:41" data-timezone="UTC">01:54PM - 22 Dec 19 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/madaidan" target="_blank">
+          <img alt="madaidan" src="https://avatars0.githubusercontent.com/u/50278627?v=4" class="onebox-avatar-inline" width="20" height="20">
+          madaidan
+        </a>
+      </div>
+
+      <div class="lines" title="2 commits changed 2 files with 6 additions and 0 deletions">
+        <a href="https://github.com/Whonix/security-misc/pull/47/files" target="_blank">
+          <span class="added">+6</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/21</link>
+        <pubDate>Sun, 22 Dec 2019 13:54:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-21</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Good to know. Then go for it <img src="//forums.whonix.org/images/emoji/twitter/grinning.png?v=9" title=":grinning:" class="emoji" alt=":grinning:"></p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/20</link>
+        <pubDate>Thu, 28 Nov 2019 17:45:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-20</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>No, you can even test it yourself by running <code>systemd-detect-virt</code> and seeing the <code>msr</code> module isn’t even loaded.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/19</link>
+        <pubDate>Thu, 28 Nov 2019 17:37:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-19</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="17" data-topic="7989">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>No. MSRs have nothing to do with that.</p>
+</blockquote>
+</aside>
+<p>I’m pretty sure they do because when i blocked access to them using libvirt it broke hypervisor detection, but <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> explained it’s not a big deal.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/18</link>
+        <pubDate>Thu, 28 Nov 2019 17:19:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-18</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="15" data-topic="7989">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Does this break virt-detect?</p>
+</blockquote>
+</aside>
+<p>No. MSRs have nothing to do with that.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/17</link>
+        <pubDate>Thu, 28 Nov 2019 16:23:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-17</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="15" data-topic="7989">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Does this break virt-detect?</p>
+</blockquote>
+</aside>
+<p>Good point but even if it does, that is only required by two features.</p>
+<ul>
+<li>[1] power-savings-disable-in-vms</li>
+<li>[2] whonixcheck warn against unsupported virtualizers</li>
+</ul>
+<p>Non-essential features. [1] could be implemented in another way.</p>
+<p>Kicksecure has both, VM and host packages:</p>
+<ul>
+<li>kicksecure-cli-vm / kicksecure-cli</li>
+<li>kicksecure-xfce-vm / kicksecure-xfce</li>
+</ul>
+<p>Whonix doesn’t have that yet and it’s difficult to make the conversion for existing users. (Since this is the “top level” meta package.)</p>
+<p>[2] might be lost but I guess that is a feature reduction we can endure.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/16</link>
+        <pubDate>Thu, 28 Nov 2019 15:45:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-16</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="14" data-topic="7989">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>MSRs are only exposed when the <code>msr</code> module <a href="http://man7.org/linux/man-pages/man4/msr.4.html">is loaded</a> so we can blacklist that module to prevent them from being abused.</p>
+</blockquote>
+</aside>
+<p>Does this break virt-detect?</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/15</link>
+        <pubDate>Thu, 28 Nov 2019 15:02:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-15</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>As per <a href="https://security.stackexchange.com/questions/119712/methods-root-can-use-to-elevate-itself-to-kernel-mode" rel="nofollow noopener">https://security.stackexchange.com/questions/119712/methods-root-can-use-to-elevate-itself-to-kernel-mode</a>, we should disable CPU MSRs.</p>
+<p>MSRs are only exposed when the <code>msr</code> module <a href="http://man7.org/linux/man-pages/man4/msr.4.html" rel="nofollow noopener">is loaded</a> so we can blacklist that module to prevent them from being abused.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/14</link>
+        <pubDate>Mon, 28 Oct 2019 15:03:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-14</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>Ubuntu’s default blacklisted modules: <a href="https://git.launchpad.net/ubuntu/+source/kmod/tree/debian/modprobe.d?h=ubuntu/disco" rel="nofollow noopener">https://git.launchpad.net/ubuntu/+source/kmod/tree/debian/modprobe.d?h=ubuntu/disco</a></p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/13</link>
+        <pubDate>Tue, 10 Sep 2019 22:20:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-13</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="6" data-topic="7989">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Shows nothing for me in a Qubes VM.</p>
+</blockquote>
+</aside>
+<p>It’s there for me in Virtualbox. Virtualbox might add CD-ROM support by default while Qubes only adds the bare minimum. If so, is there a way to disable it in the Virtualbox ovas by default?</p>
+<aside class="quote no-group" data-post="7" data-topic="7989">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<ul>
+<li>A sysadmin having attached a device which contains such a file system and wanting to mount it, should be able to.</li>
+<li>Without attempting to mount such a device, no module will be load.</li>
+</ul>
+</blockquote>
+</aside>
+<p>An attacker could attempt to mount something containing the filesystem which will load the module.</p>
+<p>Things like thunar-volman and udisks allow unprivileged mounting.</p>
+<aside class="quote no-group" data-post="8" data-topic="7989">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/a183cd/40.png" class="avatar"> Algernon:</div>
+<blockquote>
+<p>Why just stick to non-root?</p>
+</blockquote>
+</aside>
+<p>Root can just remove the file that blacklists these modules anyway.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/12</link>
+        <pubDate>Mon, 02 Sep 2019 13:12:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-12</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="10" data-topic="7989" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/a183cd/40.png" class="avatar"> Algernon:</div>
+<blockquote>
+<p>Modprobing stuff would be one of the options for a kernel exploit. Certainly not the only one but at least one options less for the attacker.</p>
+<p>Edit: We also have apparmor which limits what a user, including root, can do.</p>
+</blockquote>
+</aside>
+<p>Larger discussion. Created <a href="https://forums.whonix.org/t/untrusted-root-does-it-make-sense-to-try-to-improve-security-by-restricting-root/7998" class="inline-onebox">Untrusted Root - does it make sense to try to improve security by restricting root?</a> for it.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/11</link>
+        <pubDate>Mon, 02 Sep 2019 08:25:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-11</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Algernon]]></dc:creator>
+        <description><![CDATA[
+            <p>Modprobing stuff would be one of the options for  a kernel exploit. Certainly not the only one but at least one options less for the attacker.</p>
+<p>Edit: We also have apparmor which limits what a user, including root, can do.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/10</link>
+        <pubDate>Mon, 02 Sep 2019 08:15:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-10</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+      <item>
+        <title>Blacklist more kernel modules to reduce attack surface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Because root access means game over if malware gained root. The attacker has way too many ways to compromise the system in persistent ways. Root should be allowed to load the module / mount any disk.</p>
+          <p><a href="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989/9</link>
+        <pubDate>Mon, 02 Sep 2019 08:11:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7989-9</guid>
+        <source url="http://forums.whonix.org/t/blacklist-more-kernel-modules-to-reduce-attack-surface/7989.rss">Blacklist more kernel modules to reduce attack surface</source>
+      </item>
+  </channel>
+</rss>

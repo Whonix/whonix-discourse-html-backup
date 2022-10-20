@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>make symlink attacks and other /tmp based attacks harder or impossible using libpam-tmpdir</title>
+    <link>http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488</link>
+    <description>&gt;   * Install libpam-tmpdir to set $TMP and $TMPDIR for PAM sessions [CUST-0280] 
+&gt;       https://your-domain.example.org/controls/CUST-0280/
+
+So let&#39;s install https://packages.debian.org/buster/libpam-tmpdir by default?
+
+&gt; automatic per-user temporary directories
+
+&gt; Many programs use $TMPDIR for storing temporary files. Not all of them are good at securing the permissions of those files. libpam-tmpdir sets $TMPDIR and $TMP for PAM sessions and sets the permissions quite tight. T**his helps system security by having an extra layer of security, making such symlink attacks and other /tmp based attacks harder or impossible**</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 15 Nov 2019 08:41:51 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>make symlink attacks and other /tmp based attacks harder or impossible using libpam-tmpdir</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>Ohh. That makes sense. It would be good to install that by default then.</p>
+<p>We should contact upstream about the errors.</p>
+          <p><a href="http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488/4</link>
+        <pubDate>Sun, 30 Jun 2019 13:32:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8488-4</guid>
+        <source url="http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488.rss">make symlink attacks and other /tmp based attacks harder or impossible using libpam-tmpdir</source>
+      </item>
+      <item>
+        <title>make symlink attacks and other /tmp based attacks harder or impossible using libpam-tmpdir</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Most programs use <code>mktemp</code>, I think, I hope? Or some sort of API around it? The are not supposed to have their own logic of creating a temp folder. That is supposed to be abstracted and secure.</p>
+<p>As far as I understand libpam-tmpdir attempts to make this process more secure by adding per-user temp folder separation.</p>
+<p>It sets environment variables <code>TMP</code> and <code>TEMP</code> to <code>/tmp/user/&lt;userid&gt;</code>. These will then be private temp folders.</p>
+<p>Not sure that is really needed but might be since systemd also has an instance <code>PrivateTmp=true</code>?</p>
+<p>Examples:</p>
+<hr>
+<p>user:</p>
+<pre><code>mktemp
+</code></pre>
+<blockquote>
+<p>/tmp/user/1000/tmp.16V0NDw304</p>
+</blockquote>
+<hr>
+<p>root:</p>
+<pre><code>mktemp
+</code></pre>
+<blockquote>
+<p>/tmp/user/0/tmp.SWfIATj8AU</p>
+</blockquote>
+<hr>
+<p>Unfortunately it seems to be incompatible with some Debian packaging tools? Perhaps since this package is rather unpopular? Examples:</p>
+<hr>
+<pre><code>dpkg-deb: building package 'pbuilder-satisfydepends-dummy' in '/tmp/satisfydepends-aptitude/pbuilder-satisfydepends-dummy.deb'.
+dpkg-deb: error: failed to make temporary file (control member): No such file or directory
+E: pbuilder-satisfydepends failed.
+</code></pre>
+<hr>
+<p>Happening during 1100_prepare-build-machine cowbuilder --create. Perhaps since environment variables user vs root do not match in chroot. Unsetting the TMP / TEMP environment variables and/or installing libpam-tmpdir in chroot does not solve this issue either.</p>
+<pre><code>+ /usr/lib/security-misc/apt-get-wrapper -o Acquire::http::Proxy=http://127.0.0.1:3142 -o Acquire::https::Proxy=http://127.0.0.1:3142 -o Acquire::tor::Proxy=http://127.0.0.1:3142 -o Acquire::Languages=none -o Acquire::IndexTargets::deb::Contents-deb::DefaultEnabled=false -o Acquire::Retries=3 -o Acquire::BlockDotOnion=false update
++ set -e
++ set -o pipefail
++ set -o errtrace
+++ mktemp --directory
+mktemp: failed to create directory via template '/tmp/user/0/tmp.XXXXXXXXXX': No such file or directory</code></pre>
+          <p><a href="http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488/3</link>
+        <pubDate>Sun, 30 Jun 2019 10:29:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8488-3</guid>
+        <source url="http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488.rss">make symlink attacks and other /tmp based attacks harder or impossible using libpam-tmpdir</source>
+      </item>
+      <item>
+        <title>make symlink attacks and other /tmp based attacks harder or impossible using libpam-tmpdir</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="4" data-topic="7633">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>So let’s install <a href="https://packages.debian.org/buster/libpam-tmpdir" rel="nofollow noopener">https://packages.debian.org/buster/libpam-tmpdir</a> by default?</p>
+</blockquote>
+</aside>
+<p>I’m not entirely sure how that works or how it would help. Don’t most programs just use /tmp?</p>
+<aside class="quote no-group" data-post="4" data-topic="7633">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><a href="https://packages.debian.org/buster/debsecan" rel="nofollow noopener">https://packages.debian.org/buster/debsecan</a></p>
+<p>I did not manage to gather any actionable / useful advice. If annyone has more luck on how to use this, please share.</p>
+</blockquote>
+</aside>
+<p>Doesn’t seem to install properly for me.</p>
+          <p><a href="http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488/2</link>
+        <pubDate>Sat, 29 Jun 2019 21:14:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8488-2</guid>
+        <source url="http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488.rss">make symlink attacks and other /tmp based attacks harder or impossible using libpam-tmpdir</source>
+      </item>
+      <item>
+        <title>make symlink attacks and other /tmp based attacks harder or impossible using libpam-tmpdir</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<ul>
+<li>Install libpam-tmpdir to set $TMP and $TMPDIR for PAM sessions [CUST-0280]<br>
+<a href="https://your-domain.example.org/controls/CUST-0280/">https://your-domain.example.org/controls/CUST-0280/</a>
+</li>
+</ul>
+</blockquote>
+<p>So let’s install <a href="https://packages.debian.org/buster/libpam-tmpdir">https://packages.debian.org/buster/libpam-tmpdir</a> by default?</p>
+<blockquote>
+<p>automatic per-user temporary directories</p>
+</blockquote>
+<blockquote>
+<p>Many programs use $TMPDIR for storing temporary files. Not all of them are good at securing the permissions of those files. libpam-tmpdir sets $TMPDIR and $TMP for PAM sessions and sets the permissions quite tight. T<strong>his helps system security by having an extra layer of security, making such symlink attacks and other /tmp based attacks harder or impossible</strong></p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488/1</link>
+        <pubDate>Sat, 29 Jun 2019 19:42:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8488-1</guid>
+        <source url="http://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488.rss">make symlink attacks and other /tmp based attacks harder or impossible using libpam-tmpdir</source>
+      </item>
+  </channel>
+</rss>

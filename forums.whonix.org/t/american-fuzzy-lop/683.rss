@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>American-fuzzy-lop</title>
+    <link>http://forums.whonix.org/t/american-fuzzy-lop/683</link>
+    <description>Running automated fuzzers is a good way to uncover unexpected bugs. Random crashes or strange quirks are quickly discovered using fuzzing. A powerful generic fuzzer that is afl-fuzzer. I really don&#39;t want to make this a long post but I want to make a case for why its really worth running this against our script. 
+
+afl-fuzzer is authored by a talented security researcher that goes by the handle lcamtuf. He was one of the people who uncovered the recent problems with bash.
+
+Though its not packaged for Debian it can be fetched from here:
+
+https://code.google.com/p/american-fuzzy-lop/
+
+***
+
+http://lcamtuf.blogspot.com/2014/08/a-bit-more-about-american-fuzzy-lop.html
+
+&lt;blockquote&gt;Fuzzing is one of the most powerful strategies for identifying security issues in real-world software. Unfortunately, it also offers fairly shallow coverage: it is impractical to exhaustively cycle through all possible inputs, so even something as simple as setting three separate bytes to a specific value to reach a chunk of unsafe code can be an insurmountable obstacle to a typical fuzzer.
+
+There have been numerous attempts to solve this problem by augmenting the process with additional information about the behavior of the tested code. These techniques can be divided into three broad groups:
+
+* Simple coverage maximization. This approach boils down to trying to isolate initial test cases that offer diverse code coverage in the targeted application - and them fuzzing them using conventional techniques.
+
+* Control flow analysis. A more sophisticated technique that leverages instrumented binaries to focus the fuzzing efforts on mutations that generate distinctive sequences of conditional branches within the instrumented binary.
+
+* Static analysis. An approach that attempts to reason about potentially interesting states within the tested program and then make educated guesses about the input values that could possibly trigger them. 
+
+The first technique is surprisingly powerful when used to pre-select initial test cases from a massive corpus of valid data - say, the result of a large-scale web crawl. Unfortunately, coverage measurements provide only a very simplistic view of the internal state of the program, making them less suited for creatively guiding the fuzzing process later on.
+
+The latter two techniques are extremely promising in experimental settings. That said, in real-world applications, they are not only very slow, but frequently lead to irreducible complexity: most of the high-value targets will have a vast number of internal states and possible execution paths, and deciding which ones are interesting and substantially different from the rest is an extremely difficult challenge that, if not solved, usually causes the &quot;smart&quot; fuzzer to perform no better than a traditional one.
+
+American fuzzy lop tries to find a reasonable middle ground between sophistication and practical utility. In essence, it&#39;s a fuzzer that relies on a form of edge coverage measurements to detect subtle, local-scale changes to program control flow without having to perform complex global-scale comparisons between series of long and winding execution traces - a common failure point for similar tools.&lt;/blockquote&gt;
+
+***
+
+http://lcamtuf.blogspot.com/2014/11/pulling-jpegs-out-of-thin-air.html
+
+&lt;blockquote&gt;You can throw afl-fuzz at many other types of parsers with similar results: with bash, it will write valid scripts; with giflib, it will make GIFs; with fileutils, it will create and flag ELF files, Atari 68xxx executables, x86 boot sectors, and UTF-8 with BOM. In almost all cases, the performance impact of instrumentation is minimal, too.&lt;/blockquote&gt;</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 02 May 2015 15:57:45 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/american-fuzzy-lop/683.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>American-fuzzy-lop</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“HulaHoop, post:4, topic:683”]ShellCheck is the equivalent of lintian for bash scripts.</p>
+<p>Its packaged in Jessie.[/quote]<br>
+Has quite some false positives, but still a very nice tool. Used this earlier and went though all shell scripts developed under the Whonix umbrella some time ago. Still using it sometimes.</p>
+<p>shellcheck-wrapper:<br>
+</p><aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonix-developer-meta-files/blob/master/debug-steps/shellcheck-wrapper" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonix-developer-meta-files/blob/master/debug-steps/shellcheck-wrapper" target="_blank" rel="nofollow noopener">Whonix/whonix-developer-meta-files/blob/master/debug-steps/shellcheck-wrapper</a></h4>
+<pre><code class="lang-">#!/bin/bash
+
+set -x
+set -e
+set -o pipefail
+set -o errtrace
+
+if ! test -d "$1" &amp;&amp; ! test -f "$1" ; then
+   true "ERROR: not a folder or file: $1"
+   exit 1
+fi
+
+opts="\
+   --exclude SC2086 \
+   --exclude SC2086 \
+   --exclude SC2016 \
+   --exclude SC2034 \
+   --exclude SC2129 \
+   --exclude SC2004 \
+   --exclude SC2088 \
+</code></pre>
+
+  This file has been truncated. <a href="https://github.com/Whonix/whonix-developer-meta-files/blob/master/debug-steps/shellcheck-wrapper" target="_blank" rel="nofollow noopener">show original</a>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Usage:<br>
+From ./packages/whonix-developer-meta-files folder.</p>
+<pre><code class="lang-auto"></code></pre>
+          <p><a href="http://forums.whonix.org/t/american-fuzzy-lop/683/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/american-fuzzy-lop/683/5</link>
+        <pubDate>Sat, 02 May 2015 15:57:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-683-5</guid>
+        <source url="http://forums.whonix.org/t/american-fuzzy-lop/683.rss">American-fuzzy-lop</source>
+      </item>
+      <item>
+        <title>American-fuzzy-lop</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>ShellCheck is the equivalent of lintian for bash scripts.</p>
+<p>Its packaged in Jessie.</p>
+          <p><a href="http://forums.whonix.org/t/american-fuzzy-lop/683/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/american-fuzzy-lop/683/4</link>
+        <pubDate>Sat, 02 May 2015 14:36:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-683-4</guid>
+        <source url="http://forums.whonix.org/t/american-fuzzy-lop/683.rss">American-fuzzy-lop</source>
+      </item>
+      <item>
+        <title>American-fuzzy-lop</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>AFL-derived tools now offer explicit support for Java, Go, Rust, and Python: <a href="http://lcamtuf.coredump.cx/afl/">http://lcamtuf.coredump.cx/afl/</a></p>
+<p><a href="https://bitbucket.org/jwilk/python-afl" class="onebox" target="_blank">https://bitbucket.org/jwilk/python-afl</a></p>
+          <p><a href="http://forums.whonix.org/t/american-fuzzy-lop/683/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/american-fuzzy-lop/683/3</link>
+        <pubDate>Fri, 01 May 2015 14:24:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-683-3</guid>
+        <source url="http://forums.whonix.org/t/american-fuzzy-lop/683.rss">American-fuzzy-lop</source>
+      </item>
+      <item>
+        <title>American-fuzzy-lop</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>It’s for compiled code. (C… Not python…)</p>
+          <p><a href="http://forums.whonix.org/t/american-fuzzy-lop/683/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/american-fuzzy-lop/683/2</link>
+        <pubDate>Sat, 15 Nov 2014 02:16:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-683-2</guid>
+        <source url="http://forums.whonix.org/t/american-fuzzy-lop/683.rss">American-fuzzy-lop</source>
+      </item>
+      <item>
+        <title>American-fuzzy-lop</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Running automated fuzzers is a good way to uncover unexpected bugs. Random crashes or strange quirks are quickly discovered using fuzzing. A powerful generic fuzzer that is afl-fuzzer. I really don’t want to make this a long post but I want to make a case for why its really worth running this against our script.</p>
+<p>afl-fuzzer is authored by a talented security researcher that goes by the handle lcamtuf. He was one of the people who uncovered the recent problems with bash.</p>
+<p>Though its not packaged for Debian it can be fetched from here:</p>
+<p><a href="https://code.google.com/p/american-fuzzy-lop/" class="onebox" target="_blank">https://code.google.com/p/american-fuzzy-lop/</a></p>
+<hr>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="http://lcamtuf.blogspot.com/favicon.ico" class="site-icon" width="32" height="32">
+      <a href="http://lcamtuf.blogspot.com/2014/08/a-bit-more-about-american-fuzzy-lop.html" target="_blank">lcamtuf.blogspot.com</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:500/413;"><img src="https://lh6.googleusercontent.com/proxy/VG7Zgy2IIgfC2HFV51pw_PiI5ioSbGkCkLFwkfVXFUrPSCJyDPYLt6DFFXD8dBwiN0XCBqU-gKEP6hgMti15FpQ=w1200-h630-p-k-no-nu" class="thumbnail" width="500" height="413"></div>
+
+<h3><a href="http://lcamtuf.blogspot.com/2014/08/a-bit-more-about-american-fuzzy-lop.html" target="_blank">A bit more about american fuzzy lop</a></h3>
+
+<p>Fuzzing is one of the most powerful strategies for identifying security issues in real-world software. Unfortunately, it also offers fairl...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>Fuzzing is one of the most powerful strategies for identifying security issues in real-world software. Unfortunately, it also offers fairly shallow coverage: it is impractical to exhaustively cycle through all possible inputs, so even something as simple as setting three separate bytes to a specific value to reach a chunk of unsafe code can be an insurmountable obstacle to a typical fuzzer.
+<p>There have been numerous attempts to solve this problem by augmenting the process with additional information about the behavior of the tested code. These techniques can be divided into three broad groups:</p>
+<ul>
+<li>
+<p>Simple coverage maximization. This approach boils down to trying to isolate initial test cases that offer diverse code coverage in the targeted application - and them fuzzing them using conventional techniques.</p>
+</li>
+<li>
+<p>Control flow analysis. A more sophisticated technique that leverages instrumented binaries to focus the fuzzing efforts on mutations that generate distinctive sequences of conditional branches within the instrumented binary.</p>
+</li>
+<li>
+<p>Static analysis. An approach that attempts to reason about potentially interesting states within the tested program and then make educated guesses about the input values that could possibly trigger them.</p>
+</li>
+</ul>
+<p>The first technique is surprisingly powerful when used to pre-select initial test cases from a massive corpus of valid data - say, the result of a large-scale web crawl. Unfortunately, coverage measurements provide only a very simplistic view of the internal state of the program, making them less suited for creatively guiding the fuzzing process later on.</p>
+<p>The latter two techniques are extremely promising in experimental settings. That said, in real-world applications, they are not only very slow, but frequently lead to irreducible complexity: most of the high-value targets will have a vast number of internal states and possible execution paths, and deciding which ones are interesting and substantially different from the rest is an extremely difficult challenge that, if not solved, usually causes the “smart” fuzzer to perform no better than a traditional one.</p>
+<p>American fuzzy lop tries to find a reasonable middle ground between sophistication and practical utility. In essence, it’s a fuzzer that relies on a form of edge coverage measurements to detect subtle, local-scale changes to program control flow without having to perform complex global-scale comparisons between series of long and winding execution traces - a common failure point for similar tools.</p>
+</blockquote>
+<hr>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="http://lcamtuf.blogspot.com/favicon.ico" class="site-icon" width="32" height="32">
+      <a href="http://lcamtuf.blogspot.com/2014/11/pulling-jpegs-out-of-thin-air.html" target="_blank">lcamtuf.blogspot.com</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/294;"><img src="https://lh6.googleusercontent.com/proxy/-6MjaR00hYA40HOvCaSW4PF_TvPpqAjNZIwGadsPVaYE9hRrGNTi91BBKlVdXtK4X7E5qf9hgk6kHMrxWaE-WaCckCsgZzA=w1200-h630-p-k-no-nu" class="thumbnail" width="690" height="294"></div>
+
+<h3><a href="http://lcamtuf.blogspot.com/2014/11/pulling-jpegs-out-of-thin-air.html" target="_blank">Pulling JPEGs out of thin air</a></h3>
+
+<p>This is an interesting demonstration of the capabilities of afl ; I was actually pretty surprised that it worked!   $ mkdir in_dir $ echo ' ...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>You can throw afl-fuzz at many other types of parsers with similar results: with bash, it will write valid scripts; with giflib, it will make GIFs; with fileutils, it will create and flag ELF files, Atari 68xxx executables, x86 boot sectors, and UTF-8 with BOM. In almost all cases, the performance impact of instrumentation is minimal, too.</blockquote>
+          <p><a href="http://forums.whonix.org/t/american-fuzzy-lop/683/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/american-fuzzy-lop/683/1</link>
+        <pubDate>Sat, 15 Nov 2014 01:50:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-683-1</guid>
+        <source url="http://forums.whonix.org/t/american-fuzzy-lop/683.rss">American-fuzzy-lop</source>
+      </item>
+  </channel>
+</rss>

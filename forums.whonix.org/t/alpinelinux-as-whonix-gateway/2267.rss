@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>AlpineLinux as Whonix-Gateway</title>
+    <link>http://forums.whonix.org/t/alpinelinux-as-whonix-gateway/2267</link>
+    <description>Hey, 
+
+i saw some support pages on the wiki mentioning AlpineLinux, its a small lightweight linux distribution with some nice security features (grsecurity/PaX in default kernel + most/all packages have PIC) so i thought i would give it a try. 
+I actually wanted to see/test two things:
+
+1. how easy is it to replace the Whonix-Gateway with a non-standard Distribution i.e. testing portability of &quot;anon distribution&quot;/Whonix. 
+2. what are the downsides/upsides of &quot;minimalistic distributions&quot;
+
+i am happy to report that i now have an up and running Whonix-Gateway based on a minimal alpinelinux image.  
+First of all, Whonix/anon-gw is VERY EASY to port, big respect to the Whonix-Devs ... i had alpinelinux running as a tor gateway in less then 4 hours. For semi-full functionality (including sdwdate and cpfpd) i needed about a day. Thats much better then i&#39;ve ever expected :) . 
+
+So whats working actually/whats not working:
+
+* full tor proxy/gateway functionality (did some leaktests, looked good but obviously not 100% tested); 
+* cpfpd works fine
+* sdwdate - runs nicely now but needed some bug hunting :)
+* Whonix-firewall: worked out of the box 
+* uwt: NOT WORKING, calls to dpkg and stuff, didn&#39;t looked into it as i dont need it on the gateway anyway. For update functionality via apk i use torsocks which is fine for me. 
+* Whonix-setup: NOT WORKING, to be honest, didn&#39;t looked into it but probably needs a lot of work. 
+* no GUI/X11: thats intentional :) 
+* No AppArmor - intentional, i will try to use the grsecuritys RBAC System
+* Gateway now uses ~80M ram &amp; &lt;800MB disk space; only 6 services running (syslogd, klogd, acpid, tor, cpfpd, sdwdate)
+
+In the interest of Whonix hacking i will give a short (generic) overview of what i did to port the Whonix-Gateway functionality to another Linux distribution:
+
+1. Checked anon-meta-packages and installed most available packages via apk
+2. Checked out/cloned all whonix-gw*, anon-gw*, sdwdate, some of the &quot;shared&quot; and cpfp-python github-repos 
+3. copied most files from the repos to their locations in the file-system; i didn&#39;t copy debian specifics (systemd, apparmor ...) 
+4. Then i looked into every cloned repo, checked the debian/control+post-install and added dependencies/user/groups/dir/chmods/chowns according to the scripts 
+5. Test every package -&gt; fix -&gt; repeat :)  - usually undocumented dependencies, hardcoded pathes, calls to debian specifics and a lot of problems with the fact that alpine uses busybox and busybox doesn&#39;t like a LOT of command line switches for common shell utils. 
+
+Some Problems i ran into with alpinelinux-as-a-whonix-gw: 
+
+* TOR: Biggest problem in the beginning was Tor not accepting TransPort/TransListenAddress. The package alpine ships is actually the newest tor version. However, and i didn&#39;t realize this until i failed multiple times to compile tor in a way so it would work, you need to have iptables-dev installed (and maybe you have to do ./configure --enable-transparent) to be able to compile tor with TransPort/TransListenAddress support. I will probably open a ticket with AlpineLinux for this problem. 
+* SDWDATE: to get it up and running was not the hard problem (some permission problems). I also had to fix some of the anon-helper-scripts sdwdate calls to check if tor is up&amp;running. Biggest problem however was a very sneaky bug(?) of python-locale that only occurs if called from init/during boot. To pinpoint the problem i had to write a small python &quot;init script&quot; that basically does the same as guimessages-translations.py only with lot of debug printings :). I realized that locale.getdefaultlocale() fails at this point during boot. To be precise, i guess it returns an empty(?) tuple and therefore the .split method translations.py is trying to call is not defined. As i do not require localization support anyway i ended up just commenting out that line - it will fall back to what ever is defined as DEFAULT_LANG inside the translations.py lib file. 
+* already mentioned, had to fix a lot of shell scripts because busybox builtin tools don&#39;t accept a lot of CLI switches. Next time i&#39;ll just install coreutils :)
+* had to port some systemd services to openrc - not hard, used a skeleton init script (can be VERY simple) and let openrc do the magic
+* Some python packages had to be installed via pip because their weren&#39;t any alpinelinux packages. Not a big problem
+
+Things i want to try now: 
+* Grsecurity/PaX: now that everything is running i think i will try to start grsecurity in learning mode and see if i can come up with some sensible rules. 
+* ideas? :) 
+
+I hope this can be a starting point in experimenting a little bit with other linux flavors as &quot;Anon-Distribution&quot;. I think when it comes to security features (apparmor, firejail, grsec ...)  a small lightweight distribution would be much easier to handle. If we only have to contain six running services any kind of policy creation will be much easier to do. On the other hand, usability is my main concern with my approach. I mean beside the fact that currently some whonix usability functions aren&#39;t working in my setup (these could be ported) a minimal image will always lack certain ease-of-use features important to people coming from a non-linux OS. Maybe at some point in the future the Gateway could be something &quot;the user doesn&#39;t need to look at anyway&quot;. 
+
+If anyone is interested in what i did precisely, feel free to ask. If anyone wants to give it a try i could upload the VirtualBox Image somewhere or post the installed package list / pip list so you don&#39;t have to do it all by yourself. 
+
+best wishes</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 25 Apr 2016 02:44:15 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/alpinelinux-as-whonix-gateway/2267.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>AlpineLinux as Whonix-Gateway</title>
+        <dc:creator><![CDATA[supplecat]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="2267">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/b5e925/40.png" class="avatar"> nermd:</div>
+<blockquote>
+<p>post the installed package list / pip list so you don’t have to do it all by yourself.</p>
+</blockquote>
+</aside>
+<p>Hi! I signed up just to reply to you. Can you “post the installed package list / pip list so you don’t have to do it all by yourself.” Place on github or somewhere with a more formal review of the steps you took to reproduce. I’ve just completed an Alpine vagrant script that builds alpine vagrant VM’s and configures them with ansible to do whatever you want. For my use case I auto-configured an alpine container to serve web pages. I still have a little bit more configurations to do before publishing but I will release this playbook too.</p>
+          <p><a href="http://forums.whonix.org/t/alpinelinux-as-whonix-gateway/2267/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/alpinelinux-as-whonix-gateway/2267/3</link>
+        <pubDate>Mon, 25 Apr 2016 02:44:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2267-3</guid>
+        <source url="http://forums.whonix.org/t/alpinelinux-as-whonix-gateway/2267.rss">AlpineLinux as Whonix-Gateway</source>
+      </item>
+      <item>
+        <title>AlpineLinux as Whonix-Gateway</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Interesting stuff! Glad, Whonix was easily portable and has been useful to you. <img src="//forums.whonix.org/images/emoji/twitter/slightly_smiling.png?v=5" title=":slightly_smiling:" class="emoji" alt=":slightly_smiling:"></p>
+<p>A few dependencies might be missing, because those are not supposed to be added to debian/control, namely “essential packages” as in Debian terms.</p>
+          <p><a href="http://forums.whonix.org/t/alpinelinux-as-whonix-gateway/2267/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/alpinelinux-as-whonix-gateway/2267/2</link>
+        <pubDate>Sat, 26 Mar 2016 17:15:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2267-2</guid>
+        <source url="http://forums.whonix.org/t/alpinelinux-as-whonix-gateway/2267.rss">AlpineLinux as Whonix-Gateway</source>
+      </item>
+      <item>
+        <title>AlpineLinux as Whonix-Gateway</title>
+        <dc:creator><![CDATA[nermd]]></dc:creator>
+        <description><![CDATA[
+            <p>Hey,</p>
+<p>i saw some support pages on the wiki mentioning AlpineLinux, its a small lightweight linux distribution with some nice security features (grsecurity/PaX in default kernel + most/all packages have PIC) so i thought i would give it a try.<br>
+I actually wanted to see/test two things:</p>
+<ol>
+<li>how easy is it to replace the Whonix-Gateway with a non-standard Distribution i.e. testing portability of “anon distribution”/Whonix.</li>
+<li>what are the downsides/upsides of “minimalistic distributions”</li>
+</ol>
+<p>i am happy to report that i now have an up and running Whonix-Gateway based on a minimal alpinelinux image.<br>
+First of all, Whonix/anon-gw is VERY EASY to port, big respect to the Whonix-Devs … i had alpinelinux running as a tor gateway in less then 4 hours. For semi-full functionality (including sdwdate and cpfpd) i needed about a day. Thats much better then i’ve ever expected <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"> .</p>
+<p>So whats working actually/whats not working:</p>
+<ul>
+<li>full tor proxy/gateway functionality (did some leaktests, looked good but obviously not 100% tested);</li>
+<li>cpfpd works fine</li>
+<li>sdwdate - runs nicely now but needed some bug hunting <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:">
+</li>
+<li>Whonix-firewall: worked out of the box</li>
+<li>uwt: NOT WORKING, calls to dpkg and stuff, didn’t looked into it as i dont need it on the gateway anyway. For update functionality via apk i use torsocks which is fine for me.</li>
+<li>Whonix-setup: NOT WORKING, to be honest, didn’t looked into it but probably needs a lot of work.</li>
+<li>no GUI/X11: thats intentional <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:">
+</li>
+<li>No AppArmor - intentional, i will try to use the grsecuritys RBAC System</li>
+<li>Gateway now uses ~80M ram &amp; &lt;800MB disk space; only 6 services running (syslogd, klogd, acpid, tor, cpfpd, sdwdate)</li>
+</ul>
+<p>In the interest of Whonix hacking i will give a short (generic) overview of what i did to port the Whonix-Gateway functionality to another Linux distribution:</p>
+<ol>
+<li>Checked anon-meta-packages and installed most available packages via apk</li>
+<li>Checked out/cloned all whonix-gw*, anon-gw*, sdwdate, some of the “shared” and cpfp-python github-repos</li>
+<li>copied most files from the repos to their locations in the file-system; i didn’t copy debian specifics (systemd, apparmor …)</li>
+<li>Then i looked into every cloned repo, checked the debian/control+post-install and added dependencies/user/groups/dir/chmods/chowns according to the scripts</li>
+<li>Test every package -&gt; fix -&gt; repeat <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:">  - usually undocumented dependencies, hardcoded pathes, calls to debian specifics and a lot of problems with the fact that alpine uses busybox and busybox doesn’t like a LOT of command line switches for common shell utils.</li>
+</ol>
+<p>Some Problems i ran into with alpinelinux-as-a-whonix-gw:</p>
+<ul>
+<li>TOR: Biggest problem in the beginning was Tor not accepting TransPort/TransListenAddress. The package alpine ships is actually the newest tor version. However, and i didn’t realize this until i failed multiple times to compile tor in a way so it would work, you need to have iptables-dev installed (and maybe you have to do ./configure --enable-transparent) to be able to compile tor with TransPort/TransListenAddress support. I will probably open a ticket with AlpineLinux for this problem.</li>
+<li>SDWDATE: to get it up and running was not the hard problem (some permission problems). I also had to fix some of the anon-helper-scripts sdwdate calls to check if tor is up&amp;running. Biggest problem however was a very sneaky bug(?) of python-locale that only occurs if called from init/during boot. To pinpoint the problem i had to write a small python “init script” that basically does the same as guimessages-translations.py only with lot of debug printings :). I realized that locale.getdefaultlocale() fails at this point during boot. To be precise, i guess it returns an empty(?) tuple and therefore the .split method translations.py is trying to call is not defined. As i do not require localization support anyway i ended up just commenting out that line - it will fall back to what ever is defined as DEFAULT_LANG inside the translations.py lib file.</li>
+<li>already mentioned, had to fix a lot of shell scripts because busybox builtin tools don’t accept a lot of CLI switches. Next time i’ll just install coreutils <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:">
+</li>
+<li>had to port some systemd services to openrc - not hard, used a skeleton init script (can be VERY simple) and let openrc do the magic</li>
+<li>Some python packages had to be installed via pip because their weren’t any alpinelinux packages. Not a big problem</li>
+</ul>
+<p>Things i want to try now:</p>
+<ul>
+<li>Grsecurity/PaX: now that everything is running i think i will try to start grsecurity in learning mode and see if i can come up with some sensible rules.</li>
+<li>ideas? <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:">
+</li>
+</ul>
+<p>I hope this can be a starting point in experimenting a little bit with other linux flavors as “Anon-Distribution”. I think when it comes to security features (apparmor, firejail, grsec …)  a small lightweight distribution would be much easier to handle. If we only have to contain six running services any kind of policy creation will be much easier to do. On the other hand, usability is my main concern with my approach. I mean beside the fact that currently some whonix usability functions aren’t working in my setup (these could be ported) a minimal image will always lack certain ease-of-use features important to people coming from a non-linux OS. Maybe at some point in the future the Gateway could be something “the user doesn’t need to look at anyway”.</p>
+<p>If anyone is interested in what i did precisely, feel free to ask. If anyone wants to give it a try i could upload the VirtualBox Image somewhere or post the installed package list / pip list so you don’t have to do it all by yourself.</p>
+<p>best wishes</p>
+          <p><a href="http://forums.whonix.org/t/alpinelinux-as-whonix-gateway/2267/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/alpinelinux-as-whonix-gateway/2267/1</link>
+        <pubDate>Wed, 23 Mar 2016 15:30:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2267-1</guid>
+        <source url="http://forums.whonix.org/t/alpinelinux-as-whonix-gateway/2267.rss">AlpineLinux as Whonix-Gateway</source>
+      </item>
+  </channel>
+</rss>

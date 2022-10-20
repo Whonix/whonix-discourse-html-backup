@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Kloak service problem</title>
+    <link>http://forums.whonix.org/t/kloak-service-problem/12935</link>
+    <description>I&#39;m trying to implement kloak as a service on my Devuan virtualbox machine and i understand that by the default it won&#39;t work because of init incompatibility so i decided to build a service script.
+
+When i try to start the service i get this message...
+
+user@hostname:$ sudo service kloak start
+Starting the process: kloakFound keyboard at: /dev/input/event0
+Found uinput at: /dev/uinput
+Waiting 500 ms...
+Unable to grab device &#39;/dev/input/event0&#39; : Device or resource busy
+ failed!
+
+Script look like this...what can be the problem?
+
+BEGIN INIT INFO
+Provides: kloak
+Required-Start: local_fs
+Required-Stop: local_fs
+Default-Start: 2 3 4 5
+Default-Stop: 0 1 6
+Short-Description: Kloak
+Description: Anti Keystroke deanonymization tool
+END INIT INFO
+Using the lsb functions to perform the operations.
+. /lib/lsb/init-functions
+
+Process name ( For display )
+NAME=kloak
+
+Daemon name, where is the actual executable
+DAEMON=/usr/sbin/kloak
+
+pid file for the daemon
+PIDFILE=/var/run/kloak.pid
+
+If the daemon is not there, then exit.
+test -x $DAEMON || exit 5
+
+case $1 in
+start)
+
+Checked the PID file exists and check the actual status of process
+if [ -e $PIDFILE ]; then
+status_of_proc -p $PIDFILE $DAEMON “$NAME process” &amp;&amp; status=“0” || status=&quot;$?&quot;
+
+If the status is SUCCESS then don’t need to start again.
+if [ $status = “0” ]; then
+exit # Exit
+fi
+fi
+
+Start the daemon.
+log_daemon_msg “Starting the process” “$NAME”
+
+Start the daemon with the help of start-stop-daemon
+Log the message appropriately
+if start-stop-daemon --start --quiet --oknodo --pidfile $PIDFILE --exec $DAEMON ; then
+log_end_msg 0
+else
+log_end_msg 1
+fi
+;;
+stop)
+
+Stop the daemon.
+if [ -e $PIDFILE ]; then
+status_of_proc -p $PIDFILE $DAEMON “Stoppping the $NAME process” &amp;&amp; status=“0” || status=&quot;$?&quot;
+if [ “$status” = 0 ]; then
+start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE
+/bin/rm -rf $PIDFILE
+fi
+else
+log_daemon_msg “$NAME process is not running”
+log_end_msg 0
+fi
+;;
+restart)
+
+Restart the daemon.
+$0 stop &amp;&amp; sleep 2 &amp;&amp; $0 start
+;;
+status)
+
+Check the status of the process.
+if [ -e $PIDFILE ]; then
+status_of_proc -p $PIDFILE $DAEMON “$NAME process” &amp;&amp; exit 0 || exit $?
+else
+log_daemon_msg “$NAME Process is not running”
+log_end_msg 0
+fi
+;;
+reload)
+
+Reload the process. Basically sending some signal to a daemon to reload
+it configurations.
+if [ -e $PIDFILE ]; then
+start-stop-daemon --stop --signal USR1 --quiet --pidfile $PIDFILE --name $NAME
+log_success_msg “$NAME process reloaded successfully”
+else
+log_failure_msg “$PIDFILE does not exists”
+fi
+;;
+*)
+
+For invalid arguments, print the usage message.
+echo “Usage: $0 {start|stop|restart|reload|status}”
+exit 2
+;;
+esac</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 04 Dec 2021 18:53:59 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/kloak-service-problem/12935.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Kloak service problem</title>
+        <dc:creator><![CDATA[anonimac]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks, it works.</p>
+          <p><a href="http://forums.whonix.org/t/kloak-service-problem/12935/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kloak-service-problem/12935/5</link>
+        <pubDate>Sat, 04 Dec 2021 18:53:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12935-5</guid>
+        <source url="http://forums.whonix.org/t/kloak-service-problem/12935.rss">Kloak service problem</source>
+      </item>
+      <item>
+        <title>Kloak service problem</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>You can change settings with a systemd drop-in file.</p>
+          <p><a href="http://forums.whonix.org/t/kloak-service-problem/12935/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kloak-service-problem/12935/4</link>
+        <pubDate>Sat, 04 Dec 2021 18:14:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12935-4</guid>
+        <source url="http://forums.whonix.org/t/kloak-service-problem/12935.rss">Kloak service problem</source>
+      </item>
+      <item>
+        <title>Kloak service problem</title>
+        <dc:creator><![CDATA[anonimac]]></dc:creator>
+        <description><![CDATA[
+            <p>Okay i understand. Want to ask one more question…how to increase kloak delay in whonix workstation if installed as a service? Is it possible?</p>
+          <p><a href="http://forums.whonix.org/t/kloak-service-problem/12935/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kloak-service-problem/12935/3</link>
+        <pubDate>Sat, 04 Dec 2021 15:18:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12935-3</guid>
+        <source url="http://forums.whonix.org/t/kloak-service-problem/12935.rss">Kloak service problem</source>
+      </item>
+      <item>
+        <title>Kloak service problem</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="anonimac" data-post="1" data-topic="12935">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/d9b06d/40.png" class="avatar"> anonimac:</div>
+<blockquote>
+<p>kloak as a service on my Devuan virtualbox machine</p>
+</blockquote>
+</aside>
+<p>The Whonix project doesn’t develop kloak or Devuan.</p>
+<p>Whonix development of kloak is limited to contributing small parts upstream such as Debian packaging, AppArmor or systemd integreation.</p>
+<p>This however is out of scope. Please contact upstream.</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener" title="01:04AM - 02 December 2021">Whonix – 2 Dec 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:85/170;"><img src="https://www.whonix.org/w/images/7/74/Booster132.png" class="thumbnail" width="85" height="170"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener">Information Booster might be Available!</a></h3>
+
+  <p>Utilizing other resources to help solve questions/issues unspecific to Whonix ™.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/kloak-service-problem/12935/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kloak-service-problem/12935/2</link>
+        <pubDate>Fri, 03 Dec 2021 11:24:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12935-2</guid>
+        <source url="http://forums.whonix.org/t/kloak-service-problem/12935.rss">Kloak service problem</source>
+      </item>
+      <item>
+        <title>Kloak service problem</title>
+        <dc:creator><![CDATA[anonimac]]></dc:creator>
+        <description><![CDATA[
+            <p>I’m trying to implement kloak as a service on my Devuan virtualbox machine and i understand that by the default it won’t work because of init incompatibility so i decided to build a service script.</p>
+<p>When i try to start the service i get this message…</p>
+<p>user@hostname:$ sudo service kloak start<br>
+Starting the process: kloakFound keyboard at: /dev/input/event0<br>
+Found uinput at: /dev/uinput<br>
+Waiting 500 ms…<br>
+Unable to grab device ‘/dev/input/event0’ : Device or resource busy<br>
+failed!</p>
+<p>Script look like this…what can be the problem?</p>
+<p>BEGIN INIT INFO<br>
+Provides: kloak<br>
+Required-Start: local_fs<br>
+Required-Stop: local_fs<br>
+Default-Start: 2 3 4 5<br>
+Default-Stop: 0 1 6<br>
+Short-Description: Kloak<br>
+Description: Anti Keystroke deanonymization tool<br>
+END INIT INFO<br>
+Using the lsb functions to perform the operations.<br>
+. /lib/lsb/init-functions</p>
+<p>Process name ( For display )<br>
+NAME=kloak</p>
+<p>Daemon name, where is the actual executable<br>
+DAEMON=/usr/sbin/kloak</p>
+<p>pid file for the daemon<br>
+PIDFILE=/var/run/kloak.pid</p>
+<p>If the daemon is not there, then exit.<br>
+test -x $DAEMON || exit 5</p>
+<p>case $1 in<br>
+start)</p>
+<p>Checked the PID file exists and check the actual status of process<br>
+if [ -e $PIDFILE ]; then<br>
+status_of_proc -p $PIDFILE $DAEMON “$NAME process” &amp;&amp; status=“0” || status="$?"</p>
+<p>If the status is SUCCESS then don’t need to start again.<br>
+if [ $status = “0” ]; then<br>
+exit # Exit<br>
+fi<br>
+fi</p>
+<p>Start the daemon.<br>
+log_daemon_msg “Starting the process” “$NAME”</p>
+<p>Start the daemon with the help of start-stop-daemon<br>
+Log the message appropriately<br>
+if start-stop-daemon --start --quiet --oknodo --pidfile $PIDFILE --exec $DAEMON ; then<br>
+log_end_msg 0<br>
+else<br>
+log_end_msg 1<br>
+fi<br>
+;;<br>
+stop)</p>
+<p>Stop the daemon.<br>
+if [ -e $PIDFILE ]; then<br>
+status_of_proc -p $PIDFILE $DAEMON “Stoppping the $NAME process” &amp;&amp; status=“0” || status="$?"<br>
+if [ “$status” = 0 ]; then<br>
+start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE<br>
+/bin/rm -rf $PIDFILE<br>
+fi<br>
+else<br>
+log_daemon_msg “$NAME process is not running”<br>
+log_end_msg 0<br>
+fi<br>
+;;<br>
+restart)</p>
+<p>Restart the daemon.<br>
+$0 stop &amp;&amp; sleep 2 &amp;&amp; $0 start<br>
+;;<br>
+status)</p>
+<p>Check the status of the process.<br>
+if [ -e $PIDFILE ]; then<br>
+status_of_proc -p $PIDFILE $DAEMON “$NAME process” &amp;&amp; exit 0 || exit $?<br>
+else<br>
+log_daemon_msg “$NAME Process is not running”<br>
+log_end_msg 0<br>
+fi<br>
+;;<br>
+reload)</p>
+<p>Reload the process. Basically sending some signal to a daemon to reload<br>
+it configurations.<br>
+if [ -e $PIDFILE ]; then<br>
+start-stop-daemon --stop --signal USR1 --quiet --pidfile $PIDFILE --name $NAME<br>
+log_success_msg “$NAME process reloaded successfully”<br>
+else<br>
+log_failure_msg “$PIDFILE does not exists”<br>
+fi<br>
+;;<br>
+*)</p>
+<p>For invalid arguments, print the usage message.<br>
+echo “Usage: $0 {start|stop|restart|reload|status}”<br>
+exit 2<br>
+;;<br>
+esac</p>
+          <p><a href="http://forums.whonix.org/t/kloak-service-problem/12935/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kloak-service-problem/12935/1</link>
+        <pubDate>Thu, 02 Dec 2021 13:10:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12935-1</guid>
+        <source url="http://forums.whonix.org/t/kloak-service-problem/12935.rss">Kloak service problem</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Selfrando Tor Browser - How To: Installation Guide</title>
+    <link>http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748</link>
+    <description>**Selfrando Hardened Tor Browser - Installing in Qubes-Whonix**
+
+_Only works on 64 bit Linux systems._
+
+**Installation Rationale**
+
+See: https://blog.torproject.org/blog/selfrando-q-and-georg-koppen
+
+&gt; &quot;Selfrando randomizes Tor browser code to ensure that an attacker doesn&#39;t know where the code is on your computer. This makes it much harder for someone to construct a reliable attack--and harder for them to use a flaw in your Tor Browser to de-anonymize you.&quot;
+
+**Steps**
+
+* Using Tor in your anon-whonix appVM, navigate to the directory for the latest hardened browser release*:
+
+&gt; https://people.torproject.org/~linus/builds/
+
+_*Note the builds are released every 3 days (currently) and are unsigned. The Tor browser sits in your /home directory which retains changes between sessions, so there is no need to install it in the Whonix-workstation template._
+
+* Click on the lock icon to check the certificate that you are really connected to torproject.org
+
+* Using Tor Browser, download this public key which signs all Tor browser nightly versions (as advised by gk)*:
+
+&gt; Continuous-TBB-builds-4D0DB324.asc
+
+_*If you have very restrictive apparmor protections that prevent downloading or changing download destinations, then open a terminal instead and run curl -O URL-OF-FILE to retrieve it_
+
+* Click on the link to descend to the directory with the latest nightly hardened builds. At time of writing it was:
+
+&gt; https://people.torproject.org/~linus/builds/tbb-nightly-hardened-2016-07-15/
+
+* Download these files:
+
+&gt; sha256sums-unsigned-build.txt
+&gt; sha256sums-unsigned-build.txt.asc
+&gt; tor-browser-linux64-tbb-nightly-hardened_ALL.tar.xz
+
+The first is a text file stating the SHA256 sums of the build. The second is the detached GPG signature for that text file. The third is the tarball.
+
+* To verify the SHA256 sum of the tarball, in Konsole type:
+
+&gt; sha256sum tor-browser-linux64-tbb-nightly-hardened_ALL.tar.xz
+
+Carefully check that the reported hash matches exactly the string given in the file named sha256sums-unsigned-build.txt
+
+* To verify the authenticity of the reported hash value, in Konsole type:
+
+&gt; gpg --import Continuous-TBB-builds-4D0DB324.asc
+
+&gt; gpg --verify sha256sums-unsigned-build.txt.asc sha256sums-unsigned-build.txt
+
+The first command imports the needed key into your keyring. The second verifies the detached signature sha256sums-unsigned-build.txt.asc. If all is good, you should see something like this:
+
+&gt; gpg: Signature made Fri 15 Jul 2016 09:31:01 AM UTC
+&gt; gpg:                using RSA key 0xD1982B344D0DB324
+&gt; gpg: Good signature from &quot;Continuous TBB builds&quot; [unknown]
+&gt; gpg: WARNING: This key is not certified with a trusted signature!
+&gt; gpg:          There is no indication that the signature belongs to the owner.
+&gt; Primary key fingerprint: B06F C0C1 F35B 8462 A2DB  64DA D198 2B34 4D0D B324
+
+* But we still don&#39;t know that this key really belongs to Linus Nordberg, so check the key itself using (q to exit gpg):
+
+&gt; gpg --edit-key 0xD1982B344D0DB324
+&gt; check
+
+You should see that the key is self-signed, which doesn&#39;t help. If you already have a second key owned by Linus Nordberg you should also see
+
+&gt; sig! 0x1E8BF34923291265 2015-10-20 Linus Nordberg
+
+* If you don&#39;t see output above, go to a key server and search for and then import into your keyring the key 0x1E8BF34923291265
+
+In Konsole, type:
+
+&gt; gpg --keyserver x-hkp://pool.sks-keyservers.net --recv-keys 0x1E8BF34923291265
+
+**Note:** https://www.torproject.org/docs/signing-keys.html provides the list of all Tor signing keys for your reference. You can confirm Linus&#39; key is there as:
+
+&gt; pub   4096R/23291265 2010-05-07
+&gt;           Key fingerprint = 8C4C D511 095E 982E B0EF  BFA2 1E8B F349 2329 1265
+&gt;     uid                  Linus Nordberg &lt;linus@torproject.org&gt;
+&gt;     sub   4096R/B5F7D1B1 2016-04-14 [expires: 2017-04-14]
+
+* Run the step above again (gpg &#39;check&#39;), and you should now see GPG confirming that Linus signed the special key used only to sign the TBB hardened nightly builds. You can also check his key to see that it is indeed signed by many Tor Project employees and other people, at least one of whom you hopefully trust.
+
+* At this point you are &#39;probably&#39; safe to unpack the tarball in the appropriate anon-whonix directory:
+-&gt; Extract the tarball under the /home directory
+-&gt; Use Dolphin to navigate to the hidden .tb directory (either show hidden files or cd .tb)
+-&gt; Rename current Tor Browser Folder as &#39;Tor-browser Old&#39;
+-&gt; Move your Selfrando Tor browser to the .tb directory
+
+* Close old Tor-browser instance and start the new Selfrando Tor browser from the anon-whonix appVM menu
+
+* Immediately check you are connected to Tor. Update addons immediately and restart. Check the &#39;Help -&gt; About Tor&#39; button now shows:
+
+&gt; tbb-nightly-hardened (based on Mozilla Firefox 45.2.0)
+
+Congratulations, you now have the most hardened Tor browser on the block running on your system! 
+
+Even those with 0-day Tor exploits will have difficulty hacking your ass, particularly if you also run apparmor profiles, seccomp restrictions and rarely run Javascript.
+
+You&#39;ll need around 3gb memory to run the browser though, due to numerous memory protections e.g. address sanitization etc.
+
+**Check back to the torproject every few days to repeat this process with the latest tarball.** You will not have to import the keys again, but should repeat the process to ensure the build is not corrupt or back-doored.</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 04 Aug 2016 03:54:39 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Selfrando Tor Browser - How To: Installation Guide</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks HulaHoop - interesting read.</p>
+<p>BTW my advice above has now been superseded by Torproject’s decision to bake in Selfrando to the ‘hardened’ Tor Browser series.</p>
+<p>So, paranoid 64bit Qubes-Whonix users (isn’t that most of us <img src="//forums.whonix.org/images/emoji/twitter/grin.png?v=5" title=":grin:" class="emoji" alt=":grin:"> ) should just use tbb-downloader to install the “6.5a2-hardened (based on Mozilla Firefox 45.3.0)” browser, and keep it updated every 6 weeks or so.</p>
+<p>The only caveat is that after FF releases new updates, there is a window of about 6-12 hours before torproject makes the ‘hardened’ browser available. Therefore, technically there is a small window when bad guys can know of vulnerabilities in the browser and hack away, before the hardened update is available for installation. So, maybe that is when you decide to hit the bar instead of the keyboard.</p>
+<p>Usually the window for the standard Tor Browser is much smaller - an hour or so.</p>
+          <p><a href="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/7</link>
+        <pubDate>Thu, 04 Aug 2016 03:54:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2748-7</guid>
+        <source url="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748.rss">Selfrando Tor Browser - How To: Installation Guide</source>
+      </item>
+      <item>
+        <title>Selfrando Tor Browser - How To: Installation Guide</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks <a class="mention" href="http://forums.whonix.org/u/torjunkie">@torjunkie</a>.</p>
+<p>Thats good news. I remember the earliest hardened builds were unusable with videos on youtube. As for the RAM thing thats because they still use ASan despite it being resource hungry and of no security benefit at all (it increases attack surface actually):</p>
+<p>From <a href="http://www.openwall.com/lists/oss-security/2016/02/17/9">http://www.openwall.com/lists/oss-security/2016/02/17/9</a></p>
+          <p><a href="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/6</link>
+        <pubDate>Sun, 24 Jul 2016 16:30:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2748-6</guid>
+        <source url="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748.rss">Selfrando Tor Browser - How To: Installation Guide</source>
+      </item>
+      <item>
+        <title>Selfrando Tor Browser - How To: Installation Guide</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi HulaHoop,</p>
+<p>The performance has been good - I see no difference to the standard Tor browser except it chews around 3gb of memory (or so). But for browsing and so on, it’s just like the vanilla version.</p>
+          <p><a href="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/5</link>
+        <pubDate>Sun, 24 Jul 2016 10:04:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2748-5</guid>
+        <source url="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748.rss">Selfrando Tor Browser - How To: Installation Guide</source>
+      </item>
+      <item>
+        <title>Selfrando Tor Browser - How To: Installation Guide</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="3" data-topic="2748">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>we should switch to it by default.</p>
+</blockquote>
+</aside>
+<p>It would be a bold decision to go with the unstable rather than stable version of TBB. More ArchLinux / Gentoo rather than Debian style. I think this should be optional and we should wait for the improvements to flow back into stable versions.</p>
+          <p><a href="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/4</link>
+        <pubDate>Sun, 17 Jul 2016 17:09:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2748-4</guid>
+        <source url="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748.rss">Selfrando Tor Browser - How To: Installation Guide</source>
+      </item>
+      <item>
+        <title>Selfrando Tor Browser - How To: Installation Guide</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>With the upcoming transition to 64-bit guests this will become an option for all users.</p>
+<p><a class="mention" href="http://forums.whonix.org/u/torjunkie">@torjunkie</a> How is the performance of hardened TBB? If its comparable to vanilla TBB performance we should switch to it by default.</p>
+          <p><a href="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/3</link>
+        <pubDate>Sun, 17 Jul 2016 14:30:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2748-3</guid>
+        <source url="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748.rss">Selfrando Tor Browser - How To: Installation Guide</source>
+      </item>
+      <item>
+        <title>Selfrando Tor Browser - How To: Installation Guide</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks torjunkie!</p>
+<p>(Moved to <em>Development</em>. Not <em>Qubes-Whonix</em> specific, and too advanced for <em>Support</em>.)</p>
+          <p><a href="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/2</link>
+        <pubDate>Sat, 16 Jul 2016 21:24:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2748-2</guid>
+        <source url="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748.rss">Selfrando Tor Browser - How To: Installation Guide</source>
+      </item>
+      <item>
+        <title>Selfrando Tor Browser - How To: Installation Guide</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p><strong>Selfrando Hardened Tor Browser - Installing in Qubes-Whonix</strong></p>
+<p><em>Only works on 64 bit Linux systems.</em></p>
+<p><strong>Installation Rationale</strong></p>
+<p>See: <a href="https://blog.torproject.org/blog/selfrando-q-and-georg-koppen">https://blog.torproject.org/blog/selfrando-q-and-georg-koppen</a></p>
+<blockquote>
+<p>“Selfrando randomizes Tor browser code to ensure that an attacker doesn’t know where the code is on your computer. This makes it much harder for someone to construct a reliable attack–and harder for them to use a flaw in your Tor Browser to de-anonymize you.”</p>
+</blockquote>
+<p><strong>Steps</strong></p>
+<ul>
+<li>Using Tor in your anon-whonix appVM, navigate to the directory for the latest hardened browser release*:</li>
+</ul>
+<blockquote>
+<p><a href="https://people.torproject.org/~linus/builds/">https://people.torproject.org/~linus/builds/</a></p>
+</blockquote>
+<p><em>*Note the builds are released every 3 days (currently) and are unsigned. The Tor browser sits in your /home directory which retains changes between sessions, so there is no need to install it in the Whonix-workstation template.</em></p>
+<ul>
+<li>
+<p>Click on the lock icon to check the certificate that you are really connected to <a href="http://torproject.org">torproject.org</a></p>
+</li>
+<li>
+<p>Using Tor Browser, download this public key which signs all Tor browser nightly versions (as advised by gk)*:</p>
+</li>
+</ul>
+<blockquote>
+<p>Continuous-TBB-builds-4D0DB324.asc</p>
+</blockquote>
+<p><em>*If you have very restrictive apparmor protections that prevent downloading or changing download destinations, then open a terminal instead and run curl -O URL-OF-FILE to retrieve it</em></p>
+<ul>
+<li>Click on the link to descend to the directory with the latest nightly hardened builds. At time of writing it was:</li>
+</ul>
+<blockquote>
+<p><a href="https://people.torproject.org/~linus/builds/tbb-nightly-hardened-2016-07-15/">https://people.torproject.org/~linus/builds/tbb-nightly-hardened-2016-07-15/</a></p>
+</blockquote>
+<ul>
+<li>Download these files:</li>
+</ul>
+<blockquote>
+<p>sha256sums-unsigned-build.txt<br>
+sha256sums-unsigned-build.txt.asc<br>
+tor-browser-linux64-tbb-nightly-hardened_ALL.tar.xz</p>
+</blockquote>
+<p>The first is a text file stating the SHA256 sums of the build. The second is the detached GPG signature for that text file. The third is the tarball.</p>
+<ul>
+<li>To verify the SHA256 sum of the tarball, in Konsole type:</li>
+</ul>
+<blockquote>
+<p>sha256sum tor-browser-linux64-tbb-nightly-hardened_ALL.tar.xz</p>
+</blockquote>
+<p>Carefully check that the reported hash matches exactly the string given in the file named sha256sums-unsigned-build.txt</p>
+<ul>
+<li>To verify the authenticity of the reported hash value, in Konsole type:</li>
+</ul>
+<blockquote>
+<p>gpg --import Continuous-TBB-builds-4D0DB324.asc</p>
+</blockquote>
+<blockquote>
+<p>gpg --verify sha256sums-unsigned-build.txt.asc sha256sums-unsigned-build.txt</p>
+</blockquote>
+<p>The first command imports the needed key into your keyring. The second verifies the detached signature sha256sums-unsigned-build.txt.asc. If all is good, you should see something like this:</p>
+<blockquote>
+<p>gpg: Signature made Fri 15 Jul 2016 09:31:01 AM UTC<br>
+gpg:                using RSA key 0xD1982B344D0DB324<br>
+gpg: Good signature from “Continuous TBB builds” [unknown]<br>
+gpg: WARNING: This key is not certified with a trusted signature!<br>
+gpg:          There is no indication that the signature belongs to the owner.<br>
+Primary key fingerprint: B06F C0C1 F35B 8462 A2DB  64DA D198 2B34 4D0D B324</p>
+</blockquote>
+<ul>
+<li>But we still don’t know that this key really belongs to Linus Nordberg, so check the key itself using (q to exit gpg):</li>
+</ul>
+<blockquote>
+<p>gpg --edit-key 0xD1982B344D0DB324<br>
+check</p>
+</blockquote>
+<p>You should see that the key is self-signed, which doesn’t help. If you already have a second key owned by Linus Nordberg you should also see</p>
+<blockquote>
+<p>sig! 0x1E8BF34923291265 2015-10-20 Linus Nordberg</p>
+</blockquote>
+<ul>
+<li>If you don’t see output above, go to a key server and search for and then import into your keyring the key 0x1E8BF34923291265</li>
+</ul>
+<p>In Konsole, type:</p>
+<blockquote>
+<p>gpg --keyserver x-hkp://pool.sks-keyservers.net --recv-keys 0x1E8BF34923291265</p>
+</blockquote>
+<p><strong>Note:</strong> <a href="https://www.torproject.org/docs/signing-keys.html">https://www.torproject.org/docs/signing-keys.html</a> provides the list of all Tor signing keys for your reference. You can confirm Linus’ key is there as:</p>
+<blockquote>
+<p>pub   4096R/23291265 2010-05-07<br>
+Key fingerprint = 8C4C D511 095E 982E B0EF  BFA2 1E8B F349 2329 1265<br>
+uid                  Linus Nordberg <a href="mailto:linus@torproject.org">linus@torproject.org</a><br>
+sub   4096R/B5F7D1B1 2016-04-14 [expires: 2017-04-14]</p>
+</blockquote>
+<ul>
+<li>
+<p>Run the step above again (gpg ‘check’), and you should now see GPG confirming that Linus signed the special key used only to sign the TBB hardened nightly builds. You can also check his key to see that it is indeed signed by many Tor Project employees and other people, at least one of whom you hopefully trust.</p>
+</li>
+<li>
+<p>At this point you are ‘probably’ safe to unpack the tarball in the appropriate anon-whonix directory:<br>
+-&gt; Extract the tarball under the /home directory<br>
+-&gt; Use Dolphin to navigate to the hidden .tb directory (either show hidden files or cd .tb)<br>
+-&gt; Rename current Tor Browser Folder as ‘Tor-browser Old’<br>
+-&gt; Move your Selfrando Tor browser to the .tb directory</p>
+</li>
+<li>
+<p>Close old Tor-browser instance and start the new Selfrando Tor browser from the anon-whonix appVM menu</p>
+</li>
+<li>
+<p>Immediately check you are connected to Tor. Update addons immediately and restart. Check the ‘Help -&gt; About Tor’ button now shows:</p>
+</li>
+</ul>
+<blockquote>
+<p>tbb-nightly-hardened (based on Mozilla Firefox 45.2.0)</p>
+</blockquote>
+<p>Congratulations, you now have the most hardened Tor browser on the block running on your system!</p>
+<p>Even those with 0-day Tor exploits will have difficulty hacking your ass, particularly if you also run apparmor profiles, seccomp restrictions and rarely run Javascript.</p>
+<p>You’ll need around 3gb memory to run the browser though, due to numerous memory protections e.g. address sanitization etc.</p>
+<p><strong>Check back to the torproject every few days to repeat this process with the latest tarball.</strong> You will not have to import the keys again, but should repeat the process to ensure the build is not corrupt or back-doored.</p>
+          <p><a href="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748/1</link>
+        <pubDate>Sat, 16 Jul 2016 15:06:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2748-1</guid>
+        <source url="http://forums.whonix.org/t/selfrando-tor-browser-how-to-installation-guide/2748.rss">Selfrando Tor Browser - How To: Installation Guide</source>
+      </item>
+  </channel>
+</rss>

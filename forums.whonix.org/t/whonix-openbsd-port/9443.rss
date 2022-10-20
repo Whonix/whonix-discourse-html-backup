@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix-OpenBSD Port</title>
+    <link>http://forums.whonix.org/t/whonix-openbsd-port/9443</link>
+    <description>Hello.
+
+I have created a guide to install OpenBSD as a Whonix-Custom-Workstation: ( /wiki/Other_Operating_Systems#Whonix_.E2.84.A2-OpenBSD-Workstation ) (cannot post links). I will update the guide once 6.7 is released, which should be soon.
+
+What remains to be done is instructions to install Tor Browser. There is a tor-browser package in OpenBSD ports tree, but apparently an update to Rust broke it as I found here ( https : // www. reddit. com/r/openbsd/comments/dkuz7u/tor_browser/ ), so it currently can&#39;t be installed using pkg_add.
+
+Hopefully the issue will be resolved in 6.7.
+
+I am currently trying to build Whonix packages on OpenBSD. Here is a summary of my progress so far:
+
+Installed necessary packages for building: gcc gmake git
+
+Started with **genmkfile**, because it is required to build all the other packages.
+
+Since master branch of genmkfile does not have a Makefile, I cloned the Whonix13 branch.
+Since OpenBSD paths are different, I changed all instances of **/bin/bash** to **/usr/local/bin/bash**.
+
+All instances of **/usr/bin/make** must be replaced with **/usr/local/bin/gmake**.
+
+After that, running
+**sudo gmake install**
+works fine.
+
+I have built several packages partially; **dist-base-files**, **helper-scripts**, **bootclockrandomization** and attempted to build **sdwdate**.
+Here is a synopsis of what needs to be done:
+
+Installing the **coreutils** package, because the code uses some commands and flags absent in OpenBSD utilities; I did not want to make intrusive changes to the code. Then changing the code so it uses coreutils, synopsis:
+
+chmod &gt;&gt; gchmod
+chown &gt;&gt; gchown
+cp &gt;&gt; gcp
+date &gt;&gt; gdate
+mkdir &gt;&gt; gmkdir
+mkfifo &gt;&gt; gmkfifo
+mktemp &gt;&gt; gmktemp
+rm &gt;&gt; grm
+timeout &gt;&gt; gtimeout
+
+And so on.
+
+After that, I cloned **dist-base-files**.
+Replaced all instances of **/bin/bash** with **/usr/local/bin/bash**.
+Saved the old Makefile from genmkfile in the directory and ran
+**sudo gmake install**
+This seems to have worked fine and the files were updated.
+
+Cloned **bootclockrandomization**.
+Changed bash paths, changed **/run/** to **/var/run/**, **date** to **gdate**.
+Wrote an /etc/rc.d bootclockrandomization script.
+Then modified rc.conf.local to include **bootclockrandomization** in pkg_scripts.
+But that did not make **bootclockrandomization** recognized by rc and using **rcctl enable bootclockrandomization** fails (service does not exist).
+Not sure what to do with this yet. It seems it has to be installed as a package for pkg_scripts and rcctl to work.
+
+Running the scripts **clock-random-manual-cli** and **/usr/share/bootclockrandomization/start** was successful with no errors after adding the line
+`gmkdir &quot;$DIR&quot;`
+
+to **start** (because first attempt reported missing directory).
+
+Then I tried to build one of the most important Whonix packages, sdwdate.
+
+Installed the dependencies found in debian/control.
+
+pkg_add python3 py3-stem py3-dateutil py3-gevent py3-socks gbc
+
+Then cloned python-guimessages, since it is a dependency.
+Replaced all instances of **/usr/bin/python3** with **/usr/local/bin/python3**.
+
+Since Python modules are also stored elsewhere on OpenBSD, I moved all the files from
+**usr/lib/python/dist-files/guimessages/** to
+**usr/local/lib/python3.7/guimessages/**
+
+Just to make sure, I also made a copy of the directory usr/local/lib/python3.7/guimessages/ as usr/local/lib/python3.6/guimessages/.
+
+Copied the old Makefile again and installed the modules.
+
+Cloned **helper-scripts**.
+
+Change bash and python paths as usual.
+Change all commands to coreutils.
+
+Change all the paths of **/run/** to **/var/run/**
+
+in **te_pe_tb_check**
+comment line
+`source /usr/lib/helper-scripts/pkg_manager_running_check`
+
+
+in **usr/lib/helper-scripts/tor_bootstrap_check.bsh**:
+
+added custom code to ensure the IP is correct
+
+	if [ -f &quot;/etc/mygate&quot; ]; then
+	   GATEWAY_IP=&quot;`cat /etc/mygate`&quot;
+	fi
+
+	if [ &quot;$gateway_control_port&quot; = &quot;&quot; ]; then
+	   gateway_control_port=&quot;9051&quot;
+	fi
+
+
+Cloned **sdwdate**.
+Once again, started with replacing the bash and python paths.
+
+In **usr/bin/sdwdate**, I commented all lines related to sdnotify, including all instances of n.notify, as systemd-related code won&#39;t work and does not seem to be critical to sdwdate&#39;s functionality (except starting it at boot).
+
+In **usr/lib/sdwdate/restart_fresh**
+Change rm to grm and change systemctl to rcctl, remove its flags, and comment the line. rcctl won&#39;t work yet as mentioned.
+
+Change all the instances of coreutils in all files to their OpenBSD equivalents.
+
+Comment the line related to systemd in suspend-post.
+Change instances of systemctl to rcctl and remove the flags.
+Change paths of **/run/sdwdate** to **/var/run/sdwdate** and update the paths elsewhere as well.
+
+In **/usr/bin/sdwdate**
+Change **/bin/date** to **/usr/local/bin/gdate**
+Change **mktemp** to **gmktemp**
+
+Then sudo gmake install
+
+Error related to translation code. Comment all lines related to translations, because non-critical.
+
+After reinstalling it, sdwdate started, but wasn&#39;t able to connect:
+bash-5.0$ sdwdate
+2020-04-28 22:51:28 - sdwdate - INFO - sdwdate started. PID: 49391
+2020-04-28 22:51:28 - sdwdate - INFO - create temp_dir: /tmp/tmp.Z6JXBEqSaH
+2020-04-28 22:51:28 - sdwdate - INFO - Tor socks host: 10.152.152.10 Tor socks port: 9050
+2020-04-28 22:51:28 - sdwdate - INFO - Running sdwdate main loop. iteration: 1 / 10000
+2020-04-28 22:51:28 - sdwdate - INFO - WARNING - Tor Bootstrap Result: Tor&#39;s Control Port could not be reached.
+
+Did you start Gateway beforehand?
+
+Unexpected error: &lt;class &#39;FileNotFoundError&#39;&gt;
+^CTraceback (most recent call last):
+  File &quot;/usr/bin/sdwdate&quot;, line 604, in &lt;module&gt;
+    prerequisite_check()
+  File &quot;/usr/bin/sdwdate&quot;, line 558, in prerequisite_check
+    time.sleep(prerequisite_check_sleep_seconds)
+KeyboardInterrupt
+bash-5.0$
+
+Tried to manually run Tor-related helper-scripts.
+
+**tor_bootstrap_check**, **tor_circuit_established_check**, and **tor_signal_newnym** report:
+Unable to connect to tor. Are you sure it&#39;s running?
+
+It seems the problem is helper-scripts trying to connect to local Tor daemon which is disabled, instead of the Whonix-Gateway, despite adding the custom code earlier to ensure the IP settings are correct.
+
+I looked through the code, but I am at a loss as to how to resolve this. Building **anon-ws-disable-stacked-tor** could help, but it seems to rely on systemd.
+
+I do not know how much interest there will be in an OpenBSD port. It is a potential consideration for: /wiki/Dev/Operating_System#Criteria_for_Choosing_a_Base_Distribution , but OpenBSD was addressed already.
+
+However, I will update on my progress. If anyone knows how to resolve these issues, help will be appreciated.</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 29 Apr 2020 22:53:30 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-openbsd-port/9443.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix-OpenBSD Port</title>
+        <dc:creator><![CDATA[singularity]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you for your response.</p>
+<p>I will take note of your advice.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="9443">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Debian uses /run now. Past was /var/run. I guess compatibility symlink<br>
+might be better.</p>
+</blockquote>
+</aside>
+<p>Good point.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="9443">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Not sure why that would be required. A a fix / feature independent from<br>
+OpenBSD port?</p>
+</blockquote>
+</aside>
+<p>Yes, this is probably only temporary. I wanted to make sure the gateway IP is set correctly and is the same as <code>/etc/mygate</code>. Because <strong>tor_bootstrap_check</strong> looks for the file <code>/usr/share/anon-ws-base-files/workstation</code>, but <strong>anon-ws-base-files</strong> was not installed.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="9443">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><code>""]</code> is missing a space.</p>
+</blockquote>
+</aside>
+<p>My bad. That is because I rewrote the line here, instead of copying it. I did not forget the space in the script.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="9443">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Indeed. Git history at some point implemented the same using a ton of<br>
+socat instances without “much” reliance on systemd (i.e. starting the<br>
+script as a usual daemon which would be similarly easy to replace).</p>
+</blockquote>
+</aside>
+<p>Seems it could be used as a basis for the OpenBSD version with some modifications, I will have a look.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-openbsd-port/9443/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-openbsd-port/9443/3</link>
+        <pubDate>Wed, 29 Apr 2020 22:53:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9443-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-openbsd-port/9443.rss">Whonix-OpenBSD Port</source>
+      </item>
+      <item>
+        <title>Whonix-OpenBSD Port</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Interesting, you seem to find your way around the source code really well.</p>
+<p>singularity via Whonix Forum:</p>
+<blockquote>
+<p>Started with <strong>genmkfile</strong>, because it is required to build all the other packages.</p>
+</blockquote>
+<p>No longer required.</p>
+<p>This was replaced by file:<br>
+debian/packagename.install</p>
+<p>Which should be trivial to port anywhere hopefully. Folder structure<br>
+source code file usr/bin/something copying to /usr/bin/something is<br>
+still the same.</p>
+<blockquote>
+<p>Since master branch of genmkfile does not have a Makefile, I cloned the Whonix13 branch.</p>
+</blockquote>
+<p>Don’t bother with ancient releases.</p>
+<blockquote>
+<p>Changed bash paths, changed <strong>/run/</strong> to <strong>/var/run/</strong>, <strong>date</strong> to <strong>gdate</strong>.</p>
+</blockquote>
+<p>Debian uses /run now. Past was /var/run. I guess compatibility symlink<br>
+might be better.</p>
+<blockquote>
+<p>in te_pe_tb_check<br>
+comment line<br>
+source /usr/lib/helper-scripts/pkg_manager_running_check</p>
+<p>in usr/lib/helper-scripts/tor_bootstrap_check.bsh:</p>
+<p>added custom code to ensure the IP is correct</p>
+<p>if [ -f “/etc/mygate” ]; then<br>
+GATEWAY_IP="<code>cat /etc/mygate</code>"<br>
+fi</p>
+</blockquote>
+<p>Not sure why that would be required. A a fix / feature independent from<br>
+OpenBSD port?</p>
+<blockquote>
+<p>if [ “$gateway_control_port” = “”]; then<br>
+gateway_control_port=“9051”<br>
+fi</p>
+</blockquote>
+<p><code>""]</code> is missing a space.</p>
+<blockquote>
+<p>In usr/bin/sdwdate, I commented all lines related to sdnotify, including all instances of n.notify, as systemd-related code won’t work and does not seem to be critical to sdwdate’s functionality (except starting it at boot).</p>
+</blockquote>
+<p>Indeed sdnotify not critical.</p>
+<blockquote>
+<p>It seems the problem is helper-scripts trying to connect to local Tor daemon which is disabled, instead of the Whonix-Gateway,</p>
+</blockquote>
+<p>That’s how Whonix works. anon-ws-disable-stacked-tor package redirects<br>
+Whonix-Workstation ports localhost to Whonix-Gateway. Also Tor Browser<br>
+will need this.</p>
+<blockquote>
+<p>I looked through the code, but I am at a loss as to how to resolve this. Building <strong>anon-ws-disable-stacked-tor</strong> could help, but it seems to rely on systemd.</p>
+</blockquote>
+<p>Indeed. Git history at some point implemented the same using a ton of<br>
+socat instances without “much” reliance on systemd (i.e. starting the<br>
+script as a usual daemon which would be similarly easy to replace).</p>
+          <p><a href="http://forums.whonix.org/t/whonix-openbsd-port/9443/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-openbsd-port/9443/2</link>
+        <pubDate>Wed, 29 Apr 2020 11:15:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9443-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-openbsd-port/9443.rss">Whonix-OpenBSD Port</source>
+      </item>
+      <item>
+        <title>Whonix-OpenBSD Port</title>
+        <dc:creator><![CDATA[singularity]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello.</p>
+<p>I have created a guide to install OpenBSD as a Whonix-Custom-Workstation: ( /wiki/Other_Operating_Systems#Whonix_.E2.84.A2-OpenBSD-Workstation ) (cannot post links). I will update the guide once 6.7 is released, which should be soon.</p>
+<p>What remains to be done is instructions to install Tor Browser. There is a tor-browser package in OpenBSD ports tree, but apparently an update to Rust broke it as I found here ( https : // www. reddit. com/r/openbsd/comments/dkuz7u/tor_browser/ ), so it currently can’t be installed using pkg_add.</p>
+<p>Hopefully the issue will be resolved in 6.7.</p>
+<p>I am currently trying to build Whonix packages on OpenBSD. Here is a summary of my progress so far:</p>
+<p>Installed necessary packages for building: gcc gmake git</p>
+<p>Started with <strong>genmkfile</strong>, because it is required to build all the other packages.</p>
+<p>Since master branch of genmkfile does not have a Makefile, I cloned the Whonix13 branch.<br>
+Since OpenBSD paths are different, I changed all instances of <strong>/bin/bash</strong> to <strong>/usr/local/bin/bash</strong>.</p>
+<p>All instances of <strong>/usr/bin/make</strong> must be replaced with <strong>/usr/local/bin/gmake</strong>.</p>
+<p>After that, running<br>
+<strong>sudo gmake install</strong><br>
+works fine.</p>
+<p>I have built several packages partially; <strong>dist-base-files</strong>, <strong>helper-scripts</strong>, <strong>bootclockrandomization</strong> and attempted to build <strong>sdwdate</strong>.<br>
+Here is a synopsis of what needs to be done:</p>
+<p>Installing the <strong>coreutils</strong> package, because the code uses some commands and flags absent in OpenBSD utilities; I did not want to make intrusive changes to the code. Then changing the code so it uses coreutils, synopsis:</p>
+<p>chmod &gt;&gt; gchmod<br>
+chown &gt;&gt; gchown<br>
+cp &gt;&gt; gcp<br>
+date &gt;&gt; gdate<br>
+mkdir &gt;&gt; gmkdir<br>
+mkfifo &gt;&gt; gmkfifo<br>
+mktemp &gt;&gt; gmktemp<br>
+rm &gt;&gt; grm<br>
+timeout &gt;&gt; gtimeout</p>
+<p>And so on.</p>
+<p>After that, I cloned <strong>dist-base-files</strong>.<br>
+Replaced all instances of <strong>/bin/bash</strong> with <strong>/usr/local/bin/bash</strong>.<br>
+Saved the old Makefile from genmkfile in the directory and ran<br>
+<strong>sudo gmake install</strong><br>
+This seems to have worked fine and the files were updated.</p>
+<p>Cloned <strong>bootclockrandomization</strong>.<br>
+Changed bash paths, changed <strong>/run/</strong> to <strong>/var/run/</strong>, <strong>date</strong> to <strong>gdate</strong>.<br>
+Wrote an /etc/rc.d bootclockrandomization script.<br>
+Then modified rc.conf.local to include <strong>bootclockrandomization</strong> in pkg_scripts.<br>
+But that did not make <strong>bootclockrandomization</strong> recognized by rc and using <strong>rcctl enable bootclockrandomization</strong> fails (service does not exist).<br>
+Not sure what to do with this yet. It seems it has to be installed as a package for pkg_scripts and rcctl to work.</p>
+<p>Running the scripts <strong>clock-random-manual-cli</strong> and <strong>/usr/share/bootclockrandomization/start</strong> was successful with no errors after adding the line<br>
+<code>gmkdir "$DIR"</code></p>
+<p>to <strong>start</strong> (because first attempt reported missing directory).</p>
+<p>Then I tried to build one of the most important Whonix packages, sdwdate.</p>
+<p>Installed the dependencies found in debian/control.</p>
+<p>pkg_add python3 py3-stem py3-dateutil py3-gevent py3-socks gbc</p>
+<p>Then cloned python-guimessages, since it is a dependency.<br>
+Replaced all instances of <strong>/usr/bin/python3</strong> with <strong>/usr/local/bin/python3</strong>.</p>
+<p>Since Python modules are also stored elsewhere on OpenBSD, I moved all the files from<br>
+<strong>usr/lib/python/dist-files/guimessages/</strong> to<br>
+<strong>usr/local/lib/python3.7/guimessages/</strong></p>
+<p>Just to make sure, I also made a copy of the directory usr/local/lib/python3.7/guimessages/ as usr/local/lib/python3.6/guimessages/.</p>
+<p>Copied the old Makefile again and installed the modules.</p>
+<p>Cloned <strong>helper-scripts</strong>.</p>
+<p>Change bash and python paths as usual.<br>
+Change all commands to coreutils.</p>
+<p>Change all the paths of <strong>/run/</strong> to <strong>/var/run/</strong></p>
+<p>in <strong>te_pe_tb_check</strong><br>
+comment line<br>
+<code>source /usr/lib/helper-scripts/pkg_manager_running_check</code></p>
+<p>in <strong>usr/lib/helper-scripts/tor_bootstrap_check.bsh</strong>:</p>
+<p>added custom code to ensure the IP is correct</p>
+<pre><code>if [ -f "/etc/mygate" ]; then
+   GATEWAY_IP="`cat /etc/mygate`"
+fi
+
+if [ "$gateway_control_port" = "" ]; then
+   gateway_control_port="9051"
+fi
+</code></pre>
+<p>Cloned <strong>sdwdate</strong>.<br>
+Once again, started with replacing the bash and python paths.</p>
+<p>In <strong>usr/bin/sdwdate</strong>, I commented all lines related to sdnotify, including all instances of n.notify, as systemd-related code won’t work and does not seem to be critical to sdwdate’s functionality (except starting it at boot).</p>
+<p>In <strong>usr/lib/sdwdate/restart_fresh</strong><br>
+Change rm to grm and change systemctl to rcctl, remove its flags, and comment the line. rcctl won’t work yet as mentioned.</p>
+<p>Change all the instances of coreutils in all files to their OpenBSD equivalents.</p>
+<p>Comment the line related to systemd in suspend-post.<br>
+Change instances of systemctl to rcctl and remove the flags.<br>
+Change paths of <strong>/run/sdwdate</strong> to <strong>/var/run/sdwdate</strong> and update the paths elsewhere as well.</p>
+<p>In <strong>/usr/bin/sdwdate</strong><br>
+Change <strong>/bin/date</strong> to <strong>/usr/local/bin/gdate</strong><br>
+Change <strong>mktemp</strong> to <strong>gmktemp</strong></p>
+<p>Then sudo gmake install</p>
+<p>Error related to translation code. Comment all lines related to translations, because non-critical.</p>
+<p>After reinstalling it, sdwdate started, but wasn’t able to connect:<br>
+bash-5.0$ sdwdate<br>
+2020-04-28 22:51:28 - sdwdate - INFO - sdwdate started. PID: 49391<br>
+2020-04-28 22:51:28 - sdwdate - INFO - create temp_dir: /tmp/tmp.Z6JXBEqSaH<br>
+2020-04-28 22:51:28 - sdwdate - INFO - Tor socks host: 10.152.152.10 Tor socks port: 9050<br>
+2020-04-28 22:51:28 - sdwdate - INFO - Running sdwdate main loop. iteration: 1 / 10000<br>
+2020-04-28 22:51:28 - sdwdate - INFO - WARNING - Tor Bootstrap Result: Tor’s Control Port could not be reached.</p>
+<p>Did you start Gateway beforehand?</p>
+<p>Unexpected error: &lt;class ‘FileNotFoundError’&gt;<br>
+^CTraceback (most recent call last):<br>
+File “/usr/bin/sdwdate”, line 604, in <br>
+prerequisite_check()<br>
+File “/usr/bin/sdwdate”, line 558, in prerequisite_check<br>
+time.sleep(prerequisite_check_sleep_seconds)<br>
+KeyboardInterrupt<br>
+bash-5.0$</p>
+<p>Tried to manually run Tor-related helper-scripts.</p>
+<p><strong>tor_bootstrap_check</strong>, <strong>tor_circuit_established_check</strong>, and <strong>tor_signal_newnym</strong> report:<br>
+Unable to connect to tor. Are you sure it’s running?</p>
+<p>It seems the problem is helper-scripts trying to connect to local Tor daemon which is disabled, instead of the Whonix-Gateway, despite adding the custom code earlier to ensure the IP settings are correct.</p>
+<p>I looked through the code, but I am at a loss as to how to resolve this. Building <strong>anon-ws-disable-stacked-tor</strong> could help, but it seems to rely on systemd.</p>
+<p>I do not know how much interest there will be in an OpenBSD port. It is a potential consideration for: /wiki/Dev/Operating_System#Criteria_for_Choosing_a_Base_Distribution , but OpenBSD was addressed already.</p>
+<p>However, I will update on my progress. If anyone knows how to resolve these issues, help will be appreciated.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-openbsd-port/9443/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-openbsd-port/9443/1</link>
+        <pubDate>Wed, 29 Apr 2020 09:52:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9443-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-openbsd-port/9443.rss">Whonix-OpenBSD Port</source>
+      </item>
+  </channel>
+</rss>

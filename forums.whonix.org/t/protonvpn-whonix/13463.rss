@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>ProtonVPN + Whonix ?</title>
+    <link>http://forums.whonix.org/t/protonvpn-whonix/13463</link>
+    <description>Hello, 
+
+I am trying to configure a VPN with Whonix of type: **User → VPN → Tor → Internet**, as described in the Whonix-Wiki: **Tunnels -&gt; Connecting_to_a_VPN_before_Tor -&gt; VPN_Setup**
+
+
+My goal is to hide (not in a strong way, but just as a first level of obfuscation) my TOR usage from my ISP.
+
+The wiki is very well written. I followed it. First (as recommended) I have tried to learn how to setup OpenVPN in KickSecure and it works. But I am now having problems with Whonix.
+
+**My problem:** I haven&#39;t succeeded in properly merging the Whonix template for the openvpn service:
+
+```
+##############################
+## VPN provider specific settings ##
+##############################
+auth-user-pass auth.txt
+
+## using nyc.vpn.riseup.net 80
+remote 198.252.153.226 80
+
+ca RiseupCA.pem
+
+remote-cert-tls server
+
+####################################
+## TUNNEL_FIREWALL specific settings ##
+####################################
+client
+dev tun0
+persist-tun
+persist-key
+
+script-security 2
+#up &quot;/etc/openvpn/update-resolv-conf script_type=up dev=tun0&quot;
+#down &quot;/etc/openvpn/update-resolv-conf script_type=down dev=tun0&quot;
+
+user tunnel
+iproute /usr/bin/ip_unpriv
+
+# Disabling any possible ipv6 auto-configuration since we have ipv6 disabled on our Whonix-Gateway
+pull-filter ignore &quot;dhcp-option DNS6&quot;
+pull-filter ignore &quot;tun-ipv6&quot;
+pull-filter ignore &quot;ifconfig-ipv6&quot;
+```
+
+
+with the configuration file provided by my VPN (which is ProtonVPN), which has the following shape:
+
+```
+client
+dev tun
+proto tcp
+
+remote 195.178.172.188 5995
+remote 138.199.55.34 8443
+remote 195.178.172.188 443
+remote 138.199.55.34 5995
+remote 195.178.172.188 8443
+remote 138.199.55.34 443
+server-poll-timeout 20
+
+remote-random
+resolv-retry infinite
+nobind
+
+# The following setting is only needed for old OpenVPN clients compatibility. New clients
+# automatically negotiate the optimal cipher.
+cipher AES-256-CBC
+
+auth SHA512
+verb 3
+
+setenv CLIENT_CERT 0
+tun-mtu 1500
+tun-mtu-extra 32
+mssfix 1450
+persist-key
+persist-tun
+
+reneg-sec 0
+
+remote-cert-tls server
+pull
+fast-io
+
+script-security 2
+up /etc/openvpn/update-resolv-conf
+down /etc/openvpn/update-resolv-conf
+
+&lt;ca&gt;
+-----BEGIN CERTIFICATE-----
+MIIFozCCA4ugAwIBAgIBATANBgkqhkiG9w0BAQ0FADBAMQswCQYDVQQGEwfZXBCxVIVc2ea1fjxQ6vkT...........................SO3XixsXpOVOYP6rJIXW9bMZ
+A1gTTlpi7A==
+-----END CERTIFICATE-----
+&lt;/ca&gt;
+
+key-direction 1
+&lt;tls-auth&gt;
+# 2048 bit OpenVPN static key
+-----BEGIN OpenVPN Static key V1-----
+6acef03f62675b4b1bbd03e53b187727
+423cea742242106cb2916a8a4c829756
+.........................................................
+aeb893d9a96d1f15519bb3c4dcb40ee3
+16672ea16c012664f8a9f11255518deb
+-----END OpenVPN Static key V1-----
+&lt;/tls-auth&gt;
+```
+
+This is my attempt for a merge, but the VPN connection fails:
+
+```
+client
+dev tun0
+proto tcp
+
+remote 195.178.172.188 5995
+remote 138.199.55.34 8443
+remote 195.178.172.188 443
+remote 138.199.55.34 5995
+remote 195.178.172.188 8443
+remote 138.199.55.34 443
+server-poll-timeout 20
+
+remote-random
+resolv-retry infinite
+nobind
+
+# The following setting is only needed for old OpenVPN clients compatibility. New clients
+# automatically negotiate the optimal cipher.
+cipher AES-256-CBC
+
+auth SHA512
+verb 3
+
+user tunnel
+iproute /usr/bin/ip_unpriv
+
+
+
+setenv CLIENT_CERT 0
+tun-mtu 1500
+tun-mtu-extra 32
+mssfix 1450
+persist-key
+persist-tun
+
+reneg-sec 0
+
+remote-cert-tls server
+auth-user-pass auth.txt
+pull
+fast-io
+
+
+
+# Disabling any possible ipv6 auto-configuration since we have ipv6 disabled on our Whonix-Gateway
+pull-filter ignore &quot;dhcp-option DNS6&quot;
+pull-filter ignore &quot;tun-ipv6&quot;
+pull-filter ignore &quot;ifconfig-ipv6&quot;
+
+
+
+script-security 2
+up /etc/openvpn/update-resolv-conf
+down /etc/openvpn/update-resolv-conf
+
+&lt;ca&gt;
+-----BEGIN CERTIFICATE-----
+MIIFozCCA4ugAwIBAgIBATANBgkqhkiG9w0BAQ0FADBAMQswCQYDVQQGEwJDSDEV
+................................................................
+DK/yPwECUcPgHIeXiRjHnJt0Zcm23O2Q3RphpU+1SO3XixsXpOVOYP6rJIXW9bMZ
+A1gTTlpi7A==
+-----END CERTIFICATE-----
+&lt;/ca&gt;
+
+key-direction 1
+&lt;tls-auth&gt;
+# 2048 bit OpenVPN static key
+-----BEGIN OpenVPN Static key V1-----
+6acef03f62675b4b1bbd03e53b187727
+................................
+16672ea16c012664f8a9f11255518deb
+-----END OpenVPN Static key V1-----
+&lt;/tls-auth&gt;
+```
+
+Beside the above, I have configured as indicated in the wiki the firewall file `/etc/whonix_firewall.d/50_user.conf` and the file `/etc/sudoers.d/tunnel_unpriv`.
+
+Thank you very much in advance for any help!</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 28 Mar 2022 18:01:57 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/protonvpn-whonix/13463.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>ProtonVPN + Whonix ?</title>
+        <dc:creator><![CDATA[bananavpn]]></dc:creator>
+        <description><![CDATA[
+            <p>ProtonVPN use wireguard.</p>
+          <p><a href="http://forums.whonix.org/t/protonvpn-whonix/13463/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/protonvpn-whonix/13463/2</link>
+        <pubDate>Mon, 28 Mar 2022 18:01:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13463-2</guid>
+        <source url="http://forums.whonix.org/t/protonvpn-whonix/13463.rss">ProtonVPN + Whonix ?</source>
+      </item>
+      <item>
+        <title>ProtonVPN + Whonix ?</title>
+        <dc:creator><![CDATA[whonix-noob2022]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello,</p>
+<p>I am trying to configure a VPN with Whonix of type: <strong>User → VPN → Tor → Internet</strong>, as described in the Whonix-Wiki: <strong>Tunnels → Connecting_to_a_VPN_before_Tor → VPN_Setup</strong></p>
+<p>My goal is to hide (not in a strong way, but just as a first level of obfuscation) my TOR usage from my ISP.</p>
+<p>The wiki is very well written. I followed it. First (as recommended) I have tried to learn how to setup OpenVPN in KickSecure and it works. But I am now having problems with Whonix.</p>
+<p><strong>My problem:</strong> I haven’t succeeded in properly merging the Whonix template for the openvpn service:</p>
+<pre><code class="lang-auto">##############################
+## VPN provider specific settings ##
+##############################
+auth-user-pass auth.txt
+
+## using nyc.vpn.riseup.net 80
+remote 198.252.153.226 80
+
+ca RiseupCA.pem
+
+remote-cert-tls server
+
+####################################
+## TUNNEL_FIREWALL specific settings ##
+####################################
+client
+dev tun0
+persist-tun
+persist-key
+
+script-security 2
+#up "/etc/openvpn/update-resolv-conf script_type=up dev=tun0"
+#down "/etc/openvpn/update-resolv-conf script_type=down dev=tun0"
+
+user tunnel
+iproute /usr/bin/ip_unpriv
+
+# Disabling any possible ipv6 auto-configuration since we have ipv6 disabled on our Whonix-Gateway
+pull-filter ignore "dhcp-option DNS6"
+pull-filter ignore "tun-ipv6"
+pull-filter ignore "ifconfig-ipv6"
+</code></pre>
+<p>with the configuration file provided by my VPN (which is ProtonVPN), which has the following shape:</p>
+<pre><code class="lang-auto">client
+dev tun
+proto tcp
+
+remote 195.178.172.188 5995
+remote 138.199.55.34 8443
+remote 195.178.172.188 443
+remote 138.199.55.34 5995
+remote 195.178.172.188 8443
+remote 138.199.55.34 443
+server-poll-timeout 20
+
+remote-random
+resolv-retry infinite
+nobind
+
+# The following setting is only needed for old OpenVPN clients compatibility. New clients
+# automatically negotiate the optimal cipher.
+cipher AES-256-CBC
+
+auth SHA512
+verb 3
+
+setenv CLIENT_CERT 0
+tun-mtu 1500
+tun-mtu-extra 32
+mssfix 1450
+persist-key
+persist-tun
+
+reneg-sec 0
+
+remote-cert-tls server
+pull
+fast-io
+
+script-security 2
+up /etc/openvpn/update-resolv-conf
+down /etc/openvpn/update-resolv-conf
+
+&lt;ca&gt;
+-----BEGIN CERTIFICATE-----
+MIIFozCCA4ugAwIBAgIBATANBgkqhkiG9w0BAQ0FADBAMQswCQYDVQQGEwfZXBCxVIVc2ea1fjxQ6vkT...........................SO3XixsXpOVOYP6rJIXW9bMZ
+A1gTTlpi7A==
+-----END CERTIFICATE-----
+&lt;/ca&gt;
+
+key-direction 1
+&lt;tls-auth&gt;
+# 2048 bit OpenVPN static key
+-----BEGIN OpenVPN Static key V1-----
+6acef03f62675b4b1bbd03e53b187727
+423cea742242106cb2916a8a4c829756
+.........................................................
+aeb893d9a96d1f15519bb3c4dcb40ee3
+16672ea16c012664f8a9f11255518deb
+-----END OpenVPN Static key V1-----
+&lt;/tls-auth&gt;
+</code></pre>
+<p>This is my attempt for a merge, but the VPN connection fails:</p>
+<pre><code class="lang-auto">client
+dev tun0
+proto tcp
+
+remote 195.178.172.188 5995
+remote 138.199.55.34 8443
+remote 195.178.172.188 443
+remote 138.199.55.34 5995
+remote 195.178.172.188 8443
+remote 138.199.55.34 443
+server-poll-timeout 20
+
+remote-random
+resolv-retry infinite
+nobind
+
+# The following setting is only needed for old OpenVPN clients compatibility. New clients
+# automatically negotiate the optimal cipher.
+cipher AES-256-CBC
+
+auth SHA512
+verb 3
+
+user tunnel
+iproute /usr/bin/ip_unpriv
+
+
+
+setenv CLIENT_CERT 0
+tun-mtu 1500
+tun-mtu-extra 32
+mssfix 1450
+persist-key
+persist-tun
+
+reneg-sec 0
+
+remote-cert-tls server
+auth-user-pass auth.txt
+pull
+fast-io
+
+
+
+# Disabling any possible ipv6 auto-configuration since we have ipv6 disabled on our Whonix-Gateway
+pull-filter ignore "dhcp-option DNS6"
+pull-filter ignore "tun-ipv6"
+pull-filter ignore "ifconfig-ipv6"
+
+
+
+script-security 2
+up /etc/openvpn/update-resolv-conf
+down /etc/openvpn/update-resolv-conf
+
+&lt;ca&gt;
+-----BEGIN CERTIFICATE-----
+MIIFozCCA4ugAwIBAgIBATANBgkqhkiG9w0BAQ0FADBAMQswCQYDVQQGEwJDSDEV
+................................................................
+DK/yPwECUcPgHIeXiRjHnJt0Zcm23O2Q3RphpU+1SO3XixsXpOVOYP6rJIXW9bMZ
+A1gTTlpi7A==
+-----END CERTIFICATE-----
+&lt;/ca&gt;
+
+key-direction 1
+&lt;tls-auth&gt;
+# 2048 bit OpenVPN static key
+-----BEGIN OpenVPN Static key V1-----
+6acef03f62675b4b1bbd03e53b187727
+................................
+16672ea16c012664f8a9f11255518deb
+-----END OpenVPN Static key V1-----
+&lt;/tls-auth&gt;
+</code></pre>
+<p>Beside the above, I have configured as indicated in the wiki the firewall file <code>/etc/whonix_firewall.d/50_user.conf</code> and the file <code>/etc/sudoers.d/tunnel_unpriv</code>.</p>
+<p>Thank you very much in advance for any help!</p>
+          <p><a href="http://forums.whonix.org/t/protonvpn-whonix/13463/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/protonvpn-whonix/13463/1</link>
+        <pubDate>Thu, 17 Mar 2022 17:15:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13463-1</guid>
+        <source url="http://forums.whonix.org/t/protonvpn-whonix/13463.rss">ProtonVPN + Whonix ?</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,594 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+    <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806</link>
+    <description>Ok, everything went fine until final reboot.
+
+So after starting ws-gw tor connection is off. 
+
+Some logs:
+
+&gt; ERROR: Tor Pid Check Result: 
+&gt; Tor not running. (tor_pid_message: Pid file /var/run/tor/tor.pid does not exist.) 
+&gt; You have to fix this error, before you can use Tor.
+
+So I checked:
+
+&gt; ls -l /var/run/tor
+&gt; total 0
+&gt; 
+&gt; ls -l /var/run/tor/tor.pida
+&gt; ls: cannot access &#39;/var/run/tor/tor.pid&#39;: No such file or directory
+
+Next (from “systemctl status tor@default.service” and “journalctl -xe”):
+
+&gt; systemctl status tor@default.service
+&gt; 
+&gt; ● tor@default.service - Anonymizing overlay network for TCP
+&gt;    Loaded: loaded (/lib/systemd/system/tor@default.service; static; vendor preset: enabled)
+&gt;   Drop-In: /lib/systemd/system/tor@default.service.d
+&gt;            └─40_obfs4proxy-workaround.conf, 50_controlsocket-workaround.conf
+&gt;    Active: failed (Result: exit-code) since Thu 2018-08-30 18:33:43 UTC; 1min 35s ago
+&gt;   Process: 2968 ExecStart=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc ----RunAsDaemon 0 (code=exited, status=1/FAILURE)
+&gt;   Process: 2964 ExecStartPre=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0 --verify-config (code=exited, status=0/SUCCESS)
+&gt;   Process: 2963 ExecStartPre=/usr/bin/install -Z -m 02755 -o debian-tor -g debian-tor -d /var/run/tor (code=exited, status=0/SUCCESS)
+&gt;  Main PID: 2968 (code=exited, status=1/FAILURE)                                                                                      
+&gt;                                                                                                                                       
+&gt; Aug 30 18:33:43 host systemd[1]: Failed to start Anonymizing overlay network for TCP.                                                  
+&gt; Aug 30 18:33:43 host systemd[1]: tor@default.service: Unit entered failed state.
+&gt; Aug 30 18:33:43 host systemd[1]: tor@default.service: Failed with result &#39;exit-code&#39;.
+&gt; Aug 30 18:33:43 host systemd[1]: tor@default.service: Service hold-off time over, scheduling restart.
+&gt; Aug 30 18:33:43 host systemd[1]: Stopped Anonymizing overlay network for TCP.
+&gt; Aug 30 18:33:43 host systemd[1]: tor@default.service: Start request repeated too quickly.
+&gt; Aug 30 18:33:43 host systemd[1]: Failed to start Anonymizing overlay network for TCP.
+&gt; Aug 30 18:33:43 host systemd[1]: tor@default.service: Unit entered failed state.
+&gt; Aug 30 18:33:43 host systemd[1]: tor@default.service: Failed with result &#39;exit-code&#39;.
+
+Also (this is going on an on...):
+
+&gt; **Aug 30 18:33:42 host systemd[1]: Starting Anonymizing overlay network for TCP...**
+&gt; **-- Subject: Unit tor@default.service has begun start-up**
+&gt; **-- Defined-By: systemd**
+&gt; **-- Support: https://www.debian.org/support**
+&gt; **-- **
+&gt; **-- Unit tor@default.service has begun starting up.**
+&gt; **Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.847 [notice] Tor 0.3.3.9 (git-ca1a436fa8e53a32) running on Linux with Libevent 2.0.21-stable, OpenSSL 1.1.0f, Zlib 1.2.8, Liblzma 5.2.2, and Libzstd 1.1.2.**
+&gt; **Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.848 [notice] Tor can&#39;t help you if you use it wrong! Learn how to be safe at https://www.torproject.org/download/download#warning**
+&gt; **Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.849 [notice] Read configuration file &quot;/usr/share/tor/tor-service-defaults-torrc&quot;.**
+&gt; **Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.849 [notice] Read configuration file &quot;/etc/tor/torrc&quot;.**
+&gt; **Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.858 [warn] Option &#39;DisableNetwork&#39; used more than once; all but the last value will be ignored.**
+&gt; **Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.858 [notice] You configured a non-loopback address &#39;10.152.152.10:5300&#39; for DNSPort. This allows everybody on your local network to use your machine as a proxy. Make sure this is what you wanted.**
+&gt; **Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.858 [notice] You configured a non-loopback address &#39;10.152.152.10:9040&#39; for TransPort. This allows everybody on your local network to use your machine as a proxy. Make sure this is what you wanted.**
+&gt; **Aug 30 18:33:42 host tor[2964]: Configuration was valid**
+&gt; **Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.377 [notice] Tor 0.3.3.9 (git-ca1a436fa8e53a32) running on Linux with Libevent 2.0.21-stable, OpenSSL 1.1.0f, Zlib 1.2.8, Liblzma 5.2.2, and Libzstd 1.1.2.**
+&gt; **Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.379 [notice] Tor can&#39;t help you if you use it wrong! Learn how to be safe at https://www.torproject.org/download/download#warning**
+&gt; **Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.380 [notice] Read configuration file &quot;/usr/share/tor/tor-service-defaults-torrc&quot;.**
+&gt; **Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.380 [notice] Read configuration file &quot;/etc/tor/torrc&quot;.**
+&gt; **Aug 30 18:33:43 host audit[2968]: AVC apparmor=&quot;DENIED&quot; operation=&quot;open&quot; profile=&quot;system_tor&quot; name=&quot;/etc/torrc.d/95_whonix.conf&quot; pid=2968 comm=&quot;tor&quot; requested_mask=&quot;r&quot; denied_mask=&quot;r&quot; fsuid=0 ouid=0**
+&gt; **Aug 30 18:33:43 host audit[2968]: SYSCALL arch=40000003 syscall=5 success=no exit=-13 a0=a2ad20 a1=88000 a2=0 a3=b7278000 items=1 ppid=1 pid=2968 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=&quot;tor&quot; exe=&quot;/usr/bin/tor&quot; key=(null)**
+&gt; **Aug 30 18:33:43 host audit: CWD cwd=&quot;/&quot;**
+&gt; **Aug 30 18:33:43 host audit: PATH item=0 name=&quot;/etc/torrc.d/95_whonix.conf&quot; inode=3016178 dev=08:01 mode=0100644 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL**
+&gt; **Aug 30 18:33:43 host audit: PROCTITLE proctitle=2F7573722F62696E2F746F72002D2D64656661756C74732D746F727263002F7573722F73686172652F746F722F746F722D736572766963652D64656661756C74732D746F727263002D66002F6574632F746F722F746F727263002D2D52756E41734461656D6F6E0030**
+&gt; **Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.389 [warn] Could not open &quot;/etc/torrc.d/95_whonix.conf&quot;: Permission denied**
+&gt; **Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.389 [warn] Error reading included configuration file or directory: &quot;/etc/torrc.d/95_whonix.conf&quot;.**
+&gt; **Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.389 [err] Reading config failed--see warnings above.**
+&gt; **Aug 30 18:33:43 host systemd[1]: tor@default.service: Main process exited, code=exited, status=1/FAILURE**
+&gt; **Aug 30 18:33:43 host audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 msg=&#39;unit=tor@default comm=&quot;systemd&quot; exe=&quot;/lib/systemd/systemd&quot; hostname=? addr=? terminal=? res=failed&#39;**
+&gt; **Aug 30 18:33:43 host systemd[1]: Failed to start Anonymizing overlay network for TCP.**
+&gt; **-- Subject: Unit tor@default.service has failed**
+&gt; **-- Defined-By: systemd**
+&gt; **-- Support: https://www.debian.org/support**
+&gt; **-- **
+&gt; **-- Unit tor@default.service has failed.**
+&gt; **-- **
+&gt; **-- The result is failed.**
+&gt; **Aug 30 18:33:43 host systemd[1]: tor@default.service: Unit entered failed state.**
+&gt; **Aug 30 18:33:43 host systemd[1]: tor@default.service: Failed with result &#39;exit-code&#39;.**
+&gt; **Aug 30 18:33:43 host systemd[1]: tor@default.service: Service hold-off time over, scheduling restart.**
+&gt; **Aug 30 18:33:43 host audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 msg=&#39;unit=tor@default comm=&quot;systemd&quot; exe=&quot;/lib/systemd/systemd&quot; hostname=? addr=? terminal=? res=success&#39;**
+&gt; **Aug 30 18:33:43 host systemd[1]: brltty.service: Cannot add dependency job, ignoring: Unit brltty.service is masked.**
+&gt; **Aug 30 18:33:43 host audit[1]: SERVICE_STOP pid=1 uid=0 auid=4294967295 ses=4294967295 msg=&#39;unit=tor@default comm=&quot;systemd&quot; exe=&quot;/lib/systemd/systemd&quot; hostname=? addr=? terminal=? res=success&#39;**
+&gt; **Aug 30 18:33:43 host systemd[1]: Stopped Anonymizing overlay network for TCP.**
+&gt; **-- Subject: Unit tor@default.service has finished shutting down**
+&gt; **-- Defined-By: systemd**
+&gt; **-- Support: https://www.debian.org/support**
+&gt; **-- **
+&gt; **-- Unit tor@default.service has finished shutting down.**
+&gt; **Aug 30 18:33:43 host systemd[1]: tor@default.service: Start request repeated too quickly.**
+&gt; **Aug 30 18:33:43 host systemd[1]: Failed to start Anonymizing overlay network for TCP.**
+
+I have checked network interfaces, it look ok ([same as posted here](https://forums.whonix.org/t/whonixcheck-fail-tor-pid-does-not-exist-after-upgrade-from-whonix-11-to-whonix-12/1793/10)).</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 24 Mar 2019 19:09:55 +0000</lastBuildDate>
+    <category>AppArmor</category>
+    <atom:link href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[zealot]]></dc:creator>
+        <description><![CDATA[
+            <p>OK, thank you for helping!</p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/23</link>
+        <pubDate>Sun, 24 Mar 2019 19:09:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-23</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I have no idea then. Might have another idea later on but not likely.</p>
+<p>Some cruft during upgrade form Whonix 13 to Whonix 14 must be causing this.</p>
+<p>Some file must be different that’s relevant here Whonix 13 upgraded vs Whonix 14. Creating a <code>diff</code> of Whonix 13 vs Whonix 14 files (perhaps just in <code>/etc</code>) would be most likely too much work.</p>
+<p>So I suggest to start with a fresh Whonix 14 which doesn’t have this issue.</p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/22</link>
+        <pubDate>Sun, 24 Mar 2019 19:04:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-22</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[zealot]]></dc:creator>
+        <description><![CDATA[
+            <p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/0/06874dbf4e4c0226292d12ef3fe46a7dbb6618a9.png" data-download-href="//forums.whonix.org/uploads/default/06874dbf4e4c0226292d12ef3fe46a7dbb6618a9" title="image.png"><img src="//forums.whonix.org/uploads/default/original/2X/0/06874dbf4e4c0226292d12ef3fe46a7dbb6618a9.png" alt="image" width="678" height="500" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/0/06874dbf4e4c0226292d12ef3fe46a7dbb6618a9_2_10x10.png"></a></div><br>
+Looks same<p></p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/21</link>
+        <pubDate>Sun, 24 Mar 2019 18:59:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-21</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Could you check please if /etc/apparmor.d/system_tor looks like this:</p>
+<pre><code class="lang-auto"># vim:syntax=apparmor
+#include &lt;tunables/global&gt;
+
+profile system_tor flags=(attach_disconnected) {
+  #include &lt;abstractions/tor&gt;
+
+  owner /var/lib/tor/** rwk,
+  owner /var/lib/tor/ r,
+  owner /var/log/tor/* w,
+
+  # During startup, tor (as root) tries to open various things such as
+  # directories via check_private_dir().  Let it.
+  /var/lib/tor/** r,
+
+  /{,var/}run/tor/ r,
+  /{,var/}run/tor/control w,
+  /{,var/}run/tor/socks w,
+  /{,var/}run/tor/tor.pid w,
+  /{,var/}run/tor/control.authcookie w,
+  /{,var/}run/tor/control.authcookie.tmp rw,
+  /{,var/}run/systemd/notify w,
+
+  # Site-specific additions and overrides. See local/README for details.
+  #include &lt;local/system_tor&gt;
+}
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/20</link>
+        <pubDate>Sun, 24 Mar 2019 18:52:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-20</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[zealot]]></dc:creator>
+        <description><![CDATA[
+            <p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/f/f09fa4a325f9c4658796d38dcb8c9eb6a1d85737.png" data-download-href="//forums.whonix.org/uploads/default/f09fa4a325f9c4658796d38dcb8c9eb6a1d85737" title="image.png"><img src="//forums.whonix.org/uploads/default/original/2X/f/f09fa4a325f9c4658796d38dcb8c9eb6a1d85737.png" alt="image" width="690" height="76" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/f/f09fa4a325f9c4658796d38dcb8c9eb6a1d85737_2_10x10.png"></a></div><p></p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/19</link>
+        <pubDate>Sun, 24 Mar 2019 18:22:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-19</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>And <code>/etc/apparmor.d/local/system_tor</code> also looks same?</p>
+<p>It’s actually a symlink.</p>
+<pre><code>ls -la /etc/apparmor.d/local/system_tor
+</code></pre>
+<blockquote>
+<p>lrwxrwxrwx 1 root root 19 Jan 23 14:41 /etc/apparmor.d/local/system_tor -&gt; system_tor.anondist</p>
+</blockquote>
+<p>I am just trying to figure out why that file is non-effective for you and wondering if that symlink may be broken.</p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/18</link>
+        <pubDate>Sun, 24 Mar 2019 18:19:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-18</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[zealot]]></dc:creator>
+        <description><![CDATA[
+            <p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/4/4e2c12d7d9236825f97a6fc09c5793fb30a77687.png" data-download-href="//forums.whonix.org/uploads/default/4e2c12d7d9236825f97a6fc09c5793fb30a77687" title="image.png"><img src="//forums.whonix.org/uploads/default/optimized/2X/4/4e2c12d7d9236825f97a6fc09c5793fb30a77687_2_690x432.png" alt="image" width="690" height="432" srcset="//forums.whonix.org/uploads/default/optimized/2X/4/4e2c12d7d9236825f97a6fc09c5793fb30a77687_2_690x432.png, //forums.whonix.org/uploads/default/optimized/2X/4/4e2c12d7d9236825f97a6fc09c5793fb30a77687_2_1035x648.png 1.5x, //forums.whonix.org/uploads/default/optimized/2X/4/4e2c12d7d9236825f97a6fc09c5793fb30a77687_2_1380x864.png 2x" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/4/4e2c12d7d9236825f97a6fc09c5793fb30a77687_2_10x10.png"></a></div><br>
+Yes, completly same.<p></p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/17</link>
+        <pubDate>Sun, 24 Mar 2019 18:17:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-17</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Does your <code>/etc/apparmor.d/local/system_tor.anondist</code> looks the same like <a href="https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/apparmor.d/local/system_tor.anondist" rel="nofollow noopener">https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/apparmor.d/local/system_tor.anondist</a>?</p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/16</link>
+        <pubDate>Sun, 24 Mar 2019 18:08:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-16</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/apparmor.d/local/system_tor.anondist" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/apparmor.d/local/system_tor.anondist" target="_blank" rel="nofollow noopener">Whonix/anon-gw-anonymizer-config/blob/master/etc/apparmor.d/local/system_tor.anondist</a></h4>
+<pre><code class="lang-anondist">## Copyright (C) 2012 - 2018 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+## Begin Tor Local AppArmor Profile for Anonymity Distributions
+
+## Workaround for: config-package-dev clashes with AppArmor profiles
+## https://github.com/Whonix/Whonix/issues/66
+
+## A profile /etc/apparmor.d/anondist could not cover the system_tor
+## profile, since that is enforced by the Tor systemd unit file.
+## https://github.com/Whonix/Whonix/issues/67
+
+  ## Anonymity Distributions
+  /etc/hosts.anondist r,
+  /etc/resolv.conf.anondist r,
+  /run/tor r,
+  /run/tor/log rwk,
+
+## Add permissions for obfsproxy and flashproxy.
+## AUDIT:
+</code></pre>
+
+  This file has been truncated. <a href="https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/apparmor.d/local/system_tor.anondist" target="_blank" rel="nofollow noopener">show original</a>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/15</link>
+        <pubDate>Sun, 24 Mar 2019 18:08:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-15</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[zealot]]></dc:creator>
+        <description><![CDATA[
+            <p>Its completly look like apparmor issue</p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/14</link>
+        <pubDate>Sun, 24 Mar 2019 16:59:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-14</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[zealot]]></dc:creator>
+        <description><![CDATA[
+            <pre><code class="lang-auto">grep -i error /var/run/tor/log
+</code></pre>
+<p>return no result</p>
+<pre><code class="lang-auto">sudo journalctl -f
+</code></pre>
+<p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/3/33b7f505003d68ed19e34fd48296e38277d7a8db.png" data-download-href="//forums.whonix.org/uploads/default/33b7f505003d68ed19e34fd48296e38277d7a8db" title="image.png"><img src="//forums.whonix.org/uploads/default/original/2X/3/33b7f505003d68ed19e34fd48296e38277d7a8db.png" alt="image" width="690" height="442" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/3/33b7f505003d68ed19e34fd48296e38277d7a8db_2_10x10.png"></a></div><br>
+return several identical attempt to start tor<p></p>
+<pre><code class="lang-auto">sudo cat /var/log/audit/audit.log | grep -i DENIED
+</code></pre>
+<p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/5/5d31ecd36c7a64dc92f9712c8a554d5274493601.png" data-download-href="//forums.whonix.org/uploads/default/5d31ecd36c7a64dc92f9712c8a554d5274493601" title="image.png"><img src="//forums.whonix.org/uploads/default/original/2X/5/5d31ecd36c7a64dc92f9712c8a554d5274493601.png" alt="image" width="690" height="420" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/5/5d31ecd36c7a64dc92f9712c8a554d5274493601_2_10x10.png"></a></div><br>
+I could see many messages about tor config files<p></p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/13</link>
+        <pubDate>Sun, 24 Mar 2019 16:52:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-13</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <pre><code>sudo journalctl -f
+</code></pre>
+<p>while doing this, restart Tor. That would show any apparmor related issues.</p>
+<hr>
+<p>From <a href="https://forums.whonix.org/t/whonix-14-debian-stretch-apparmor-related-changes/3563" class="inline-onebox">Whonix 14 / Debian stretch AppArmor related changes</a></p>
+<pre><code class="lang-auto">sudo cat /var/log/audit/audit.log | grep -i DENIED
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/12</link>
+        <pubDate>Sun, 24 Mar 2019 16:46:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-12</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <pre><code>grep -i error /var/run/tor/log
+</code></pre>
+<p>?</p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/11</link>
+        <pubDate>Sun, 24 Mar 2019 16:44:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-11</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[zealot]]></dc:creator>
+        <description><![CDATA[
+            <p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/0/003c54ba04721b5f5af10dc0d404e9613497f0dc.png" data-download-href="//forums.whonix.org/uploads/default/003c54ba04721b5f5af10dc0d404e9613497f0dc" title="image.png"><img src="//forums.whonix.org/uploads/default/original/2X/0/003c54ba04721b5f5af10dc0d404e9613497f0dc.png" alt="image" width="690" height="72" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/0/003c54ba04721b5f5af10dc0d404e9613497f0dc_2_10x10.png"></a></div><br>
+Weird openssl issue only.<p></p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/10</link>
+        <pubDate>Sun, 24 Mar 2019 16:27:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-10</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Please watch Tor log while restarting Tor as per:</p>
+<p><a href="https://www.whonix.org/wiki/Tor#Log_Analysis" rel="nofollow noopener">https://www.whonix.org/wiki/Tor#Log_Analysis</a></p>
+<p>This might give some clues what’s wrong.</p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/9</link>
+        <pubDate>Sun, 24 Mar 2019 16:19:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-9</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[zealot]]></dc:creator>
+        <description><![CDATA[
+            <p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/5/525732bdbde63aab9bceb4319f583e17728cc0e5.png" data-download-href="//forums.whonix.org/uploads/default/525732bdbde63aab9bceb4319f583e17728cc0e5" title="image.png"><img src="//forums.whonix.org/uploads/default/original/2X/5/525732bdbde63aab9bceb4319f583e17728cc0e5.png" alt="image" width="690" height="311" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/5/525732bdbde63aab9bceb4319f583e17728cc0e5_2_10x10.png"></a></div><br>
+There no any tor logs<br>
+<img src="//forums.whonix.org/uploads/default/original/2X/5/5483a3fae49bdf502c771d6354d881fc77dbeaee.png" alt="image" width="253" height="46"><br>
+And, i could  start tor manually.<br>
+<div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/5/5b3e32f1e25d82108a6faacb36a83053b8356fc2.png" data-download-href="//forums.whonix.org/uploads/default/5b3e32f1e25d82108a6faacb36a83053b8356fc2" title="image.png"><img src="//forums.whonix.org/uploads/default/original/2X/5/5b3e32f1e25d82108a6faacb36a83053b8356fc2.png" alt="image" width="690" height="312" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/5/5b3e32f1e25d82108a6faacb36a83053b8356fc2_2_10x10.png"></a></div><p></p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/8</link>
+        <pubDate>Sun, 24 Mar 2019 15:00:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-8</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Tor config wrong? Please try Configuration Check as per:</p>
+<p><a href="https://www.whonix.org/wiki/Tor#Configuration_Check" rel="nofollow noopener">https://www.whonix.org/wiki/Tor#Configuration_Check</a></p>
+<p>Please watch Tor log while restarting Tor as per:</p>
+<p><a href="https://www.whonix.org/wiki/Tor#Log_Analysis" rel="nofollow noopener">https://www.whonix.org/wiki/Tor#Log_Analysis</a></p>
+<p>This might give some clues what’s wrong.</p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/7</link>
+        <pubDate>Sun, 24 Mar 2019 14:23:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-7</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[zealot]]></dc:creator>
+        <description><![CDATA[
+            <p>Nope, I have same result<br>
+<img src="//forums.whonix.org/uploads/default/original/2X/c/c72a827d39f93ee3244bfc79819c36bf88fcf049.png" alt="image" width="639" height="47"><br>
+Sorry, looks like virtialbox guest utils broken, so i could not copypaste logs<br>
+<img src="//forums.whonix.org/uploads/default/original/2X/f/f99588861ca5b379471d164c000153f6a7567387.png" alt="image" width="638" height="354"><br>
+I think it is apparmor issue<br>
+</p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/a/af1547cfa9901cb3386afb5d591c4dcc3590394f.png" data-download-href="//forums.whonix.org/uploads/default/af1547cfa9901cb3386afb5d591c4dcc3590394f" title="image.png"><img src="//forums.whonix.org/uploads/default/original/2X/a/af1547cfa9901cb3386afb5d591c4dcc3590394f.png" alt="image" width="690" height="447" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/a/af1547cfa9901cb3386afb5d591c4dcc3590394f_2_10x10.png"></a></div><p></p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/6</link>
+        <pubDate>Sun, 24 Mar 2019 10:30:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-6</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <code>zealot</code></p>
+<p>Did you try rebooting? You can also try restarting Tor.</p>
+<p><a href="https://forums.whonix.org/t/error-tor-not-running-tor-pid-message-pid-file-var-run-tor-tor-pid-doest-not-exist-noob-need-help/5785">https://forums.whonix.org/t/error-tor-not-running-tor-pid-message-pid-file-var-run-tor-tor-pid-doest-not-exist-noob-need-help/5785</a></p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/5</link>
+        <pubDate>Sun, 24 Mar 2019 01:39:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-5</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[zealot]]></dc:creator>
+        <description><![CDATA[
+            <p>Have exactly same problem. How to fix it?</p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/4</link>
+        <pubDate>Sat, 23 Mar 2019 14:55:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-4</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[Harlem]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes and yes. Both files are the same, and look like the one from the link.</p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/3</link>
+        <pubDate>Thu, 30 Aug 2018 21:06:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-3</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Does your</p>
+<pre><code>/etc/apparmor.d/local/system_tor.anondist
+</code></pre>
+<p>and</p>
+<pre><code>/etc/apparmor.d/local/system_tor
+</code></pre>
+<p>Look the same? Should be. To check:</p>
+<pre><code>diff /etc/apparmor.d/local/system_tor /etc/apparmor.d/local/system_tor.anondist ; echo $?
+</code></pre>
+<p>Expected output: <code>0</code></p>
+<p>Does your /etc/apparmor.d/local/system_tor look like <a href="https://raw.githubusercontent.com/Whonix/anon-gw-anonymizer-config/master/etc/apparmor.d/local/system_tor.anondist">https://raw.githubusercontent.com/Whonix/anon-gw-anonymizer-config/master/etc/apparmor.d/local/system_tor.anondist</a>?</p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/2</link>
+        <pubDate>Thu, 30 Aug 2018 20:28:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-2</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+      <item>
+        <title>Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</title>
+        <dc:creator><![CDATA[Harlem]]></dc:creator>
+        <description><![CDATA[
+            <p>Ok, everything went fine until final reboot.</p>
+<p>So after starting ws-gw tor connection is off.</p>
+<p>Some logs:</p>
+<blockquote>
+<p>ERROR: Tor Pid Check Result:<br>
+Tor not running. (tor_pid_message: Pid file /var/run/tor/tor.pid does not exist.)<br>
+You have to fix this error, before you can use Tor.</p>
+</blockquote>
+<p>So I checked:</p>
+<blockquote>
+<p>ls -l /var/run/tor<br>
+total 0</p>
+<p>ls -l /var/run/tor/tor.pida<br>
+ls: cannot access ‘/var/run/tor/tor.pid’: No such file or directory</p>
+</blockquote>
+<p>Next (from “systemctl status tor@default.service” and “journalctl -xe”):</p>
+<blockquote>
+<p>systemctl status tor@default.service</p>
+<p>● tor@default.service - Anonymizing overlay network for TCP<br>
+Loaded: loaded (/lib/systemd/system/tor@default.service; static; vendor preset: enabled)<br>
+Drop-In: /lib/systemd/system/tor@default.service.d<br>
+└─40_obfs4proxy-workaround.conf, 50_controlsocket-workaround.conf<br>
+Active: failed (Result: exit-code) since Thu 2018-08-30 18:33:43 UTC; 1min 35s ago<br>
+Process: 2968 ExecStart=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc ----RunAsDaemon 0 (code=exited, status=1/FAILURE)<br>
+Process: 2964 ExecStartPre=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0 --verify-config (code=exited, status=0/SUCCESS)<br>
+Process: 2963 ExecStartPre=/usr/bin/install -Z -m 02755 -o debian-tor -g debian-tor -d /var/run/tor (code=exited, status=0/SUCCESS)<br>
+Main PID: 2968 (code=exited, status=1/FAILURE)</p>
+<p>Aug 30 18:33:43 host systemd[1]: Failed to start Anonymizing overlay network for TCP.<br>
+Aug 30 18:33:43 host systemd[1]: tor@default.service: Unit entered failed state.<br>
+Aug 30 18:33:43 host systemd[1]: tor@default.service: Failed with result ‘exit-code’.<br>
+Aug 30 18:33:43 host systemd[1]: tor@default.service: Service hold-off time over, scheduling restart.<br>
+Aug 30 18:33:43 host systemd[1]: Stopped Anonymizing overlay network for TCP.<br>
+Aug 30 18:33:43 host systemd[1]: tor@default.service: Start request repeated too quickly.<br>
+Aug 30 18:33:43 host systemd[1]: Failed to start Anonymizing overlay network for TCP.<br>
+Aug 30 18:33:43 host systemd[1]: tor@default.service: Unit entered failed state.<br>
+Aug 30 18:33:43 host systemd[1]: tor@default.service: Failed with result ‘exit-code’.</p>
+</blockquote>
+<p>Also (this is going on an on…):</p>
+<blockquote>
+<p><strong>Aug 30 18:33:42 host systemd[1]: Starting Anonymizing overlay network for TCP…</strong><br>
+<strong>– Subject: Unit tor@default.service has begun start-up</strong><br>
+<strong>– Defined-By: systemd</strong><br>
+<strong>– Support: <a href="https://www.debian.org/support" rel="nofollow noopener">https://www.debian.org/support</a></strong><br>
+**-- **<br>
+<strong>– Unit tor@default.service has begun starting up.</strong><br>
+<strong>Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.847 [notice] Tor 0.3.3.9 (git-ca1a436fa8e53a32) running on Linux with Libevent 2.0.21-stable, OpenSSL 1.1.0f, Zlib 1.2.8, Liblzma 5.2.2, and Libzstd 1.1.2.</strong><br>
+<strong>Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.848 [notice] Tor can’t help you if you use it wrong! Learn how to be safe at <a href="https://www.torproject.org/download/download#warning" rel="nofollow noopener">https://www.torproject.org/download/download#warning</a></strong><br>
+<strong>Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.849 [notice] Read configuration file “/usr/share/tor/tor-service-defaults-torrc”.</strong><br>
+<strong>Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.849 [notice] Read configuration file “/etc/tor/torrc”.</strong><br>
+<strong>Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.858 [warn] Option ‘DisableNetwork’ used more than once; all but the last value will be ignored.</strong><br>
+<strong>Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.858 [notice] You configured a non-loopback address ‘10.152.152.10:5300’ for DNSPort. This allows everybody on your local network to use your machine as a proxy. Make sure this is what you wanted.</strong><br>
+<strong>Aug 30 18:33:42 host tor[2964]: Aug 30 18:33:42.858 [notice] You configured a non-loopback address ‘10.152.152.10:9040’ for TransPort. This allows everybody on your local network to use your machine as a proxy. Make sure this is what you wanted.</strong><br>
+<strong>Aug 30 18:33:42 host tor[2964]: Configuration was valid</strong><br>
+<strong>Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.377 [notice] Tor 0.3.3.9 (git-ca1a436fa8e53a32) running on Linux with Libevent 2.0.21-stable, OpenSSL 1.1.0f, Zlib 1.2.8, Liblzma 5.2.2, and Libzstd 1.1.2.</strong><br>
+<strong>Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.379 [notice] Tor can’t help you if you use it wrong! Learn how to be safe at <a href="https://www.torproject.org/download/download#warning" rel="nofollow noopener">https://www.torproject.org/download/download#warning</a></strong><br>
+<strong>Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.380 [notice] Read configuration file “/usr/share/tor/tor-service-defaults-torrc”.</strong><br>
+<strong>Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.380 [notice] Read configuration file “/etc/tor/torrc”.</strong><br>
+<strong>Aug 30 18:33:43 host audit[2968]: AVC apparmor=“DENIED” operation=“open” profile=“system_tor” name="/etc/torrc.d/95_whonix.conf" pid=2968 comm=“tor” requested_mask=“r” denied_mask=“r” fsuid=0 ouid=0</strong><br>
+<strong>Aug 30 18:33:43 host audit[2968]: SYSCALL arch=40000003 syscall=5 success=no exit=-13 a0=a2ad20 a1=88000 a2=0 a3=b7278000 items=1 ppid=1 pid=2968 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=“tor” exe="/usr/bin/tor" key=(null)</strong><br>
+<strong>Aug 30 18:33:43 host audit: CWD cwd="/"</strong><br>
+<strong>Aug 30 18:33:43 host audit: PATH item=0 name="/etc/torrc.d/95_whonix.conf" inode=3016178 dev=08:01 mode=0100644 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL</strong><br>
+<strong>Aug 30 18:33:43 host audit: PROCTITLE proctitle=2F7573722F62696E2F746F72002D2D64656661756C74732D746F727263002F7573722F73686172652F746F722F746F722D736572766963652D64656661756C74732D746F727263002D66002F6574632F746F722F746F727263002D2D52756E41734461656D6F6E0030</strong><br>
+<strong>Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.389 [warn] Could not open “/etc/torrc.d/95_whonix.conf”: Permission denied</strong><br>
+<strong>Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.389 [warn] Error reading included configuration file or directory: “/etc/torrc.d/95_whonix.conf”.</strong><br>
+<strong>Aug 30 18:33:43 host tor[2968]: Aug 30 18:33:43.389 [err] Reading config failed–see warnings above.</strong><br>
+<strong>Aug 30 18:33:43 host systemd[1]: tor@default.service: Main process exited, code=exited, status=1/FAILURE</strong><br>
+<strong>Aug 30 18:33:43 host audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 msg='unit=tor@default comm=“systemd” exe="/lib/systemd/systemd" hostname=? addr=? terminal=? res=failed’</strong><br>
+<strong>Aug 30 18:33:43 host systemd[1]: Failed to start Anonymizing overlay network for TCP.</strong><br>
+<strong>– Subject: Unit tor@default.service has failed</strong><br>
+<strong>– Defined-By: systemd</strong><br>
+<strong>– Support: <a href="https://www.debian.org/support" rel="nofollow noopener">https://www.debian.org/support</a></strong><br>
+**-- **<br>
+<strong>– Unit tor@default.service has failed.</strong><br>
+**-- **<br>
+<strong>– The result is failed.</strong><br>
+<strong>Aug 30 18:33:43 host systemd[1]: tor@default.service: Unit entered failed state.</strong><br>
+<strong>Aug 30 18:33:43 host systemd[1]: tor@default.service: Failed with result ‘exit-code’.</strong><br>
+<strong>Aug 30 18:33:43 host systemd[1]: tor@default.service: Service hold-off time over, scheduling restart.</strong><br>
+<strong>Aug 30 18:33:43 host audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 msg='unit=tor@default comm=“systemd” exe="/lib/systemd/systemd" hostname=? addr=? terminal=? res=success’</strong><br>
+<strong>Aug 30 18:33:43 host systemd[1]: brltty.service: Cannot add dependency job, ignoring: Unit brltty.service is masked.</strong><br>
+<strong>Aug 30 18:33:43 host audit[1]: SERVICE_STOP pid=1 uid=0 auid=4294967295 ses=4294967295 msg='unit=tor@default comm=“systemd” exe="/lib/systemd/systemd" hostname=? addr=? terminal=? res=success’</strong><br>
+<strong>Aug 30 18:33:43 host systemd[1]: Stopped Anonymizing overlay network for TCP.</strong><br>
+<strong>– Subject: Unit tor@default.service has finished shutting down</strong><br>
+<strong>– Defined-By: systemd</strong><br>
+<strong>– Support: <a href="https://www.debian.org/support" rel="nofollow noopener">https://www.debian.org/support</a></strong><br>
+**-- **<br>
+<strong>– Unit tor@default.service has finished shutting down.</strong><br>
+<strong>Aug 30 18:33:43 host systemd[1]: tor@default.service: Start request repeated too quickly.</strong><br>
+<strong>Aug 30 18:33:43 host systemd[1]: Failed to start Anonymizing overlay network for TCP.</strong></p>
+</blockquote>
+<p>I have checked network interfaces, it look ok (<a href="https://forums.whonix.org/t/whonixcheck-fail-tor-pid-does-not-exist-after-upgrade-from-whonix-11-to-whonix-12/1793/10">same as posted here</a>).</p>
+          <p><a href="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806/1</link>
+        <pubDate>Thu, 30 Aug 2018 19:53:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5806-1</guid>
+        <source url="http://forums.whonix.org/t/tor-denied-message-etc-torrc-d-95-whonix-conf-after-upgrade-from-whonix-13-to-whonix-14/5806.rss">Tor denied message /etc/torrc.d/95_whonix.conf after upgrade from Whonix 13 to Whonix 14</source>
+      </item>
+  </channel>
+</rss>

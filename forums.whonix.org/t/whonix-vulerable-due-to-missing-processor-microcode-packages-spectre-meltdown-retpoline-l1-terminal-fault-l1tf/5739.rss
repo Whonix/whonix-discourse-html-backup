@@ -1,0 +1,777 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+    <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739</link>
+    <description>Also, is Whonix vulnerable beause it hasn&#39;t installed CPU microcode updates to address speculative attacks? That is, the package update is only available from Debian non-free repo?
+
+See here: https://www.debian.org/security/2018/dsa-4279
+
+From memory, I only saw this update happen in Qubes Debian 9 TemplateVM and not Whonix-14 ones.</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 05 Jan 2021 05:26:08 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>VirtualBox still vulnerable.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="49" data-topic="5739">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>VirtualBox ticket created:<br>
+<a href="https://www.virtualbox.org/ticket/17987">VirtualBox 5.2.18 vulnerable to spectre/meltdown despite microcode being installed </a></p>
+</blockquote>
+</aside>
+<blockquote>
+<p>[…]<br>
+Just to summarize the current situation: The mitigation for the Spectre/Meltdown issues documented in CVE-2017-5715 can be passed through to <a href="https://www.virtualbox.org/wiki/VirtualBox">VirtualBox</a> guests using:</p>
+<blockquote>
+<p>VBoxManage modifyvm  --spec-ctrl on</p>
+</blockquote>
+<p>This functionality is available in <a href="https://www.virtualbox.org/wiki/VirtualBox">VirtualBox</a> 5.2.32 and later, 6.0.0 and later, and 6.1.0 and later.</p>
+<p>The <a href="https://www.virtualbox.org/wiki/VirtualBox">VirtualBox</a> changes required for passing through the Speculative Store Bypass (SSB) (CVE-2018-3639) mitigations and Rogue System Register Read (RSRE), Variant 3a (CVE-2018-3640) mitigations to <a href="https://www.virtualbox.org/wiki/VirtualBox">VirtualBox</a> guests have not been implemented yet.</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/93">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/93</link>
+        <pubDate>Tue, 05 Jan 2021 05:26:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-93</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Sure I can do that. i will review each choice for a full day and then come back to this thread and edit this post with the results.<br>
+I’ll start with the “KVM” virtualization method since it is the Virtualbox default for Linux hosts and the one I happen to be using.<br>
+Here are some findings following your linked post:</p>
+<ol>
+<li>Host OS Debian 10 (4.19 current kernel, updated fully)</li>
+<li>Host arch is 64 bit x86</li>
+<li>Whonix 15, updated fully (regular mainline, not the testers repo)</li>
+<li>Virtualbox 6.0.16 as obtained from The Vbox website (through their repository)</li>
+<li>Observations. Usability is smooth. No issues noted. There were graphics issues in the past that have been worked out. I do not use the 3d acceleration (there are some concerns about compromises that could take advantage of memory errors and allow unwanted access to host’s memory pages). I have tried it, but do not really have a noticeable difference.</li>
+<li>Youtube will work. Obviously make sure the Tor shield is partly open to allow some scripts. Also, click through and allow playback when NoScript warning appears. Make sure sound is set up on host and in Vbox and it will work fine. Some exit nodes are problematic but switch circuits to fix this.</li>
+<li>I have to test VLC; I have not yet, but I will.</li>
+<li>output: kvm-clock</li>
+<li>output: kvm-clock tsc acpi_pm</li>
+<li>I have iommu enabled for all virtual machines. Also, I help mitigate the time issues with: bootclockrandomization on all machines, tirdad on all machines, host system set to UTC also running bootclockrandomization, tcp timestamps turned off on all systems, no ntp or systemd-timesyncd on any systems including host.<br>
+These commands are specific to Virtualbox:<br>
+VBoxManage setextradata  “VBoxInternal/VMMDev/0/Config/GetHostTimeDisabled” 1<br>
+VBoxManage modifyvm  --biossystemtimeoffset - (and +).</li>
+<li>dmidecode shows all Vbox related information, although the real chipset is identified in the virtualbox log files.<br>
+cpuid command is unreliable, but can identify the real chipset for some values, for others it is not accurate.</li>
+</ol>
+<p>EDIT: More Hypervisor “interfaces” to report</p>
+<p>This is for the Virtualbox choice of “Minimal.” Vbox version remains the same, as well as the two tested hosts, and guests. Guests worked with were: Debian Buster vanilla guest machines, and both Whonix machines.<br>
+1-5 remain the same as above.<br>
+6. This is tough. There seem to be ridiculous amount of trouble to get on to the site. I changed circuit about a half-dozen times, that failed. Then I shut down the browser (Tor Browser) and restarted. This time it was successful.<br>
+7. VLC was fine. I actually used it to watch something from youtube, by putting the youtube video url into VLC and having it connect and play the video on VLC’s player. No problem noted.<br>
+8. output: tsc<br>
+9. output: tsc acpi_pm<br>
+Note: as we know, tsc is the clock that is on the hardware/cpu. is this better than kvm-clock? Probably it is, but not sure why exactly. Once again, the previous time-related mods were present for this test. In journalctl output, ioapic is reported along with its pointer in memory. Also, clocksource reported as: tsc-early using “pmtimer” reference calibration. x2Apic reported that the irq remapping does not support x2 apic (?). This is different than with “Default” or “KVM” which do not display that in journals.<br>
+11. Same result for dmidecode. Cpuid was similar, but the section on tsc and cpu frequency was very busy! It had a complete list of instructions that exist on the host’s actual chipset. Here, x2APIC was reported as active and had some stats about it. Seemed to contradict journal, but i have seen this from cpuid before with hypervisors. It can get confused.<br>
+Next will be “Legacy” for the Virtualbox hypervisor interface.</p>
+<p>Legacy:<br>
+1-5 are the same once again<br>
+6. Youtube is great, no issues whatsoever, worked on first try.<br>
+7. VLC also works<br>
+8. output: tsc<br>
+9. output tsc acpi_pm<br>
+This was very similar to the “Minimal” option. The journal was almost exactly the same, timesource was reported as tsc once again. Dmidecode was boring. All Virtualbox information, nothing about the real chipset. Cpuid was similar to “Minimal,” but there were differences. For instance, tsc was noted, but that’s all. No memory information. Apic on chip was recognized and the journal had the same clock/timer readings:<br>
+x2apic: IRQ remapping doesn’t support X2APIC mode<br>
+host kernel: …TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1<br>
+host kernel: tsc: Unable to calibrate against PIT<br>
+host kernel: tsc: using PMTIMER reference calibration<br>
+As with Minimal, Legacy worked very well, no problems to report. On the Default/KVM setting, I had tried to run with Nested Paging disabled and performance was degraded to a point of being un usable. With both Legacy and Minimal, the same result was noted. For the tested settings so far, the cpu temperature (as taken on the host from /sys/) is very reasonable and stays almost exact among the different options. I have not found one interface choice to be better than another, except for the fact that the potential security concerns of kvm-clock are not present with Minimal/Legacy.<br>
+Next one up is Hyper-V. As far as I am aware, this is the Microsoft native hypervisor. I am not running a Windows host, so do not know what to expect.</p>
+<p>Hyper-V<br>
+1-5 the same once again. 6 works well with youtube, VLC is no issue.<br>
+8. output: tsc<br>
+9. output: tsc acpi_pm<br>
+10. I guess I was expecting some sort of windows-esque experience, but Hyper-V was almost the same as Legacy, and Minimal. I say “almost” because the journal produced this error that was not there on the previous two interfaces:<br>
+APIC calibration not consistent with PM-Timer and APIC delta adjusted to PM-Timer. One noteworthy item is that for every interface that used “tsc” as a clocksource, there was this same error in the early logs, right after boot: tsc: Unable to calibrate against PIT. It did not appear to cause any issues as in everything worked the way it should.<br>
+Dmidecode was the same, reporting all Virtualbox specific info: chassis, base board, bios, etc. Cpuid listed the hypervisor_id as “VBoxVBoxVBox.” Tsc was correctly identified, x2Apic was correctly identified, but some readings were just plain wrong. i guess these tools are really meant for testing on bare metal. The hypervisor seemed to really confuse the output of bot dmidecode and cpuid. As I was evaluating these different choices, I came across the Forum User : “Corrupt_Correct_Pig” It seems that a lot of what he/she reported was also true for me. So far, there is no difference in “looks,” as far as what the interface presents as. The menus look the same, and everything is identical. Nothing to give away what interface was chosen, other than checking out the choice in the GUI. I have not run into any issues that would prevent me from using one over the other. maybe a personal bias for a certain system, that’s it though.<br>
+There is one more left to check and that is the “None” choice. I will come back tomorrow to report on that one. I gave a day’s worth of activity on each choice. A day being 12hrs give or take.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/92">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/92</link>
+        <pubDate>Fri, 07 Feb 2020 03:29:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-92</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Could you please also experiment with <a href="https://forums.whonix.org/t/whonix-virtualbox-paravirtualization-which-acceleration-mode-is-optimal-help-wanted/1703" class="inline-onebox">Whonix VirtualBox Paravirtualization - Which Acceleration Mode is Optimal? Help Wanted!</a> - that might also help fixing this issue.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/91">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/91</link>
+        <pubDate>Thu, 06 Feb 2020 09:08:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-91</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Awesome!<br>
+I am glad that the options exist for these various mitigations, as far as Virtualbox is concerned. As I was testing various configurations, and options it became clear that even without some options enabled, the guest still reported as mitigated (in the same manner as the host(s)). I suspect the microcode updates were the reason.<br>
+I had tried the most recent series of Vbox when it was 6.1. At the time, there were some problems with graphics-- specifically the sizing and full screen settings for VBoxSVGA and VMSVGA were buggy. I did not test for the presence of Spectre/Meltdown though. I notice that some graphics troubles seem to be fixed according to the changelog.<br>
+I would hope that the vulnerability defenses were at least carried over from 6.0.xx<br>
+I am going to keep a close watch on this Spec.Store Bypass issue, and any news about it will be shared with the Whonix forums. Virtualbox has its issues, as we know, but it has the potential to be excellent. I am going to do my best according to my skill level to help it become that for the Whonix community.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/90">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/90</link>
+        <pubDate>Tue, 04 Feb 2020 20:29:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-90</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>You could also try VirtualBox 6.x series but I haven’t seen anything in the changelog regarding this subject.</p>
+<aside class="quote no-group" data-username="anontor" data-post="88" data-topic="5739">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> anontor:</div>
+<blockquote>
+<p>There is a mds related command that I do not have set. The virtual machines report as mitigated. --spec-ctrl is set to “off.”</p>
+</blockquote>
+</aside>
+<p>now added:<br>
+<a href="https://www.whonix.org/w/index.php?title=Template%3AVirtualBox_Spectre_Meltdown&amp;type=revision&amp;diff=54477&amp;oldid=54476">https://www.whonix.org/w/index.php?title=Template%3AVirtualBox_Spectre_Meltdown&amp;type=revision&amp;diff=54477&amp;oldid=54476</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/89">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/89</link>
+        <pubDate>Tue, 04 Feb 2020 05:47:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-89</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>After extensive research and searching, along with some trial-and-error, I have come to a new conclusion about Vbox.<br>
+The version I tested is the most updated version in the 6.0- series which is: 6.0.16 from the vbox website. Two hosts were tried: Debian Buster and Ubuntu 18.04. Both hosts have had the proper Spectre/Meltdown mitigations through kernel updates as well as microcode. No vulnerabilities reported for either host. Checked /sys via a small bash script Patrick posted and also ran spectre-meltdown-checker and verified with log output after boot.<br>
+Now on to the virtual machines. Results were the same regardless of host. Results were the same for a Debian 10 non-Whonix virtual machine, and also the Whonix machines. 12 vulnerabilities are checked across the spectre/meltdown landscape b y the spectre-meltdown-checker tool v 42. Two CVEs reported as vulnerable: CVE-2018-3640:K0 and CVE-2018-3639:K0. These are referring to the Speculative Store Bypass issue and “Rogue system Register Read”. All other vulnerabilities checked for by the tool are successfully mitigated.<br>
+The options I have enabled for the virtual machines are as follows and can be enabled by the VBoxManage modifyvm “vm name”  . --ibpb-on-vm-entry, --ibpb-on-vm-exit, --l1d-flush-on-sched, --lid-flush-on-vm-entry. These are set to “on.” There is a mds related command that I do not have set. The virtual machines report as mitigated. --spec-ctrl is set to “off.”<br>
+Regarding the Spec. Store Bypass, I found this: <a href="https://security.stackexchange.com/questions/211265/virtualbox-spectre-v4" rel="nofollow noopener">https://security.stackexchange.com/questions/211265/virtualbox-spectre-v4</a>. He believes the the SSBD flag has not been passed to the virtual machine(s) This is something that Virtualbox would have to enable. On the hosts, Spec Store Bypass is disabled explicitly by prctl and seccomp, which is supported in the Debian kernel. It should be showing up as mitigated.<br>
+Also, regarding the same issue, there is this current ticket at Virtualbox, <span class="hashtag">#18477</span>. In it, a user with CentOS and Fedora 29 reports that despite host mitigation, the virtual machines still report as vulnerable. This ticket is active right now. I was thinking of adding my experience on to this existing ticket as opposed to opening another, just because my issue is literally identical.<br>
+So, it appears that since version 5.2.18 up until now with version 6.0.16, progress has been made. If they can fix this last issue with the remaining CVEs, spectre and meltdown will hopefully be completely patched.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/88">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/88</link>
+        <pubDate>Mon, 03 Feb 2020 22:37:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-88</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>I will prepare that for them.<br>
+Your ticket gave a lot of info, and was re-opened. And then they just left you hanging. I have not heard or seen on their forums any more information about this. This is important, and I would like them to fix it.<br>
+I like that tiny bash script-- very handy!</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/87">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/87</link>
+        <pubDate>Sun, 02 Feb 2020 19:27:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-87</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes. Please report to VirtualBox. Better they hear it from others than just me bugging them.</p>
+<p>I don’t know what to make off <a href="https://www.virtualbox.org/ticket/17987">https://www.virtualbox.org/ticket/17987</a>. First, VirtualBox developers implement spectre/meltdown defenses. Lots of effort. Then after a bug is reported, it’s suddenly not a priority anymore at all. Maybe <a href="https://www.virtualbox.org/ticket/17987">https://www.virtualbox.org/ticket/17987</a> is disregareded as such spectre-meltdown-checker oddity.</p>
+<p>Please see <a href="https://www.virtualbox.org/ticket/17987">https://www.virtualbox.org/ticket/17987</a> and prepare what they’ll be asking for. Debian version, kernel version, VirtualBox log, kernel boot parameter (<code>cat /proc/cmdline</code>, <code>cat /proc/version</code>) for both host and VM, VirtualBox settings commands, vulnerability status host and guest.</p>
+<pre><code>for f in /sys/devices/system/cpu/vulnerabilities/* ; do echo "$f" ; cat "$f" ; done</code></pre>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/86">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/86</link>
+        <pubDate>Sun, 02 Feb 2020 18:23:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-86</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>I am certainly going to ask them. Speculative Store Bypass is the only one that states “Vulnerable” on boot according to logs. Everything else<br>
+reporting as mitigated including L1tf which has its own command which I enabled, and it also reports as mitigated.<br>
+This is what I have tried so far. Results were the same on both Whonix and a “regular” not-modified Debian 10 virtual machine. Results were the same whether microcode was installed on virtual machines or not. (Both hosts are microcode updated)<br>
+–spec-ctl on This option did what it is supposed to in that spectre variants were mitigated. No effect on Spec. Store Bypass. Also, if you do not enable this option and the host has been mitigated, the virtual machine will also be mitigated.<br>
+Grub commandline options: spec_store_bypass_disable on | auto | prctl | seccomp: I tried all of these options to no effect. One at a time with update-grub command and a reboot. Tried them with --spec-ctrl on and --spec-ctrl off and the results were the same: no effect on Spec Store Bypass. Still reports as vulnerable.<br>
+I will ask Virtualbox if they have any insight and see what they tell me. I would like to get this fixed. I cannot figure out why everything else is mitigated but not this? (On both a Debian 10 host and an Ubuntu 18.04 host, all vulns are reporting as mitigated through different methods.)</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/85">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/85</link>
+        <pubDate>Sun, 02 Feb 2020 16:57:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-85</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I can only point to <a href="https://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/79">my previous post here</a>, specifically <a href="https://www.virtualbox.org/ticket/17987">VirtualBox 5.2.18 vulnerable to spectre/meltdown despite microcode being installed</a>. Feel free to reproduce this on Debian and take this up to VirtualBox as per <a href="https://www.whonix.org/wiki/Free_Support_Principle">Free Support Principle</a>.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/84">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/84</link>
+        <pubDate>Sun, 02 Feb 2020 07:50:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-84</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Sorry about that! of course some details would help:<br>
+This is in Virtualbox 6.0.16. (on a Debian Buster host machine; also same result on the Ubuntu host)<br>
+cat /proc/cmdline shows:<br>
+BOOT_IMAGE=/boot/vmlinuz-4.19.0-6-amd64 root=UUID=26ceb4c2-0512-1428-347a-cbab4216a5c1 ro console=tty0 console=ttyS0,115200n8 intel_iommu=on amd_iommu=on slab_nomerge slub_debug=FZP page_poison=1 mce=0 pti=on mds=full,nosmt spec_store_bypass_disable=on<br>
+Initially I tried the Gateway, and then Workstation, and both reported the same message</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/83">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/83</link>
+        <pubDate>Sat, 01 Feb 2020 21:21:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-83</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>anontor via Whonix Forum:</p>
+<blockquote>
+<p>Interesting, creating a “40_spec_disable.cfg” in the /etc/default/grub.d folder with the spec_store_bypass_disable=on configuration and then updating grub showed on a reboot that it had no effect.</p>
+</blockquote>
+<p>Shows up in <code>cat /proc/cmdline</code>?</p>
+<blockquote>
+<p>The log still reported:<br>
+Speculative Store Bypass: Vulnerable<br>
+(The host is appropriately patched and not vulnerable)</p>
+</blockquote>
+<p>Virtualizer?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/82">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/82</link>
+        <pubDate>Sat, 01 Feb 2020 17:59:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-82</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Interesting, creating a “40_spec_disable.cfg” in the /etc/default/grub.d folder with the spec_store_bypass_disable=on configuration and then updating grub showed on a reboot that it had no effect. The log still reported:<br>
+Speculative Store Bypass: Vulnerable<br>
+(The host is appropriately patched and not vulnerable)</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/81">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/81</link>
+        <pubDate>Sat, 01 Feb 2020 16:39:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-81</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a>, I thought it might; thanks for the clarification</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/80">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/80</link>
+        <pubDate>Wed, 29 Jan 2020 18:14:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-80</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-issues/issues/4262#issuecomment-579221112" target="_blank">github.com/QubesOS/qubes-issues</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/QubesOS/qubes-issues/issues/4262#issuecomment-579221112" target="_blank">spectre-meltdown-checker saying vulnerable inside Debian based Qubes VMs</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2018-08-28" data-time="16:26:56" data-timezone="UTC">04:26PM - 28 Aug 18 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="github-row">
+  <p class="github-content">Qubes OS version:
+R4
+Affected component(s):
+probably any Debian based TemplateVM (debian-9 tested by me), Whonix 14 (tested by me)
+not affected: Fedora
+
+Steps to reproduce...</p>
+</div>
+
+<div class="labels">
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: Debian/Ubuntu</span>
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">T: task</span>
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">security</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/speed47/spectre-meltdown-checker/issues/342" target="_blank">github.com/speed47/spectre-meltdown-checker</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/speed47/spectre-meltdown-checker/issues/342" target="_blank">VirtualBox guest VM reports: an up-to-date CPU microcode is needed to mitigate this vulnerability</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2020-01-28" data-time="11:33:25" data-timezone="UTC">11:33AM - 28 Jan 20 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="github-row">
+  <p class="github-content">spectre-meltdown-checker v0.42
+spectre-meltdown-checker --paranoid on a Debian buster host: passed (exit code 0)
+spectre-meltdown-checker --paranoid in a Debian buster VirtaulBox VM: failed
+CVE-2018-3640
+an up-to-date...</p>
+</div>
+
+<div class="labels">
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/speed47/spectre-meltdown-checker/issues/343" target="_blank">github.com/speed47/spectre-meltdown-checker</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/speed47/spectre-meltdown-checker/issues/343" target="_blank">False positives inside Xen (PVH) domU</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2020-01-28" data-time="18:16:09" data-timezone="UTC">06:16PM - 28 Jan 20 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="https://github.com/marmarek" target="_blank">
+          <img alt="marmarek" src="https://avatars1.githubusercontent.com/u/726704?v=4" class="onebox-avatar-inline" width="20" height="20">
+          marmarek
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="github-row">
+  <p class="github-content">When running in Xen with SMT disabled (smt=0 Xen boot option), multiple points are still reported as vulnerable with "Your microcode...</p>
+</div>
+
+<div class="labels">
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p>As far as VirtualBox is concerned… Quote <a href="https://www.whonix.org/wiki/Spectre_Meltdown#VirtualBox">https://www.whonix.org/wiki/Spectre_Meltdown#VirtualBox</a></p>
+<blockquote>
+<p>There is no solution for <a href="https://www.whonix.org/wiki/VirtualBox">VirtualBox</a> yet. The bug has been reported to the VirtualBox developers. See <a href="https://www.virtualbox.org/ticket/17987">VirtualBox 5.2.18 vulnerable to spectre/meltdown despite microcode being installed</a> <a href="https://web.archive.org/web/https://www.virtualbox.org/ticket/17987">[archive]</a>. The Whonix ™ developers depend on the VirtualBox developers for fixing this VirtualBox issue. Nevertheless: […]</p>
+</blockquote>
+<aside class="quote no-group" data-username="anontor" data-post="78" data-topic="5739">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/b2d939/40.png" class="avatar"> anontor:</div>
+<blockquote>
+<p>I have these options enabled in my machines, including Whonix and do not notice any performance issues. Perhaps others would?</p>
+</blockquote>
+</aside>
+<p>Yes. Enabling those VirtualBox spectre/meltdown related security settings makes a VirtualBox Whonix-Gateway VM notifibly slow and the fan of my otherwise powerful notebook turns on.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/79">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/79</link>
+        <pubDate>Wed, 29 Jan 2020 13:45:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-79</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>Some of these mitigations are available “optionally.” I mean like in the case of Vbox, as an example, the L1Df vuln can be mitigated on a per machine basis on commandline using “VBoxManage modifyvm…”<br>
+There are 4 total commands specific to this particular vuln, and documentation says “perf degradation can be SEVERE…”<br>
+I have these options enabled in my machines, including Whonix and do not notice any performance issues. Perhaps others would? I guess the chip makes a difference?<br>
+Commands: --l1d-flush-on-vm-entry on, --l1d-flush-on-sched on, --ibpb-on-vm-entry on, --ibpb-on-vm-exit on.<br>
+There is also a set of commands for other vulns that I have not enabled. According to logs on non-Whonix Debian virtual machines, with the above commands enabled, spectre v1 and v2 are mitigated, MDS is mitigated using a clearing of cpu buffers, but warns for full mitigation to turn off smt (hyperthreading). It lists Spec. Store bypass a still vulnerable though. Since Spec. Store Bypass has been mitigated on the host through a microcode update, is the VM still vulnerable? I am not sure.<br>
+On my host(s), everything is mitigated.<br>
+A copy of the vm logs:<br>
+Jan 28 20:33:32 host kernel: Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization<br>
+Jan 28 20:33:32 host kernel: Spectre V2 : Mitigation: Full generic retpoline<br>
+Jan 28 20:33:32 host kernel: Spectre V2 : Spectre v2 / SpectreRSB mitigation: Filling RSB on context switch<br>
+Jan 28 20:33:32 host kernel: Speculative Store Bypass: Vulnerable<br>
+Jan 28 20:33:32 host kernel: MDS: Mitigation: Clear CPU buffers</p>
+<p>EDIT: Here is a good list of mitigations that <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> posted some time ago:<br>
+</p><aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm" target="_blank" rel="nofollow noopener">Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm</a></h4>
+<pre><code class="lang-d/2600_create-vbox-vm">#!/bin/bash
+
+## Copyright (C) 2012 - 2018 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+set -x
+set -e
+
+true "INFO: Currently running script: $BASH_SOURCE $@"
+
+MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &amp;&amp; pwd )"
+
+cd "$MYDIR"
+cd ..
+cd help-steps
+
+source pre
+source colors
+source variables
+
+</code></pre>
+
+  This file has been truncated. <a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/2600_create-vbox-vm" target="_blank" rel="nofollow noopener">show original</a>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Observations:<br>
+I notice that MDS mitigates along the same lines in the VM as on the hosts. Like if you mitigate mds on host, the virtual machine follows that and displays the same mitigation in the virtual machine. The Speculative Store Bypass does not for some reason, despite being mitigated on the host. Interesting though that for MDS, there is an associated VBoxManage command, 2 of them to clear on vm entry and/or on vm exit. There is also a --spec-ctl on | off option as well which I do not have enabled on the VMs.<br>
+On the Debian VMs, the only vulns listed as active is Speculative Store Bypass, and something called itlb_multithit according to /sys/devices/system/cpu/vulnerabilities. There is an entry for tsx_async_abort but it says “Not affected” inside the file. Obviously disabling hyperthreading on the host would take care of itlb_multihit. When it (hyperthreading) is disabled, the Debian VM is not vulnerable anymore.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/78">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/78</link>
+        <pubDate>Tue, 28 Jan 2020 21:13:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-78</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Issue back in (at least) Qubes Debian based VMs or a false positive. Reported here just now:</p>
+<p><a href="https://github.com/QubesOS/qubes-issues/issues/4262#issuecomment-579221112">https://github.com/QubesOS/qubes-issues/issues/4262#issuecomment-579221112</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/77">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/77</link>
+        <pubDate>Tue, 28 Jan 2020 12:25:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-77</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/speed47/spectre-meltdown-checker/issues/342" target="_blank">github.com/speed47/spectre-meltdown-checker</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/speed47/spectre-meltdown-checker/issues/342" target="_blank">VirtualBox guest VM reports: an up-to-date CPU microcode is needed to mitigate this vulnerability</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2020-01-28" data-time="11:33:25" data-timezone="UTC">11:33AM - 28 Jan 20 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="github-row">
+  <p class="github-content">spectre-meltdown-checker --paranoid on a Debian buster host: passed (exit code 0)
+spectre-meltdown-checker --paranoid in a Debian buster VirtaulBox VM: failed
+CVE-2018-3640
+an up-to-date CPU...</p>
+</div>
+
+<div class="labels">
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/76">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/76</link>
+        <pubDate>Tue, 28 Jan 2020 11:34:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-76</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="11" data-topic="7647">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/should-all-kernel-patches-for-cpu-bugs-be-unconditionally-enabled-vs-performance-vs-applicability/7647/11">Should all kernel patches for CPU bugs be unconditionally enabled? Vs Performance vs Applicability</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    Quote <a href="https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html#default-mitigations">https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html#default-mitigations</a> 
+
+The kernel does not by default enforce the disabling of SMT, which leaves SMT systems vulnerable when running untrusted guests with EPT enabled. 
+
+Since we disable SMT (mds=full,nosmt) that should be ok? 
+As per <a href="https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html#smt-control">https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html#smt-control</a> there is also a separate kernel boot parameter nosmt=force which I find confusing. Should we set that as well…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/75">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/75</link>
+        <pubDate>Tue, 28 Jan 2020 08:37:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-75</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="71" data-topic="5739">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/v/ee7513/40.png" class="avatar"> Vercy:</div>
+<blockquote>
+<p>Qubes not supported.</p>
+</blockquote>
+</aside>
+<p>Known issue:</p>
+<p><a href="http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/free-bios-hardware-that-support-all-your-needs/6411/9" class="onebox" target="_blank" rel="nofollow noopener">http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/free-bios-hardware-that-support-all-your-needs/6411/9</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/73">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/73</link>
+        <pubDate>Sun, 30 Jun 2019 22:15:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-73</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="71" data-topic="5739">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/v/ee7513/40.png" class="avatar"> Vercy:</div>
+<blockquote>
+<p>After that if you boot guest and and run spectre-meltdown checker you will see VULNERABLE status for most vulnerabilities. Might be because CPU is being detected as CPU is QEMU Virtual CPU version. So is guest vulnerable in this case ?</p>
+</blockquote>
+</aside>
+<p>I’ve switched the VMs to use the passed through host CPU instructions in the last few versions. You should upgrade or stop changing the settings.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/72">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/72</link>
+        <pubDate>Tue, 25 Jun 2019 03:56:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-72</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Vercy]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="67" data-topic="5739">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Microcode fixes always go on the host otheriwse they don’t take an effect, because guests can’t modify microcode for security reasons.</p>
+</blockquote>
+</aside>
+<p>Just patch host and get sure spectre-meltdown checker returns NOT VULNERABLE status for all vulnerabilities.<br>
+After that if you boot guest and and run spectre-meltdown checker you will see VULNERABLE status for most vulnerabilities. Might be because CPU is being detected as CPU is QEMU Virtual CPU version. So is guest vulnerable in this case ?</p>
+<aside class="quote no-group" data-post="70" data-topic="5739">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tnt_bom_bom/40/2148_2.png" class="avatar"> TNT_BOM_BOM:</div>
+<blockquote>
+<p>Ultimate solution would be using open processor like Power9:</p>
+</blockquote>
+</aside>
+<p>Qubes not supported.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/71">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/71</link>
+        <pubDate>Tue, 25 Jun 2019 02:14:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-71</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="68" data-topic="5739">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/v/ee7513/40.png" class="avatar"> Vercy:</div>
+<blockquote>
+<p>I ask because some months ago I saw on this forum a post like this:<br>
+"Don’t install intel-microcode to fix spectre and meltdown, new microcode can contain new backdoors. Just update your kernel "</p>
+</blockquote>
+</aside>
+<p>Thats one reason , another reason i personally got:</p>
+<p>Installing latest Microcode updates doesnt solve CPU flaws anymore in some old pcs.</p>
+<p>So whether you installed it or not , not much of a different if you are using Intel/AMD and really concerned about security.</p>
+<p>Ultimate solution would be using open processor like Power9:</p>
+<p><a href="https://www.raptorcs.com/" class="onebox" target="_blank" rel="nofollow noopener">https://www.raptorcs.com/</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/70">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/70</link>
+        <pubDate>Sun, 09 Jun 2019 09:26:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-70</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="68" data-topic="5739">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/v/ee7513/40.png" class="avatar"> Vercy:</div>
+<blockquote>
+<p>I ask because some months ago I saw on this forum a post like this:<br>
+"Don’t install intel-microcode to fix spectre and meltdown, new microcode can contain new backdoors. Just update your kernel "</p>
+</blockquote>
+</aside>
+<p>One who had that opinion would still have it now.</p>
+<p>I still don’t agree with it.</p>
+<p>Not installing microcode only leaves known vulnerabilities (= for all practical purposes the same like a backdoors - just known by much more people) remain.</p>
+<p>The cold hard truth is that CPU is fully trusted, i.e. has ultimate control. We can only patch some known vulnerabilities at the mercy of the producers.</p>
+<p>The solution can most likely could only be non-technical:</p>
+<ul>
+<li>Smash Intel/AMD using anti-trust law [not great, but also not too bad].</li>
+<li>Allow emerging competition by removing market entrance barriers such as copyright and patent law. [It didn’t happen until now that a new company could compete with existing armies of copyright and patent lawyers and I predict it won’t happen unless laws are softened to allow competition or unless at least some country allows for such an environment. The required investment seems to high, too difficult, too risky, too low return of investment.]</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/69">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/69</link>
+        <pubDate>Sat, 08 Jun 2019 11:08:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-69</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+      <item>
+        <title>Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</title>
+        <dc:creator><![CDATA[Vercy]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you. I ask because some months ago I  saw on this forum a post like this:<br>
+"Don’t install intel-microcode to fix spectre and meltdown, new microcode can contain new backdoors. Just update your kernel "</p>
+          <p><a href="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/68">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739/68</link>
+        <pubDate>Sat, 08 Jun 2019 10:49:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5739-68</guid>
+        <source url="http://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739.rss">Whonix vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)</source>
+      </item>
+  </channel>
+</rss>

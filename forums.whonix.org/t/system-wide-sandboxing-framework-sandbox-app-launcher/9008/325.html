@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>System-wide sandboxing framework - sandbox-app-launcher - #325 by Patrick - Development - Whonix Forum</title>
+    <meta name="description" content="We’re currently working on a full system apparmor policy to confine all userspace processes but this has 2 issues: 
+
+
+It doesn’t use more restrictive profiles for user applications. A PDF viewer shouldn’t have the same p&amp;hellip;">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="../90085c43.html?page=17" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../../c/news/21.html">NEWS</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;System-wide sandboxing framework - sandbox-app-launcher&#39;" href="../9008.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/325" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/325" />
+<meta property="og:title" content="System-wide sandboxing framework - sandbox-app-launcher" />
+<meta name="twitter:title" content="System-wide sandboxing framework - sandbox-app-launcher" />
+<meta property="og:description" content="Indeed. User would have to re-run setup, which is bad usability. Would be better if we could fix that automagically for the user.   In theory, yes. But during run_program() sandbox-app-launcher is run as user, not root. Therefore I don’t see how that’s possible. If a have a solution, please implement or let me know.  I have one idea that would be doable, though.  At the moment the tests during setup() look like this:    if ! [ &quot;$(stat -c %a &quot;${shared_dir}&quot;)&quot; = &quot;1777&quot; ]; then     chmod 1777 &quot;${..." />
+<meta name="twitter:description" content="Indeed. User would have to re-run setup, which is bad usability. Would be better if we could fix that automagically for the user.   In theory, yes. But during run_program() sandbox-app-launcher is run as user, not root. Therefore I don’t see how that’s possible. If a have a solution, please implement or let me know.  I have one idea that would be doable, though.  At the moment the tests during setup() look like this:    if ! [ &quot;$(stat -c %a &quot;${shared_dir}&quot;)&quot; = &quot;1777&quot; ]; then     chmod 1777 &quot;${..." />
+<meta property="article:published_time" content="2021-03-18T09:57:55+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+        <link rel="prev" href="../900842a7.html?page=16">
+        <link rel="next" href="../90089683.html?page=18">
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../../index.html">
+          <img src="../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="../9008.html">System-wide sandboxing framework - sandbox-app-launcher</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../../c/development/8.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #25AAE2'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>Development</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+      <div class="topic-category">
+        <div class='discourse-tags list-tags'>
+            <a href='../../../tag/component_security.html' class='discourse-tag' rel="tag">component_security</a>, 
+            <a href='../../../tag/status_open_issue_todo.html' class='discourse-tag' rel="tag">status_open_issue_todo</a>
+        </div>
+      </div>
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-13T06:50:16Z' class='post-time'>
+                March 13, 2021,  6:50am
+              </time>
+              <meta itemprop='dateModified' content='2021-03-13T06:50:16Z'>
+          <span itemprop='position'>#320</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Thanks. Missed that one. Answered just now.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+          <meta itemprop='keywords' content='component_security, status_open_issue_todo'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/HulaHoop'><span itemprop='name'>HulaHoop</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-13T17:02:57Z' class='post-time'>
+                March 13, 2021,  5:02pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-13T17:02:57Z'>
+          <span itemprop='position'>#321</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Saw this “new” feature being upstreamed. Don’t know how useful it can be for the sandbox:</p>
+<p><a href="../../../../external.html?link=https://www.phoronix.com/scan.php?page=news_item&amp;px=2021-Unprivileged-Chroot" class="onebox" target="_blank" rel="noopener">https://www.phoronix.com/scan.php?page=news_item&amp;px=2021-Unprivileged-Chroot</a></p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-17T22:18:02Z' class='post-time'>
+                March 17, 2021, 10:18pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-17T22:18:02Z'>
+          <span itemprop='position'>#322</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Mount namespaces / AppArmor provide greater flexibility for us.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-17T23:59:24Z' class='post-time'>
+                March 17, 2021, 11:59pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-17T23:59:24Z'>
+          <span itemprop='position'>#323</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/ffd45c6efdb26b971a143b8845728ff3da060d82" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/ffd45c6efdb26b971a143b8845728ff3da060d82" target="_blank" rel="noopener nofollow ugc">fix permissions if messed up by something</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-01-12" data-time="07:29:13" data-timezone="UTC">07:29AM - 12 Jan 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank" rel="noopener nofollow ugc">
+          <img alt="adrelanos" src="../../../../external.html?link=https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 12 additions and 4 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/commit/ffd45c6efdb26b971a143b8845728ff3da060d82" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+12</span>
+          <span class="removed">-4</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="github-row">
+    <pre class="github-content" style="white-space: normal;">(such as Qubes home folder implementation or after restoration of backup)
+use sudo long instead of short parameters
+fix setup already done check:
+https://forums.whonix.org/t/system-wide-sandboxing-framework-sandbox-app-launcher/9008/310...</pre>
+  </div>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Wouldn’t this be better suited in <code>run_program()</code>? Those <code>chmod</code> calls will only execute during setup; it won’t help if something messes up the permissions after setup.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-18T00:32:06Z' class='post-time'>
+                March 18, 2021, 12:32am
+              </time>
+              <meta itemprop='dateModified' content='2021-03-18T00:32:06Z'>
+          <span itemprop='position'>#324</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/52" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/52" target="_blank" rel="noopener nofollow ugc">Add option to remove app data</a>
+    </h4>
+
+    <div class="branches">
+      <code>Whonix:master</code> ← <code>madaidan:uninstall</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2021-03-18" data-time="00:30:53" data-timezone="UTC">12:30AM - 18 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank" rel="noopener nofollow ugc">
+          <img alt="madaidan" src="../../../../external.html?link=https://avatars.githubusercontent.com/u/50278627?v=4" class="onebox-avatar-inline" width="20" height="20">
+          madaidan
+        </a>
+      </div>
+
+      <div class="lines" title="1 commits changed 1 files with 30 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/52/files" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+30</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/53" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/53" target="_blank" rel="noopener nofollow ugc">Fix postrm script</a>
+    </h4>
+
+    <div class="branches">
+      <code>Whonix:master</code> ← <code>madaidan:postrm</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2021-03-18" data-time="00:32:09" data-timezone="UTC">12:32AM - 18 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank" rel="noopener nofollow ugc">
+          <img alt="madaidan" src="../../../../external.html?link=https://avatars.githubusercontent.com/u/50278627?v=4" class="onebox-avatar-inline" width="20" height="20">
+          madaidan
+        </a>
+      </div>
+
+      <div class="lines" title="1 commits changed 1 files with 2 additions and 2 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/53/files" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+2</span>
+          <span class="removed">-2</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-18T09:57:55Z' class='post-time'>
+                March 18, 2021,  9:57am
+              </time>
+              <meta itemprop='dateModified' content='2021-03-18T09:57:55Z'>
+          <span itemprop='position'>#325</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="madaidan" data-post="323" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Wouldn’t this be better suited in <code>run_program()</code>? Those <code>chmod</code> calls will only execute during setup; it won’t help if something messes up the permissions after setup.</p>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-username="madaidan" data-post="323" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Those <code>chmod</code> calls will only execute during setup; it won’t help if something messes up the permissions after setup.</p>
+</blockquote>
+</aside>
+<p>Indeed. User would have to re-run setup, which is bad usability. Would be better if we could fix that automagically for the user.</p>
+<aside class="quote no-group" data-username="madaidan" data-post="323" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Wouldn’t this be better suited in <code>run_program()</code>?</p>
+</blockquote>
+</aside>
+<p>In theory, yes. But during <code>run_program()</code> sandbox-app-launcher is run as user, not root. Therefore I don’t see how that’s possible. If a have a solution, please implement or let me know.</p>
+<p>I have one idea that would be doable, though.</p>
+<p>At the moment the tests during <code>setup()</code> look like this:</p>
+<pre><code>  if ! [ "$(stat -c %a "${shared_dir}")" = "1777" ]; then
+    chmod 1777 "${dir}"
+  fi
+</code></pre>
+<p>I.e.</p>
+<ol>
+<li>Test if already done.</li>
+<li>Do whatever needed not already done.</li>
+</ol>
+<p>What could be done when running as user, without root, during <code>run_program()</code> is instead:</p>
+<ol>
+<li>Test if already done.</li>
+<li>If root, do it if not yet done. | If user, notify user and error exit.</li>
+</ol>
+<pre><code class="lang-auto">run_if_root() {
+  if [ "$sal_is_run_with_root" = "true" ]; then
+    "$@"
+  else
+    echo "ERROR: The setup for this program is incomplete. To fix, please execute:
+
+sudo sandbox-app-launcher setup ${app_name}
+
+(Debugging information: $@)" &gt;&amp;2
+    exit 1
+  fi
+}
+
+if [ "$(id -u)" = "0" ]; then
+  sal_is_run_with_root=true
+fi
+
+if ! [ "$(stat -c %a "${shared_dir}")" = "1777" ]; then
+  run_if_root chmod 1777 "${dir}"
+fi
+</code></pre>
+<p>What do you think?</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-18T10:16:33Z' class='post-time'>
+                March 18, 2021, 10:16am
+              </time>
+              <meta itemprop='dateModified' content='2021-03-18T10:16:33Z'>
+          <span itemprop='position'>#326</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Merged.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-18T23:00:05Z' class='post-time'>
+                March 18, 2021, 11:00pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-18T23:00:05Z'>
+          <span itemprop='position'>#327</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Patrick" data-post="325" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>What do you think?</p>
+</blockquote>
+</aside>
+<p>That would be a good idea.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-18T23:26:25Z' class='post-time'>
+                March 18, 2021, 11:26pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-18T23:26:25Z'>
+          <span itemprop='position'>#328</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/54" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/54" target="_blank" rel="noopener nofollow ugc">Use useradd on non-Debian systems</a>
+    </h4>
+
+    <div class="branches">
+      <code>Whonix:master</code> ← <code>madaidan:useradd</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2021-03-18" data-time="23:26:59" data-timezone="UTC">11:26PM - 18 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank" rel="noopener nofollow ugc">
+          <img alt="madaidan" src="../../../../external.html?link=https://avatars.githubusercontent.com/u/50278627?v=4" class="onebox-avatar-inline" width="20" height="20">
+          madaidan
+        </a>
+      </div>
+
+      <div class="lines" title="1 commits changed 1 files with 9 additions and 1 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/54/files" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+9</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-19T02:27:09Z' class='post-time'>
+                March 19, 2021,  2:27am
+              </time>
+              <meta itemprop='dateModified' content='2021-03-19T02:27:09Z'>
+          <span itemprop='position'>#329</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/55" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/55" target="_blank" rel="noopener nofollow ugc">Permit FICLONE and SIOCGIWMODE ioctls</a>
+    </h4>
+
+    <div class="branches">
+      <code>Whonix:master</code> ← <code>madaidan:ioctls</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2021-03-19" data-time="02:27:00" data-timezone="UTC">02:27AM - 19 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank" rel="noopener nofollow ugc">
+          <img alt="madaidan" src="../../../../external.html?link=https://avatars.githubusercontent.com/u/50278627?v=4" class="onebox-avatar-inline" width="20" height="20">
+          madaidan
+        </a>
+      </div>
+
+      <div class="lines" title="2 commits changed 2 files with 4 additions and 0 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/55/files" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+4</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-19T02:49:56Z' class='post-time'>
+                March 19, 2021,  2:49am
+              </time>
+              <meta itemprop='dateModified' content='2021-03-19T02:49:56Z'>
+          <span itemprop='position'>#330</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="madaidan" data-post="64" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>We shouldn’t just whitelist <code>SIOCGIFHWADDR</code> since that’s a privacy risk. We can maybe replace <code>SIOCGIFHWADDR</code> with a function that returns an anonymous MAC address but I’m not sure if that’s possible.</p>
+</blockquote>
+</aside>
+<p>I implemented a way to stub <code>SIOCGIFHWADDR</code> (and other syscalls if the need arises) with <code>LD_PRELOAD</code>.</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/madaidan/sandbox-app-launcher/commit/42b8d8859019c73150539eb2124441ea99e8f9c8" target="_blank" rel="noopener nofollow ugc">github.com/madaidan/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/madaidan/sandbox-app-launcher/commit/42b8d8859019c73150539eb2124441ea99e8f9c8" target="_blank" rel="noopener nofollow ugc">Implement syscall stubbing functionality</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2021-03-19" data-time="02:39:13" data-timezone="UTC">02:39AM - 19 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank" rel="noopener nofollow ugc">
+          <img alt="madaidan" src="../../../../external.html?link=https://avatars.githubusercontent.com/u/50278627?v=4" class="onebox-avatar-inline" width="20" height="20">
+          madaidan
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 3 files with 42 additions and 0 deletions">
+        <a href="../../../../external.html?link=https://github.com/madaidan/sandbox-app-launcher/commit/42b8d8859019c73150539eb2124441ea99e8f9c8" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+42</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>I haven’t created a pull request yet because I want to know what you think of it. This will prevent apps using <code>SIOCGIFHWADDR</code> (like Telegram) from dying without actually exposing the MAC address. Right now, it just exits with a return code of 0 but in the future, we could make it return a legitimate MAC address shared amongst all sandbox-app-launcher users.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-19T12:27:22Z' class='post-time'>
+                March 19, 2021, 12:27pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-19T12:27:22Z'>
+          <span itemprop='position'>#331</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <blockquote>
+<p>grep -qE “NAME=“Debian GNU/Linux”|NAME=“Ubuntu”” /etc/os-release</p>
+</blockquote>
+<p>What do you think about…</p>
+<pre><code>grep --quiet --invert-match --extended-regexp 'NAME="Debian|NAME="Ubuntu' /etc/os-release
+</code></pre>
+<p>Good? Better?</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-19T12:34:31Z' class='post-time'>
+                March 19, 2021, 12:34pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-19T12:34:31Z'>
+          <span itemprop='position'>#332</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>All merged.</p>
+<aside class="quote no-group quote-modified" data-username="madaidan" data-post="330" data-topic="9008" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<aside class="quote no-group" data-username="madaidan" data-post="64" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>We shouldn’t just whitelist <code>SIOCGIFHWADDR</code> since that’s a privacy risk. We can maybe replace <code>SIOCGIFHWADDR</code> with a function that returns an anonymous MAC address but I’m not sure if that’s possible.</p>
+</blockquote>
+</aside>
+<p>I implemented a way to stub <code>SIOCGIFHWADDR</code> (and other syscalls if the need arises) with <code>LD_PRELOAD</code>.</p>
+<p><a href="../../../../external.html?link=https://github.com/madaidan/sandbox-app-launcher/commit/42b8d8859019c73150539eb2124441ea99e8f9c8">github.com/madaidan/sandbox-app-launcher </a></p>
+<h4><a href="../../../../external.html?link=https://github.com/madaidan/sandbox-app-launcher/commit/42b8d8859019c73150539eb2124441ea99e8f9c8">Implement syscall stubbing functionality </a></h4>
+<p>committed Yesterday 10:39 PM</p>
+<p><a href="../../../../external.html?link=https://github.com/madaidan"> <img src="../../../../external.html?link=https://avatars.githubusercontent.com/u/50278627?v=4" alt="madaidan" width="20" height="20"> madaidan </a></p>
+<p><a href="../../../../external.html?link=https://github.com/madaidan/sandbox-app-launcher/commit/42b8d8859019c73150539eb2124441ea99e8f9c8"> +42 -0 </a></p>
+<p>I haven’t created a pull request yet because I want to know what you think of it. This will prevent apps using <code>SIOCGIFHWADDR</code> (like Telegram) from dying without actually exposing the MAC address. Right now, it just exits with a return code of 0 but in the future, we could make it return a legitimate MAC address shared amongst all sandbox-app-launcher users.</p>
+</blockquote>
+</aside>
+<p>On a second thought… With the goal of code simplicity… Does sandbox-app-launcher get involved with privacy? Overextending project scope? Is that the right level to handle privacy issues?</p>
+<p>If privacy matters, use a (Whonix or other) VM. Then it’s not a real hardware serial.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-19T14:03:38Z' class='post-time'>
+                March 19, 2021,  2:03pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-19T14:03:38Z'>
+          <span itemprop='position'>#333</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Patrick" data-post="331" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Good? Better?</p>
+</blockquote>
+</aside>
+<p>Much better.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="332" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>On a second thought… With the goal of code simplicity… Does sandbox-app-launcher get involved with privacy? Overextending project scope? Is that the right level to handle privacy issues?</p>
+</blockquote>
+</aside>
+<p>Sandboxing / permission models are fundamentally involved with privacy. If not, you could also make an argument for removing the camera, webcam, etc. permissions too. I don’t think restricting access to identifiers would be out of scope.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-19T14:27:34Z' class='post-time'>
+                March 19, 2021,  2:27pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-19T14:27:34Z'>
+          <span itemprop='position'>#334</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>How should we handle updates to the seccomp filter? Currently, the binaries won’t be recompiled if we were to update it. Could we move the seccomp filter generation into an apt install script that’s executed on every update? This would also simplify the main script a bit.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-19T14:39:27Z' class='post-time'>
+                March 19, 2021,  2:39pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-19T14:39:27Z'>
+          <span itemprop='position'>#335</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/56" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/sandbox-app-launcher</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/56" target="_blank" rel="noopener nofollow ugc">Better wording</a>
+    </h4>
+
+    <div class="branches">
+      <code>Whonix:master</code> ← <code>madaidan:wording</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2021-03-19" data-time="14:40:05" data-timezone="UTC">02:40PM - 19 Mar 21 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank" rel="noopener nofollow ugc">
+          <img alt="madaidan" src="../../../../external.html?link=https://avatars.githubusercontent.com/u/50278627?v=4" class="onebox-avatar-inline" width="20" height="20">
+          madaidan
+        </a>
+      </div>
+
+      <div class="lines" title="1 commits changed 1 files with 5 additions and 5 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/56/files" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+5</span>
+          <span class="removed">-5</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-19T14:54:50Z' class='post-time'>
+                March 19, 2021,  2:54pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-19T14:54:50Z'>
+          <span itemprop='position'>#336</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="madaidan" data-post="333" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Much better.</p>
+</blockquote>
+</aside>
+<p>Improved in git master.</p>
+<aside class="quote no-group" data-username="madaidan" data-post="333" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Sandboxing / permission models are fundamentally involved with privacy. If not, you could also make an argument for removing the camera, webcam, etc. permissions too. I don’t think restricting access to identifiers would be out of scope.</p>
+</blockquote>
+</aside>
+<p>I see. For microphone, webcam I see a very strong rationale. Nobody wants a compromised application that doesn’t have legitimate use for these devices to turn these on after application compromise. One of the worse possible privacy breaches. MAC addresses have a lot lower severity, well, at least in a VM.</p>
+<p>Feasible to blacklist enough identifiers due or <a href="../../../../external.html?link=https://www.whonix.org/wiki/VM_Fingerprinting">https://www.whonix.org/wiki/VM_Fingerprinting</a> making that infeasible?</p>
+<p>There’s tons of hardware identifies. (Many listed here: <a href="../../../../external.html?link=https://www.whonix.org/wiki/Protocol-Leak-Protection_and_Fingerprinting-Protection">https://www.whonix.org/wiki/Protocol-Leak-Protection_and_Fingerprinting-Protection</a>) Feasible to go for it or would that be similar to re-inventing a VM or full emulation?</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-19T15:04:44Z' class='post-time'>
+                March 19, 2021,  3:04pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-19T15:04:44Z'>
+          <span itemprop='position'>#337</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>We don’t have to <em>blacklist</em> identifiers since our AppArmor and seccomp policy are default-deny. Identifiers must be specifically whitelisted. In the case of MAC addresses, the issue was that I didn’t want to whitelist it.</p>
+<p>We have fine-grained restrictions on filesystems like <code>/sys</code> and <code>/proc</code> which kills most identifiers already. machine-id is already spoofed (<a href="../../../../external.html?link=https://github.com/madaidan/sandbox-app-launcher/blob/master/usr/share/sandbox-app-launcher/machine-id" rel="noopener nofollow ugc">https://github.com/madaidan/sandbox-app-launcher/blob/master/usr/share/sandbox-app-launcher/machine-id</a>) and we could spoof other potential identifiers in a similar fashion. It wouldn’t be very difficult.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-19T16:39:33Z' class='post-time'>
+                March 19, 2021,  4:39pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-19T16:39:33Z'>
+          <span itemprop='position'>#338</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Then I guess, go for it.</p>
+<aside class="quote no-group" data-username="madaidan" data-post="335" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<h4><a href="../../../../external.html?link=https://github.com/Whonix/sandbox-app-launcher/pull/56">Better wording</a></h4>
+</blockquote>
+</aside>
+<p>Merged.</p>
+<aside class="quote no-group" data-username="madaidan" data-post="334" data-topic="9008" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>How should we handle updates to the seccomp filter? Currently, the binaries won’t be recompiled if we were to update it. Could we move the seccomp filter generation into an apt install script that’s executed on every update? This would also simplify the main script a bit.</p>
+</blockquote>
+</aside>
+<p>These are application specific or for all applications?<br>
+Yes. Moving to Debian maintainer postinst script would be appropriate if for all applications.<br>
+(Even if application specific this could be considered.)<br>
+Getting things out of the main script can also be good.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../9008.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2021-03-19T16:51:25Z' class='post-time'>
+                March 19, 2021,  4:51pm
+              </time>
+              <meta itemprop='dateModified' content='2021-03-19T16:51:25Z'>
+          <span itemprop='position'>#339</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-username="Patrick" data-post="338" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>These are application specific or for all applications?</p>
+</blockquote>
+</aside>
+<p>All applications.</p>
+        </div>
+
+        <meta itemprop='headline' content='System-wide sandboxing framework - sandbox-app-launcher'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+
+    <div role='navigation' itemscope itemtype='http://schema.org/SiteNavigationElement' class="topic-body crawler-post">
+        <span itemprop='name'><a rel="prev" itemprop="url" href="../900842a7.html?page=16">← previous page</a></span>
+        <span itemprop='name'><b><a rel="next" itemprop="url" href="../90089683.html?page=18">next page →</a></b></span>
+    </div>
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

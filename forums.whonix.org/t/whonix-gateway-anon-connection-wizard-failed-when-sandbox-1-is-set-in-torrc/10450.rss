@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix gateway anon connection wizard failed when Sandbox 1 is set in torrc</title>
+    <link>http://forums.whonix.org/t/whonix-gateway-anon-connection-wizard-failed-when-sandbox-1-is-set-in-torrc/10450</link>
+    <description>Qubes os whonix gateway, direct connection. No proxy,no bridge.
+Sandbox 1 is set in torrc file according to whonix gateway hardening tutorial.
+
+Anon Connection Wizard reports 
+&quot;Tor failed to (re)start.
+Job for tor@default.service failed because the control process exited with error code.
+Error code: 1
+Often, this is because your torrc file(s) has corrupted settings.
+...&quot;
+
+systemctl status tor@default.service reports
+
+&quot;tor@default.service - Anonymizing overlay network for TCP
+   Loaded: loaded (/lib/systemd/system/tor@default.service; enabled-runtime; vendor preset: enabled)
+  Drop-In: /usr/lib/systemd/system/tor@default.service.d
+           └─30_clean-torrc-d-on-reload.conf, 30_qubes.conf, 40_obfs4proxy-workaround.conf, 40_qubes.conf, 50_controlsocket-workaround.conf
+   Active: failed (Result: exit-code) since [time]
+  Process: 1787 ExecStartPre=/usr/bin/install -Z -m 02755 -o debian-tor -g debian-tor -d /run/tor (code=exited, status=0/SUCCESS)
+  Process: 1789 ExecStartPre=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0 --verify-config (code=exited, status=0/SUCCESS)
+  Process: 1793 ExecStart=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0 (code=exited, status=1/FAILURE)
+  Process: 1799 ExecStartPost=/bin/kill -HUP ${MAINPID} (code=exited, status=0/SUCCESS)
+ Main PID: 1793 (code=exited, status=1/FAILURE)&quot;
+
+journalctl -xe reports
+&quot;[time] host systemd[1]: tor@default.service: Can&#39;t open PID file /run/tor/tor.pid (yet?) after start-post: No such file or directory
+[time] host systemd[1]: tor@default.service: Main process exited, code=exited, status=1/FAILURE
+ Subject: Unit process exited
+ Defined-By: systemd
+ Support: https://www.debian.org/support
+ An ExecStart= process belonging to unit tor@default.service has exited.
+
+ The process&#39; exit code is &#39;exited&#39; and its exit status is 1.
+[time] host systemd[1]: tor@default.service: Daemon never wrote its PID file. Failing.
+[time] host systemd[1]: tor@default.service: Failed with result &#39;exit-code&#39;.
+ Subject: Unit failed
+ Defined-By: systemd
+ Support: https://www.debian.org/support
+
+The unit tor@default.service has entered the &#39;failed&#39; state with result &#39;exit-code&#39;.
+[time] host audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 subj==unconfined msg=&#39;unit=tor@default comm=&quot;systemd&quot; exe=&quot;/usr/lib/systemd/systemd&quot; hostname=? addr=
+[time] host systemd[1]: Failed to start Anonymizing overlay network for TCP.
+ Subject: A start job for unit tor@default.service has failed
+ Defined-By: systemd
+ Support: https://www.debian.org/support
+ 
+ A start job for unit tor@default.service has finished with a failure.
+ 
+ The job identifier is 1545 and the job result is failed.
+[time] host audit[2756]: USER_ACCT pid=2756 uid=1000 auid=4294967295 ses=4294967295 subj==unconfined msg=&#39;op=PAM:accounting grantors=pam_tally2,pam_permit acct=&quot;user&quot; exe=&quot;/usr/bin
+[time] host audit[2756]: USER_CMD pid=2756 uid=1000 auid=4294967295 ses=4294967295 subj==unconfined msg=&#39;cwd=&quot;/home/user&quot; cmd=6A6F75726E616C63746C202D7865 terminal=pts/2 res=succes
+[time] host audit[2756]: CRED_REFR pid=2756 uid=0 auid=4294967295 ses=4294967295 subj==unconfined msg=&#39;op=PAM:setcred grantors=pam_tally2,pam_wheel,pam_permit acct=&quot;root&quot; exe=&quot;/usr
+[time] host sudo[2756]:     user : TTY=pts/2 ; PWD=/home/[username] ; USER=root ; COMMAND=/usr/bin/journalctl -xe
+[time] host audit[2756]: USER_START pid=2756 uid=0 auid=4294967295 ses=4294967295 subj==unconfined msg=&#39;op=PAM:session_open grantors=pam_permit,pam_unix acct=&quot;root&quot; exe=&quot;/usr/bin/s
+[time] host sudo[2756]: pam_unix(sudo:session): session opened for user root by (uid=0)tor@default.service - Anonymizing overlay network for TCP
+   Loaded: loaded (/lib/systemd/system/tor@default.service; enabled-runtime; vendor preset: enabled)
+  Drop-In: /usr/lib/systemd/system/tor@default.service.d
+           └─30_clean-torrc-d-on-reload.conf, 30_qubes.conf, 40_obfs4proxy-workaround.conf, 40_qubes.conf, 50_controlsocket-workaround.conf
+   Active: failed (Result: exit-code) since [time]
+  Process: 1787 ExecStartPre=/usr/bin/install -Z -m 02755 -o debian-tor -g debian-tor -d /run/tor (code=exited, status=0/SUCCESS)
+  Process: 1789 ExecStartPre=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0 --verify-config (code=exited, status=0/SUCCESS)
+  Process: 1793 ExecStart=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0 (code=exited, status=1/FAILURE)
+  Process: 1799 ExecStartPost=/bin/kill -HUP ${MAINPID} (code=exited, status=0/SUCCESS)
+ Main PID: 1793 (code=exited, status=1/FAILURE)&quot;</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 18 Oct 2020 13:57:43 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-gateway-anon-connection-wizard-failed-when-sandbox-1-is-set-in-torrc/10450.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix gateway anon connection wizard failed when Sandbox 1 is set in torrc</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="1" data-topic="10267">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/letter_avatar_proxy/v4/letter/k/b782af/40.png" class="avatar">
+    <a href="https://forums.whonix.org/t/cannot-use-seccomp-in-sys-whonix-after-update/10267">Cannot use Seccomp in sys-whonix after update</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/qubes-whonix/12"><span class="badge-category-bg" style="background-color: #63a0ff;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Everything specific to Qubes-Whonix. (devs)">Qubes-Whonix</span></a>
+  </div>
+  <blockquote>
+    Hello, today after updating my whonix-15 template and restarting my sys-whonix, I got the following error: 
+ERROR: Tor Pid Check Result: 
+Tor not running. (tor_pid_message: Pid file /run/tor/tor.pid does not exist.) 
+You have to fix this error, before you can use Tor. 
+Please restart Tor after fixing this error. 
+dom0 -&gt; Start Menu -&gt; ServiceVM: sys-whonix-xmr -&gt; Restart Tor
+or in Terminal: 
+sudo service tor@default restart 
+Restart whonixcheck after fixing this error. 
+dom0 -&gt; Start Menu -&gt; Ser…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-anon-connection-wizard-failed-when-sandbox-1-is-set-in-torrc/10450/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-anon-connection-wizard-failed-when-sandbox-1-is-set-in-torrc/10450/2</link>
+        <pubDate>Sun, 18 Oct 2020 13:57:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10450-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-anon-connection-wizard-failed-when-sandbox-1-is-set-in-torrc/10450.rss">Whonix gateway anon connection wizard failed when Sandbox 1 is set in torrc</source>
+      </item>
+      <item>
+        <title>Whonix gateway anon connection wizard failed when Sandbox 1 is set in torrc</title>
+        <dc:creator><![CDATA[90WUVLight]]></dc:creator>
+        <description><![CDATA[
+            <p>Qubes os whonix gateway, direct connection. No proxy,no bridge.<br>
+Sandbox 1 is set in torrc file according to whonix gateway hardening tutorial.</p>
+<p>Anon Connection Wizard reports<br>
+“Tor failed to (re)start.<br>
+Job for tor@default.service failed because the control process exited with error code.<br>
+Error code: 1<br>
+Often, this is because your torrc file(s) has corrupted settings.<br>
+…”</p>
+<p>systemctl status tor@default.service reports</p>
+<p>“tor@default.service - Anonymizing overlay network for TCP<br>
+Loaded: loaded (/lib/systemd/system/tor@default.service; enabled-runtime; vendor preset: enabled)<br>
+Drop-In: /usr/lib/systemd/system/tor@default.service.d<br>
+└─30_clean-torrc-d-on-reload.conf, 30_qubes.conf, 40_obfs4proxy-workaround.conf, 40_qubes.conf, 50_controlsocket-workaround.conf<br>
+Active: failed (Result: exit-code) since [time]<br>
+Process: 1787 ExecStartPre=/usr/bin/install -Z -m 02755 -o debian-tor -g debian-tor -d /run/tor (code=exited, status=0/SUCCESS)<br>
+Process: 1789 ExecStartPre=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0 --verify-config (code=exited, status=0/SUCCESS)<br>
+Process: 1793 ExecStart=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0 (code=exited, status=1/FAILURE)<br>
+Process: 1799 ExecStartPost=/bin/kill -HUP ${MAINPID} (code=exited, status=0/SUCCESS)<br>
+Main PID: 1793 (code=exited, status=1/FAILURE)”</p>
+<p>journalctl -xe reports<br>
+"[time] host systemd[1]: tor@default.service: Can’t open PID file /run/tor/tor.pid (yet?) after start-post: No such file or directory<br>
+[time] host systemd[1]: tor@default.service: Main process exited, code=exited, status=1/FAILURE<br>
+Subject: Unit process exited<br>
+Defined-By: systemd<br>
+Support: <a href="https://www.debian.org/support" rel="nofollow noopener">https://www.debian.org/support</a><br>
+An ExecStart= process belonging to unit tor@default.service has exited.</p>
+<p>The process’ exit code is ‘exited’ and its exit status is 1.<br>
+[time] host systemd[1]: tor@default.service: Daemon never wrote its PID file. Failing.<br>
+[time] host systemd[1]: tor@default.service: Failed with result ‘exit-code’.<br>
+Subject: Unit failed<br>
+Defined-By: systemd<br>
+Support: <a href="https://www.debian.org/support" rel="nofollow noopener">https://www.debian.org/support</a></p>
+<p>The unit tor@default.service has entered the ‘failed’ state with result ‘exit-code’.<br>
+[time] host audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 subj==unconfined msg='unit=tor@default comm=“systemd” exe="/usr/lib/systemd/systemd" hostname=? addr=<br>
+[time] host systemd[1]: Failed to start Anonymizing overlay network for TCP.<br>
+Subject: A start job for unit tor@default.service has failed<br>
+Defined-By: systemd<br>
+Support: <a href="https://www.debian.org/support" rel="nofollow noopener">https://www.debian.org/support</a></p>
+<p>A start job for unit tor@default.service has finished with a failure.</p>
+<p>The job identifier is 1545 and the job result is failed.<br>
+[time] host audit[2756]: USER_ACCT pid=2756 uid=1000 auid=4294967295 ses=4294967295 subj==unconfined msg='op=PAM:accounting grantors=pam_tally2,pam_permit acct=“user” exe="/usr/bin<br>
+[time] host audit[2756]: USER_CMD pid=2756 uid=1000 auid=4294967295 ses=4294967295 subj==unconfined msg='cwd="/home/user" cmd=6A6F75726E616C63746C202D7865 terminal=pts/2 res=succes<br>
+[time] host audit[2756]: CRED_REFR pid=2756 uid=0 auid=4294967295 ses=4294967295 subj==unconfined msg='op=PAM:setcred grantors=pam_tally2,pam_wheel,pam_permit acct=“root” exe="/usr<br>
+[time] host sudo[2756]:     user : TTY=pts/2 ; PWD=/home/[username] ; USER=root ; COMMAND=/usr/bin/journalctl -xe<br>
+[time] host audit[2756]: USER_START pid=2756 uid=0 auid=4294967295 ses=4294967295 subj==unconfined msg='op=PAM:session_open grantors=pam_permit,pam_unix acct=“root” exe="/usr/bin/s<br>
+[time] host sudo[2756]: pam_unix(sudo:session): session opened for user root by (uid=0)tor@default.service - Anonymizing overlay network for TCP<br>
+Loaded: loaded (/lib/systemd/system/tor@default.service; enabled-runtime; vendor preset: enabled)<br>
+Drop-In: /usr/lib/systemd/system/tor@default.service.d<br>
+└─30_clean-torrc-d-on-reload.conf, 30_qubes.conf, 40_obfs4proxy-workaround.conf, 40_qubes.conf, 50_controlsocket-workaround.conf<br>
+Active: failed (Result: exit-code) since [time]<br>
+Process: 1787 ExecStartPre=/usr/bin/install -Z -m 02755 -o debian-tor -g debian-tor -d /run/tor (code=exited, status=0/SUCCESS)<br>
+Process: 1789 ExecStartPre=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0 --verify-config (code=exited, status=0/SUCCESS)<br>
+Process: 1793 ExecStart=/usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0 (code=exited, status=1/FAILURE)<br>
+Process: 1799 ExecStartPost=/bin/kill -HUP ${MAINPID} (code=exited, status=0/SUCCESS)<br>
+Main PID: 1793 (code=exited, status=1/FAILURE)"</p>
+          <p><a href="http://forums.whonix.org/t/whonix-gateway-anon-connection-wizard-failed-when-sandbox-1-is-set-in-torrc/10450/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-gateway-anon-connection-wizard-failed-when-sandbox-1-is-set-in-torrc/10450/1</link>
+        <pubDate>Sat, 17 Oct 2020 17:40:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10450-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-gateway-anon-connection-wizard-failed-when-sandbox-1-is-set-in-torrc/10450.rss">Whonix gateway anon connection wizard failed when Sandbox 1 is set in torrc</source>
+      </item>
+  </channel>
+</rss>

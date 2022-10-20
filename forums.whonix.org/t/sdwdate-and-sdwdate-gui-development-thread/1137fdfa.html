@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>sdwdate and sdwdate-gui development thread - Development - Whonix Forum</title>
+    <meta name="description" content="There is a modified standalone url_to_unixtime at https://github.com/troubadoour/url_to_unixtime-asynchronous. 
+The idea is to get the time from the pool’s remotes asynchronously, using some of the Python gevent magic. B&amp;hellip;">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="1137fdfa.html?page=8" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../c/news/21.html">NEWS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;sdwdate and sdwdate-gui development thread&#39;" href="1137.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/sdwdate-and-sdwdate-gui-development-thread/1137?page=8" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/sdwdate-and-sdwdate-gui-development-thread/1137?page=8" />
+<meta property="og:title" content="sdwdate and sdwdate-gui development thread" />
+<meta name="twitter:title" content="sdwdate and sdwdate-gui development thread" />
+<meta property="og:description" content="I’ve been wondering for a while now, if    https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L309-L349 and  https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L394-L442  could be refactored? If the very similar code for the three pools could be compressed. I.e. if there could be a ~15 lines long functions that takes pool_one, pool_two or pool_three as argument." />
+<meta name="twitter:description" content="I’ve been wondering for a while now, if    https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L309-L349 and  https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L394-L442  could be refactored? If the very similar code for the three pools could be compressed. I.e. if there could be a ~15 lines long functions that takes pool_one, pool_two or pool_three as argument." />
+<meta name="twitter:label1" value="Reading time" />
+<meta name="twitter:data1" value="77 mins 🕑" />
+<meta name="twitter:label2" value="Likes" />
+<meta name="twitter:data2" value="48 ❤" />
+<meta property="article:published_time" content="2015-09-17T00:48:49+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+        <link rel="prev" href="1137235c.html?page=7">
+        <link rel="next" href="11370b08.html?page=9">
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../index.html">
+          <img src="../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="1137.html">sdwdate and sdwdate-gui development thread</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../c/development/8.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #25AAE2'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>Development</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-17T00:48:49Z' class='post-time'>
+                September 17, 2015, 12:48am
+              </time>
+              <meta itemprop='dateModified' content='2015-09-17T00:48:49Z'>
+          <span itemprop='position'>#141</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I’ve been wondering for a while now, if</p>
+<ul>
+<li>
+<a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L309-L349">https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L309-L349</a> and</li>
+<li>
+<a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L394-L442">https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L394-L442</a><br>
+could be refactored? If the very similar code for the three pools could be compressed. I.e. if there could be a ~15 lines long functions that takes pool_one, pool_two or pool_three as argument.</li>
+</ul>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+          <meta itemprop='keywords' content=''>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/troubadour'><span itemprop='name'>troubadour</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-17T21:19:18Z' class='post-time'>
+                September 17, 2015,  9:19pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-17T21:19:18Z'>
+          <span itemprop='position'>#142</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>“Bad urls” was bad. Replaced by “Unreachable” for not finding a better word myself. If someone can make a suggestion…</p>
+<p>[quote=“Patrick, post:141, topic:1137”]I’ve been wondering for a while now, if</p>
+<ul>
+<li>
+<a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L309-L349" rel="nofollow noopener">https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L309-L349</a> and</li>
+<li>
+<a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L394-L442" rel="nofollow noopener">https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L394-L442</a><br>
+could be refactored? If the very similar code for the three pools could be compressed. I.e. if there could be a ~15 lines long functions that takes pool_one, pool_two or pool_three as argument.[/quote]<br>
+The problem is that each pool has single variables that would have to be passed individually.</li>
+</ul>
+<p><code>self.range_pool_one
+self.already_picked_index_pool_one
+self.pool_one_done
+self.url_random_pool_one</code></p>
+<p>The solution would be to declare new arrays:</p>
+<p><code>self.range_pool = [] for i in range(self.number_of_pools)
+self.already_picked_index_pool = [] for i in range(self.number_of_pools)</code><br>
+and so on.</p>
+<p>Still left with the single variables returned from config, used in the new function. That should be feasible, with a major rewrite. Putting it in the pipeline.</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/marmarek'><span itemprop='name'>marmarek</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-18T00:01:24Z' class='post-time'>
+                September 18, 2015, 12:01am
+              </time>
+              <meta itemprop='dateModified' content='2015-09-18T00:01:24Z'>
+          <span itemprop='position'>#143</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>[quote=“Patrick, post:141, topic:1137”]I’ve been wondering for a while now, if</p>
+<ul>
+<li>
+<a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L309-L349" data-bbcode="true" rel="nofollow noopener">https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L309-L349</a> and</li>
+<li>
+<a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L394-L442" data-bbcode="true" rel="nofollow noopener">https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L394-L442</a><br>
+could be refactored? If the very similar code for the three pools could be compressed. I.e. if there could be a ~15 lines long functions that takes pool_one, pool_two or pool_three as argument.[/quote]</li>
+</ul>
+<p>The simplest thing would be to merge all that <code>pool_one</code>, <code>pool_two</code> and <code>pool_three</code> to a single array <code>pools[]</code>. And instead of using separate arrays for each attribute, you can create a class for them:</p>
+<pre><code class="lang-auto">class Pool:
+  def __init__(self):
+    name = "" # 'one', 'two', 'three' - for logging purposes; or use numbers instead and drop this field
+    url = []
+    url_random = []
+    comment = []
+    done = False
+    already_picked_index = []
+    
+  @property
+  def range(self):
+    return len(self.url)</code></pre>
+<p>And then iterate with something like <code>for pool in self.pools:</code></p>
+<p>Also there could be some other improvements:<br>
+The first code chunk:</p>
+<p>[ul][li]use “random.randrange(0, pool[x].range)” instead of “random.sample(range(…), 1)”[/li]<br>
+[li]I don’t see why <code>while</code> loop is there - since “self.already_picked_index_pool_two.append(url_index)” it will execute exactly one iteration[/li][/ul]</p>
+<p>The second code chunk:</p>
+<p>[ul][li]“for i in range(len(self.url_random_pool_one))” -&gt; “for url_random in pool.url_random” (since you don’t use “i” in anything other than url_random_pool_one[]) [/li][/ul]</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/troubadour'><span itemprop='name'>troubadour</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-20T18:29:02Z' class='post-time'>
+                September 20, 2015,  6:29pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-20T18:29:02Z'>
+          <span itemprop='position'>#144</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Thanks for the input, it’s quite helpful.</p>
+<p>sdwdate is modified. There is a liitle more involved than creating a class. “config.py” is modified too, to return the pool’s data individually. It means that we have to read the whole lot three times.</p>
+<p>I have commited each siginficant step (11 commits).<br>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="../../../external.html?link=https://assets-cdn.github.com/favicon.ico" class="site-icon" width="32" height="32">
+      <a href="../../../external.html?link=https://github.com/troubadoour/sdwdate" target="_blank" rel="nofollow noopener">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="../../../external.html?link=https://avatars1.githubusercontent.com/u/7442918?s=400&amp;v=4" class="thumbnail onebox-avatar" width="420" height="420">
+
+<h3><a href="../../../external.html?link=https://github.com/troubadoour/sdwdate" target="_blank" rel="nofollow noopener">troubadoour/sdwdate</a></h3>
+
+<p>Secure Distributed Web Date; privacy, anonymity and Tor friendly; console time fetcher and daemon; supports plugins, such as connection checker, graphical user interface etc. Website: https://www.w...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/troubadour'><span itemprop='name'>troubadour</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-21T20:47:16Z' class='post-time'>
+                September 21, 2015,  8:47pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-21T20:47:16Z'>
+          <span itemprop='position'>#145</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>New commits.</p>
+<ul>
+<li>logging pool number in “no valid time returned from pool”</li>
+<li>modified general_proxy_error handling.</li>
+<li>added general_timeout_error</li>
+<li>removed retrying loop.</li>
+</ul>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-21T21:19:14Z' class='post-time'>
+                September 21, 2015,  9:19pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-21T21:19:14Z'>
+          <span itemprop='position'>#146</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>[quote=“troubadour, post:142, topic:1137”]“Bad urls” was bad. Replaced by “Unreachable” for not finding a better word myself. If someone can make a suggestion…</p>
+<aside class="quote">
+<blockquote>
+<p>I’ve been wondering for a while now, if</p>
+<ul>
+<li>
+<a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L309-L349">https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L309-L349</a> and</li>
+<li>
+<a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L394-L442">https://github.com/troubadoour/sdwdate/blob/f24cdf57c29525b327e1ff7ee8b5830e6202ddd4/usr/bin/sdwdate#L394-L442</a><br>
+could be refactored? If the very similar code for the three pools could be compressed. I.e. if there could be a ~15 lines long functions that takes pool_one, pool_two or pool_three as argument.</li>
+</ul>
+</blockquote>
+</aside>
+<p>The problem is that each pool has single variables that would have to be passed individually.</p>
+<p><code>self.range_pool_one
+self.already_picked_index_pool_one
+self.pool_one_done
+self.url_random_pool_one</code></p>
+<p>The solution would be to declare new arrays:</p>
+<p><code>self.range_pool = [] for i in range(self.number_of_pools)
+self.already_picked_index_pool = [] for i in range(self.number_of_pools)</code><br>
+and so on.</p>
+<p>Still left with the single variables returned from config, used in the new function. That should be feasible, with a major rewrite. Putting it in the pipeline.[/quote]<br>
+Works well.</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-21T21:31:26Z' class='post-time'>
+                September 21, 2015,  9:31pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-21T21:31:26Z'>
+          <span itemprop='position'>#147</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>See this iteration.</p>
+<pre><code class="lang-auto">2015-09-21 21:14:19,208 - sdwdate_log - INFO - Gradually adjusting the time by running sclockadj, PID=1021
+2015-09-21 21:14:19,209 - sdwdate_log - INFO - Last run (on Mon Sep 21 21:14:19 UTC 2015) was successful. Sleeping for 10 minutes.
+2015-09-21 21:24:19,471 - sdwdate_log - INFO - Fetching remote times, start Mon Sep 21 21:24:19 UTC 2015 (unixtime 1442870659.47)
+2015-09-21 21:24:19,472 - sdwdate_log - INFO - The clock is sane. Current time "Mon Sep 21 21:24:19 UTC 2015".
+2015-09-21 21:24:19,472 - sdwdate_log - INFO - Running sdwdate loop, iteration 1
+2015-09-21 21:24:19,472 - sdwdate_log - INFO - Requested urls ['hkjpnjbvhrxjvikd.onion', '5r4bjnjug3apqdii.onion', 'wi7qkxyrdpu5cmvr.onion']
+2015-09-21 21:24:25,268 - sdwdate_log - INFO - Returned urls "['hkjpnjbvhrxjvikd.onion', '5r4bjnjug3apqdii.onion', 'wi7qkxyrdpu5cmvr.onion']"
+2015-09-21 21:24:25,269 - sdwdate_log - INFO - Remote status "hkjpnjbvhrxjvikd.onion", False: connect error: 0x04: Host unreachable
+2015-09-21 21:24:25,270 - sdwdate_log - INFO - Remote status "5r4bjnjug3apqdii.onion", True
+2015-09-21 21:24:25,270 - sdwdate_log - INFO - Remote status "wi7qkxyrdpu5cmvr.onion", True
+2015-09-21 21:24:25,270 - sdwdate_log - INFO - Pool 2 last url: 5r4bjnjug3apqdii.onion, web unixtime: 1442870662, web time: Mon Sep 21 21:24:22 UTC 2015, diff: -3 seconds
+2015-09-21 21:24:25,270 - sdwdate_log - INFO - Pool 3 last url: wi7qkxyrdpu5cmvr.onion, web unixtime: 1442870662, web time: Mon Sep 21 21:24:22 UTC 2015, diff: -3 seconds
+2015-09-21 21:24:25,271 - sdwdate_log - INFO - Running sdwdate loop, iteration 2
+2015-09-21 21:24:25,271 - sdwdate_log - INFO - Requested urls ['hkjpnjbvhrxjvikd.onion']
+2015-09-21 21:24:30,100 - sdwdate_log - INFO - Returned urls "['hkjpnjbvhrxjvikd.onion']"
+2015-09-21 21:24:30,101 - sdwdate_log - INFO - Remote status "hkjpnjbvhrxjvikd.onion", False: connect error: 0x04: Host unreachable
+2015-09-21 21:24:30,102 - sdwdate_log - INFO - Running sdwdate loop, iteration 3
+2015-09-21 21:24:30,102 - sdwdate_log - INFO - Requested urls ['pubdrop4dw6rk3aq.onion']
+2015-09-21 21:24:32,055 - sdwdate_log - INFO - Returned urls "['pubdrop4dw6rk3aq.onion']"
+2015-09-21 21:24:32,055 - sdwdate_log - INFO - Remote status "pubdrop4dw6rk3aq.onion", True
+2015-09-21 21:24:32,055 - sdwdate_log - INFO - Pool 1 last url: pubdrop4dw6rk3aq.onion, web unixtime: 1442870673, web time: Mon Sep 21 21:24:33 UTC 2015, diff: 1 seconds
+2015-09-21 21:24:32,055 - sdwdate_log - INFO - Reachable urls:
+5r4bjnjug3apqdii.onion: "Irpileaks[29][30]      2013-October-7  Investigative Journalism        5r4bjnjug3apqdii.onion  https://5r4bjnjug3apqdii.tor2web.org/   Italy"
+wi7qkxyrdpu5cmvr.onion: "Austici www.autistici.org/en/stuff/man_anon/tor.html"
+pubdrop4dw6rk3aq.onion: "ProPublica     https://securedrop.propublica.org       pubdrop4dw6rk3aq.onion"
+2015-09-21 21:24:32,056 - sdwdate_log - INFO - Unreachable urls:
+hkjpnjbvhrxjvikd.onion: "Radio24syv     https://securedrop.radio24syv.dk        hkjpnjbvhrxjvikd.onion"
+hkjpnjbvhrxjvikd.onion: "Radio24syv     https://securedrop.radio24syv.dk        hkjpnjbvhrxjvikd.onion"
+2015-09-21 21:24:32,056 - sdwdate_log - INFO - Fetching remote times, end Mon Sep 21 21:24:19 UTC 2015 (unixtime 1442870672.06)
+2015-09-21 21:24:32,060 - sdwdate_log - INFO - Pool differences, sorted: [-3, -3, 1]
+2015-09-21 21:24:32,061 - sdwdate_log - INFO - Median time difference: -3
+2015-09-21 21:24:32,061 - sdwdate_log - INFO - Seconds to add: - 0.674467549
+2015-09-21 21:24:32,061 - sdwdate_log - INFO - New time difference: -3.674467549
+2015-09-21 21:24:32,064 - sdwdate_log - INFO - Gradually adjusting the time by running sclockadj, PID=1126
+2015-09-21 21:24:32,065 - sdwdate_log - INFO - Last run (on Mon Sep 21 21:24:32 UTC 2015) was successful. Sleeping for 10 minutes.</code></pre>
+<p>The same unreachable url was tried twice.</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-21T23:56:09Z' class='post-time'>
+                September 21, 2015, 11:56pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-21T23:56:09Z'>
+          <span itemprop='position'>#148</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Please cherry-pick <a href="../../../external.html?link=https://github.com/Whonix/sdwdate/commit/1566b7c9b7d36bdb4b48cd607c743df5d4d57fe2">https://github.com/Whonix/sdwdate/commit/1566b7c9b7d36bdb4b48cd607c743df5d4d57fe2</a>.</p>
+<pre><code class="lang-auto"></code></pre>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-22T11:53:38Z' class='post-time'>
+                September 22, 2015, 11:53am
+              </time>
+              <meta itemprop='dateModified' content='2015-09-22T11:53:38Z'>
+          <span itemprop='position'>#149</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Another one.<br>
+Please cherry-pick <a href="../../../external.html?link=https://github.com/Whonix/sdwdate/commit/50fd9eb567da5128c53d0592ee99a75334c6efa9">https://github.com/Whonix/sdwdate/commit/50fd9eb567da5128c53d0592ee99a75334c6efa9</a>.</p>
+<pre><code class="lang-auto"></code></pre>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/troubadour'><span itemprop='name'>troubadour</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-22T15:38:22Z' class='post-time'>
+                September 22, 2015,  3:38pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-22T15:38:22Z'>
+          <span itemprop='position'>#150</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Cherry-picked both commits.</p>
+<blockquote>The same unreachable url was tried twice.</blockquote>
+In the url append code block (line 305 to 321), I had removed the while loop. It prevents picking the same url twice. Reinstated.
+https://github.com/troubadoour/sdwdate/commit/40701d13b317be8afef300649b4351d346ba3662
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-24T12:22:15Z' class='post-time'>
+                September 24, 2015, 12:22pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-24T12:22:15Z'>
+          <span itemprop='position'>#151</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>As of latest commit, it’s broken. This is one restart cycle.</p>
+<pre><code class="lang-auto">2015-09-24 12:24:29,166 - sdwdate_log - INFO - Fetching remote times, start Thu Sep 24 12:24:29 UTC 2015 (unixtime 1443097469.17)
+2015-09-24 12:24:29,171 - sdwdate_log - INFO - The clock is sane. Current time "Thu Sep 24 12:24:29 UTC 2015".
+2015-09-24 12:24:29,171 - sdwdate_log - INFO - Running sdwdate loop, iteration 1
+2015-09-24 12:24:29,594 - sdwdate_log - INFO - Fetching remote times, start Thu Sep 24 12:24:29 UTC 2015 (unixtime 1443097469.59)
+2015-09-24 12:24:29,607 - sdwdate_log - INFO - The clock is sane. Current time "Thu Sep 24 12:24:29 UTC 2015".
+2015-09-24 12:24:29,608 - sdwdate_log - INFO - Running sdwdate loop, iteration 1
+2015-09-24 12:24:30,093 - sdwdate_log - INFO - Fetching remote times, start Thu Sep 24 12:24:30 UTC 2015 (unixtime 1443097470.09)
+2015-09-24 12:24:30,105 - sdwdate_log - INFO - The clock is sane. Current time "Thu Sep 24 12:24:30 UTC 2015".
+2015-09-24 12:24:30,105 - sdwdate_log - INFO - Running sdwdate loop, iteration 1
+2015-09-24 12:24:30,594 - sdwdate_log - INFO - Fetching remote times, start Thu Sep 24 12:24:30 UTC 2015 (unixtime 1443097470.59)
+2015-09-24 12:24:30,605 - sdwdate_log - INFO - The clock is sane. Current time "Thu Sep 24 12:24:30 UTC 2015".
+2015-09-24 12:24:30,606 - sdwdate_log - INFO - Running sdwdate loop, iteration 1
+2015-09-24 12:24:31,094 - sdwdate_log - INFO - Fetching remote times, start Thu Sep 24 12:24:31 UTC 2015 (unixtime 1443097471.09)
+2015-09-24 12:24:31,105 - sdwdate_log - INFO - The clock is sane. Current time "Thu Sep 24 12:24:31 UTC 2015".
+2015-09-24 12:24:31,106 - sdwdate_log - INFO - Running sdwdate loop, iteration 1</code></pre>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/troubadour'><span itemprop='name'>troubadour</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-24T19:01:36Z' class='post-time'>
+                September 24, 2015,  7:01pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-24T19:01:36Z'>
+          <span itemprop='position'>#152</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Strange. I compared the files in the remote repositiry and the one i’m using, they are equal.</p>
+<p>I could reproduce it by commenting line 307 in sdwdate (because I forgot it at some stage beforehand).</p>
+<pre><code class="lang-auto"></code></pre>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-25T11:41:42Z' class='post-time'>
+                September 25, 2015, 11:41am
+              </time>
+              <meta itemprop='dateModified' content='2015-09-25T11:41:42Z'>
+          <span itemprop='position'>#153</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Just confirmed, got that line. (And the issue.)</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/troubadour'><span itemprop='name'>troubadour</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-25T16:05:47Z' class='post-time'>
+                September 25, 2015,  4:05pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-25T16:05:47Z'>
+          <span itemprop='position'>#154</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Have deleted all the sdwdate files, removed the local repositiry, cloned from troubadoour and reinstalled. Have’nt got the issue.</p>
+<p>So, step by step. Reverted the last commit and pushed. Can you check again?</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-25T16:10:41Z' class='post-time'>
+                September 25, 2015,  4:10pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-25T16:10:41Z'>
+          <span itemprop='position'>#155</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Issue persists.</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-25T16:19:40Z' class='post-time'>
+                September 25, 2015,  4:19pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-25T16:19:40Z'>
+          <span itemprop='position'>#156</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>After starting with a fresh VM / reboot, it works. So this could be an issue with packaging or python caching or something.</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-25T16:20:42Z' class='post-time'>
+                September 25, 2015,  4:20pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-25T16:20:42Z'>
+          <span itemprop='position'>#157</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Also the previous 7dce7b7902d6b53b8c83d84cea195f3b522a5af1 seems to work now.</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-25T16:21:44Z' class='post-time'>
+                September 25, 2015,  4:21pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-25T16:21:44Z'>
+          <span itemprop='position'>#158</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I mean 40701d13b317be8afef300649b4351d346ba3662.</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/troubadour'><span itemprop='name'>troubadour</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-09-25T20:13:32Z' class='post-time'>
+                September 25, 2015,  8:13pm
+              </time>
+              <meta itemprop='dateModified' content='2015-09-25T20:13:32Z'>
+          <span itemprop='position'>#159</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Glad it works! Have hard reset the revert anf force pushed.</p>
+<p>Logging  pid on start.<br>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/commit/ff9d6d911a7c7a4d903a762fdb85a563ea3fe89e" target="_blank" rel="nofollow noopener">github.com/troubadoour/sdwdate</a>
+  </header>
+  <article class="onebox-body">
+      <a href="../../../external.html?link=https://github.com/troubadoour" target="_blank" rel="nofollow noopener">
+    <img alt="troubadoour" src="../../../external.html?link=https://avatars0.githubusercontent.com/u/7442918?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/commit/ff9d6d911a7c7a4d903a762fdb85a563ea3fe89e" target="_blank" rel="nofollow noopener">log own pid at start</a>
+</h4>
+
+
+<div class="date">
+  by <a href="../../../external.html?link=https://github.com/troubadoour" target="_blank" rel="nofollow noopener">troubadoour</a>
+  on <a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/commit/ff9d6d911a7c7a4d903a762fdb85a563ea3fe89e" target="_blank" rel="nofollow noopener">07:42PM - 25 Sep 15</a>
+</div>
+
+<div class="github-commit-stats">
+  changed <strong>1 files</strong>
+  with <strong>5 additions</strong>
+  and <strong>0 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+</p>
+<p>By the way, tried using python-daemon so that the pid would be automatically managed, but it clashes with gevent in url_to _unxtime. It seems that there is no solution at this stage of development, be it for python-daemon or python-gevent.</p>
+<p>Regarding the use of gui_message, not sure it should be implemented in sdwdate. A lot of the messages are for logging only and do not require HTML But the question is: do we want all the GUI verbose in the log, especially for situations where the user is asked to fix an issue, like in timesanitycheck failing? Perhaps gui_message can be used in sdwdate-gui only.</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../external.html?link=https://forums.whonix.org/u/troubadour'><span itemprop='name'>troubadour</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="1137.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2015-10-01T21:15:26Z' class='post-time'>
+                October 1, 2015,  9:15pm
+              </time>
+              <meta itemprop='dateModified' content='2015-10-01T21:15:26Z'>
+          <span itemprop='position'>#160</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote" data-post="159" data-topic="1137">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../letter_avatar_proxy/v2/letter/t/d9b06d/40.png" class="avatar"> troubadour:</div>
+<blockquote>
+<p>Regarding the use of gui_message, not sure it should be implemented in sdwdate</p>
+</blockquote>
+</aside>
+<p>It’s finally implemented in sdwdate, because of the redundancies it would create with the log messages.<br>
+<a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/commit/f9a735a26d2a872a105e7d599d1a89e5f55d0e62" rel="nofollow noopener">https://github.com/troubadoour/sdwdate/commit/f9a735a26d2a872a105e7d599d1a89e5f55d0e62</a> and<br>
+<a href="../../../external.html?link=https://github.com/troubadoour/sdwdate/commit/75f20cb991344f5ba86abc0dd756d8d70be43002" rel="nofollow noopener">https://github.com/troubadoour/sdwdate/commit/75f20cb991344f5ba86abc0dd756d8d70be43002</a></p>
+<p>If there is anything you wish to add…</p>
+<p>Regarding timesanitycheck, will look in a gui for manually set the time, and run it after fetching the times.</p>
+        </div>
+
+        <meta itemprop='headline' content='sdwdate and sdwdate-gui development thread'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+
+    <div role='navigation' itemscope itemtype='http://schema.org/SiteNavigationElement' class="topic-body crawler-post">
+        <span itemprop='name'><a rel="prev" itemprop="url" href="1137235c.html?page=7">← previous page</a></span>
+        <span itemprop='name'><b><a rel="next" itemprop="url" href="11370b08.html?page=9">next page →</a></b></span>
+    </div>
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

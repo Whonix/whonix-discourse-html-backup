@@ -1,0 +1,804 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Kernel Hardening</title>
+    <link>http://forums.whonix.org/t/kernel-hardening/7296</link>
+    <description>Whonix should implement more kernel hardening. All of these settings add no or a very minimal performance decrease.
+
+Setting &quot;kernel.kptr_restrict=1&quot; makes kernel symbols in /proc/kallsyms only accessible to root which can make it more difficult for a kernel exploit to resolve addresses/symbols.  Setting it to 2 hides the symbols regardless of privileges.
+
+Setting &quot;kernel.dmesg_restrict=1&quot; restricts access to the kernel logs which can give an attacker less information on what they can do.
+
+Setting &quot;kernel.unprivileged_bpf_disabled=1&quot; and &quot;net.core.bpf_jit_harden=2&quot; hardens the BPF JIT compiler and restricts it to root. It comes with a performance drop on systems that use the JIT compiler a lot but this should only really effect servers.
+
+Setting &quot;vm.mmap_rnd_bits=32&quot; and &quot;vm.mmap_rnd_compat_bits=16&quot; improves KASLR effectiveness for mmap.
+
+These can all be set in files in /etc/sysctl.d
+
+I have tested all of these on Whonix Gateway and Whonix Workstation and they worked fine.
+
+Adding &quot;slab_nomerge&quot; as a boot parameter may also be useful. slab_nomerge disables the merging of slabs of similar sizes. Sometimes a slab can be used in a vulnerable way which an attacker can exploit. 
+
+Mounting /proc with hidepid=2 in /etc/fstab will hide other users&#39; processes from unprivileged users. This makes it a lot harder for an attacker to get information about other running processes. This did break systemd-logind for me on Whonix even when I added an exception for systemd-logind.
+
+It may also be good to look into using the linux-hardened kernel.  Would it be possible to use this for Whonix?
+
+https://github.com/anthraxx/linux-hardened
+
+Useful links: 
+
+https://wiki.archlinux.org/index.php/Security#Kernel_hardening
+
+http://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project/Recommended_Settings
+
+https://www.kernel.org/doc/Documentation/sysctl/kernel.txt
+
+https://tails.boum.org/contribute/design/kernel_hardening/
+
+Edit by Patrick:
+
+* https://phabricator.whonix.org/T670</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 18 Oct 2022 18:38:47 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/kernel-hardening/7296.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>hidepid can be re-tested once based on Debian bookworm. Maybe pkexec based applications will be no longer broken by hidepid.</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/501">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/501</link>
+        <pubDate>Tue, 18 Oct 2022 18:38:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-501</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[raja]]></dc:creator>
+        <description><![CDATA[
+            <p>Awesome, great to see more eyes keeping track of potential hardening methods.</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/500">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/500</link>
+        <pubDate>Tue, 27 Sep 2022 16:03:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-500</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>That was all previously done already.</p>
+<aside class="quote no-group quote-modified" data-username="HulaHoop" data-post="498" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p><a href="https://gitlab.tails.boum.org/tails/tails/-/issues/18302" class="inline-onebox">Kernel hardening: restricts loading TTY line disciplines (#18302) · Issues · tails / tails · GitLab</a></p>
+</blockquote>
+</aside>
+<p>Using.</p>
+<aside class="quote no-group quote-modified" data-username="HulaHoop" data-post="498" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p><a href="https://gitlab.tails.boum.org/tails/tails/-/issues/18858" class="inline-onebox">Consider dropping slub_debug=P and page_poison=1 options and let init_on_free wipe slab and page allocations (#18858) · Issues · tails / tails · GitLab</a></p>
+</blockquote>
+</aside>
+<p>Also done.</p>
+<aside class="quote no-group quote-modified" data-username="HulaHoop" data-post="498" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p><a href="https://gitlab.tails.boum.org/tails/tails/-/issues/18886" class="inline-onebox">Enable page allocator freelist randomization (#18886) · Issues · tails / tails · GitLab</a></p>
+</blockquote>
+</aside>
+<p>Using.</p>
+<p>Thanks anyhow since we could be missing something in theory.</p>
+<p>To verify, grepping the source code (or probably enough grepping the security-misc source code) for kernel parameters which should be used or not used would work (which I’ve just done but anyone else welcome to check this as well).</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/499">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/499</link>
+        <pubDate>Fri, 23 Sep 2022 18:51:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-499</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Tails enabled 3 boot time kernel options for hardening. Some are caused by changes to upstream security features, another affects TTY which I am not sure how it will impact our current config.</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://gitlab.tails.boum.org/tails/tails/-/issues/18302">
+  <header class="source">
+      <img src="https://gitlab.tails.boum.org/uploads/-/system/appearance/favicon/1/gitlab.png" class="site-icon" width="32" height="32">
+
+      <a href="https://gitlab.tails.boum.org/tails/tails/-/issues/18302" target="_blank" rel="noopener">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://gitlab.tails.boum.org/assets/twitter_card-570ddb06edf56a2312253c5872489847a0f385112ddbcd71ccfa1570febab5d2.jpg" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://gitlab.tails.boum.org/tails/tails/-/issues/18302" target="_blank" rel="noopener">Kernel hardening: restricts loading TTY line disciplines (#18302) · Issues ·...</a></h3>
+
+  <p>Current scope We can try this sysctl setting that can improve security: dev.tty.ldisc_autoload = 0 This restricts...</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://gitlab.tails.boum.org/tails/tails/-/issues/18858">
+  <header class="source">
+      <img src="https://gitlab.tails.boum.org/uploads/-/system/appearance/favicon/1/gitlab.png" class="site-icon" width="32" height="32">
+
+      <a href="https://gitlab.tails.boum.org/tails/tails/-/issues/18858" target="_blank" rel="noopener">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://gitlab.tails.boum.org/assets/twitter_card-570ddb06edf56a2312253c5872489847a0f385112ddbcd71ccfa1570febab5d2.jpg" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://gitlab.tails.boum.org/tails/tails/-/issues/18858" target="_blank" rel="noopener">Consider dropping slub_debug=P and page_poison=1 options and let init_on_free...</a></h3>
+
+  <p>Hi, I recently spotted these kernel log messages in Tails.  amnesia...</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://gitlab.tails.boum.org/tails/tails/-/issues/18886">
+  <header class="source">
+      <img src="https://gitlab.tails.boum.org/uploads/-/system/appearance/favicon/1/gitlab.png" class="site-icon" width="32" height="32">
+
+      <a href="https://gitlab.tails.boum.org/tails/tails/-/issues/18886" target="_blank" rel="noopener">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://gitlab.tails.boum.org/assets/twitter_card-570ddb06edf56a2312253c5872489847a0f385112ddbcd71ccfa1570febab5d2.jpg" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://gitlab.tails.boum.org/tails/tails/-/issues/18886" target="_blank" rel="noopener">Enable page allocator freelist randomization (#18886) · Issues · tails / tails...</a></h3>
+
+  <p>https://outflux.net/blog/archives/2019/07/17/security-things-in-linux-v5-2/ CONFIG_SHUFFLE_PAGE_ALLOCATOR is enabled in the Debian kernel but this needs to be enabled at boot time with page_alloc.shuffle=1.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/498">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/498</link>
+        <pubDate>Fri, 23 Sep 2022 11:46:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-498</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="67" data-topic="8985">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img loading="lazy" alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar">
+    <a href="https://forums.whonix.org/t/kicksecure-network-configuration/8985/67">Kicksecure Network Configuration</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development/8"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of components looking for maintainer)">Development</span></a>
+  </div>
+  <blockquote>
+    It’s not fingerprinting that concerns me, but the security implications which are still valid for KS. 
+Disabling MTU probing was necessary along with some other TCP options to mitigate the SACK vuln. You might say that it is fixed and water under the bridge, but the argument still stands that the less functionality turned on in the kernel the safer and really that’s the only thing we care about here as long as performance is usable and acceptable. 
+
+If your system is prone to these TCP SACK PAN…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/497">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/497</link>
+        <pubDate>Wed, 21 Sep 2022 17:26:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-497</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Merged, thanks!</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/496">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/496</link>
+        <pubDate>Mon, 22 Aug 2022 10:56:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-496</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubpullrequest" data-onebox-src="https://github.com/Kicksecure/security-misc/pull/113">
+  <header class="source">
+
+      <a href="https://github.com/Kicksecure/security-misc/pull/113" target="_blank" rel="noopener">github.com/Kicksecure/security-misc</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Kicksecure/security-misc/pull/113" target="_blank" rel="noopener">Comment out machine check exception</a>
+    </h4>
+
+    <div class="branches">
+      <code>Kicksecure:master</code> ← <code>raja-grewal:master</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2022-08-21" data-time="13:06:14" data-timezone="UTC">01:06PM - 21 Aug 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/raja-grewal" target="_blank" rel="noopener">
+          <img alt="raja-grewal" src="https://avatars.githubusercontent.com/u/79781370?v=4" class="onebox-avatar-inline" width="20" height="20">
+          raja-grewal
+        </a>
+      </div>
+
+      <div class="lines" title="2 commits changed 2 files with 3 additions and 5 deletions">
+        <a href="https://github.com/Kicksecure/security-misc/pull/113/files" target="_blank" rel="noopener">
+          <span class="added">+3</span>
+          <span class="removed">-5</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">Please refer to:
+https://forums.whonix.org/t/kernel-hardening/7296/494</p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/495">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/495</link>
+        <pubDate>Mon, 22 Aug 2022 10:56:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-495</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Therefore in absence of any authoritative recommendation to change any mce settings, it’s best we comment it out and don’t change anything related to mce until there is a better argument.</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/494">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/494</link>
+        <pubDate>Tue, 16 Aug 2022 09:45:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-494</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Got this by e-mail.</p>
+<blockquote>
+<p>Kernel panic is a <em>software</em> routine. It should be executed by the kernel<br>
+itself.  The MCE handler decides whether the system should panic or not based on<br>
+the exception that happened. If you disable MCE and the aforementioned file is<br>
+the only place that is called upon identifying such exceptions, the panic will<br>
+not happen at all.</p>
+<p>And by the way I agree with their concern regarding exposing log messages to<br>
+malicious processes. But I would expect them to refer to an study, blog post,<br>
+article, code example, etc, to show that how this concern can be valid in real<br>
+world.</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/493">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/493</link>
+        <pubDate>Tue, 16 Aug 2022 09:44:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-493</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Maybe there is a general kernel feature to always treat <code>=0</code> as <code>=off</code>?</p>
+<hr>
+<p><a href="https://www.kernel.org/doc/html/v5.3/x86/x86_64/machinecheck.html" class="onebox" target="_blank" rel="noopener">https://www.kernel.org/doc/html/v5.3/x86/x86_64/machinecheck.html</a></p>
+<blockquote>
+<p>tolerant<br>
+Tolerance level. When a machine check exception occurs for a non corrected machine check the kernel can take different actions.</p>
+</blockquote>
+<ul>
+<li>
+<blockquote>
+<p>0: always panic on uncorrected errors, log corrected errors</p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p>1: panic or SIGBUS on uncorrected errors, log corrected errors</p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p>2: SIGBUS or log uncorrected errors, log corrected errors</p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p>3: never panic or SIGBUS, log all errors (for testing only)</p>
+</blockquote>
+</li>
+</ul>
+<p>As per that link close to the desired outcome to kernel panic on error would be setting <code>tolerant</code> (tolerance level) to <code>0</code>.</p>
+<p>(The kernel manual does not show any example. Might be chimerical settings. Might be setting <code>mce.tolerant=0</code> is sysctl.)</p>
+<p>This could be added to file:<br>
+<code>/etc/sysctl.d/30_security-misc.conf</code></p>
+<p>But that as per kernel manual is only for non-corrected errors. For the (maybe?) desired outcome of also kernel panicking as soon as a correctable error is detected I haven’t found a setting yet.</p>
+<p>maybe: Not clear yet if changing MCE settings can increase security at all.</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/492">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/492</link>
+        <pubDate>Mon, 25 Jul 2022 19:16:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-492</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[raja]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="489" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Quote <a href="https://tails.boum.org/contribute/design/kernel_hardening/" rel="noopener nofollow ugc">Tails - kernel hardening</a></p>
+</blockquote>
+</aside>
+<p>This must be the reference.</p>
+<p>Also I think setting <code>nomce</code> or <code>mce=off</code> stops the kernel from panicking if a machine check error is detected.</p>
+<p>Therefore the existing command should either be removed or commented out. This way, uncorrected errors will cause a panic as desired.</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/491">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/491</link>
+        <pubDate>Mon, 25 Jul 2022 18:34:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-491</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://www.mcelog.org/" class="onebox" target="_blank" rel="noopener">https://www.mcelog.org/</a></p>
+<p><a href="https://www.mcelog.org/faq.html" class="onebox" target="_blank" rel="noopener">https://www.mcelog.org/faq.html</a></p>
+<p><a href="https://www.mcelog.org/references.html" class="onebox" target="_blank" rel="noopener">https://www.mcelog.org/references.html</a></p>
+<hr>
+<p>web search terms:</p>
+<ul>
+<li>
+<blockquote>
+<p>site:kernel.org “mce=0”</p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p>site:kernel.org “mce=off”</p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p>site:kernel.org “nomce”</p>
+</blockquote>
+</li>
+</ul>
+<hr>
+<p>So I guess we want to check but once an exception is found whether correctable or uncorrectable, a kernel panic is preferred.</p>
+<p>I haven’t found a very authoritative source (kernel) to me that setting <code>mce=0</code> (which can no longer be found in kernel documentation), <code>nomce</code> or <code>mce=off</code> results in kernel panic if an exception is found or that exceptions are even still detected or that this setting is related to security.</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/490">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/490</link>
+        <pubDate>Mon, 25 Jul 2022 18:15:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-490</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I wonder where this <code>mce=0</code> think is coming from.</p>
+<p>web search term:</p>
+<ul>
+<li>
+<blockquote>
+<p>linux “mce” security hardening</p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p>linux “mce=off” ecc security</p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p>linux “mce=0” ecc security</p>
+</blockquote>
+</li>
+</ul>
+<hr>
+<p>Quote <a href="https://tails.boum.org/contribute/design/kernel_hardening/" class="inline-onebox">Tails - kernel hardening</a></p>
+<blockquote>
+<h4><code>mce=0</code></h4>
+</blockquote>
+<blockquote>
+<p>Mostly useful for systems with ECC memory, setting <code>mce</code> to 0 will cause the kernel to panic on any uncorrectable errors detected by the machine check exception system. Corrected errors will just be logged. The default is <code>mce=1</code>, which will SIGBUS on many uncorrected errors. Unfortunately this means malicious processes which try to exploit hardware bugginess (such as rowhammer) will be able to try over and over, suffering only a SIGBUS at failure. Setting <code>mce=0</code> should have no impact. Any hardware which regularly triggers a memory-based MCE is unlikely to even boot, and the default is 1 only for long-lived servers.</p>
+</blockquote>
+<hr>
+<p><a href="https://www.suse.com/support/kb/doc/?id=000019052" class="onebox" target="_blank" rel="noopener">https://www.suse.com/support/kb/doc/?id=000019052</a></p>
+<p><a href="https://www.kernel.org/doc/Documentation/x86/x86_64/machinecheck.rst" class="onebox" target="_blank" rel="noopener">https://www.kernel.org/doc/Documentation/x86/x86_64/machinecheck.rst</a></p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/489">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/489</link>
+        <pubDate>Mon, 25 Jul 2022 18:06:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-489</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[raja]]></dc:creator>
+        <description><![CDATA[
+            <p>Looking into <code>mce=0</code>, I am not entirely sure what its connection to ECC memory is based on the kernel docs.</p>
+<p>Regarding <code>mce=off</code>, I think that would be less secure as per the definition of a machine check:<br>
+<a href="https://www.kernel.org/doc/html/latest/x86/x86_64/machinecheck.html" class="onebox" target="_blank" rel="noopener nofollow ugc">https://www.kernel.org/doc/html/latest/x86/x86_64/machinecheck.html</a></p>
+<p>“Machine checks report internal hardware error conditions detected by the CPU. Uncorrected errors typically cause a machine check (often with panic), corrected ones cause a machine check log entry.”</p>
+<aside class="quote no-group" data-username="Patrick" data-post="486" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><code>GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX mce=0"</code></p>
+</blockquote>
+</aside>
+<p>Therefore, maybe we should remove or comment out that command as I am not sure what it does. On the other hand, replacing it with <code>mce=off</code> may not be desirable.</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/488">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/488</link>
+        <pubDate>Mon, 25 Jul 2022 09:50:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-488</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you!</p>
+<p>This was merged.</p>
+<p>But undone one single commit of the many other commits:</p>
+<aside class="onebox githubcommit" data-onebox-src="https://github.com/Kicksecure/security-misc/commit/0c5b1e9f577d52e2c056e786e32c14ff37db344b">
+  <header class="source">
+
+      <a href="https://github.com/Kicksecure/security-misc/commit/0c5b1e9f577d52e2c056e786e32c14ff37db344b" target="_blank" rel="noopener">github.com/Kicksecure/security-misc</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Kicksecure/security-misc/commit/0c5b1e9f577d52e2c056e786e32c14ff37db344b" target="_blank" rel="noopener">undo `"force kernel to panic on "oopses"`</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2022-07-23" data-time="11:49:56" data-timezone="UTC">11:49AM - 23 Jul 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+
+      <div class="lines" title="changed 1 files with 6 additions and 1 deletions">
+        <a href="https://github.com/Kicksecure/security-misc/commit/0c5b1e9f577d52e2c056e786e32c14ff37db344b" target="_blank" rel="noopener">
+          <span class="added">+6</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">because implemented differently already
+
+https://forums.whonix.org/t/set-oops-pa<span class="show-more-container"><a href="https://github.com/Kicksecure/security-misc/commit/0c5b1e9f577d52e2c056e786e32c14ff37db344b" target="_blank" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">nic-kernel-parameter-or-kernel-panic-on-oops-1-sysctl-for-better-security/7713</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>related:<br>
+<a href="https://forums.whonix.org/t/set-oops-panic-kernel-parameter-or-kernel-panic-on-oops-1-sysctl-for-better-security/7713" class="inline-onebox">set oops=panic kernel parameter or kernel.panic_on_oops=1 sysctl for better security</a></p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/487">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/487</link>
+        <pubDate>Sat, 23 Jul 2022 12:00:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-487</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <pre><code class="lang-auto">## Makes the kernel panic on uncorrectable errors in ECC memory that an attacker could exploit.
+GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX mce=0"
+</code></pre>
+<p>Shouldn’t that be <code>mce=off</code>?</p>
+<p>And useful for security anyhow?</p>
+<p><a href="https://www.kernel.org/doc/Documentation/x86/x86_64/boot-options.rst" class="onebox" target="_blank" rel="noopener">https://www.kernel.org/doc/Documentation/x86/x86_64/boot-options.rst</a></p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/486">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/486</link>
+        <pubDate>Sat, 23 Jul 2022 11:53:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-486</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Someone sent this to my inbox where I cannot handle it.</p>
+<blockquote>
+<p>Spectre Side Channels<br>
+<a href="https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/spectre.html" class="inline-onebox">Spectre Side Channels — The Linux Kernel documentation</a></p>
+<p>L1TF<br>
+<a href="https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html" class="inline-onebox">L1TF - L1 Terminal Fault — The Linux Kernel documentation</a></p>
+<p>MDS<br>
+<a href="https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/mds.html" class="inline-onebox">MDS - Microarchitectural Data Sampling — The Linux Kernel documentation</a></p>
+<p>TAA-TSX Asynchronous Abort<br>
+<a href="https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/tsx_async_abort.html" class="inline-onebox">TAA - TSX Asynchronous Abort — The Linux Kernel documentation</a></p>
+<p>ITLB Multihit<br>
+<a href="https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/multihit.html" class="inline-onebox">iTLB multihit — The Linux Kernel documentation</a></p>
+<p>SRBDS Special Register Buffer Data Sampling<br>
+<a href="https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/special-register-buffer-data-sampling.html" class="inline-onebox">SRBDS - Special Register Buffer Data Sampling — The Linux Kernel documentation</a></p>
+<p>Core Scheduling<br>
+<a href="https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/core-scheduling.html" class="inline-onebox">Core Scheduling — The Linux Kernel documentation</a></p>
+<p>L1D Flushing<br>
+<a href="https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1d_flush.html" class="inline-onebox">L1D Flushing — The Linux Kernel documentation</a></p>
+</blockquote>
+<p>Some hardening settings are already applied in security-misc.</p>
+<p>Help welcome checking what’s missing if any.</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/485">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/485</link>
+        <pubDate>Fri, 15 Jul 2022 13:30:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-485</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Merged. Thank you!</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/484">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/484</link>
+        <pubDate>Fri, 15 Jul 2022 13:29:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-484</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[raja]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubpullrequest" data-onebox-src="https://github.com/Kicksecure/security-misc/pull/112">
+  <header class="source">
+
+      <a href="https://github.com/Kicksecure/security-misc/pull/112" target="_blank" rel="noopener nofollow ugc">github.com/Kicksecure/security-misc</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Kicksecure/security-misc/pull/112" target="_blank" rel="noopener nofollow ugc">Corrected kernel module disabling</a>
+    </h4>
+
+    <div class="branches">
+      <code>Kicksecure:master</code> ← <code>raja-grewal:blacklist</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2022-07-13" data-time="13:45:00" data-timezone="UTC">01:45PM - 13 Jul 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/raja-grewal" target="_blank" rel="noopener nofollow ugc">
+          <img alt="raja-grewal" src="https://avatars.githubusercontent.com/u/79781370?v=4" class="onebox-avatar-inline" width="20" height="20">
+          raja-grewal
+        </a>
+      </div>
+
+      <div class="lines" title="1 commits changed 12 files with 51 additions and 61 deletions">
+        <a href="https://github.com/Kicksecure/security-misc/pull/112/files" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+51</span>
+          <span class="removed">-61</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">https://forums.whonix.org/t/kernel-hardening/7296/478</p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/483">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/483</link>
+        <pubDate>Wed, 13 Jul 2022 13:54:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-483</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes, that would be good.</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/482">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/482</link>
+        <pubDate>Wed, 13 Jul 2022 13:01:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-482</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[raja]]></dc:creator>
+        <description><![CDATA[
+            <p>Ok so I can add individually the files without the folder?</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/481">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/481</link>
+        <pubDate>Wed, 13 Jul 2022 13:00:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-481</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>No, lintian does not like the subdir. I.e. having a dir inside /bin (or /usr/bin).</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/480">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/480</link>
+        <pubDate>Wed, 13 Jul 2022 12:56:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-480</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[raja]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="478" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Debian’s lintian does not like use of folder <code>bin/disabled-module-by-security-misc/</code>.</p>
+</blockquote>
+</aside>
+<p>If am not mistaken, this could be fixed by moving the folder from <code>bin</code> → <code>usr/bin</code> with no change in code required. Though if we want to keep it in <code>bin</code> it might just be easier to unpack the directory and rename the files. What do you think?</p>
+<p>I prefer the second approach. Should I send a PR?</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/479">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/479</link>
+        <pubDate>Wed, 13 Jul 2022 12:52:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-479</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Debian’s lintian does not like use of folder <code>bin/disabled-module-by-security-misc/</code>.</p>
+<pre><code class="lang-auto">################################################################################
+E: security-misc: subdir-in-bin bin/disabled-module-by-security-misc/
+N:
+E: subdir-in-bin
+N:
+N:   The Filesystem Hierarchy Standard forbids the installation of new
+N:   directories in /bin.
+N:   
+N:   Refer to Filesystem Hierarchy Standard (/bin : Essential user command
+N:   binaries (for use by all users)) for details.
+N:   
+N:   Severity: error
+N:   
+N:   Check: files/hierarchy/standard
+N:
+################################################################################
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/478">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/478</link>
+        <pubDate>Wed, 13 Jul 2022 12:31:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-478</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+      <item>
+        <title>Kernel Hardening</title>
+        <dc:creator><![CDATA[raja]]></dc:creator>
+        <description><![CDATA[
+            <p>No problem, commit reverted and the readme has been updated.</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening/7296/477">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening/7296/477</link>
+        <pubDate>Wed, 13 Jul 2022 12:30:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7296-477</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening/7296.rss">Kernel Hardening</source>
+      </item>
+  </channel>
+</rss>

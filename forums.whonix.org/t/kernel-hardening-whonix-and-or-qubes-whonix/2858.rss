@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Kernel Hardening (Whonix and/or Qubes-Whonix)</title>
+    <link>http://forums.whonix.org/t/kernel-hardening-whonix-and-or-qubes-whonix/2858</link>
+    <description>@Patrick
+
+Hi Patrick,
+
+I read somewhere  where you were discussing hardening the kernel/s in either Whonix and/or Qubes with other developers. 
+
+This information below may be of use (?) - recommendations for &#39;paranoid settings&#39; from the Kernel Hardening Project. 
+
+I&#39;m not sure of the default kernel settings in Debian/Fedora etc that is used in Qubes-Whonix and non-Qubes-Whonix.
+
+http://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project#Recommended_settings
+
+Key section:
+
+ &gt;  Recommended settings 
+&gt; People ask from time to time what a good security set of build 
+&gt; CONFIGs and runtime sysctl are. This is a brain-dump of the various 
+&gt; options for a particularly paranoid system.
+
+&gt;   CONFIGs 
+&gt; # Report BUG() conditions and kill the offending process.
+&gt; CONFIG_BUG=y
+
+&gt; # Make sure kernel page tables have safe permissions.
+&gt; CONFIG_DEBUG_KERNEL=y
+&gt; CONFIG_DEBUG_RODATA=y
+
+&gt; # Use -fstack-protector-strong (gcc 4.9+) for best stack canary coverage.
+&gt; CONFIG_CC_STACKPROTECTOR=y
+&gt; CONFIG_CC_STACKPROTECTOR_STRONG=y
+
+&gt; # Blocks direct physical memory access.
+&gt; CONFIG_STRICT_DEVMEM=y
+
+&gt; # Provides some protections against SYN flooding.
+&gt; CONFIG_SYN_COOKIES=y
+
+&gt; # Perform additional validation of various commonly targetted structures.
+&gt; CONFIG_DEBUG_CREDENTIALS=y
+&gt; CONFIG_DEBUG_NOTIFIERS=y
+&gt; CONFIG_DEBUG_LIST=y
+
+&gt; # Provide userspace with seccomp BPF API for syscall attack surface reduction.
+&gt; CONFIG_SECCOMP=y
+&gt; CONFIG_SECCOMP_FILTER=y
+
+&gt; # Provide userspace with ptrace ancestry protections.
+&gt; CONFIG_SECURITY=y
+&gt; CONFIG_SECURITY_YAMA=y
+
+&gt; # Perform usercopy bounds checking.
+&gt; CONFIG_HARDENED_USERCOPY=y
+
+&gt; # Randomize allocator freelists.
+&gt; CONFIG_SLAB_FREELIST_RANDOM=y
+
+&gt; # Allow allocator validation checking to be enabled.
+&gt; CONFIG_SLUB_DEBUG=y
+
+&gt; # Dangerous; allows direct physical memory writing.
+&gt; # CONFIG_ACPI_CUSTOM_METHOD is not set
+
+&gt; # Dangerous; disables brk ASLR.
+&gt; # CONFIG_COMPAT_BRK is not set
+
+&gt; # Dangerous; disables VDSO ASLR.
+&gt; # CONFIG_COMPAT_VDSO is not set
+
+&gt; # Dangerous; allows direct kernel memory writing.
+&gt; # CONFIG_DEVKMEM is not set
+
+&gt; # Dangerous; allows replacement of running kernel.
+&gt; # CONFIG_KEXEC is not set
+
+&gt; # Dangerous; allows replacement of running kernel.
+&gt; # CONFIG_HIBERNATION is not set
+
+&gt; # Prior to v4.1, assists heap memory attacks; best to keep interface disabled.
+&gt; # CONFIG_INET_DIAG is not set
+
+&gt; # Easily confused by misconfigured userspace, keep off.
+&gt; # CONFIG_BINFMT_MISC is not set
+
+&gt; # Use the modern PTY interface (devpts) only.
+&gt; # CONFIG_LEGACY_PTYS is not set
+
+&gt; # Reboot devices immediately if kernel experiences an Oops.
+&gt; CONFIG_PANIC_ON_OOPS=y
+&gt; CONFIG_PANIC_TIMEOUT=-1
+
+&gt; # Keep root from altering kernel memory via loadable modules.
+&gt; # CONFIG_MODULES is not set
+
+&gt; # But if CONFIG_MODULE=y is needed, at least they must be signed with a per-build key.
+&gt; CONFIG_DEBUG_SET_MODULE_RONX=y
+&gt; CONFIG_MODULE_SIG=y
+&gt; CONFIG_MODULE_SIG_FORCE=y
+&gt; CONFIG_MODULE_SIG_ALL=y
+&gt; CONFIG_MODULE_SIG_SHA512=y
+&gt; CONFIG_MODULE_SIG_HASH=&quot;sha512&quot;
+&gt; CONFIG_MODULE_SIG_KEY=&quot;certs/signing_key.pem&quot;
+
+&gt;   x86_32 
+&gt; # On 32-bit kernels, require PAE for NX bit support.
+&gt; # CONFIG_M486 is not set
+&gt; # CONFIG_HIGHMEM4G is not set
+&gt; CONFIG_HIGHMEM64G=y
+&gt; CONFIG_X86_PAE=y
+
+&gt; # Disallow allocating the first 64k of memory.
+&gt; CONFIG_DEFAULT_MMAP_MIN_ADDR=65536
+
+&gt; # Randomize position of kernel.
+&gt; CONFIG_RANDOMIZE_BASE=y
+
+&gt;   x86_64 
+&gt; # Full 64-bit means PAE and NX bit.
+&gt; CONFIG_X86_64=y
+
+&gt; # Disallow allocating the first 64k of memory.
+&gt; CONFIG_DEFAULT_MMAP_MIN_ADDR=65536
+
+&gt; # Randomize position of kernel and memory.
+&gt; CONFIG_RANDOMIZE_BASE=y
+&gt; CONFIG_RANDOMIZE_MEMORY=y
+
+&gt; # Modern libc no longer needs a fixed-position mapping in userspace, remove it as a possible target.
+&gt; CONFIG_LEGACY_VSYSCALL_NONE=y
+
+&gt; # Remove additional attack surface, unless you really need them.
+&gt; # CONFIG_IA32_EMULATION is not set
+&gt; # CONFIG_X86_X32 is not set
+&gt; # CONFIG_MODIFY_LDT_SYSCALL is not set
+
+&gt;   arm 
+&gt; # Disallow allocating the first 32k of memory (cannot be 64k due to ARM loader).
+&gt; CONFIG_DEFAULT_MMAP_MIN_ADDR=32768
+
+&gt; # For maximal userspace memory area (and maximum ASLR).
+&gt; CONFIG_VMSPLIT_3G=y
+
+&gt; # If building an out-of-tree Qualcomm kernel, this is similar to CONFIG_DEBUG_RODATA.
+&gt; CONFIG_STRICT_MEMORY_RWX=y
+
+&gt; # Make sure PXN/PAN emulation is enabled.
+&gt; CONFIG_CPU_SW_DOMAIN_PAN=y
+
+&gt; # Dangerous; old interfaces and needless additional attack surface.
+&gt; # CONFIG_OABI_COMPAT is unset
+
+&gt;   arm64 
+&gt; # Disallow allocating the first 32k of memory (cannot be 64k due to ARM loader).
+&gt; CONFIG_DEFAULT_MMAP_MIN_ADDR=32768
+
+&gt; # Randomize position of kernel (requires UEFI RNG or bootloader support for /chosen/kaslr-seed DT property).
+&gt; CONFIG_RANDOMIZE_BASE=y
+
+&gt;   kernel command line options 
+&gt; # Enable allocator free poisoning.
+&gt; slub_debug=P
+
+&gt;   x86_64 
+&gt; # Remove vsyscall entirely to avoid it being a fixed-position ROP target of any kind.
+&gt; # (Same as CONFIG_LEGACY_VSYSCALL_NONE=y above.)
+&gt; vsyscall=none
+
+&gt;   sysctls 
+&gt; # Try to keep kernel address exposures out of various /proc files (kallsyms, modules, etc).
+&gt; kernel.kptr_restrict = 1
+
+&gt; # Avoid kernel memory address exposures via dmesg.
+&gt; kernel.dmesg_restrict = 1
+
+&gt; # Block non-uid-0 profiling
+&gt; kernel.perf_event_paranoid = 3
+
+&gt; # Turn off kexec, even if it&#39;s built in.
+&gt; kernel.kexec_load_disabled = 1
+
+&gt; # Avoid non-ancestor ptrace access to running processes and their credentials.
+&gt; kernel.yama.ptrace_scope = 1</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 18 Aug 2016 03:11:15 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/kernel-hardening-whonix-and-or-qubes-whonix/2858.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Kernel Hardening (Whonix and/or Qubes-Whonix)</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>That the Linux project is moving to improve kernel security is a welcome development on the surface. However their cherry-picking approach of minor Grsec features makes the effort a security theater exercise. All the features of Grsec work together to provide the robust security it has. Unless a serious effort is made to add all of it there isn’t much real world protection we can expect to see in vanilla kernels.</p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening-whonix-and-or-qubes-whonix/2858/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening-whonix-and-or-qubes-whonix/2858/3</link>
+        <pubDate>Thu, 18 Aug 2016 03:11:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2858-3</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening-whonix-and-or-qubes-whonix/2858.rss">Kernel Hardening (Whonix and/or Qubes-Whonix)</source>
+      </item>
+      <item>
+        <title>Kernel Hardening (Whonix and/or Qubes-Whonix)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This is hard to do oneself. Let alone deploy in a Linux distribution.</p>
+<p>If it was simple, it would be a standard feature of Debian already. If we get to that point, I cannot say yet.</p>
+<p>Mentioned here:<br>
+<a href="https://www.whonix.org/wiki/Advanced_Security_Guide#grsecurity">https://www.whonix.org/wiki/Advanced_Security_Guide#grsecurity</a></p>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening-whonix-and-or-qubes-whonix/2858/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening-whonix-and-or-qubes-whonix/2858/2</link>
+        <pubDate>Tue, 16 Aug 2016 15:57:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2858-2</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening-whonix-and-or-qubes-whonix/2858.rss">Kernel Hardening (Whonix and/or Qubes-Whonix)</source>
+      </item>
+      <item>
+        <title>Kernel Hardening (Whonix and/or Qubes-Whonix)</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a></p>
+<p>Hi Patrick,</p>
+<p>I read somewhere  where you were discussing hardening the kernel/s in either Whonix and/or Qubes with other developers.</p>
+<p>This information below may be of use (?) - recommendations for ‘paranoid settings’ from the Kernel Hardening Project.</p>
+<p>I’m not sure of the default kernel settings in Debian/Fedora etc that is used in Qubes-Whonix and non-Qubes-Whonix.</p>
+<p><a href="http://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project#Recommended_settings" class="onebox" target="_blank">http://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project#Recommended_settings</a></p>
+<p>Key section:</p>
+<blockquote>
+<p>Recommended settings<br>
+People ask from time to time what a good security set of build<br>
+CONFIGs and runtime sysctl are. This is a brain-dump of the various<br>
+options for a particularly paranoid system.</p>
+</blockquote>
+<blockquote>
+<p>CONFIGs</p>
+<h1>Report BUG() conditions and kill the offending process.</h1>
+<p>CONFIG_BUG=y</p>
+</blockquote>
+<blockquote>
+<h1>Make sure kernel page tables have safe permissions.</h1>
+<p>CONFIG_DEBUG_KERNEL=y<br>
+CONFIG_DEBUG_RODATA=y</p>
+</blockquote>
+<blockquote>
+<h1>Use -fstack-protector-strong (gcc 4.9+) for best stack canary coverage.</h1>
+<p>CONFIG_CC_STACKPROTECTOR=y<br>
+CONFIG_CC_STACKPROTECTOR_STRONG=y</p>
+</blockquote>
+<blockquote>
+<h1>Blocks direct physical memory access.</h1>
+<p>CONFIG_STRICT_DEVMEM=y</p>
+</blockquote>
+<blockquote>
+<h1>Provides some protections against SYN flooding.</h1>
+<p>CONFIG_SYN_COOKIES=y</p>
+</blockquote>
+<blockquote>
+<h1>Perform additional validation of various commonly targetted structures.</h1>
+<p>CONFIG_DEBUG_CREDENTIALS=y<br>
+CONFIG_DEBUG_NOTIFIERS=y<br>
+CONFIG_DEBUG_LIST=y</p>
+</blockquote>
+<blockquote>
+<h1>Provide userspace with seccomp BPF API for syscall attack surface reduction.</h1>
+<p>CONFIG_SECCOMP=y<br>
+CONFIG_SECCOMP_FILTER=y</p>
+</blockquote>
+<blockquote>
+<h1>Provide userspace with ptrace ancestry protections.</h1>
+<p>CONFIG_SECURITY=y<br>
+CONFIG_SECURITY_YAMA=y</p>
+</blockquote>
+<blockquote>
+<h1>Perform usercopy bounds checking.</h1>
+<p>CONFIG_HARDENED_USERCOPY=y</p>
+</blockquote>
+<blockquote>
+<h1>Randomize allocator freelists.</h1>
+<p>CONFIG_SLAB_FREELIST_RANDOM=y</p>
+</blockquote>
+<blockquote>
+<h1>Allow allocator validation checking to be enabled.</h1>
+<p>CONFIG_SLUB_DEBUG=y</p>
+</blockquote>
+<blockquote>
+<h1>Dangerous; allows direct physical memory writing.</h1>
+<h1>CONFIG_ACPI_CUSTOM_METHOD is not set</h1>
+</blockquote>
+<blockquote>
+<h1>Dangerous; disables brk ASLR.</h1>
+<h1>CONFIG_COMPAT_BRK is not set</h1>
+</blockquote>
+<blockquote>
+<h1>Dangerous; disables VDSO ASLR.</h1>
+<h1>CONFIG_COMPAT_VDSO is not set</h1>
+</blockquote>
+<blockquote>
+<h1>Dangerous; allows direct kernel memory writing.</h1>
+<h1>CONFIG_DEVKMEM is not set</h1>
+</blockquote>
+<blockquote>
+<h1>Dangerous; allows replacement of running kernel.</h1>
+<h1>CONFIG_KEXEC is not set</h1>
+</blockquote>
+<blockquote>
+<h1>Dangerous; allows replacement of running kernel.</h1>
+<h1>CONFIG_HIBERNATION is not set</h1>
+</blockquote>
+<blockquote>
+<h1>Prior to v4.1, assists heap memory attacks; best to keep interface disabled.</h1>
+<h1>CONFIG_INET_DIAG is not set</h1>
+</blockquote>
+<blockquote>
+<h1>Easily confused by misconfigured userspace, keep off.</h1>
+<h1>CONFIG_BINFMT_MISC is not set</h1>
+</blockquote>
+<blockquote>
+<h1>Use the modern PTY interface (devpts) only.</h1>
+<h1>CONFIG_LEGACY_PTYS is not set</h1>
+</blockquote>
+<blockquote>
+<h1>Reboot devices immediately if kernel experiences an Oops.</h1>
+<p>CONFIG_PANIC_ON_OOPS=y<br>
+CONFIG_PANIC_TIMEOUT=-1</p>
+</blockquote>
+<blockquote>
+<h1>Keep root from altering kernel memory via loadable modules.</h1>
+<h1>CONFIG_MODULES is not set</h1>
+</blockquote>
+<blockquote>
+<h1>But if CONFIG_MODULE=y is needed, at least they must be signed with a per-build key.</h1>
+<p>CONFIG_DEBUG_SET_MODULE_RONX=y<br>
+CONFIG_MODULE_SIG=y<br>
+CONFIG_MODULE_SIG_FORCE=y<br>
+CONFIG_MODULE_SIG_ALL=y<br>
+CONFIG_MODULE_SIG_SHA512=y<br>
+CONFIG_MODULE_SIG_HASH="sha512"<br>
+CONFIG_MODULE_SIG_KEY=“certs/signing_key.pem”</p>
+</blockquote>
+<blockquote>
+<p>x86_32</p>
+<h1>On 32-bit kernels, require PAE for NX bit support.</h1>
+<h1>CONFIG_M486 is not set</h1>
+<h1>CONFIG_HIGHMEM4G is not set</h1>
+<p>CONFIG_HIGHMEM64G=y<br>
+CONFIG_X86_PAE=y</p>
+</blockquote>
+<blockquote>
+<h1>Disallow allocating the first 64k of memory.</h1>
+<p>CONFIG_DEFAULT_MMAP_MIN_ADDR=65536</p>
+</blockquote>
+<blockquote>
+<h1>Randomize position of kernel.</h1>
+<p>CONFIG_RANDOMIZE_BASE=y</p>
+</blockquote>
+<blockquote>
+<p>x86_64</p>
+<h1>Full 64-bit means PAE and NX bit.</h1>
+<p>CONFIG_X86_64=y</p>
+</blockquote>
+<blockquote>
+<h1>Disallow allocating the first 64k of memory.</h1>
+<p>CONFIG_DEFAULT_MMAP_MIN_ADDR=65536</p>
+</blockquote>
+<blockquote>
+<h1>Randomize position of kernel and memory.</h1>
+<p>CONFIG_RANDOMIZE_BASE=y<br>
+CONFIG_RANDOMIZE_MEMORY=y</p>
+</blockquote>
+<blockquote>
+<h1>Modern libc no longer needs a fixed-position mapping in userspace, remove it as a possible target.</h1>
+<p>CONFIG_LEGACY_VSYSCALL_NONE=y</p>
+</blockquote>
+<blockquote>
+<h1>Remove additional attack surface, unless you really need them.</h1>
+<h1>CONFIG_IA32_EMULATION is not set</h1>
+<h1>CONFIG_X86_X32 is not set</h1>
+<h1>CONFIG_MODIFY_LDT_SYSCALL is not set</h1>
+</blockquote>
+<blockquote>
+<p>arm</p>
+<h1>Disallow allocating the first 32k of memory (cannot be 64k due to ARM loader).</h1>
+<p>CONFIG_DEFAULT_MMAP_MIN_ADDR=32768</p>
+</blockquote>
+<blockquote>
+<h1>For maximal userspace memory area (and maximum ASLR).</h1>
+<p>CONFIG_VMSPLIT_3G=y</p>
+</blockquote>
+<blockquote>
+<h1>If building an out-of-tree Qualcomm kernel, this is similar to CONFIG_DEBUG_RODATA.</h1>
+<p>CONFIG_STRICT_MEMORY_RWX=y</p>
+</blockquote>
+<blockquote>
+<h1>Make sure PXN/PAN emulation is enabled.</h1>
+<p>CONFIG_CPU_SW_DOMAIN_PAN=y</p>
+</blockquote>
+<blockquote>
+<h1>Dangerous; old interfaces and needless additional attack surface.</h1>
+<h1>CONFIG_OABI_COMPAT is unset</h1>
+</blockquote>
+<blockquote>
+<p>arm64</p>
+<h1>Disallow allocating the first 32k of memory (cannot be 64k due to ARM loader).</h1>
+<p>CONFIG_DEFAULT_MMAP_MIN_ADDR=32768</p>
+</blockquote>
+<blockquote>
+<h1>Randomize position of kernel (requires UEFI RNG or bootloader support for /chosen/kaslr-seed DT property).</h1>
+<p>CONFIG_RANDOMIZE_BASE=y</p>
+</blockquote>
+<blockquote>
+<p>kernel command line options</p>
+<h1>Enable allocator free poisoning.</h1>
+<p>slub_debug=P</p>
+</blockquote>
+<blockquote>
+<p>x86_64</p>
+<h1>Remove vsyscall entirely to avoid it being a fixed-position ROP target of any kind.</h1>
+<h1>(Same as CONFIG_LEGACY_VSYSCALL_NONE=y above.)</h1>
+<p>vsyscall=none</p>
+</blockquote>
+<blockquote>
+<p>sysctls</p>
+<h1>Try to keep kernel address exposures out of various /proc files (kallsyms, modules, etc).</h1>
+<p>kernel.kptr_restrict = 1</p>
+</blockquote>
+<blockquote>
+<h1>Avoid kernel memory address exposures via dmesg.</h1>
+<p>kernel.dmesg_restrict = 1</p>
+</blockquote>
+<blockquote>
+<h1>Block non-uid-0 profiling</h1>
+<p>kernel.perf_event_paranoid = 3</p>
+</blockquote>
+<blockquote>
+<h1>Turn off kexec, even if it’s built in.</h1>
+<p>kernel.kexec_load_disabled = 1</p>
+</blockquote>
+<blockquote>
+<h1>Avoid non-ancestor ptrace access to running processes and their credentials.</h1>
+<p>kernel.yama.ptrace_scope = 1</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/kernel-hardening-whonix-and-or-qubes-whonix/2858/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kernel-hardening-whonix-and-or-qubes-whonix/2858/1</link>
+        <pubDate>Tue, 16 Aug 2016 14:37:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2858-1</guid>
+        <source url="http://forums.whonix.org/t/kernel-hardening-whonix-and-or-qubes-whonix/2858.rss">Kernel Hardening (Whonix and/or Qubes-Whonix)</source>
+      </item>
+  </channel>
+</rss>

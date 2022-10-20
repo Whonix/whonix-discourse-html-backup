@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Tor Browser not working - User --&gt; Tor --&gt; VPN --&gt; Internet</title>
+    <link>http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385</link>
+    <description>Hi,
+
+Ive run into issues in setting up Tor before VPN and have run out of ideas.  Hope someone here can help.  
+
+When I start Tor Browser and go to any site; I get no response at all.  Pings to check torproject work from the terminal; so DNS resolution is fine and network traffic also looks fine - so something in the Tor Browser configuration is not right.  
+
+This is what I started with.
+
+- Installed Gateway and Workstation (Whonix-XFCE-15.0.1.5.1).  I am not using Qubes.  I am using VirtualBox on a Windows 10 host.
+- Updated packages using sudo apt-get command specified by whonixcheck
+- Verified that I am connected to Tor using check torproject
+- Verified that I can connect to my VPN using their provide .ovpn configuration and running &quot;sudo openvpn openvpn.conf&quot;.  Changes I made to their provided configuration at this point in time.
+	- Added username/password to auth.txt
+	- Changed dev tun to dev tun0 
+	- Changed remote domain name to IP address
+
+	Interestingly, even with OpenVPN running; when I go to check torproject; it still said I was connected to TOR with the message, &quot;Congratulations. This browser is configured to use Tor.&quot;.  So; not sure if OpenVPN is even being used at this stage.  The console logs when starting openvpn are as follows
+
+
+
+&gt; Wed Oct  7 00:43:05 2020 OPTIONS IMPORT: route options modified
+&gt;     Wed Oct  7 00:43:05 2020 OPTIONS IMPORT: route-related options modified
+&gt;     Wed Oct  7 00:43:05 2020 OPTIONS IMPORT: --ip-win32 and/or --dhcp-option options modified
+&gt;     Wed Oct  7 00:43:05 2020 OPTIONS IMPORT: peer-id set
+&gt;     Wed Oct  7 00:43:05 2020 OPTIONS IMPORT: adjusting link_mtu to 1658
+&gt;     Wed Oct  7 00:43:05 2020 OPTIONS IMPORT: data channel crypto options modified
+&gt;     Wed Oct  7 00:43:05 2020 Data Channel: using negotiated cipher &#39;AES-256-GCM&#39;
+&gt;     Wed Oct  7 00:43:05 2020 Outgoing Data Channel: Cipher &#39;AES-256-GCM&#39; initialized with 256 bit key
+&gt;     Wed Oct  7 00:43:05 2020 Incoming Data Channel: Cipher &#39;AES-256-GCM&#39; initialized with 256 bit key
+&gt;     Wed Oct  7 00:43:05 2020 ROUTE_GATEWAY 10.152.152.10/255.255.192.0 IFACE=eth0 HWADDR=08:00:27:60:30:a3
+&gt;     Wed Oct  7 00:43:05 2020 TUN/TAP device tun0 opened
+&gt;     Wed Oct  7 00:43:05 2020 TUN/TAP TX queue length set to 100
+&gt;     Wed Oct  7 00:43:05 2020 /sbin/ip link set dev tun0 up mtu 1500
+&gt;     Wed Oct  7 00:43:05 2020 /sbin/ip addr add dev tun0 10.7.7.2/24 broadcast 10.7.7.255
+&gt;     Wed Oct  7 00:43:05 2020 /sbin/ip route add XX.XX.XX.XX/32 via 10.152.152.10
+&gt;     Wed Oct  7 00:43:05 2020 /sbin/ip route add 0.0.0.0/1 via 10.7.7.1
+&gt;     Wed Oct  7 00:43:05 2020 /sbin/ip route add 128.0.0.0/1 via 10.7.7.1
+&gt;     Wed Oct  7 00:43:05 2020 Initialization Sequence Completed
+
+
+I am following the instructions at /wiki/Tunnels/Connecting_to_Tor_before_a_VPN and this is what I&#39;ve done so far.
+All changes were made on Workstation only.  No changes on Gateway.
+
+- Disable uwtWrappers
+- Tor Browser Remove Proxy Settings
+- Reboot Workstation
+- Verified OpenVPN is still able to connect.  However, check torproject is no longer able to connect.  I&#39;m thinking maybe DNS is no longer working since VPN can connect through IP
+- Deactivate Misc Proxy Settings  (4 occurences in whonix file and 13 occurances in debian file)
+- Removed proxy settings for Tor Browser Downloader
+- OpenVPN still connects although Tor Browser no longer connects to anything
+
+Next, I followed instructions for Inside Whonix-Workstation
+- Modified User Firewall Settings
+- Reloaded Firewall
+- Updated sudoers configuration (made sure it was _ underscore)
+- OpenVPN no longer connects (Connection Times out) - which points to the firewall as breaking something
+
+&gt; Wed Oct  7 01:09:21 2020 NOTE: --fast-io is disabled since we are not using UDP
+&gt; Wed Oct  7 01:09:21 2020 Outgoing Control Channel Authentication: Using 512 bit message hash &#39;SHA512&#39; for HMAC authentication
+&gt; Wed Oct  7 01:09:21 2020 Incoming Control Channel Authentication: Using 512 bit message hash &#39;SHA512&#39; for HMAC authentication
+&gt; Wed Oct  7 01:09:21 2020 TCP/UDP: Preserving recently used remote address: [AF_INET]XX.XX.XX.XX:1443
+&gt; Wed Oct  7 01:09:21 2020 Socket Buffers: R=[131072-&gt;131072] S=[16384-&gt;16384]
+&gt; Wed Oct  7 01:09:21 2020 Attempting to establish TCP connection with [AF_INET]XX.XX.XX.XX:1443 [nonblock]
+&gt; Wed Oct  7 01:09:53 2020 TCP: connect to [AF_INET]XX.XX.XX.XX:1443 failed: Connection timed out
+&gt; Wed Oct  7 01:09:53 2020 SIGUSR1[connection failed(soft),init_instance] received, process restarting
+&gt; Wed Oct  7 01:09:53 2020 Restart pause, 5 second(s)
+&gt; Wed Oct  7 01:09:58 2020 WARNING: --ping should normally be used with --ping-restart or --ping-exit
+&gt; Wed Oct  7 01:09:58 2020 NOTE: --fast-io is disabled since we are not using UDP
+&gt; Wed Oct  7 01:09:58 2020 TCP/UDP: Preserving recently used remote address: [AF_INET]XX.XX.XX.XX:1443
+&gt; Wed Oct  7 01:09:58 2020 Socket Buffers: R=[131072-&gt;131072] S=[16384-&gt;16384]
+&gt; Wed Oct  7 01:09:58 2020 Attempting to establish TCP connection with [AF_INET]XX.XX.XX.XX:1443 [nonblock]
+
+- Anyway, continued on and updated openvpn.conf with following additions
+	
+&gt;     	script-security 2
+&gt;     	up &quot;/etc/openvpn/update-resolv-conf script_type=up dev=tun0&quot;
+&gt;     	down &quot;/etc/openvpn/update-resolv-conf script_type=down dev=tun0&quot;
+&gt; 
+&gt;     	user tunnel
+&gt;     	iproute /usr/bin/ip_unpriv
+
+- Skipped installation of resolvconf as at this point, I have no internet connection - so installation of packages are failing.  In one of my attempts, I did install this upfront; but it did not change the behaviour.
+- Addition to 50_openvpn_unpriv not required as the two lines already existed in that file
+- Adjusted the permissions
+- Nothing to do in original.resolvconf.  File was empty.
+- Set Configuration Folder Permissions
+- Create OpenVPN systemd service file
+- Enabled the systemd service file
+
+Here, I then went into the troubleshooting debug start steps.  Did a clean restart as I was getting Device or resource busy error message otherwise.  Then on reboot, ran the status command and that is looking good (I think)
+
+&gt; user@host:~$ sudo systemctl status openvpn@openvpn
+&gt; openvpn@openvpn.service - OpenVPN connection to openvpn
+&gt;    Loaded: loaded (/lib/systemd/system/openvpn@openvpn.service; enabled; vendor preset: enabled)
+&gt;   Drop-In: /lib/systemd/system/openvpn@openvpn.service.d
+&gt;            └─50_unpriv.conf
+&gt;    Active: active (running) since Wed 2020-10-07 01:17:28 UTC; 5min ago
+&gt;
+&gt;   Process: 677 ExecStartPre=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --rmtun --dev tun0 (code=exited, status=0/SUCCESS)
+&gt;   Process: 716 ExecStartPre=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --mktun --dev tun0 --dev-type tun --user tunnel --group 
+&gt;  Main PID: 732 (openvpn)
+&gt;    Status: &quot;Initialization Sequence Completed&quot;
+&gt;     Tasks: 1 (limit: 2355)
+&gt;    Memory: 4.4M
+&gt;    CGroup: /system.slice/system-openvpn.slice/openvpn@openvpn.service
+&gt;            └─732 /usr/sbin/openvpn --daemon ovpn-openvpn --status /run/openvpn/openvpn.status 10 --cd /etc/openvpn --config /etc/openv
+&gt; 
+&gt; Oct 07 01:17:34 host ovpn-openvpn[732]: /usr/bin/ip_unpriv route add 0.0.0.0/1 via 10.7.7.1
+&gt; Oct 07 01:17:34 host sudo[1943]:   tunnel : TTY=unknown ; PWD=/etc/openvpn ; USER=root ; COMMAND=/bin/ip route add 0.0.0.0/1 via 10.7.
+&gt; Oct 07 01:17:34 host sudo[1943]: pam_unix(sudo:session): session opened for user root by (uid=0)
+&gt; Oct 07 01:17:34 host sudo[1943]: pam_unix(sudo:session): session closed for user root
+&gt; Oct 07 01:17:34 host ovpn-openvpn[732]: /usr/bin/ip_unpriv route add 128.0.0.0/1 via 10.7.7.1
+&gt; Oct 07 01:17:34 host sudo[1945]:   tunnel : TTY=unknown ; PWD=/etc/openvpn ; USER=root ; COMMAND=/bin/ip route add 128.0.0.0/1 via 10.
+&gt; Oct 07 01:17:34 host sudo[1945]: pam_unix(sudo:session): session opened for user root by (uid=0)
+&gt; Oct 07 01:17:34 host sudo[1945]: pam_unix(sudo:session): session closed for user root
+&gt; Oct 07 01:17:34 host ovpn-openvpn[732]: UID set to tunnel
+&gt; Oct 07 01:17:34 host ovpn-openvpn[732]: Initialization Sequence Completed
+
+- Restarted resolvconf (although probably not required since the whole Workstation was restarted)
+- Verified resolv.conf entries does not include local entries. It had two entries, I did not recognise.  Assuming they are VPN providers DNS entries
+- Fix whonixcheck
+- Ping test worked
+- nslookup check torproject worked
+- DNS and IP address command returned no response
+
+Leak Tests
+Regular Application Test - PASSED
+UWT Wrapped Application Test - PASSED
+
+So,everything looks good - but Tor Browser is not working.  Can&#39;t access any site, clearnet or darknet.
+
+Thank you in advance
+
+Cheers,
+MrHyde</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 08 Oct 2020 06:15:04 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Tor Browser not working - User --&gt; Tor --&gt; VPN --&gt; Internet</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Added.</p>
+          <p><a href="http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385/5</link>
+        <pubDate>Thu, 08 Oct 2020 06:15:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10385-5</guid>
+        <source url="http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385.rss">Tor Browser not working - User --&gt; Tor --&gt; VPN --&gt; Internet</source>
+      </item>
+      <item>
+        <title>Tor Browser not working - User --&gt; Tor --&gt; VPN --&gt; Internet</title>
+        <dc:creator><![CDATA[MrHyde]]></dc:creator>
+        <description><![CDATA[
+            <p>Brilliant that worked.</p>
+<p>Also, can the documentation be slightly updated to be more clearer.  I tried editting it myself; but am having trouble logging into the wiki.</p>
+<blockquote>
+<p>Tor Browser → URL bar →  <code>about:config</code> → search for  <code>network.dns.disabled</code>  → set to  <code>false</code></p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385/4</link>
+        <pubDate>Wed, 07 Oct 2020 19:36:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10385-4</guid>
+        <source url="http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385.rss">Tor Browser not working - User --&gt; Tor --&gt; VPN --&gt; Internet</source>
+      </item>
+      <item>
+        <title>Tor Browser not working - User --&gt; Tor --&gt; VPN --&gt; Internet</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Related documentation:<br>
+<a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#Prevent_Bypassing_of_the_Tunnel-Link">Prevent Bypassing of the Tunnel-Link</a></p>
+<p>Related wiki template:<br>
+<a href="https://www.whonix.org/wiki/Template:Tor_Browser_Remove_Proxy_Settings">https://www.whonix.org/wiki/Template:Tor_Browser_Remove_Proxy_Settings</a></p>
+<p>Updated just now:<br>
+<a href="https://www.whonix.org/w/index.php?title=Template%3ATor_Browser_Remove_Proxy_Settings&amp;action=historysubmit&amp;type=revision&amp;diff=60220&amp;oldid=56792">https://www.whonix.org/w/index.php?title=Template%3ATor_Browser_Remove_Proxy_Settings&amp;action=historysubmit&amp;type=revision&amp;diff=60220&amp;oldid=56792</a></p>
+<blockquote>
+<p><strong>Tor Browser Settings Changes</strong></p>
+<p>Required since Tor Browser 10. Untested. Please report if this works.</p>
+<p>Tor Browser → URL bar → search for <code>network.dns.disabled</code> → set to <code>false</code></p>
+<p>See also:</p>
+<ul>
+<li>
+<a href="https://forums.whonix.org/t/tor-browser-10-without-tor/10313" class="inline-onebox">Tor Browser 10 without Tor</a> <a href="https://web.archive.org/web/https://forums.whonix.org/t/tor-browser-10-without-tor/10313">[archive]</a>
+</li>
+<li>
+<a href="https://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385" class="inline-onebox">Tor Browser not working - User --&gt; Tor --&gt; VPN --&gt; Internet</a> <a href="https://web.archive.org/web/https://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385">[archive]</a>
+</li>
+</ul>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385/3</link>
+        <pubDate>Wed, 07 Oct 2020 14:26:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10385-3</guid>
+        <source url="http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385.rss">Tor Browser not working - User --&gt; Tor --&gt; VPN --&gt; Internet</source>
+      </item>
+      <item>
+        <title>Tor Browser not working - User --&gt; Tor --&gt; VPN --&gt; Internet</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="MrHyde" data-post="1" data-topic="10385">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/22d042/40.png" class="avatar"> MrHyde:</div>
+<blockquote>
+<p>When I start Tor Browser and go to any site; I get no response at all. Pings to check torproject work from the terminal; so DNS resolution is fine and network traffic also looks fine - so something in the Tor Browser configuration is not right.</p>
+</blockquote>
+</aside>
+<p>In Tor Browser 10+ you will have to adjust a pref related to DNS to get it to connect in a transparent proxy environment. This is mentioned on the forum and on our wiki also I think.</p>
+<aside class="quote no-group" data-username="MrHyde" data-post="1" data-topic="10385">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/22d042/40.png" class="avatar"> MrHyde:</div>
+<blockquote>
+<p>Interestingly, even with OpenVPN running; when I go to check torproject; it still said I was connected to TOR with the message, “Congratulations. This browser is configured to use Tor.”. So; not sure if OpenVPN is even being used at this stage. The console logs when starting openvpn are as follows</p>
+</blockquote>
+</aside>
+<p>TBB will connect to Tor normally, but the problem happens if you try to repurpose it to work with OpenVPN.</p>
+          <p><a href="http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385/2</link>
+        <pubDate>Wed, 07 Oct 2020 13:04:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10385-2</guid>
+        <source url="http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385.rss">Tor Browser not working - User --&gt; Tor --&gt; VPN --&gt; Internet</source>
+      </item>
+      <item>
+        <title>Tor Browser not working - User --&gt; Tor --&gt; VPN --&gt; Internet</title>
+        <dc:creator><![CDATA[MrHyde]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi,</p>
+<p>Ive run into issues in setting up Tor before VPN and have run out of ideas.  Hope someone here can help.</p>
+<p>When I start Tor Browser and go to any site; I get no response at all.  Pings to check torproject work from the terminal; so DNS resolution is fine and network traffic also looks fine - so something in the Tor Browser configuration is not right.</p>
+<p>This is what I started with.</p>
+<ul>
+<li>
+<p>Installed Gateway and Workstation (Whonix-XFCE-15.0.1.5.1).  I am not using Qubes.  I am using VirtualBox on a Windows 10 host.</p>
+</li>
+<li>
+<p>Updated packages using sudo apt-get command specified by whonixcheck</p>
+</li>
+<li>
+<p>Verified that I am connected to Tor using check torproject</p>
+</li>
+<li>
+<p>Verified that I can connect to my VPN using their provide .ovpn configuration and running “sudo openvpn openvpn.conf”.  Changes I made to their provided configuration at this point in time.</p>
+<ul>
+<li>Added username/password to auth.txt</li>
+<li>Changed dev tun to dev tun0</li>
+<li>Changed remote domain name to IP address</li>
+</ul>
+<p>Interestingly, even with OpenVPN running; when I go to check torproject; it still said I was connected to TOR with the message, “Congratulations. This browser is configured to use Tor.”.  So; not sure if OpenVPN is even being used at this stage.  The console logs when starting openvpn are as follows</p>
+</li>
+</ul>
+<blockquote>
+<p>Wed Oct  7 00:43:05 2020 OPTIONS IMPORT: route options modified<br>
+Wed Oct  7 00:43:05 2020 OPTIONS IMPORT: route-related options modified<br>
+Wed Oct  7 00:43:05 2020 OPTIONS IMPORT: --ip-win32 and/or --dhcp-option options modified<br>
+Wed Oct  7 00:43:05 2020 OPTIONS IMPORT: peer-id set<br>
+Wed Oct  7 00:43:05 2020 OPTIONS IMPORT: adjusting link_mtu to 1658<br>
+Wed Oct  7 00:43:05 2020 OPTIONS IMPORT: data channel crypto options modified<br>
+Wed Oct  7 00:43:05 2020 Data Channel: using negotiated cipher ‘AES-256-GCM’<br>
+Wed Oct  7 00:43:05 2020 Outgoing Data Channel: Cipher ‘AES-256-GCM’ initialized with 256 bit key<br>
+Wed Oct  7 00:43:05 2020 Incoming Data Channel: Cipher ‘AES-256-GCM’ initialized with 256 bit key<br>
+Wed Oct  7 00:43:05 2020 ROUTE_GATEWAY 10.152.152.10/255.255.192.0 IFACE=eth0 HWADDR=08:00:27:60:30:a3<br>
+Wed Oct  7 00:43:05 2020 TUN/TAP device tun0 opened<br>
+Wed Oct  7 00:43:05 2020 TUN/TAP TX queue length set to 100<br>
+Wed Oct  7 00:43:05 2020 /sbin/ip link set dev tun0 up mtu 1500<br>
+Wed Oct  7 00:43:05 2020 /sbin/ip addr add dev tun0 10.7.7.2/24 broadcast 10.7.7.255<br>
+Wed Oct  7 00:43:05 2020 /sbin/ip route add XX.XX.XX.XX/32 via 10.152.152.10<br>
+Wed Oct  7 00:43:05 2020 /sbin/ip route add 0.0.0.0/1 via 10.7.7.1<br>
+Wed Oct  7 00:43:05 2020 /sbin/ip route add 128.0.0.0/1 via 10.7.7.1<br>
+Wed Oct  7 00:43:05 2020 Initialization Sequence Completed</p>
+</blockquote>
+<p>I am following the instructions at /wiki/Tunnels/Connecting_to_Tor_before_a_VPN and this is what I’ve done so far.<br>
+All changes were made on Workstation only.  No changes on Gateway.</p>
+<ul>
+<li>Disable uwtWrappers</li>
+<li>Tor Browser Remove Proxy Settings</li>
+<li>Reboot Workstation</li>
+<li>Verified OpenVPN is still able to connect.  However, check torproject is no longer able to connect.  I’m thinking maybe DNS is no longer working since VPN can connect through IP</li>
+<li>Deactivate Misc Proxy Settings  (4 occurences in whonix file and 13 occurances in debian file)</li>
+<li>Removed proxy settings for Tor Browser Downloader</li>
+<li>OpenVPN still connects although Tor Browser no longer connects to anything</li>
+</ul>
+<p>Next, I followed instructions for Inside Whonix-Workstation</p>
+<ul>
+<li>Modified User Firewall Settings</li>
+<li>Reloaded Firewall</li>
+<li>Updated sudoers configuration (made sure it was _ underscore)</li>
+<li>OpenVPN no longer connects (Connection Times out) - which points to the firewall as breaking something</li>
+</ul>
+<blockquote>
+<p>Wed Oct  7 01:09:21 2020 NOTE: --fast-io is disabled since we are not using UDP<br>
+Wed Oct  7 01:09:21 2020 Outgoing Control Channel Authentication: Using 512 bit message hash ‘SHA512’ for HMAC authentication<br>
+Wed Oct  7 01:09:21 2020 Incoming Control Channel Authentication: Using 512 bit message hash ‘SHA512’ for HMAC authentication<br>
+Wed Oct  7 01:09:21 2020 TCP/UDP: Preserving recently used remote address: [AF_INET]XX.XX.XX.XX:1443<br>
+Wed Oct  7 01:09:21 2020 Socket Buffers: R=[131072-&gt;131072] S=[16384-&gt;16384]<br>
+Wed Oct  7 01:09:21 2020 Attempting to establish TCP connection with [AF_INET]XX.XX.XX.XX:1443 [nonblock]<br>
+Wed Oct  7 01:09:53 2020 TCP: connect to [AF_INET]XX.XX.XX.XX:1443 failed: Connection timed out<br>
+Wed Oct  7 01:09:53 2020 SIGUSR1[connection failed(soft),init_instance] received, process restarting<br>
+Wed Oct  7 01:09:53 2020 Restart pause, 5 second(s)<br>
+Wed Oct  7 01:09:58 2020 WARNING: --ping should normally be used with --ping-restart or --ping-exit<br>
+Wed Oct  7 01:09:58 2020 NOTE: --fast-io is disabled since we are not using UDP<br>
+Wed Oct  7 01:09:58 2020 TCP/UDP: Preserving recently used remote address: [AF_INET]XX.XX.XX.XX:1443<br>
+Wed Oct  7 01:09:58 2020 Socket Buffers: R=[131072-&gt;131072] S=[16384-&gt;16384]<br>
+Wed Oct  7 01:09:58 2020 Attempting to establish TCP connection with [AF_INET]XX.XX.XX.XX:1443 [nonblock]</p>
+</blockquote>
+<ul>
+<li>Anyway, continued on and updated openvpn.conf with following additions</li>
+</ul>
+<blockquote>
+<pre><code>	script-security 2
+	up "/etc/openvpn/update-resolv-conf script_type=up dev=tun0"
+	down "/etc/openvpn/update-resolv-conf script_type=down dev=tun0"
+
+	user tunnel
+	iproute /usr/bin/ip_unpriv
+</code></pre>
+</blockquote>
+<ul>
+<li>Skipped installation of resolvconf as at this point, I have no internet connection - so installation of packages are failing.  In one of my attempts, I did install this upfront; but it did not change the behaviour.</li>
+<li>Addition to 50_openvpn_unpriv not required as the two lines already existed in that file</li>
+<li>Adjusted the permissions</li>
+<li>Nothing to do in original.resolvconf.  File was empty.</li>
+<li>Set Configuration Folder Permissions</li>
+<li>Create OpenVPN systemd service file</li>
+<li>Enabled the systemd service file</li>
+</ul>
+<p>Here, I then went into the troubleshooting debug start steps.  Did a clean restart as I was getting Device or resource busy error message otherwise.  Then on reboot, ran the status command and that is looking good (I think)</p>
+<blockquote>
+<p>user@host:~$ sudo systemctl status openvpn@openvpn<br>
+openvpn@openvpn.service - OpenVPN connection to openvpn<br>
+Loaded: loaded (/lib/systemd/system/openvpn@openvpn.service; enabled; vendor preset: enabled)<br>
+Drop-In: /lib/systemd/system/openvpn@openvpn.service.d<br>
+└─50_unpriv.conf<br>
+Active: active (running) since Wed 2020-10-07 01:17:28 UTC; 5min ago</p>
+<p>Process: 677 ExecStartPre=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --rmtun --dev tun0 (code=exited, status=0/SUCCESS)<br>
+Process: 716 ExecStartPre=/usr/bin/sudo --non-interactive /usr/sbin/openvpn --mktun --dev tun0 --dev-type tun --user tunnel --group<br>
+Main PID: 732 (openvpn)<br>
+Status: “Initialization Sequence Completed”<br>
+Tasks: 1 (limit: 2355)<br>
+Memory: 4.4M<br>
+CGroup: /system.slice/system-openvpn.slice/openvpn@openvpn.service<br>
+└─732 /usr/sbin/openvpn --daemon ovpn-openvpn --status /run/openvpn/openvpn.status 10 --cd /etc/openvpn --config /etc/openv</p>
+<p>Oct 07 01:17:34 host ovpn-openvpn[732]: /usr/bin/ip_unpriv route add 0.0.0.0/1 via 10.7.7.1<br>
+Oct 07 01:17:34 host sudo[1943]:   tunnel : TTY=unknown ; PWD=/etc/openvpn ; USER=root ; COMMAND=/bin/ip route add 0.0.0.0/1 via 10.7.<br>
+Oct 07 01:17:34 host sudo[1943]: pam_unix(sudo:session): session opened for user root by (uid=0)<br>
+Oct 07 01:17:34 host sudo[1943]: pam_unix(sudo:session): session closed for user root<br>
+Oct 07 01:17:34 host ovpn-openvpn[732]: /usr/bin/ip_unpriv route add 128.0.0.0/1 via 10.7.7.1<br>
+Oct 07 01:17:34 host sudo[1945]:   tunnel : TTY=unknown ; PWD=/etc/openvpn ; USER=root ; COMMAND=/bin/ip route add 128.0.0.0/1 via 10.<br>
+Oct 07 01:17:34 host sudo[1945]: pam_unix(sudo:session): session opened for user root by (uid=0)<br>
+Oct 07 01:17:34 host sudo[1945]: pam_unix(sudo:session): session closed for user root<br>
+Oct 07 01:17:34 host ovpn-openvpn[732]: UID set to tunnel<br>
+Oct 07 01:17:34 host ovpn-openvpn[732]: Initialization Sequence Completed</p>
+</blockquote>
+<ul>
+<li>Restarted resolvconf (although probably not required since the whole Workstation was restarted)</li>
+<li>Verified resolv.conf entries does not include local entries. It had two entries, I did not recognise.  Assuming they are VPN providers DNS entries</li>
+<li>Fix whonixcheck</li>
+<li>Ping test worked</li>
+<li>nslookup check torproject worked</li>
+<li>DNS and IP address command returned no response</li>
+</ul>
+<p>Leak Tests<br>
+Regular Application Test - PASSED<br>
+UWT Wrapped Application Test - PASSED</p>
+<p>So,everything looks good - but Tor Browser is not working.  Can’t access any site, clearnet or darknet.</p>
+<p>Thank you in advance</p>
+<p>Cheers,<br>
+MrHyde</p>
+          <p><a href="http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385/1</link>
+        <pubDate>Wed, 07 Oct 2020 03:48:44 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-10385-1</guid>
+        <source url="http://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385.rss">Tor Browser not working - User --&gt; Tor --&gt; VPN --&gt; Internet</source>
+      </item>
+  </channel>
+</rss>

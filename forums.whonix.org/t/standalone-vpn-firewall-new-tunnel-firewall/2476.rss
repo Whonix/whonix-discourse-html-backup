@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Standalone VPN-Firewall (new Tunnel Firewall)</title>
+    <link>http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476</link>
+    <description>Continuing the discussion from [Whonix-13-Workstation VPN-Firewall](https://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/2):
+
+[quote=&quot;Patrick, post:2, topic:2465, full:true&quot;]
+off-topic, you might also be interested in:
+ https://www.whonix.org/wiki/VPN-Firewall
+[/quote]
+
+Working on Qubes!
+
+**Test Setup**
+VM Name: sys-vpn
+VM Type: ProxyVM
+Template: **fedora-23-minimal**
+NetVM: Whonix 12 Gateway
+AppVM: Whonix 13 Workstation DispVM
+
+Fail-closed works!
+sudo openvpn fails! (as it should)
+SocksPorts traffic fails (obviously)
+
+Just to confirm my understanding: the point of using user &#39;tunnel&#39; is if attacker compromises openvpn process, he won&#39;t gain root privileges but be limited to acting as &#39;tunnel&#39;, who does **not** have passwordless-root.
+
+* &#39;tunnel&#39; can change routes but can not alter whonix_firewall, meaning no traffic will bypass the tunnel (nor Tor - by Whonix design). However, tunnel can make connections **through the vpn** to the outside, as can any successful attacker.
+* &#39;tunnel&#39; should not have write access to openvpn.conf; otherwise, he can connect to a different vpn server, effectively bypassing the intended tunnel.
+* &#39;tunnel&#39; is not a member of group &#39;user&#39; but will have read &amp; execute access to most files in /home/user/ given Whonix default permissions. Would it break anything to chmod -R 750/751 /home/user?
+
+Sorry, wasn&#39;t able to check much of the documentation or the build since I didn&#39;t have a Debian handy. On the bright side, I&#39;ve got some notes on how to port to Fedora. :slight_smile: 
+
+    Assuming manual (non-systemd) openvpn launch:
+
+    IN PROXYVM:
+    ## CONFIGURE USER TUNNEL
+    adduser tunnel
+    chown -R tunnel:tunnel /var/run/openvpn
+    ## To use openvpn conf dns script
+    chown tunnel:tunnel /etc/resolv.conf
+    touch /etc/resolv.conf.qubes
+    chown tunnel:tunnel /etc/resolv.conf.qubes
+
+    ## PERSISTENT IPTABLES
+    (https://fedoraproject.org/wiki/FirewallD#Using_static_firewall_rules_with_the_iptables_and_ip6tables_services)
+    (https://docs.fedoraproject.org/en-US/Fedora/11/html/Security_Guide/sect-Security_Guide-IPTables-Saving_IPTables_Rules.html)
+    dnf install iptables-services
+    systemctl mask firewalld.service
+    systemctl enable iptables.service
+    systemctl enable ip6tables.service
+
+    ## VPN-FIREWALL INSTALL
+    clone repository
+    cp /etc/vpn-firewall.d (add Qubes LOCAL_NET)
+    cp /etc/sudoers.d/tunnel-unpriv (change to /sbin/ip)
+    cp /usr/bin/ip-unpriv (change to /sbin/ip)
+    &quot;anondist-ify&quot; /usr/lib/qubes/qubes-setup-dnat-ns
+    cp lib/systemd/system/qubes-iptables.service.d/40_vpn-firewall.conf (customize)
+    cp lib/systemd/system/qubes-firewall.service.d/40_vpn-firewall.conf (customize)
+    systemctl daemon-reload
+
+    edit vpn-firewall (add forward rules)
+    sh ./vpn-firewall start
+    /sbin/service iptables save (will restore rules on reboot)
+
+    IN APPVM:
+    edit /etc/resolv.conf to vpn&#39;s nameserver
+    (which is on proxyvm resolv.conf - just need to query that somehow)
+    no other changes (qvmm firewall is disabled)
+
+
+Minor note (that cost me some hair):
+Whonix TUNNEL_FIREWALL uses **ip_unpriv** (underscore)
+Standalone VPN-FIREWALL uses **ip-unpriv** (hyphen)
+
+And a reminder:
+
+&gt; Signed git tags and commits available. TODO: document how to verify, use some wiki template
+
+Current signing key is expired. Probably can reuse documentation from https://www.whonix.org/wiki/Dev/Build_Documentation/Physical_Isolation#OpenPGP_Verify_the_Source_Code
+
+!PS: Just saw your post to qubes-users but I&#39;m gonna post this anyway cause I started this many hours ago and I want to take my victory lap. :)  Never knew what iptables was before I started using Whonix and never tried Fedora before using Qubes so I&#39;ll grin for a bit before I go read your updates and see everything I did wrong!</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 01 Jun 2016 16:00:15 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Standalone VPN-Firewall (new Tunnel Firewall)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/adrelanos/vpn-firewall/issues/16" target="_blank" rel="nofollow noopener">github.com/adrelanos/vpn-firewall</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/sydii" rel="nofollow noopener">
+<img src="https://avatars1.githubusercontent.com/u/19676623?v=2&amp;s=96" class="thumbnail onebox-avatar" width="420" height="420">
+</a>
+
+<h4><a href="https://github.com/adrelanos/vpn-firewall/issues/16" target="_blank" rel="nofollow noopener">Issue: tun0.openvpn nameserver file not being generated by resolvconf</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/sydii" target="_blank" rel="nofollow noopener">sydii</a>
+	on <a href="https://github.com/adrelanos/vpn-firewall/issues/16" target="_blank" rel="nofollow noopener">2016-06-01</a>
+	</div>
+	<div class="user">
+	closed by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/adrelanos/vpn-firewall/issues/16" target="_blank" rel="nofollow noopener">2016-07-02</a>
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">I spent a few days messing around with the new version of the VPN firewall (on Debian Jessie) and figured out...</pre>
+
+<div class="labels">
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476/4</link>
+        <pubDate>Wed, 01 Jun 2016 16:00:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2476-4</guid>
+        <source url="http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476.rss">Standalone VPN-Firewall (new Tunnel Firewall)</source>
+      </item>
+      <item>
+        <title>Standalone VPN-Firewall (new Tunnel Firewall)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Please also regard:</p>
+<ul>
+<li>Related mailing list discussion on the (non-)sensicalness of VPN-Firewall implementation in Qubes: <a href="https://groups.google.com/forum/#!topic/qubes-devel/9zR_plUWRMA">https://groups.google.com/forum/#!topic/qubes-devel/9zR_plUWRMA</a>
+</li>
+<li>This single comment: <a href="https://github.com/QubesOS/qubes-issues/issues/1941#issuecomment-217220257">https://github.com/QubesOS/qubes-issues/issues/1941#issuecomment-217220257</a>
+</li>
+<li>Comments from here: <a href="https://github.com/QubesOS/qubes-issues/issues/1941#issuecomment-220818746">https://github.com/QubesOS/qubes-issues/issues/1941#issuecomment-220818746</a>
+</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476/3</link>
+        <pubDate>Sun, 22 May 2016 14:24:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2476-3</guid>
+        <source url="http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476.rss">Standalone VPN-Firewall (new Tunnel Firewall)</source>
+      </item>
+      <item>
+        <title>Standalone VPN-Firewall (new Tunnel Firewall)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="2476">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>Template: fedora-23-minimal</p>
+</blockquote>
+</aside>
+<p>To my surprise, because Fedora is entirely unconsidered and untested during development.</p>
+<aside class="quote" data-post="1" data-topic="2476">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>Just to confirm my understanding: the point of using user ‘tunnel’ is if attacker compromises openvpn process, he won’t gain root privileges but be limited to acting as ‘tunnel’, who does not have passwordless-root.</p>
+</blockquote>
+</aside>
+<p>No. None of this. It is to separate out tunnel / vpn traffic from all other traffic. Otherwise from iptables level, there is no way to figure out which traffic is for the VPN. IP/PORT based filtering to allow only traffic to the VPN server alone is insufficient. ( <a href="https://github.com/adrelanos/vpn-firewall/issues/12">https://github.com/adrelanos/vpn-firewall/issues/12</a> )</p>
+<aside class="quote" data-post="1" data-topic="2476">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>Current signing key is expired.</p>
+</blockquote>
+</aside>
+<p>Now updated on <a href="http://whonix.org">whonix.org</a> server.</p>
+<aside class="quote" data-post="1" data-topic="2476">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>Probably can reuse documentation from <a href="https://www.whonix.org/wiki/Dev/Build_Documentation/Physical_Isolation#OpenPGP_Verify_the_Source_Code">https://www.whonix.org/wiki/Dev/Build_Documentation/Physical_Isolation#OpenPGP_Verify_the_Source_Code</a></p>
+</blockquote>
+</aside>
+<p>These can be reused:</p>
+<ul>
+<li><a href="https://www.whonix.org/wiki/Template:Build_Documentation_Build_Package">https://www.whonix.org/wiki/Template:Build_Documentation_Build_Package</a></li>
+<li><a href="https://www.whonix.org/wiki/Dev/Build_Documentation/apparmor-profile-torbrowser">https://www.whonix.org/wiki/Dev/Build_Documentation/apparmor-profile-torbrowser</a></li>
+</ul>
+<aside class="quote" data-post="1" data-topic="2476">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>Just saw your post to qubes-users but I’m gonna post this anyway cause I started this many hours ago and I want to take my victory lap.</p>
+</blockquote>
+</aside>
+<p><img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<aside class="quote" data-post="1" data-topic="2476">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>add Qubes LOCAL_NET</p>
+</blockquote>
+</aside>
+<p>Should no longer be necessary.</p>
+<aside class="quote" data-post="1" data-topic="2476">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>cp /etc/sudoers.d/tunnel-unpriv (change to /sbin/ip)</p>
+</blockquote>
+</aside>
+<aside class="quote" data-post="1" data-topic="2476">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>cp /usr/bin/ip-unpriv (change to /sbin/ip)</p>
+</blockquote>
+</aside>
+<p>If someone ever does the Fedora packaging for VPN-Firewall that could be automated with fedora specific packaging patches.</p>
+          <p><a href="http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476/2</link>
+        <pubDate>Sun, 22 May 2016 13:09:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2476-2</guid>
+        <source url="http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476.rss">Standalone VPN-Firewall (new Tunnel Firewall)</source>
+      </item>
+      <item>
+        <title>Standalone VPN-Firewall (new Tunnel Firewall)</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>Continuing the discussion from <a href="https://forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/2">Whonix-13-Workstation VPN-Firewall</a>:</p>
+<aside class="quote" data-post="2" data-topic="2465" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"><a href="//forums.whonix.org/t/whonix-13-workstation-vpn-firewall/2465/2">Whonix-13-Workstation VPN-Firewall</a>
+</div>
+<blockquote>
+<p>off-topic, you might also be interested in:<br>
+<a href="https://www.whonix.org/wiki/VPN-Firewall">https://www.whonix.org/wiki/VPN-Firewall</a></p>
+</blockquote>
+</aside>
+<p>Working on Qubes!</p>
+<p><strong>Test Setup</strong><br>
+VM Name: sys-vpn<br>
+VM Type: ProxyVM<br>
+Template: <strong>fedora-23-minimal</strong><br>
+NetVM: Whonix 12 Gateway<br>
+AppVM: Whonix 13 Workstation DispVM</p>
+<p>Fail-closed works!<br>
+sudo openvpn fails! (as it should)<br>
+SocksPorts traffic fails (obviously)</p>
+<p>Just to confirm my understanding: the point of using user ‘tunnel’ is if attacker compromises openvpn process, he won’t gain root privileges but be limited to acting as ‘tunnel’, who does <strong>not</strong> have passwordless-root.</p>
+<ul>
+<li>‘tunnel’ can change routes but can not alter whonix_firewall, meaning no traffic will bypass the tunnel (nor Tor - by Whonix design). However, tunnel can make connections <strong>through the vpn</strong> to the outside, as can any successful attacker.</li>
+<li>‘tunnel’ should not have write access to openvpn.conf; otherwise, he can connect to a different vpn server, effectively bypassing the intended tunnel.</li>
+<li>‘tunnel’ is not a member of group ‘user’ but will have read &amp; execute access to most files in /home/user/ given Whonix default permissions. Would it break anything to chmod -R 750/751 /home/user?</li>
+</ul>
+<p>Sorry, wasn’t able to check much of the documentation or the build since I didn’t have a Debian handy. On the bright side, I’ve got some notes on how to port to Fedora. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<pre><code>Assuming manual (non-systemd) openvpn launch:
+
+IN PROXYVM:
+## CONFIGURE USER TUNNEL
+adduser tunnel
+chown -R tunnel:tunnel /var/run/openvpn
+## To use openvpn conf dns script
+chown tunnel:tunnel /etc/resolv.conf
+touch /etc/resolv.conf.qubes
+chown tunnel:tunnel /etc/resolv.conf.qubes
+
+## PERSISTENT IPTABLES
+(https://fedoraproject.org/wiki/FirewallD#Using_static_firewall_rules_with_the_iptables_and_ip6tables_services)
+(https://docs.fedoraproject.org/en-US/Fedora/11/html/Security_Guide/sect-Security_Guide-IPTables-Saving_IPTables_Rules.html)
+dnf install iptables-services
+systemctl mask firewalld.service
+systemctl enable iptables.service
+systemctl enable ip6tables.service
+
+## VPN-FIREWALL INSTALL
+clone repository
+cp /etc/vpn-firewall.d (add Qubes LOCAL_NET)
+cp /etc/sudoers.d/tunnel-unpriv (change to /sbin/ip)
+cp /usr/bin/ip-unpriv (change to /sbin/ip)
+"anondist-ify" /usr/lib/qubes/qubes-setup-dnat-ns
+cp lib/systemd/system/qubes-iptables.service.d/40_vpn-firewall.conf (customize)
+cp lib/systemd/system/qubes-firewall.service.d/40_vpn-firewall.conf (customize)
+systemctl daemon-reload
+
+edit vpn-firewall (add forward rules)
+sh ./vpn-firewall start
+/sbin/service iptables save (will restore rules on reboot)
+
+IN APPVM:
+edit /etc/resolv.conf to vpn's nameserver
+(which is on proxyvm resolv.conf - just need to query that somehow)
+no other changes (qvmm firewall is disabled)
+</code></pre>
+<p>Minor note (that cost me some hair):<br>
+Whonix TUNNEL_FIREWALL uses <strong>ip_unpriv</strong> (underscore)<br>
+Standalone VPN-FIREWALL uses <strong>ip-unpriv</strong> (hyphen)</p>
+<p>And a reminder:</p>
+<blockquote>
+<p>Signed git tags and commits available. TODO: document how to verify, use some wiki template</p>
+</blockquote>
+<p>Current signing key is expired. Probably can reuse documentation from <a href="https://www.whonix.org/wiki/Dev/Build_Documentation/Physical_Isolation#OpenPGP_Verify_the_Source_Code">https://www.whonix.org/wiki/Dev/Build_Documentation/Physical_Isolation#OpenPGP_Verify_the_Source_Code</a></p>
+<p>!PS: Just saw your post to qubes-users but I’m gonna post this anyway cause I started this many hours ago and I want to take my victory lap. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:">  Never knew what iptables was before I started using Whonix and never tried Fedora before using Qubes so I’ll grin for a bit before I go read your updates and see everything I did wrong!</p>
+          <p><a href="http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476/1</link>
+        <pubDate>Sun, 22 May 2016 05:26:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2476-1</guid>
+        <source url="http://forums.whonix.org/t/standalone-vpn-firewall-new-tunnel-firewall/2476.rss">Standalone VPN-Firewall (new Tunnel Firewall)</source>
+      </item>
+  </channel>
+</rss>

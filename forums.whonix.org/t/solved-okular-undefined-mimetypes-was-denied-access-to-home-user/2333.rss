@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</title>
+    <link>http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333</link>
+    <description>[s]Qubes-Whonix-12
+Followed steps from https://www.whonix.org/wiki/AppArmor to set kernelopts for Whonix Templates and existing AppVMs.
+Installed AppArmor Profiles from Whonix Testers Repository. Reboot all VMs.
+In existing AppVMs, okular &amp; gwenview behave as expected: access (rw) is granted to /home/user/ and /home/user/Downloads. access (r) is denied to /home/user/somethingelse.
+Created new AppVMs based on existing Templates. kernelopts are inherited. env var $HOME=/home/user. Running okular generates many DENIED operations (not present on Existing AppVMs):[/s]
+
+    Apr 15 22:23:20 host kernel: [   17.718374] audit: type=1400 audit(1460759000.626:17): apparmor=&quot;DENIED&quot; operation=&quot;exec&quot; profile=&quot;/usr/bin/okular&quot; name=&quot;/bin/dash&quot; pid=2044 comm=&quot;okular&quot; requested_mask=&quot;x&quot; denied_mask=&quot;x&quot; fsuid=1000 ouid=0
+    Apr 15 22:23:20 host kernel: [   17.779099] audit: type=1400 audit(1460759000.686:18): apparmor=&quot;DENIED&quot; operation=&quot;exec&quot; profile=&quot;/usr/bin/okular&quot; name=&quot;/bin/dash&quot; pid=2048 comm=&quot;kdeinit4&quot; requested_mask=&quot;x&quot; denied_mask=&quot;x&quot; fsuid=1000 ouid=0
+    Apr 15 22:23:20 host kernel: [   17.825963] audit: type=1400 audit(1460759000.732:19): apparmor=&quot;DENIED&quot; operation=&quot;open&quot; profile=&quot;/usr/bin/okular&quot; name=&quot;/usr/share/kde-power-savings-disable-in-vms/share/config/kdedrc&quot; pid=2050 comm=&quot;kded4&quot; requested_mask=&quot;r&quot; denied_mask=&quot;r&quot; fsuid=1000 ouid=0
+    Apr 15 22:23:20 host kernel: [   17.826143] audit: type=1400 audit(1460759000.733:20): apparmor=&quot;DENIED&quot; operation=&quot;open&quot; profile=&quot;/usr/bin/okular&quot; name=&quot;/usr/share/kde-lowfat/share/config/kdedrc&quot; pid=2050 comm=&quot;kded4&quot; requested_mask=&quot;r&quot; denied_mask=&quot;r&quot; fsuid=1000 ouid=0
+    Apr 15 22:23:20 host kernel: [   17.973326] audit: type=1400 audit(1460759000.880:21): apparmor=&quot;DENIED&quot; operation=&quot;open&quot; profile=&quot;/usr/bin/okular&quot; name=&quot;/usr/share/kde-power-savings-disable-in-vms/share/config/kdedrc&quot; pid=2051 comm=&quot;kded4&quot; requested_mask=&quot;r&quot; denied_mask=&quot;r&quot; fsuid=1000 ouid=0
+    Apr 15 22:23:20 host kernel: [   17.973367] audit: type=1400 audit(1460759000.880:22): apparmor=&quot;DENIED&quot; operation=&quot;open&quot; profile=&quot;/usr/bin/okular&quot; name=&quot;/usr/share/kde-lowfat/share/config/kdedrc&quot; pid=2051 comm=&quot;kded4&quot; requested_mask=&quot;r&quot; denied_mask=&quot;r&quot; fsuid=1000 ouid=0
+    Apr 15 22:23:20 host kernel: [   18.040736] audit: type=1400 audit(1460759000.947:23): apparmor=&quot;DENIED&quot; operation=&quot;open&quot; profile=&quot;/usr/bin/okular&quot; name=&quot;/usr/share/mime/&quot; pid=2052 comm=&quot;kbuildsycoca4&quot; requested_mask=&quot;r&quot; denied_mask=&quot;r&quot; fsuid=1000 ouid=0
+    Apr 15 22:23:20 host kernel: [   18.040758] audit: type=1400 audit(1460759000.947:24): apparmor=&quot;DENIED&quot; operation=&quot;open&quot; profile=&quot;/usr/bin/okular&quot; name=&quot;/home/user/.kde/share/kde4/services/&quot; pid=2052 comm=&quot;kbuildsycoca4&quot; requested_mask=&quot;r&quot; denied_mask=&quot;r&quot; fsuid=1000 ouid=1000
+    Apr 15 22:23:20 host kernel: [   18.040775] audit: type=1400 audit(1460759000.947:25): apparmor=&quot;DENIED&quot; operation=&quot;open&quot; profile=&quot;/usr/bin/okular&quot; name=&quot;/usr/share/kde-power-savings-disable-in-vms/share/kde4/services/&quot; pid=2052 comm=&quot;kbuildsycoca4&quot; requested_mask=&quot;r&quot; denied_mask=&quot;r&quot; fsuid=1000 ouid=0
+    Apr 15 22:23:20 host kernel: [   18.088457] audit: type=1400 audit(1460759000.995:26): apparmor=&quot;DENIED&quot; operation=&quot;open&quot; profile=&quot;/usr/bin/okular&quot; name=&quot;/usr/share/kde-power-savings-disable-in-vms/share/kde4/services/plasma-applet-batterymonitor.desktop&quot; pid=2052 comm=&quot;kbuildsycoca4&quot; requested_mask=&quot;r&quot; denied_mask=&quot;r&quot; fsuid=1000 ouid=0
+
+[s]Also, DENIED access to /home/user:[/s]
+
+    Apr 15 23:43:29 host kernel: [ 4827.022576] audit: type=1400 audit(1460763809.929:108): apparmor=&quot;DENIED&quot; operation=&quot;open&quot; profile=&quot;/usr/bin/okular&quot; name=&quot;/home/user/&quot; pid=3910 comm=&quot;kio_file&quot; requested_mask=&quot;r&quot; denied_mask=&quot;r&quot; fsuid=1000 ouid=1000`
+
+[s]Tried aa-complain, followed by aa-logprof. No changes proposed.
+Tried aa-disable /etc/apparmor.d/usr.bin.okular. Still no access to /home/user.
+Maybe not apparmor related?
+Feels like I need to initialize something without apparmor present?[/s]</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 01 May 2016 03:48:04 +0000</lastBuildDate>
+    <category>AppArmor</category>
+    <atom:link href="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>what a mess… disregard all of the above…</p>
+<p>In a nutshell:</p>
+<ol>
+<li>enabled apparmor in template vm, installed apparmor-profiles-whonix</li>
+<li>any appVM based on that template (even with apparmor disabled in kernelopts) can not open jpg files in okular</li>
+</ol>
+<p>Before changes to template vm, this issue was not present.</p>
+<p><strong>Solution</strong>: run <code>kbuildsycoca4</code>. No idea why. Something related to apparmor install modified <code>/var/tmp/kdecache-user/ksycoca4</code>.</p>
+<p>Okular apparmor profile is fine.</p>
+<p>While troubleshooting, discovered that aa-logprof wasn’t doing anything at all… <a href="https://forums.whonix.org/t/apparmor-and-whonix/1092/4?u=entr0py">AppArmor and Whonix</a></p>
+          <p><a href="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333/6</link>
+        <pubDate>Sun, 01 May 2016 03:48:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2333-6</guid>
+        <source url="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333.rss">[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</source>
+      </item>
+      <item>
+        <title>[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="4" data-topic="2333">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>Not sure if aa-logprof can change other profiles.</p>
+</blockquote>
+</aside>
+<p><span class="bbcode-s"><br>
+Here are the ALLOWED operations from /var/log/kern.log while in complain mode:<br>
+</span></p>
+<pre><code>Apr 20 20:26:26 host kernel: [   81.512181] audit: type=1400 audit(1461183986.583:18): apparmor="ALLOWED" operation="exec" profile="/usr/bin/okular" name="/bin/dash" pid=1920 comm="okular" requested_mask="x" denied_mask="x" fsuid=1000 ouid=0 target="/usr/bin/okular//null-1"
+Apr 20 20:26:26 host kernel: [   81.513188] audit: type=1400 audit(1461183986.584:19): apparmor="ALLOWED" operation="open" profile="/usr/bin/okular//null-1" name="/etc/ld.so.cache" pid=1920 comm="sh" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+Apr 20 20:26:26 host kernel: [   81.513200] audit: type=1400 audit(1461183986.584:20): apparmor="ALLOWED" operation="getattr" profile="/usr/bin/okular//null-1" name="/etc/ld.so.cache" pid=1920 comm="sh" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+Apr 20 20:26:26 host kernel: [   81.513226] audit: type=1400 audit(1461183986.584:21): apparmor="ALLOWED" operation="open" profile="/usr/bin/okular//null-1" name="/lib/x86_64-linux-gnu/libc-2.19.so" pid=1920 comm="sh" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+Apr 20 20:26:26 host kernel: [   81.513242] audit: type=1400 audit(1461183986.584:22): apparmor="ALLOWED" operation="getattr" profile="/usr/bin/okular//null-1" name="/lib/x86_64-linux-gnu/libc-2.19.so" pid=1920 comm="sh" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+Apr 20 20:26:26 host kernel: [   81.513252] audit: type=1400 audit(1461183986.584:23): apparmor="ALLOWED" operation="file_mmap" profile="/usr/bin/okular//null-1" name="/lib/x86_64-linux-gnu/libc-2.19.so" pid=1920 comm="sh" requested_mask="mr" denied_mask="mr" fsuid=1000 ouid=0
+Apr 20 20:26:26 host kernel: [   81.513422] audit: type=1400 audit(1461183986.584:24): apparmor="ALLOWED" operation="file_mprotect" profile="/usr/bin/okular//null-1" name="/bin/dash" pid=1920 comm="sh" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+Apr 20 20:26:26 host kernel: [   81.513439] audit: type=1400 audit(1461183986.584:25): apparmor="ALLOWED" operation="file_mprotect" profile="/usr/bin/okular//null-1" name="/lib/x86_64-linux-gnu/ld-2.19.so" pid=1920 comm="sh" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+Apr 20 20:26:26 host kernel: [   81.513588] audit: type=1400 audit(1461183986.584:26): apparmor="ALLOWED" operation="getattr" profile="/usr/bin/okular//null-1" name="/home/user/" pid=1920 comm="sh" requested_mask="r" denied_mask="r" fsuid=1000 ouid=1000
+Apr 20 20:26:34 host kernel: [   89.113878] audit_printk_skb: 288 callbacks suppressed
+Apr 20 20:26:34 host kernel: [   89.113896] audit: type=1400 audit(1461183994.184:123): apparmor="ALLOWED" operation="open" profile="/usr/bin/okular" name="/home/user/" pid=1919 comm="okular" requested_mask="r" denied_mask="r" fsuid=1000 ouid=1000
+Apr 20 20:26:34 host kernel: [   89.114753] audit: type=1400 audit(1461183994.185:124): apparmor="ALLOWED" operation="open" profile="/usr/bin/okular" name="/home/user/" pid=1919 comm="okular" requested_mask="r" denied_mask="r" fsuid=1000 ouid=1000
+Apr 20 20:26:34 host kernel: [   89.124746] audit: type=1400 audit(1461183994.195:125): apparmor="ALLOWED" operation="open" profile="/usr/bin/okular" name="/home/user/" pid=1949 comm="kio_file" requested_mask="r" denied_mask="r" fsuid=1000 ouid=1000
+</code></pre>
+<p><span class="bbcode-s"><br>
+abstractions/base has a line:<br>
+<code>/lib/@{multiarch}/** r,</code> and<br>
+<code>/lib/@{multiarch}/lib*.so* mr,</code><br>
+which should cover the libc permissions?<br>
+</span></p>
+          <p><a href="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333/5</link>
+        <pubDate>Wed, 20 Apr 2016 20:33:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2333-5</guid>
+        <source url="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333.rss">[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</source>
+      </item>
+      <item>
+        <title>[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p><span class="bbcode-s"><strong>Solution (or something)</strong><br>
+Before first Okular run,<br>
+<code>sudo aa-complain /usr/bin/okular</code><br>
+Launch Okular, navigate file open dialog, open jpeg file, quit.<br>
+<code>sudo aa-logprof</code><br>
+says profiles updated in /etc/apparmor.d though no interactions are presented to user. Checked usr.bin.okular and no changes made. Not sure if aa-logprof can change other profiles.<br>
+<code>sudo aa-enforce /usr/bin/okular</code><br>
+Run Okular and now able to open jpeg files…<br>
+This was performed in AppVM and does not persist across reboots. Must be performed in TemplateVM which is bad because we do not want to run executables in our template. Real solution is to find out cause of error in profile. Help please!</span></p>
+          <p><a href="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333/4</link>
+        <pubDate>Wed, 20 Apr 2016 20:21:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2333-4</guid>
+        <source url="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333.rss">[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</source>
+      </item>
+      <item>
+        <title>[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p>Qubes Whonix 12</p>
+<p>New AppVM based on Whonix-Workstation-12 template with apparmor kernelopts and apparmor-profiles from Whonix Testers Repository. (following <a href="https://www.whonix.org/wiki/AppArmor">https://www.whonix.org/wiki/AppArmor</a>)</p>
+<p>Okular with default profile enabled can not open a jpeg file.</p>
+<p>Error message:</p>
+<pre><code>okular(2046)/kdecore (trader) mimeTypeSycocaServiceOffers: KMimeTypeTrader: mimeType "image/jpeg" not found 
+okular(2046)/okular (app) Okular::Document::openDocument: No plugin for mimetype '"image/jpeg"'.
+</code></pre>
+<p>In addition, first run per boot produces numerous kbuildsycoca4 messages.</p>
+<p>Some samples:</p>
+<pre><code>kbuildsycoca4(2055) KBuildSycoca::checkTimestamps: checking file timestamps
+kbuildsycoca4(2055) KBuildSycoca::checkDirTimestamps: timestamp changed: "/usr/share/kde4/servicetypes/"
+kbuildsycoca4(2055) kdemain: Reusing existing ksycoca
+kbuildsycoca4(2055) KBuildSycoca::recreate: Recreating ksycoca file ("/var/tmp/kdecache-user/ksycoca4", version 241)
+kbuildsycoca4(2055) KBuildSycoca::createEntry: new: "kateplugin.desktop" in servicetypes
+kbuildsycoca4(2055) KBuildSycoca::createEntry: modified: "qvm-dvm.desktop" in services
+kbuildsycoca4(2055) KBuildSycoca::createEntry: new: "katetabifyplugin.desktop" in services
+kbuildsycoca4(2055) KBuildSycoca::createEntry: new: "katemailfilesplugin.desktop" in services
+...
+kbuildsycoca4(2055) KBuildSycoca::build: Still in the time dict (i.e. deleted files) ("apps", "xdgdata-mime")
+kbuildsycoca4(2055) VFolderMenu::pushDocInfo: Menu "debian-menu.menu" not found.
+kbuildsycoca4(2055) VFolderMenu::pushDocInfo: Menu "applications-kmenuedit.menu" not found.
+kbuildsycoca4(2055) VFolderMenu::processMenu: Processing KDE Legacy dirs for &lt;KDE&gt;
+kbuildsycoca4(2055) VFolderMenu::processKDELegacyDirs:
+kbuildsycoca4(2055) VFolderMenu::loadApplications: Looking up applications under "/usr/share/applications/"
+kbuildsycoca4(2055) KBuildSycoca::createEntry: modified: "/usr/share/applications/display-im6.q16.desktop" in apps
+kbuildsycoca4(2055) KBuildSycoca::createEntry: modified: "/usr/share/applications/display-im6.desktop" in apps
+kbuildsycoca4(2055) KBuildSycoca::createEntry: modified: "/usr/share/applications/iceweasel.desktop" in apps
+...
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "/usr/share/applications/display-im6.q16.desktop" specifies undefined mimetype/servicetype "image/avs"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "/usr/share/applications/display-im6.q16.desktop" specifies undefined mimetype/servicetype "image/bie"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "/usr/share/applications/display-im6.q16.desktop" specifies undefined mimetype/servicetype "image/x-ms-bmp"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "/usr/share/applications/display-im6.q16.desktop" specifies undefined mimetype/servicetype "image/cmyk"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "/usr/share/applications/display-im6.q16.desktop" specifies undefined mimetype/servicetype "image/dcx"
+...
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "phononbackends/vlc.desktop" specifies undefined mimetype/servicetype "audio/mpeg3"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "phononbackends/vlc.desktop" specifies undefined mimetype/servicetype "audio/vnd.rn-realmedia"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "phononbackends/vlc.desktop" specifies undefined mimetype/servicetype "audio/x-16sv"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "phononbackends/vlc.desktop" specifies undefined mimetype/servicetype "audio/x-8svx"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "phononbackends/vlc.desktop" specifies undefined mimetype/servicetype "audio/x-basic"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "phononbackends/vlc.desktop" specifies undefined mimetype/servicetype "audio/x-mpeg2"
+...
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "/usr/share/applications/vlc.desktop" specifies undefined mimetype/servicetype "audio/x-pn-aiff"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "/usr/share/applications/vlc.desktop" specifies undefined mimetype/servicetype "audio/x-pn-au"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "/usr/share/applications/vlc.desktop" specifies undefined mimetype/servicetype "audio/x-pn-wav"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "/usr/share/applications/vlc.desktop" specifies undefined mimetype/servicetype "audio/x-pn-windows-acm"
+kbuildsycoca4(2055) KBuildServiceFactory::populateServiceTypes: "/usr/share/applications/vlc.desktop" specifies undefined mimetype/servicetype "application/x-extension-mp4"</code></pre>
+          <p><a href="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333/3</link>
+        <pubDate>Wed, 20 Apr 2016 20:12:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2333-3</guid>
+        <source url="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333.rss">[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</source>
+      </item>
+      <item>
+        <title>[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="2333">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"> entr0py:</div>
+<blockquote>
+<p>Feels like I need to initialize something without apparmor present?</p>
+</blockquote>
+</aside>
+<p><span class="bbcode-s">Changed new AppVM kernelopts to “nopat”.<br>
+Launched okular &amp; gwenview, navigated to /home/user/, viewed .jpg without any issues.<br>
+Changed new AppVM kernelopts back to "noapt apparmor=1 security=apparmor"<br>
+All DENIED messages still present. <img src="//forums.whonix.org/images/emoji/twitter/frowning.png?v=5" title=":frowning:" class="emoji" alt=":frowning:"><br>
+Not sure what is different about this new AppVM vs my existing AppVMs… (All based on original, non-upgraded Whonix-12 templates)</span></p>
+          <p><a href="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333/2</link>
+        <pubDate>Sat, 16 Apr 2016 20:46:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2333-2</guid>
+        <source url="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333.rss">[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</source>
+      </item>
+      <item>
+        <title>[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <p><span class="bbcode-s">Qubes-Whonix-12<br>
+Followed steps from <a href="https://www.whonix.org/wiki/AppArmor">https://www.whonix.org/wiki/AppArmor</a> to set kernelopts for Whonix Templates and existing AppVMs.<br>
+Installed AppArmor Profiles from Whonix Testers Repository. Reboot all VMs.<br>
+In existing AppVMs, okular &amp; gwenview behave as expected: access (rw) is granted to /home/user/ and /home/user/Downloads. access ® is denied to /home/user/somethingelse.<br>
+Created new AppVMs based on existing Templates. kernelopts are inherited. env var $HOME=/home/user. Running okular generates many DENIED operations (not present on Existing AppVMs):</span></p>
+<pre><code>Apr 15 22:23:20 host kernel: [   17.718374] audit: type=1400 audit(1460759000.626:17): apparmor="DENIED" operation="exec" profile="/usr/bin/okular" name="/bin/dash" pid=2044 comm="okular" requested_mask="x" denied_mask="x" fsuid=1000 ouid=0
+Apr 15 22:23:20 host kernel: [   17.779099] audit: type=1400 audit(1460759000.686:18): apparmor="DENIED" operation="exec" profile="/usr/bin/okular" name="/bin/dash" pid=2048 comm="kdeinit4" requested_mask="x" denied_mask="x" fsuid=1000 ouid=0
+Apr 15 22:23:20 host kernel: [   17.825963] audit: type=1400 audit(1460759000.732:19): apparmor="DENIED" operation="open" profile="/usr/bin/okular" name="/usr/share/kde-power-savings-disable-in-vms/share/config/kdedrc" pid=2050 comm="kded4" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+Apr 15 22:23:20 host kernel: [   17.826143] audit: type=1400 audit(1460759000.733:20): apparmor="DENIED" operation="open" profile="/usr/bin/okular" name="/usr/share/kde-lowfat/share/config/kdedrc" pid=2050 comm="kded4" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+Apr 15 22:23:20 host kernel: [   17.973326] audit: type=1400 audit(1460759000.880:21): apparmor="DENIED" operation="open" profile="/usr/bin/okular" name="/usr/share/kde-power-savings-disable-in-vms/share/config/kdedrc" pid=2051 comm="kded4" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+Apr 15 22:23:20 host kernel: [   17.973367] audit: type=1400 audit(1460759000.880:22): apparmor="DENIED" operation="open" profile="/usr/bin/okular" name="/usr/share/kde-lowfat/share/config/kdedrc" pid=2051 comm="kded4" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+Apr 15 22:23:20 host kernel: [   18.040736] audit: type=1400 audit(1460759000.947:23): apparmor="DENIED" operation="open" profile="/usr/bin/okular" name="/usr/share/mime/" pid=2052 comm="kbuildsycoca4" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+Apr 15 22:23:20 host kernel: [   18.040758] audit: type=1400 audit(1460759000.947:24): apparmor="DENIED" operation="open" profile="/usr/bin/okular" name="/home/user/.kde/share/kde4/services/" pid=2052 comm="kbuildsycoca4" requested_mask="r" denied_mask="r" fsuid=1000 ouid=1000
+Apr 15 22:23:20 host kernel: [   18.040775] audit: type=1400 audit(1460759000.947:25): apparmor="DENIED" operation="open" profile="/usr/bin/okular" name="/usr/share/kde-power-savings-disable-in-vms/share/kde4/services/" pid=2052 comm="kbuildsycoca4" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+Apr 15 22:23:20 host kernel: [   18.088457] audit: type=1400 audit(1460759000.995:26): apparmor="DENIED" operation="open" profile="/usr/bin/okular" name="/usr/share/kde-power-savings-disable-in-vms/share/kde4/services/plasma-applet-batterymonitor.desktop" pid=2052 comm="kbuildsycoca4" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+</code></pre>
+<p><span class="bbcode-s">Also, DENIED access to /home/user:</span></p>
+<pre><code>Apr 15 23:43:29 host kernel: [ 4827.022576] audit: type=1400 audit(1460763809.929:108): apparmor="DENIED" operation="open" profile="/usr/bin/okular" name="/home/user/" pid=3910 comm="kio_file" requested_mask="r" denied_mask="r" fsuid=1000 ouid=1000`
+</code></pre>
+<p><span class="bbcode-s">Tried aa-complain, followed by aa-logprof. No changes proposed.<br>
+Tried aa-disable /etc/apparmor.d/usr.bin.okular. Still no access to /home/user.<br>
+Maybe not apparmor related?<br>
+Feels like I need to initialize something without apparmor present?</span></p>
+          <p><a href="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333/1</link>
+        <pubDate>Fri, 15 Apr 2016 23:57:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-2333-1</guid>
+        <source url="http://forums.whonix.org/t/solved-okular-undefined-mimetypes-was-denied-access-to-home-user/2333.rss">[Solved] Okular Undefined Mimetypes (was: Denied access to /home/user/)</source>
+      </item>
+  </channel>
+</rss>

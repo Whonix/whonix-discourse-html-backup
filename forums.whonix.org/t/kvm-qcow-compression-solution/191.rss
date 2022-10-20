@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>KVM (qcow) Compression Solution</title>
+    <link>http://forums.whonix.org/t/kvm-qcow-compression-solution/191</link>
+    <description>I just started to test out KVM version; both the downloaded one and one I compiled from source (the one I compiled from source was missing a kernel though, I will post that in new topic).
+
+My host system I downloaded the &#39;Whonix-Gateway-8.tar.gz&#39; file is Ubuntu Server 14.04 running btrfs file system.  When I extract the file it is 100G.  Also, when I built the file from source, the final qcow2 image in &#39;whonix_binary&#39; was also 100G.
+
+In order to be able to untar the qcow2 file at the expected size of 2.6G and not 100G I would suggest you add one more step to the build process as shown in the example below.
+
+Running qemu-img convert on the freshly created qcow2 image will compress it and allow it to be extracted from a tar at the 2.6G file size instead of the 100G file size.  The qcow2 image itself is reduced from 100G to 2.6G as also shown and the tar.gz image is still 1.2G.  As you will note we are converting a qcow2 to a qcow2 :)
+[code]
+qemu-img convert -O qcow2 Whonix-Gateway-8.qcow2 Whonix-Gateway-8-downloaded.qcow2
+[/code]
+
+Sample output:
+[code]
+# ls -l
+&gt; -rw-r--r--  1 root root 107390828544 Feb 20 18:48 Whonix-Gateway-8.qcow2
+&gt; -rw-r--r--  1 root root   1211742737 Feb 26 07:55 Whonix-Gateway-8.tar.gz
+
+# qemu-img convert -O qcow2 Whonix-Gateway-8.qcow2 Whonix-Gateway-8-downloaded.qcow2
+
+&gt; -rw-r--r--  1 root root   2233729024 Mar 23 17:19 Whonix-Gateway-8-downloaded.qcow2
+&gt; -rw-r--r--  1 root root 107390828544 Feb 20 18:48 Whonix-Gateway-8.qcow2
+&gt; -rw-r--r--  1 root root   1211742737 Feb 26 07:55 Whonix-Gateway-8.tar.gz
+[/code]</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 24 Mar 2014 09:17:17 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/kvm-qcow-compression-solution/191.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>KVM (qcow) Compression Solution</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>As promised, here are the results.</p>
+<p>Without needing to study the results closely my conclusion is that it appears preallocation of the metadata has file system thinking its fully allocated.  Since the container is only using the expected 2.6G everything seems fine.  Its just a bit confusing.</p>
+<p>Thank you for taking the time to respond to this and I hope this thread will find useful for someone else in the future as well.</p>
+<pre><code class="lang-auto">## Grab Whonix Gateway from Sourceforge
+# wget http://downloads.sourceforge.net/project/whonix/current/8/Whonix-Gateway-8.tar.gz
+
+## File size of download
+# ls -lh
+-rw-r--r-- 1 root         root 1.2G Feb 26 07:55 Whonix-Gateway-8.tar.gz
+
+## Un-tar; some unknown keyword?
+# tar xvfz Whonix-Gateway-8.tar.gz 
+tar: Ignoring unknown extended header keyword 'LIBARCHIVE.xattr.security.selinux'
+Whonix-Gateway-8.qcow2
+
+## Uncompressed file look really big, but is it?
+# ls -lh
+-rw-r--r-- 1 1000 1000 101G Feb 20 18:48 Whonix-Gateway-8.qcow2
+-rw-r--r-- 1 root root 1.2G Feb 26 07:55 Whonix-Gateway-8.tar.gz
+
+## Apparently it just looks big since du is showing sparse size
+# du -h --apparent-size Whonix-Gateway-8.qcow2 &amp;&amp; du -h --apparent-size Whonix-Gateway-8.qcow2 
+101G    Whonix-Gateway-8.qcow2
+2.5G    Whonix-Gateway-8.qcow2
+
+## Ok, lets convert it as requested to see result.  
+# qemu-img convert -o cluster_size=2M -o preallocation=metadata -O qcow2 Whonix-Gateway-8.qcow2 Whonix-Gateway-8-downloaded.qcow2
+# ls -lh
+-rw-r--r-- 1 root root 101G Mar 24 04:51 Whonix-Gateway-8-downloaded.qcow2
+-rw-r--r-- 1 1000 1000 101G Feb 20 18:48 Whonix-Gateway-8.qcow2
+-rw-r--r-- 1 root root 1.2G Feb 26 07:55 Whonix-Gateway-8.tar.gz
+
+## Result is the same as extracted downloaded file; looks big but only taking up 2.5G disk space
+# du -h --apparent-size Whonix-Gateway-8-downloaded.qcow2 &amp;&amp; du -h Whonix-Gateway-8-downloaded.qcow2 
+101G    Whonix-Gateway-8-downloaded.qcow2
+2.5G    Whonix-Gateway-8-downloaded.qcow2
+
+## So lets convert it without the -o cluster_size=2M -o preallocation=metadata options
+# qemu-img convert -O qcow2 Whonix-Gateway-8.qcow2 Whonix-Gateway-8-downloaded-no-special-options.qcow2
+-rw-r--r-- 1 root root 2.6G Mar 24 04:54 Whonix-Gateway-8-downloaded-no-special-options.qcow2
+-rw-r--r-- 1 root root 101G Mar 24 04:51 Whonix-Gateway-8-downloaded.qcow2
+-rw-r--r-- 1 1000 1000 101G Feb 20 18:48 Whonix-Gateway-8.qcow2
+-rw-r--r-- 1 root root 1.2G Feb 26 07:55 Whonix-Gateway-8.tar.gz
+
+# Well, 'df -h' now shows actual size used on disk
+# du -h --apparent-size Whonix-Gateway-8-downloaded-no-special-options.qcow2 &amp;&amp; du -h Whonix-Gateway-8-downloaded-no-special-options.qcow2 
+2.6G   Whonix-Gateway-8-downloaded-no-special-options.qcow2
+2.6G   Whonix-Gateway-8-downloaded-no-special-options.qcow2</code></pre>
+          <p><a href="http://forums.whonix.org/t/kvm-qcow-compression-solution/191/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kvm-qcow-compression-solution/191/4</link>
+        <pubDate>Mon, 24 Mar 2014 09:17:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-191-4</guid>
+        <source url="http://forums.whonix.org/t/kvm-qcow-compression-solution/191.rss">KVM (qcow) Compression Solution</source>
+      </item>
+      <item>
+        <title>KVM (qcow) Compression Solution</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>I will provide all my results as request, most likely, tomorrow since my raid array is currently rebuilding (switching from raid 6 to raid 5 on-the-fly).  I already deleted the images since I was running out of disk space but can copy them back when its complete.</p>
+          <p><a href="http://forums.whonix.org/t/kvm-qcow-compression-solution/191/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kvm-qcow-compression-solution/191/3</link>
+        <pubDate>Mon, 24 Mar 2014 01:56:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-191-3</guid>
+        <source url="http://forums.whonix.org/t/kvm-qcow-compression-solution/191.rss">KVM (qcow) Compression Solution</source>
+      </item>
+      <item>
+        <title>KVM (qcow) Compression Solution</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="191">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"> nrgaway:</div>
+<blockquote>
+<p>I just started to test out KVM version; both the downloaded one and one I compiled from source (the one I compiled from source was missing a kernel though, I will post that in new topic).</p>
+</blockquote>
+</aside>
+<p>For reference, my answer is here:<br>
+<a href="https://www.whonix.org/forum/index.php/topic,203.msg1269.html#msg1269" class="onebox" target="_blank">https://www.whonix.org/forum/index.php/topic,203.msg1269.html#msg1269</a></p>
+<blockquote>My host system I downloaded the 'Whonix-Gateway-8.tar.gz' file is Ubuntu Server 14.04 running btrfs file system.  When I extract the file it is 100G.  Also, when I built the file from source, the final qcow2 image in 'whonix_binary' was also 100G.</blockquote>
+Are you sure about this? Please run the following commands (adjust file names):
+<p><code>du -h --apparent-size file.img
+du -h file.img</code><br>
+And share the results here.</p>
+<blockquote>In order to be able to untar the qcow2 file at the expected size of 2.6G and not 100G I would suggest you add one more step to the build process as shown in the example below.
+<p>Running qemu-img convert on the freshly created qcow2 image will compress it and allow it to be extracted from a tar at the 2.6G file size instead of the 100G file size.  The qcow2 image itself is reduced from 100G to 2.6G as also shown and the tar.gz image is still 1.2G.  As you will note we are converting a qcow2 to a qcow2 <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<pre><code class="lang-auto">qemu-img convert -O qcow2 Whonix-Gateway-8.qcow2 Whonix-Gateway-8-downloaded.qcow2</code></pre>
+<p>Sample output:</p>
+<p>[code]</p>
+<h1>ls -l</h1>
+<blockquote>
+<p>-rw-r–r--  1 root root 107390828544 Feb 20 18:48 Whonix-Gateway-8.qcow2<br>
+-rw-r–r--  1 root root   1211742737 Feb 26 07:55 Whonix-Gateway-8.tar.gz</p>
+</blockquote>
+<h1>qemu-img convert -O qcow2 Whonix-Gateway-8.qcow2 Whonix-Gateway-8-downloaded.qcow2</h1>
+<blockquote>
+<p>-rw-r–r--  1 root root   2233729024 Mar 23 17:19 Whonix-Gateway-8-downloaded.qcow2<br>
+-rw-r–r--  1 root root 107390828544 Feb 20 18:48 Whonix-Gateway-8.qcow2<br>
+-rw-r–r--  1 root root   1211742737 Feb 26 07:55 Whonix-Gateway-8.tar.gz<br>
+[/code]</p>
+</blockquote>
+</blockquote>
+<p>Converting from qcow2 to qcow2 during the build process sounds like a hack. This “compression” should be possible with one command?</p>
+<p>By the way, latest implementation can be found here:<br>
+<a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/2400_convert-img-to-qcow2" class="onebox" target="_blank">https://github.com/Whonix/Whonix/blob/master/build-steps.d/2400_convert-img-to-qcow2</a><br>
+<a href="https://github.com/Whonix/whonix-developer-meta-files/blob/master/release/compress_qcow2" class="onebox" target="_blank">https://github.com/Whonix/whonix-developer-meta-files/blob/master/release/compress_qcow2</a></p>
+<p>I am happy to entertain suggestions.</p>
+<p>When “converting qcow2 to qcow2” I guess what we are doing is loosing these two options.</p>
+<p><code>-o cluster_size=2M
+-o preallocation=metadata</code></p>
+<p>I guess when you add these options, no size will be saved? Can you try please? Please share your “du -h --apparent-size file.img” and “du -h file.img” results.</p>
+<p>If you’re interested why we are using these settings in the first place, see:</p>
+<ul>
+<li><a href="https://www.whonix.org/wiki/Dev/KVM#Set_cluster_size_512_-_2MB_for_better_performance.3F">https://www.whonix.org/wiki/Dev/KVM#Set_cluster_size_512_-_2MB_for_better_performance.3F</a></li>
+<li><a href="https://www.whonix.org/wiki/Dev/KVM#metadata_preallocated_images">https://www.whonix.org/wiki/Dev/KVM#metadata_preallocated_images</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/kvm-qcow-compression-solution/191/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kvm-qcow-compression-solution/191/2</link>
+        <pubDate>Mon, 24 Mar 2014 00:39:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-191-2</guid>
+        <source url="http://forums.whonix.org/t/kvm-qcow-compression-solution/191.rss">KVM (qcow) Compression Solution</source>
+      </item>
+      <item>
+        <title>KVM (qcow) Compression Solution</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>I just started to test out KVM version; both the downloaded one and one I compiled from source (the one I compiled from source was missing a kernel though, I will post that in new topic).</p>
+<p>My host system I downloaded the ‘Whonix-Gateway-8.tar.gz’ file is Ubuntu Server 14.04 running btrfs file system.  When I extract the file it is 100G.  Also, when I built the file from source, the final qcow2 image in ‘whonix_binary’ was also 100G.</p>
+<p>In order to be able to untar the qcow2 file at the expected size of 2.6G and not 100G I would suggest you add one more step to the build process as shown in the example below.</p>
+<p>Running qemu-img convert on the freshly created qcow2 image will compress it and allow it to be extracted from a tar at the 2.6G file size instead of the 100G file size.  The qcow2 image itself is reduced from 100G to 2.6G as also shown and the tar.gz image is still 1.2G.  As you will note we are converting a qcow2 to a qcow2 <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<pre><code class="lang-auto">qemu-img convert -O qcow2 Whonix-Gateway-8.qcow2 Whonix-Gateway-8-downloaded.qcow2</code></pre>
+<p>Sample output:</p>
+<pre><code class="lang-auto"># ls -l
+&gt; -rw-r--r--  1 root root 107390828544 Feb 20 18:48 Whonix-Gateway-8.qcow2
+&gt; -rw-r--r--  1 root root   1211742737 Feb 26 07:55 Whonix-Gateway-8.tar.gz
+
+# qemu-img convert -O qcow2 Whonix-Gateway-8.qcow2 Whonix-Gateway-8-downloaded.qcow2
+
+&gt; -rw-r--r--  1 root root   2233729024 Mar 23 17:19 Whonix-Gateway-8-downloaded.qcow2
+&gt; -rw-r--r--  1 root root 107390828544 Feb 20 18:48 Whonix-Gateway-8.qcow2
+&gt; -rw-r--r--  1 root root   1211742737 Feb 26 07:55 Whonix-Gateway-8.tar.gz</code></pre>
+          <p><a href="http://forums.whonix.org/t/kvm-qcow-compression-solution/191/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/kvm-qcow-compression-solution/191/1</link>
+        <pubDate>Sun, 23 Mar 2014 22:26:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-191-1</guid>
+        <source url="http://forums.whonix.org/t/kvm-qcow-compression-solution/191.rss">KVM (qcow) Compression Solution</source>
+      </item>
+  </channel>
+</rss>

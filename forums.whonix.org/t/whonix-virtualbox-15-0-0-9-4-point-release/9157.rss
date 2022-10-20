@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix VirtualBox 15.0.0.9.4 - Point Release!</title>
+    <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157</link>
+    <description>This is a [point release](https://www.whonix.org/wiki/Point_Release).
+
+Download Whonix for VirtualBox:
+
+https://www.whonix.org/wiki/VirtualBox
+
+----
+
+Alternatively, in-place release upgrade is possible.
+
+https://www.whonix.org/wiki/Operating_System_Software_and_Updates
+
+----
+
+Please Donate!
+
+https://www.whonix.org/wiki/Donate
+
+----
+
+Please Contribute!
+
+https://www.whonix.org/wiki/Contribute
+
+----
+
+This release would not have been possible without the numerous supporters of Whonix!
+
+----
+
+# Notable Changes
+
+* Whonix VirtualBox:
+  * [improve VirtualBox screen resolution situation](https://www.whonix.org/wiki/VirtualBox/Troubleshooting#VirtualBox_Screen_Resolution_Bug)
+     * functional VirtualBox VM Window → View → Virtual Screen 1 → resize to resolution
+     * functional VirtualBox VM Window → View → Adjust Window Size
+     * workaround [improve VirtualBox screen resolution situation](https://www.whonix.org/wiki/VirtualBox/Troubleshooting#VirtualBox_Screen_Resolution_Bug) still required
+     * add xserver-xorg-video-vmware to kicksecure-desktop-environment-essential-gui because it is required by VirtualBox Graphics Controller VMSVGA for auto resize and resize through VirtualBox settings menu
+     * again set VirtualBox Graphics Controller to VMSVGA (equivalent to &quot;VirtualBox → click a VM → Settings → Display → Graphics Controller → VMSVGA → OK&quot;)
+       * Quote https://www.virtualbox.org/manual/ch03.html
+       * &gt; &quot;VMSVGA: Use this graphics controller to emulate a VMware SVGA graphics device.&quot;
+       * &gt; &quot;This is the default graphics controller for Linux guests.&quot;
+       * Has better desktop resolution in CLI (virtual terminal) mode.
+       * This was previously disabled: https://forums.whonix.org/t/black-screen-on-15-0-0-6-6-and-15-0-0-7-1/8554
+     * increase Whonix VirtualBox Whonix-Gateway video ram to 128 MB since previously assigning only 16 MB RAM can be a source of resize issues
+  * [Research notes on how to write good VirtualBox bug reports that actually have a chance of getting fixed.](https://www.whonix.org/wiki/Dev/VirtualBox#VirtualBox_Guest_Additions_Bugs)
+  * Wrote [VirtualBox developer documentation](https://www.whonix.org/wiki/Dev/VirtualBox) on VirtualBox Licensing Issues, unavailable in Debian main and Debian backports, missing features, VirtualBox security and arguments for keeping VirtualBox Support.
+  * Updated VirtualBox and VirtualBox guest addition to `6.1.4`.
+* Tor related:
+  * fix parsing `torrc.d` twice bug
+  * Fix bug in Whonix 15.0.0.8.9 where anon-connection-wizard added `%include /etc/torrc.d/95_whonix.conf` to `/etc/tor/torrc` configuration file even though Whonix was already ported to `%include /etc/torrc.d/`.
+  * [anon-verify](https://www.whonix.org/wiki/Tor#Configuration_Check)
+    * report Extraneous Tor Configuration Files (files that do not end with file extension `.conf`)
+    * ignore file names starting with dot (`.`) (Quote Tor manual: &#39;Files starting with a dot are ignored.&#39;)
+    * ignore subfolders when using `%include /path/to/folder` (Quote Tor manual: &#39;Files on subfolders are ignored.&#39;)
+    * fix, check all files in `torrc.d` folders for issues
+* [work towards Whonix Host operating system](https://forums.whonix.org/t/whonix-host-operating-system/3931/88?u=patrick)
+* upgrade LKRG to latest upstream version (not yet installed by default)
+* install gvfs by default
+  * fix access LUKS encrypted USB drive with Thunar
+  * add gvfs to kicksecure-desktop-applications-xfce
+  * https://phabricator.whonix.org/T965
+  * https://forums.whonix.org/t/cannot-access-encrypted-usb-drive-with-thunar-in-whonix-15/8131/10
+  * http://forums.whonix.org/t/whonix-host-operating-system/3931/109
+  * https://forums.whonix.org/t/whonix-xfce-development/6213/99
+  * https://forums.whonix.org/t/use-sudoedit-in-whonix-documentation-and-whonix-software/7599/22
+* add x11-xserver-utils to kicksecure-desktop-environment-essential-gui
+  * to fix XFCE logout button
+  * http://forums.whonix.org/t/whonix-host-operating-system/3931/109
+* disable `vm.unprivileged_userfaultfd=0` for now because broken
+  * https://forums.whonix.org/t/kernel-hardening/7296/406
+  * reverts &quot;Restrict the userfaultfd() syscall to root as it can make heap sprays easier.&quot;
+    * https://duasynt.com/blog/linux-kernel-heap-spray
+* pkexec wrapper: fix gdebi / synaptic but at cost of checking for passwordless sudo /etc/suders /etc/sudoers.d exceptions. (http://forums.whonix.org/t/cannot-use-pkexec/8129/53)
+* SecBrowser / i2pbrowser: no longer use firejail by default even if installed since currently not maintained by anyone in Whonix / Kicksecure.
+* fix i2pbrowser local browser homepage
+* rename package non-qubes-vm-audio to non-qubes-audio
+
+----
+
+# Full difference of all changes
+
+ https://github.com/Whonix/Whonix/compare/15.0.0.8.9-developers-only...15.0.0.9.4-developers-only
+
+----
+
+# About Whonix
+
+Whonix is being used by Edward Snowden, journalists such as Micah Lee, used by the Freedom of the Press Foundation and Qubes OS. It has a 7 years history of keeping its users safe from real world attacks. [1]
+
+The split architecture of Whonix relies on leveraging virtualization technology as a sandbox for vulnerable user applications on endpoints. This is a widely known weakness exploited by entities that want to circumvent cryptography and system integrity. Our Linux distribution come with a wide selection of data protection tools and hardened applications for document/image publishing and communications. We are the first to deploy [tirdad](https://github.com/Whonix/tirdad), which addresses the long known problem of CPU activity affecting TCP traffic properties in visible ways on the network and [vanguards](https://github.com/mikeperry-tor/vanguards), an enhancement for Tor produced by the developers of Tor, which protects against guard discovery and related traffic analysis attacks. [Live Mode](https://www.whonix.org/wiki/Whonix_Live) was recently added. We deliver the first ever solutions for user behavior masking privacy protections such as Kloak. [Kloak](https://github.com/Whonix/kloak) prevents websites from [recognizing](https://www.whonix.org/wiki/Keystroke_Deanonymization) who the typist is by altering keystroke timing signatures that are unique to everyone.
+
+In the future we plan to deploy a [hardened Linux kernel](https://github.com/Whonix/hardened-kernel) with a minimal number of
+modules for OS operation, which will greatly decrease attack surface. An [AppArmor profile for the whole system](https://github.com/Whonix/apparmor-profile-everything) as well as [Linux Kernel Runtime Guard (LKRG)](https://www.whonix.org/wiki/Linux_Kernel_Runtime_Guard_LKRG), which [quote](https://www.openwall.com/lkrg/) `performs runtime integrity checking of the Linux kernel and detection of security vulnerability exploits against the kernel.`
+
+----
+
+[1]
+
+* https://twitter.com/Snowden/status/1165607338973130752 [[archive]](https://web.archive.org/web/https://twitter.com/Snowden/status/1165607338973130752)
+* https://twitter.com/snowden/status/781495273726025728 [[archive]](https://web.archive.org/web/https://twitter.com/snowden/status/781495273726025728)
+* https://twitter.com/Snowden/status/1175435436501667840 [[archive]](https://web.archive.org/web/https://twitter.com/Snowden/status/1175435436501667840)
+* [Micah Lee, Journalist and Security Engineer at The Intercept and Advocate for Freedom of the Press, Developer of OnionShare and Tor Browser Launcher.](https://theintercept.com/2015/09/16/getting-hacked-doesnt-bad/) [[archive]](https://web.archive.org/web/https://theintercept.com/2015/09/16/getting-hacked-doesnt-bad/)
+* [SecureDrop Journalist Workstation environment for submission handling is based on Qubes-Whonix](https://github.com/freedomofpress/securedrop-workstation) [[archive]](https://web.archive.org/web/https://github.com/freedomofpress/securedrop-workstation)
+* [History](https://www.whonix.org/wiki/History)
+* https://en.wikipedia.org/wiki/Whonix [[archive]](https://web.archive.org/web/https://en.wikipedia.org/wiki/Whonix)
+* https://www.qubes-os.org [[archive]](https://web.archive.org/web/https://www.qubes-os.org)
+* [Whonix Protection against Real World Attacks](https://www.whonix.org/wiki/Security_in_Real_World)</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 06 Apr 2020 06:16:57 +0000</lastBuildDate>
+    <category>News</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix VirtualBox 15.0.0.9.4 - Point Release!</title>
+        <dc:creator><![CDATA[hellresistor]]></dc:creator>
+        <description><![CDATA[
+            <p>Thunderbird doesn’t open.</p>
+<p>Never executed before and get that: (tryed after reboots)<br>
+</p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/2/28b532b62fdafb4d6c135e42c373dfee635bfaa7.png" data-download-href="//forums.whonix.org/uploads/default/28b532b62fdafb4d6c135e42c373dfee635bfaa7" title="thuderbirdfail"><img src="//forums.whonix.org/uploads/default/optimized/2X/2/28b532b62fdafb4d6c135e42c373dfee635bfaa7_2_690x459.png" alt="thuderbirdfail" data-base62-sha1="5O7jsMPXBv3i99DblOG0TPpnzEP" width="690" height="459" srcset="//forums.whonix.org/uploads/default/optimized/2X/2/28b532b62fdafb4d6c135e42c373dfee635bfaa7_2_690x459.png, //forums.whonix.org/uploads/default/original/2X/2/28b532b62fdafb4d6c135e42c373dfee635bfaa7.png 1.5x, //forums.whonix.org/uploads/default/original/2X/2/28b532b62fdafb4d6c135e42c373dfee635bfaa7.png 2x" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/2/28b532b62fdafb4d6c135e42c373dfee635bfaa7_2_10x10.png"></a></div><p></p>
+<p>maybe same old issue?! <a href="https://forums.whonix.org/t/error-when-launching-thunderbird/3946/3" class="inline-onebox">Error when launching Thunderbird</a><br>
+Willl check today.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/7</link>
+        <pubDate>Sun, 05 Apr 2020 23:40:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9157-7</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157.rss">Whonix VirtualBox 15.0.0.9.4 - Point Release!</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.9.4 - Point Release!</title>
+        <dc:creator><![CDATA[hellresistor]]></dc:creator>
+        <description><![CDATA[
+            <p>FYI:<br>
+Just to Close this thing.</p>
+<p>I have needed Change to VM the Graphics Controller:</p>
+<ul>
+<li>VBoxVGA</li>
+<li>32MB</li>
+</ul>
+<p>And resolved, at least to me!</p>
+<p>o/</p>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/6</link>
+        <pubDate>Sun, 05 Apr 2020 15:21:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9157-6</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157.rss">Whonix VirtualBox 15.0.0.9.4 - Point Release!</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.9.4 - Point Release!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes. Nothing an operating system inside a VM does should capable of<br>
+crashing host virtualization software.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/5</link>
+        <pubDate>Sun, 05 Apr 2020 08:06:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9157-5</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157.rss">Whonix VirtualBox 15.0.0.9.4 - Point Release!</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.9.4 - Point Release!</title>
+        <dc:creator><![CDATA[hellresistor]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a></p>
+<p>Sorry again, But I have check NOW.<br>
+With version 15.0.0.8.9 Are working like a charm…<br>
+VM not break!</p>
+<p>Check This screenshot<br>
+</p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/b/b3b507902f66f87f9c6b1f5982556289559a0c03.png" data-download-href="//forums.whonix.org/uploads/default/b3b507902f66f87f9c6b1f5982556289559a0c03" title="whonix0. 8.9 zerofree OK"><img src="//forums.whonix.org/uploads/default/original/2X/b/b3b507902f66f87f9c6b1f5982556289559a0c03.png" alt="whonix0. 8.9 zerofree OK" data-base62-sha1="pDLjULyfEQ51nurHgldwlnyIz1p" width="613" height="500" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/b/b3b507902f66f87f9c6b1f5982556289559a0c03_2_10x10.png"></a></div><p></p>
+<p>Finished Sucefully.</p>
+<p>Sure It is VirtualBox Issue ?!</p>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/4</link>
+        <pubDate>Sat, 04 Apr 2020 23:27:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9157-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157.rss">Whonix VirtualBox 15.0.0.9.4 - Point Release!</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.9.4 - Point Release!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Any version. Same answer as this: <a href="https://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-testers-wanted/8961/4" class="inline-onebox">Whonix VirtualBox 15.0.0.8.9 - Testers Wanted!</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/3</link>
+        <pubDate>Thu, 02 Apr 2020 19:50:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9157-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157.rss">Whonix VirtualBox 15.0.0.9.4 - Point Release!</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.9.4 - Point Release!</title>
+        <dc:creator><![CDATA[hellresistor]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<h1>WOW SORRY I AM USING Whonix XFCE 15.0.0.9.4 ! NOT 15.0.0.8.9<br>
+MY BAD</h1>
+<p>Maybe a little later but I am getting this (on picture).</p>
+<p>What I have done to get thats?! (Following the biggest Whonix FAQ)</p>
+<ul>
+<li>Just have imported VM-Gateway on Virtual Box (in Debian sys).</li>
+<li>Change Password</li>
+<li>Updates</li>
+<li>Remove rsyslog</li>
+<li>Install ZeroFree (Its this cause the problem!)</li>
+</ul>
+<p>Do a reboot to enter on Recovery Mode to Run final zerofree commands… Not ask to root/user password. Stops here.</p>
+<p>Hope was only to me <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=9" title=":wink:" class="emoji" alt=":wink:"></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/4/4ad69bbd01d6d1751c828abda6824d642c5c4c22.png" data-download-href="//forums.whonix.org/uploads/default/4ad69bbd01d6d1751c828abda6824d642c5c4c22" title="zerofreeafter boot recovery"><img src="//forums.whonix.org/uploads/default/optimized/2X/4/4ad69bbd01d6d1751c828abda6824d642c5c4c22_2_690x435.png" alt="zerofreeafter boot recovery" data-base62-sha1="aG380doO2WtRqRPYl0wkAYU3mEO" width="690" height="435" srcset="//forums.whonix.org/uploads/default/optimized/2X/4/4ad69bbd01d6d1751c828abda6824d642c5c4c22_2_690x435.png, //forums.whonix.org/uploads/default/optimized/2X/4/4ad69bbd01d6d1751c828abda6824d642c5c4c22_2_1035x652.png 1.5x, //forums.whonix.org/uploads/default/original/2X/4/4ad69bbd01d6d1751c828abda6824d642c5c4c22.png 2x" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/4/4ad69bbd01d6d1751c828abda6824d642c5c4c22_2_10x10.png"></a></div><p></p>
+<p>EDITED</p>
+<p>Well. Seems some time waiting. has booted.! And with so configs <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=9" title=":wink:" class="emoji" alt=":wink:"> (zerofree job), because cant enter on recovery.<br>
+I am continue editing this</p>
+<p>PS: I have done this on older version 15.0.8.7 succefully. on this version no</p>
+</blockquote>
+<p>EDIT:<br>
+Missing last line on picture<br>
+[   OK   ] Started Apply Kernel Variables</p>
+<p>EDIT 2:</p>
+<ul>
+<li>Ok ! can got in recovery mode (doing some step-shutdown-step-shutdown). and get this:<br>
+<div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/d/dadfd0492ad8ad0a12895cf457fc7af76a4afdb2.png" data-download-href="//forums.whonix.org/uploads/default/dadfd0492ad8ad0a12895cf457fc7af76a4afdb2" title="zerofree can enter"><img src="//forums.whonix.org/uploads/default/original/2X/d/dadfd0492ad8ad0a12895cf457fc7af76a4afdb2.png" alt="zerofree can enter" data-base62-sha1="vefBDnLKESC9VrVuSTi9NQ4x0WK" width="618" height="500" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/d/dadfd0492ad8ad0a12895cf457fc7af76a4afdb2_2_10x10.png"></a></div>
+</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/2</link>
+        <pubDate>Thu, 02 Apr 2020 19:48:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9157-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157.rss">Whonix VirtualBox 15.0.0.9.4 - Point Release!</source>
+      </item>
+      <item>
+        <title>Whonix VirtualBox 15.0.0.9.4 - Point Release!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This is a <a href="https://www.whonix.org/wiki/Point_Release">point release</a>.</p>
+<p>Download Whonix for VirtualBox:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/VirtualBox" target="_blank" title="12:10PM - 15 May 2020">Whonix – 15 May 20</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://www.whonix.org/w/images/d/d5/Virtualbox_logo.png" class="thumbnail onebox-avatar" width="500" height="500">
+
+<h3><a href="https://www.whonix.org/wiki/VirtualBox" target="_blank">Whonix ™ for Windows, macOS, Linux inside VirtualBox</a></h3>
+
+<p>Whonix ™ for VirtualBox - Stable Version</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p>Alternatively, in-place release upgrade is possible.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Operating_System_Software_and_Updates" target="_blank" title="10:23AM - 19 June 2020">Whonix – 19 Jun 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/452;"><img src="https://www.whonix.org/w/images/3/34/Operatingsystemupdated234234.jpg" class="thumbnail" width="640" height="452"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Operating_System_Software_and_Updates" target="_blank">Operating System Software and Updates - Whonix</a></h3>
+
+<p>Operating System Software and Updates</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p>Please Donate!</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Donate" target="_blank" title="11:43AM - 07 May 2020">Whonix – 7 May 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/432;"><img src="https://www.whonix.org/w/images/8/83/Payment.jpg" class="thumbnail" width="640" height="432"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Donate" target="_blank">Donating to Whonix ™</a></h3>
+
+<p>PayPal, Bitcoin, Monero, Bank Wire</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p>Please Contribute!</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Contribute" target="_blank" title="07:50AM - 31 August 2020">Whonix – 31 Aug 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:483/500;"><img src="https://www.whonix.org/w/images/0/07/Computer_n_screen.png" class="thumbnail" width="483" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Contribute" target="_blank">Ways To Contribute</a></h3>
+
+<p>Spread, Follow, Develop, Testing, Donate. Contribute to Freedom Software / Open Source.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p>This release would not have been possible without the numerous supporters of Whonix!</p>
+<hr>
+<h1>Notable Changes</h1>
+<ul>
+<li>Whonix VirtualBox:
+<ul>
+<li>
+<a href="https://www.whonix.org/wiki/VirtualBox/Troubleshooting#VirtualBox_Screen_Resolution_Bug">improve VirtualBox screen resolution situation</a>
+<ul>
+<li>functional VirtualBox VM Window → View → Virtual Screen 1 → resize to resolution</li>
+<li>functional VirtualBox VM Window → View → Adjust Window Size</li>
+<li>workaround <a href="https://www.whonix.org/wiki/VirtualBox/Troubleshooting#VirtualBox_Screen_Resolution_Bug">improve VirtualBox screen resolution situation</a> still required</li>
+<li>add xserver-xorg-video-vmware to kicksecure-desktop-environment-essential-gui because it is required by VirtualBox Graphics Controller VMSVGA for auto resize and resize through VirtualBox settings menu</li>
+<li>again set VirtualBox Graphics Controller to VMSVGA (equivalent to “VirtualBox → click a VM → Settings → Display → Graphics Controller → VMSVGA → OK”)
+<ul>
+<li>Quote <a href="https://www.virtualbox.org/manual/ch03.html">https://www.virtualbox.org/manual/ch03.html</a>
+</li>
+<li>
+<blockquote>
+<p>“VMSVGA: Use this graphics controller to emulate a VMware SVGA graphics device.”</p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p>“This is the default graphics controller for Linux guests.”</p>
+</blockquote>
+</li>
+<li>Has better desktop resolution in CLI (virtual terminal) mode.</li>
+<li>This was previously disabled: <a href="https://forums.whonix.org/t/black-screen-on-15-0-0-6-6-and-15-0-0-7-1/8554" class="inline-onebox">Black screen on 15.0.0.6.6 and 15.0.0.7.1</a>
+</li>
+</ul>
+</li>
+<li>increase Whonix VirtualBox Whonix-Gateway video ram to 128 MB since previously assigning only 16 MB RAM can be a source of resize issues</li>
+</ul>
+</li>
+<li><a href="https://www.whonix.org/wiki/Dev/VirtualBox#VirtualBox_Guest_Additions_Bugs">Research notes on how to write good VirtualBox bug reports that actually have a chance of getting fixed.</a></li>
+<li>Wrote <a href="https://www.whonix.org/wiki/Dev/VirtualBox">VirtualBox developer documentation</a> on VirtualBox Licensing Issues, unavailable in Debian main and Debian backports, missing features, VirtualBox security and arguments for keeping VirtualBox Support.</li>
+<li>Updated VirtualBox and VirtualBox guest addition to <code>6.1.4</code>.</li>
+</ul>
+</li>
+<li>Tor related:
+<ul>
+<li>fix parsing <code>torrc.d</code> twice bug</li>
+<li>Fix bug in Whonix 15.0.0.8.9 where anon-connection-wizard added <code>%include /etc/torrc.d/95_whonix.conf</code> to <code>/etc/tor/torrc</code> configuration file even though Whonix was already ported to <code>%include /etc/torrc.d/</code>.</li>
+<li>
+<a href="https://www.whonix.org/wiki/Tor#Configuration_Check">anon-verify</a>
+<ul>
+<li>report Extraneous Tor Configuration Files (files that do not end with file extension <code>.conf</code>)</li>
+<li>ignore file names starting with dot (<code>.</code>) (Quote Tor manual: ‘Files starting with a dot are ignored.’)</li>
+<li>ignore subfolders when using <code>%include /path/to/folder</code> (Quote Tor manual: ‘Files on subfolders are ignored.’)</li>
+<li>fix, check all files in <code>torrc.d</code> folders for issues</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://forums.whonix.org/t/whonix-host-operating-system/3931/88">work towards Whonix Host operating system</a></li>
+<li>upgrade LKRG to latest upstream version (not yet installed by default)</li>
+<li>install gvfs by default
+<ul>
+<li>fix access LUKS encrypted USB drive with Thunar</li>
+<li>add gvfs to kicksecure-desktop-applications-xfce</li>
+<li><a href="https://phabricator.whonix.org/T965">https://phabricator.whonix.org/T965</a></li>
+<li><a href="https://forums.whonix.org/t/cannot-access-encrypted-usb-drive-with-thunar-in-whonix-15/8131/10" class="inline-onebox">cannot access encrypted USB drive with Thunar in Whonix 15</a></li>
+<li><a href="//forums.whonix.org/t/whonix-host-operating-system/3931/109" class="inline-onebox">Whonix host operating system</a></li>
+<li><a href="https://forums.whonix.org/t/whonix-xfce-development/6213/99" class="inline-onebox">Whonix XFCE Development</a></li>
+<li><a href="https://forums.whonix.org/t/use-sudoedit-in-whonix-documentation-and-whonix-software/7599/22" class="inline-onebox">use sudoedit in Whonix documentation and Whonix software</a></li>
+</ul>
+</li>
+<li>add x11-xserver-utils to kicksecure-desktop-environment-essential-gui
+<ul>
+<li>to fix XFCE logout button</li>
+<li><a href="//forums.whonix.org/t/whonix-host-operating-system/3931/109" class="inline-onebox">Whonix host operating system</a></li>
+</ul>
+</li>
+<li>disable <code>vm.unprivileged_userfaultfd=0</code> for now because broken
+<ul>
+<li><a href="https://forums.whonix.org/t/kernel-hardening/7296/406" class="inline-onebox">Kernel Hardening</a></li>
+<li>reverts “Restrict the userfaultfd() syscall to root as it can make heap sprays easier.”
+<ul>
+<li><a href="https://duasynt.com/blog/linux-kernel-heap-spray">https://duasynt.com/blog/linux-kernel-heap-spray</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>pkexec wrapper: fix gdebi / synaptic but at cost of checking for passwordless sudo /etc/suders /etc/sudoers.d exceptions. (<a href="//forums.whonix.org/t/cannot-use-pkexec/8129/53" class="inline-onebox">cannot use pkexec</a>)</li>
+<li>SecBrowser / i2pbrowser: no longer use firejail by default even if installed since currently not maintained by anyone in Whonix / Kicksecure.</li>
+<li>fix i2pbrowser local browser homepage</li>
+<li>rename package non-qubes-vm-audio to non-qubes-audio</li>
+</ul>
+<hr>
+<h1>Full difference of all changes</h1>
+<p><a href="https://github.com/Whonix/Whonix/compare/15.0.0.8.9-developers-only...15.0.0.9.4-developers-only">https://github.com/Whonix/Whonix/compare/15.0.0.8.9-developers-only...15.0.0.9.4-developers-only</a></p>
+<hr>
+<h1>About Whonix</h1>
+<p>Whonix is being used by Edward Snowden, journalists such as Micah Lee, used by the Freedom of the Press Foundation and Qubes OS. It has a 7 years history of keeping its users safe from real world attacks. [1]</p>
+<p>The split architecture of Whonix relies on leveraging virtualization technology as a sandbox for vulnerable user applications on endpoints. This is a widely known weakness exploited by entities that want to circumvent cryptography and system integrity. Our Linux distribution come with a wide selection of data protection tools and hardened applications for document/image publishing and communications. We are the first to deploy <a href="https://github.com/Whonix/tirdad">tirdad</a>, which addresses the long known problem of CPU activity affecting TCP traffic properties in visible ways on the network and <a href="https://github.com/mikeperry-tor/vanguards">vanguards</a>, an enhancement for Tor produced by the developers of Tor, which protects against guard discovery and related traffic analysis attacks. <a href="https://www.whonix.org/wiki/Whonix_Live">Live Mode</a> was recently added. We deliver the first ever solutions for user behavior masking privacy protections such as Kloak. <a href="https://github.com/Whonix/kloak">Kloak</a> prevents websites from <a href="https://www.whonix.org/wiki/Keystroke_Deanonymization">recognizing</a> who the typist is by altering keystroke timing signatures that are unique to everyone.</p>
+<p>In the future we plan to deploy a <a href="https://github.com/Whonix/hardened-kernel">hardened Linux kernel</a> with a minimal number of<br>
+modules for OS operation, which will greatly decrease attack surface. An <a href="https://github.com/Whonix/apparmor-profile-everything">AppArmor profile for the whole system</a> as well as <a href="https://www.whonix.org/wiki/Linux_Kernel_Runtime_Guard_LKRG">Linux Kernel Runtime Guard (LKRG)</a>, which <a href="https://www.openwall.com/lkrg/">quote</a> <code>performs runtime integrity checking of the Linux kernel and detection of security vulnerability exploits against the kernel.</code></p>
+<hr>
+<p>[1]</p>
+<ul>
+<li>
+<a href="https://twitter.com/Snowden/status/1165607338973130752">https://twitter.com/Snowden/status/1165607338973130752</a> <a href="https://web.archive.org/web/https://twitter.com/Snowden/status/1165607338973130752">[archive]</a>
+</li>
+<li>
+<a href="https://twitter.com/snowden/status/781495273726025728">https://twitter.com/snowden/status/781495273726025728</a> <a href="https://web.archive.org/web/https://twitter.com/snowden/status/781495273726025728">[archive]</a>
+</li>
+<li>
+<a href="https://twitter.com/Snowden/status/1175435436501667840">https://twitter.com/Snowden/status/1175435436501667840</a> <a href="https://web.archive.org/web/https://twitter.com/Snowden/status/1175435436501667840">[archive]</a>
+</li>
+<li>
+<a href="https://theintercept.com/2015/09/16/getting-hacked-doesnt-bad/">Micah Lee, Journalist and Security Engineer at The Intercept and Advocate for Freedom of the Press, Developer of OnionShare and Tor Browser Launcher.</a> <a href="https://web.archive.org/web/https://theintercept.com/2015/09/16/getting-hacked-doesnt-bad/">[archive]</a>
+</li>
+<li>
+<a href="https://github.com/freedomofpress/securedrop-workstation">SecureDrop Journalist Workstation environment for submission handling is based on Qubes-Whonix</a> <a href="https://web.archive.org/web/https://github.com/freedomofpress/securedrop-workstation">[archive]</a>
+</li>
+<li><a href="https://www.whonix.org/wiki/History">History</a></li>
+<li>
+<a href="https://en.wikipedia.org/wiki/Whonix">https://en.wikipedia.org/wiki/Whonix</a> <a href="https://web.archive.org/web/https://en.wikipedia.org/wiki/Whonix">[archive]</a>
+</li>
+<li>
+<a href="https://www.qubes-os.org">https://www.qubes-os.org</a> <a href="https://web.archive.org/web/https://www.qubes-os.org">[archive]</a>
+</li>
+<li><a href="https://www.whonix.org/wiki/Security_in_Real_World">Whonix Protection against Real World Attacks</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157/1</link>
+        <pubDate>Thu, 19 Mar 2020 12:31:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-9157-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-virtualbox-15-0-0-9-4-point-release/9157.rss">Whonix VirtualBox 15.0.0.9.4 - Point Release!</source>
+      </item>
+  </channel>
+</rss>

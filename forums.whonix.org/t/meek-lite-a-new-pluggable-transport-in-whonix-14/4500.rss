@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>meek_lite: A New Pluggable Transport in Whonix 14</title>
+    <link>http://forums.whonix.org/t/meek-lite-a-new-pluggable-transport-in-whonix-14/4500</link>
+    <description>&lt;small&gt;Originally published at:			https://www.whonix.org/blog/meek_lite-whonix-14
+		&lt;/small&gt;&lt;br&gt;&lt;h1 id=&quot;meek_liteanewpluggabletransportinwhonix14&quot;&gt;meek_lite: A New Pluggable Transport in Whonix 14&lt;/h1&gt;
+
+&lt;p&gt;Greetings Whonix users!&lt;/p&gt;
+
+&lt;p&gt;The Whonix development team is thrilled to announce that a new pluggable transport called &lt;code&gt;meek_lite&lt;/code&gt; will be available in Whonix 14. This blog post will briefly describe &lt;code&gt;meek_lite&lt;/code&gt; and how it can be easily configured in the forthcoming Whonix release.&lt;/p&gt;
+
+&lt;h1 id=&quot;whatarepluggabletransports&quot;&gt;What are Pluggable Transports?&lt;/h1&gt;
+
+&lt;p&gt;In many parts of the globe, direct connections to the Tor network are censored. It is simple for censors to use technology to block connections, because it only requires maintenance of a real-time blacklist of all &lt;a href=&quot;https://atlas.torproject.org/&quot;&gt;publicly known&lt;/a&gt; Tor (guard) relays and directory authorities.&lt;/p&gt;
+
+&lt;p&gt;In order to try and solve this problem, the Tor project came up with the idea of making a proportion of Tor guard relays only available via relatively private channels. However, since these alternative guard relays (&quot;vanilla bridges&quot;) use the same protocol to communicate with the Tor clients as normal guard relays, a censor can simply identify the Tor signature of the network connection and then block it.&lt;/p&gt;
+
+&lt;p&gt;Tor developers have recognized that security by obscurity has failed many bridge users, because most are still blocked in repressive environments. This has led to the development of &lt;a href=&quot;https://www.torproject.org/docs/pluggable-transports.html.en&quot;&gt;Pluggable Transports (PTs)&lt;/a&gt;, which help to circumvent censorship by transforming the Tor traffic flow between the Tor client and the bridge so it appears to be &quot;innocent&quot; network traffic, instead of the actual Tor traffic.&lt;/p&gt;
+
+&lt;p&gt;Unfortunately, traditional obfusticated bridges - obfs2, obfs3, obfs4 - still depend on censors being unaware of bridge information (like the IP address), which is still a security by obscurity approach. This allows aggressive censors to gradually block known obfusticated bridges by requesting the same information from the &lt;a href=&quot;https://bridges.torproject.org&quot;&gt;Tor Project BridgeDB&lt;/a&gt;, as any normal user would do. [^1]&lt;/p&gt;
+
+&lt;p&gt;Additionally, as David Fifield has &lt;a href=&quot;https://lists.torproject.org/pipermail/tor-dev/2017-August/012400.html&quot;&gt;noted on the @tor-dev mailing list&lt;/a&gt;:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;We know that at least China and Kazakhstan pay attention to the default Tor Browser bridges (and China blocks them as soon as they enter the source code, even before a release).&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;uniquemeek_litefeatures&quot;&gt;Unique meek_lite Features&lt;/h1&gt;
+
+&lt;p&gt;Unlike traditional bridges, &lt;code&gt;meek_lite&lt;/code&gt; utilizes the concept of collateral freedom. The basic design is outlined in the &lt;a href=&quot;https://trac.torproject.org/projects/tor/wiki/doc/meek&quot;&gt;Tor Wiki&lt;/a&gt;:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;“[t]raffic is relayed through a third-party server that is hard to block, for example a ​CDN. It uses a trick called ​domain fronting to talk to a Tor relay while appearing to talk to another domain”.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;code&gt;meek_lite&lt;/code&gt; has recently proven to perform better in circumventing censorship than other methods. For example, during the 19th National Congress of the Communist Party of China held last month, meek was one of the few effective tools to bypass strengthened Internet censorship. &lt;/p&gt;
+
+&lt;h1 id=&quot;differencesbetweenmeek_liteandmeek&quot;&gt;Differences between meek_lite and meek&lt;/h1&gt;
+
+&lt;p&gt;Tor Browser Bundle users may be familiar with the meek PT. &lt;code&gt;meek_lite&lt;/code&gt; is a different implementation of meek created by Yawning from the Tor Project. Yawning provides a &lt;a href=&quot;https://github.com/Yawning/obfs4/commit/611205be681322883a4d73dd00fcb13c4352fe53&quot;&gt;succinct description of the differences&lt;/a&gt;: &lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;This is a meek client only implementation, with the following
+  differences with dcf&#39;s meek-client:&lt;/p&gt;
+  
+  &lt;ul&gt;
+  &lt;li&gt;It is named meek_lite to differentiate it from the real thing.&lt;/li&gt;
+  
+  &lt;li&gt;It does not support using an external helper to normalize TLS
+  signatures, so adversaries can look for someone using the Go
+  TLS library to do HTTP.&lt;/li&gt;
+  
+  &lt;li&gt;It does the right thing with TOR&lt;em&gt;PT&lt;/em&gt;PROXY, even when a helper is
+  not present.&lt;/li&gt;
+  &lt;/ul&gt;
+  
+  &lt;p&gt;Most of the credit goes to dcf, who&#39;s code I librerally cribbed and
+  stole.  It is intended primarily as a &quot;better than nothina&quot; option
+  for enviornments that do not or can not presently use an external
+  Firefox helper.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;It should be understood that &lt;code&gt;meek_lite&lt;/code&gt; does not normalize TLS signatures, but it is still effective enough to help users bypass most forms of censorship. Major software projects like Orbot have come to rely on &lt;code&gt;meek_lite&lt;/code&gt;, providing support for its capabilities.&lt;/p&gt;
+
+&lt;h1 id=&quot;whymeek_liteisimportanttowhonix&quot;&gt;Why meek_lite is Important to Whonix&lt;/h1&gt;
+
+&lt;p&gt;Prior to Whonix 14, censored users were limited to two possible configurations for system Tor: either obfs3 or obfs4 bridges. The integration of &lt;code&gt;meek_lite&lt;/code&gt; into the Whonix ecosystem greatly improves both functionality and the user experience for those living in heavily censored areas:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;In some jurisdictions like China, &lt;code&gt;meek_lite&lt;/code&gt; is the only Tor PT that is currently effective.&lt;/li&gt;
+
+&lt;li&gt;Forthcoming features of Tor launcher / Anon Connection Wizard enable &lt;code&gt;meek_lite&lt;/code&gt; to &lt;a href=&quot;https://forums.whonix.org/t/graphical-gui-whonix-setup-wizard-anon-connection-wizard-technical-discussion/650/336&quot;&gt;automatically retrieve Tor bridges&lt;/a&gt;. &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;configuringmeek_liteinwhonix&quot;&gt;Configuring meek_lite in Whonix&lt;/h1&gt;
+
+&lt;p&gt;Once Whonix 14 is released, users can configure Tor to use &lt;code&gt;meek_lite&lt;/code&gt; in one of two ways. Both methods have been &lt;a href=&quot;https://www.whonix.org/wiki/Bridges#How_to_Use_Bridges_in_Whonix&quot;&gt;documented in the Whonix Wiki&lt;/a&gt;. It is recommended to check the Wiki since it will be up-to-date, unlike this blog post.&lt;/p&gt;
+
+&lt;h4 id=&quot;option1edittheetctorrcd50_usertorrcfilemanually&quot;&gt;Option 1: Edit the /etc/torrc.d/50_user.torrc file manually&lt;/h4&gt;
+
+&lt;p&gt;Beginning from Whonix 14, it is &lt;a href=&quot;https://www.whonix.org/wiki/Whonix_Configuration_Files#.d_Style_Configuration_Folders&quot;&gt;recommended&lt;/a&gt; to place all user customized Tor configurations into &lt;code&gt;/etc/torrc.d/50_user.torrc&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Add the following lines to the &lt;code&gt;/etc/torrc.d/50_user.torrc&lt;/code&gt; file:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;DisableNetwork 0
+  UseBridges 1
+  ClientTransportPlugin meek&lt;em&gt;lite exec /usr/bin/obfs4proxy 
+  Bridge meek&lt;/em&gt;lite 0.0.2.0:2 B9E7141C594AF25699E0079C1F0146F409495296 url=https://d2cly7j4zqgua7.cloudfront.net/ front=a0.awsstatic.com&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Then reload Tor.&lt;/p&gt;
+
+&lt;h4 id=&quot;option2preferreduseanonconnectionwizard&quot;&gt;Option 2 (Preferred): Use Anon-Connection-Wizard&lt;/h4&gt;
+
+&lt;p&gt;Open Anon-Connection-Wizard, and select meek-amazon or meek-azure as the bridge type in the Tor Bridges Configuration Page:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.whonix.org/blog/wp-content/uploads/2017/11/anon_connection_wizard_meek.png&quot;&gt;&lt;img class=&quot;alignnone size-medium wp-image-2340&quot; src=&#39;/uploads/default/original/2X/3/37d2bde3919d6a5e1901a7faee0ae8e45192dee8.png&#39; alt=&quot;&quot; width=&quot;300&quot; height=&quot;244&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;intendedtargetgroup&quot;&gt;Intended Target Group&lt;/h1&gt;
+
+&lt;p&gt;Users should consider the following recommendations when deciding whether or not to use a PT:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;If you are not living in a censored area, it is neither necessary nor recommended to use a PT.&lt;/li&gt;
+
+&lt;li&gt;If you are living in a censored area where obfs4 works, then use it in the first instance.&lt;/li&gt;
+
+&lt;li&gt;If you are living in a censored area where obfs4 does not work, try meek/&lt;code&gt;meek_lite&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;meek_litewhonixdevelopment&quot;&gt;meek_lite Whonix Development&lt;/h1&gt;
+
+&lt;p&gt;Integration of &lt;code&gt;meek_lite&lt;/code&gt; into Whonix 14 would simply not have been possible without the cooperation and support of developers from many different communities, including the Tor Project, Debian, Tails and Whonix. I have attempted to maintain a near-complete record of this project&#39;s development in &lt;a href=&quot;https://forums.whonix.org/t/graphical-gui-whonix-setup-wizard-anon-connection-wizard-technical-discussion/650/365&quot;&gt;this Whonix forum post&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;On a personal level, I have immensely enjoyed making contributions within an efficient, supportive and encouraging environment. I urge my fellow developers to consider joining the collaborative Whonix effort by getting in contact!&lt;/p&gt;
+
+&lt;p&gt;[^1]: BridgeDB has adopted various methods to stymie adversaries. For instance, email requests must come from certain providers, and algorithms were developed that reject requests for a large number of different bridges within a short period.&lt;/p&gt;</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 06 Nov 2017 23:35:28 +0000</lastBuildDate>
+    <category>News</category>
+    <atom:link href="http://forums.whonix.org/t/meek-lite-a-new-pluggable-transport-in-whonix-14/4500.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>meek_lite: A New Pluggable Transport in Whonix 14</title>
+        <dc:creator><![CDATA[iry]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="2" data-topic="4500">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<p>Good work! Some minor nits.</p>
+</blockquote>
+</aside>
+<p>Thank you so much for your revision, <a class="mention" href="http://forums.whonix.org/u/torjunkie">@torjunkie</a> ! I have updated the blog post.</p>
+<p>I changed this one:</p>
+<aside class="quote" data-post="2" data-topic="4500">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<p>Beginning from Whonix 14, it is recommended to place all customized Tor configurations into /etc/torrc.d/50_user.torrc.</p>
+</blockquote>
+</aside>
+<p>to:</p>
+<aside class="quote" data-post="1" data-topic="4500">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/i/c5a1d2/40.png" class="avatar"> iry:</div>
+<blockquote>
+<p>Beginning from Whonix 14, it is recommended to place all user customized Tor configurations into /etc/torrc.d/50_user.torrc.</p>
+</blockquote>
+</aside>
+<p>Because there will be many different customized files created by users, Debian and Whonix. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/meek-lite-a-new-pluggable-transport-in-whonix-14/4500/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/meek-lite-a-new-pluggable-transport-in-whonix-14/4500/3</link>
+        <pubDate>Mon, 06 Nov 2017 23:35:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4500-3</guid>
+        <source url="http://forums.whonix.org/t/meek-lite-a-new-pluggable-transport-in-whonix-14/4500.rss">meek_lite: A New Pluggable Transport in Whonix 14</source>
+      </item>
+      <item>
+        <title>meek_lite: A New Pluggable Transport in Whonix 14</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>Good work! Some minor nits.</p>
+<p>Change:</p>
+<blockquote>
+<p>To order to try and solve this problem, the Tor project came up with the idea to remain part of the Tor guard relays only available via relatively private channels. Hoewever, since these alternative guard relays, called vanilla bridges, use the same protocal to communicate with the Tor clients as normal gurard relays use, a censor can simply identify the connection is Tor traffic and then block it.</p>
+</blockquote>
+<p>To:</p>
+<blockquote>
+<p>In order to try and solve this problem, the Tor project came up with the idea of making a proportion of Tor guard relays only available via relatively private channels. However, since these alternative guard relays (“vanilla bridges”) use the same protocol to communicate with the Tor clients as normal guard relays, a censor can simply identify the Tor signature of the network connection and then block it.</p>
+</blockquote>
+<p>Change:</p>
+<blockquote>
+<p>Unfortunately, traditional obfusticated bridges - obfs2, obfs3, obfs4 - still rely on the hope that censors do not know the information (for example, IP address of the bridges), which is, still, security by obscurity. This allows aggressive censors gradually block known those obfusticated bridges by requesting the same information from the [<a href="https://bridges.torproject.org/">https://bridges.torproject.org/</a> Tor Project BridgeDB], as any normal user would do.</p>
+</blockquote>
+<p>To:</p>
+<blockquote>
+<p>Unfortunately, traditional obfusticated bridges - obfs2, obfs3, obfs4 - still depend on censors being unaware of bridge information (like the IP address), which is still a security by obscurity approach. This allows aggressive censors to gradually block known obfusticated bridges by requesting the same information from the [<a href="https://bridges.torproject.org/">https://bridges.torproject.org/</a> Tor Project BridgeDB], as any normal user would do.</p>
+</blockquote>
+<p>Change:</p>
+<blockquote>
+<p>Begin from Whonix 14, it is recommended to place all user’s own Tor configuration into /etc/torrc.d/50_user.torrc.</p>
+</blockquote>
+<p>To:</p>
+<blockquote>
+<p>Beginning from Whonix 14, it is recommended to place all customized Tor configurations into /etc/torrc.d/50_user.torrc.</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/meek-lite-a-new-pluggable-transport-in-whonix-14/4500/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/meek-lite-a-new-pluggable-transport-in-whonix-14/4500/2</link>
+        <pubDate>Mon, 06 Nov 2017 21:23:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4500-2</guid>
+        <source url="http://forums.whonix.org/t/meek-lite-a-new-pluggable-transport-in-whonix-14/4500.rss">meek_lite: A New Pluggable Transport in Whonix 14</source>
+      </item>
+      <item>
+        <title>meek_lite: A New Pluggable Transport in Whonix 14</title>
+        <dc:creator><![CDATA[iry]]></dc:creator>
+        <description><![CDATA[
+            <p><small>Originally published at:			<a href="https://www.whonix.org/blog/meek_lite-whonix-14" rel="nofollow noopener">https://www.whonix.org/blog/meek_lite-whonix-14</a><br>
+</small><br></p><h1>meek_lite: A New Pluggable Transport in Whonix 14</h1>
+<p>Greetings Whonix users!</p>
+<p>The Whonix development team is thrilled to announce that a new pluggable transport called <code>meek_lite</code> will be available in Whonix 14. This blog post will briefly describe <code>meek_lite</code> and how it can be easily configured in the forthcoming Whonix release.</p>
+<h1>What are Pluggable Transports?</h1>
+<p>In many parts of the globe, direct connections to the Tor network are censored. It is simple for censors to use technology to block connections, because it only requires maintenance of a real-time blacklist of all <a href="https://atlas.torproject.org/" rel="nofollow noopener">publicly known</a> Tor (guard) relays and directory authorities.</p>
+<p>In order to try and solve this problem, the Tor project came up with the idea of making a proportion of Tor guard relays only available via relatively private channels. However, since these alternative guard relays ("vanilla bridges") use the same protocol to communicate with the Tor clients as normal guard relays, a censor can simply identify the Tor signature of the network connection and then block it.</p>
+<p>Tor developers have recognized that security by obscurity has failed many bridge users, because most are still blocked in repressive environments. This has led to the development of <a href="https://www.torproject.org/docs/pluggable-transports.html.en" rel="nofollow noopener">Pluggable Transports (PTs)</a>, which help to circumvent censorship by transforming the Tor traffic flow between the Tor client and the bridge so it appears to be "innocent" network traffic, instead of the actual Tor traffic.</p>
+<p>Unfortunately, traditional obfusticated bridges - obfs2, obfs3, obfs4 - still depend on censors being unaware of bridge information (like the IP address), which is still a security by obscurity approach. This allows aggressive censors to gradually block known obfusticated bridges by requesting the same information from the <a href="https://bridges.torproject.org" rel="nofollow noopener">Tor Project BridgeDB</a>, as any normal user would do. [^1]</p>
+<p>Additionally, as David Fifield has <a href="https://lists.torproject.org/pipermail/tor-dev/2017-August/012400.html" rel="nofollow noopener">noted on the @tor-dev mailing list</a>:</p>
+<blockquote>
+  <p>We know that at least China and Kazakhstan pay attention to the default Tor Browser bridges (and China blocks them as soon as they enter the source code, even before a release).</p>
+</blockquote>
+<h1>Unique meek_lite Features</h1>
+<p>Unlike traditional bridges, <code>meek_lite</code> utilizes the concept of collateral freedom. The basic design is outlined in the <a href="https://trac.torproject.org/projects/tor/wiki/doc/meek" rel="nofollow noopener">Tor Wiki</a>:</p>
+<blockquote>
+  <p>“[t]raffic is relayed through a third-party server that is hard to block, for example a ​CDN. It uses a trick called ​domain fronting to talk to a Tor relay while appearing to talk to another domain”.</p>
+</blockquote>
+<p><code>meek_lite</code> has recently proven to perform better in circumventing censorship than other methods. For example, during the 19th National Congress of the Communist Party of China held last month, meek was one of the few effective tools to bypass strengthened Internet censorship. </p>
+<h1>Differences between meek_lite and meek</h1>
+<p>Tor Browser Bundle users may be familiar with the meek PT. <code>meek_lite</code> is a different implementation of meek created by Yawning from the Tor Project. Yawning provides a <a href="https://github.com/Yawning/obfs4/commit/611205be681322883a4d73dd00fcb13c4352fe53" rel="nofollow noopener">succinct description of the differences</a>: </p>
+<blockquote>
+  <p>This is a meek client only implementation, with the following
+  differences with dcf's meek-client:</p>
+  <ul>
+  <li>It is named meek_lite to differentiate it from the real thing.</li>
+  <li>It does not support using an external helper to normalize TLS
+  signatures, so adversaries can look for someone using the Go
+  TLS library to do HTTP.</li>
+  <li>It does the right thing with TOR<em>PT</em>PROXY, even when a helper is
+  not present.</li>
+  </ul>
+  <p>Most of the credit goes to dcf, who's code I librerally cribbed and
+  stole.  It is intended primarily as a "better than nothina" option
+  for enviornments that do not or can not presently use an external
+  Firefox helper.</p>
+</blockquote>
+<p>It should be understood that <code>meek_lite</code> does not normalize TLS signatures, but it is still effective enough to help users bypass most forms of censorship. Major software projects like Orbot have come to rely on <code>meek_lite</code>, providing support for its capabilities.</p>
+<h1>Why meek_lite is Important to Whonix</h1>
+<p>Prior to Whonix 14, censored users were limited to two possible configurations for system Tor: either obfs3 or obfs4 bridges. The integration of <code>meek_lite</code> into the Whonix ecosystem greatly improves both functionality and the user experience for those living in heavily censored areas:</p>
+<ul>
+<li>In some jurisdictions like China, <code>meek_lite</code> is the only Tor PT that is currently effective.</li>
+<li>Forthcoming features of Tor launcher / Anon Connection Wizard enable <code>meek_lite</code> to <a href="https://forums.whonix.org/t/graphical-gui-whonix-setup-wizard-anon-connection-wizard-technical-discussion/650/336">automatically retrieve Tor bridges</a>. </li>
+</ul>
+<h1>Configuring meek_lite in Whonix</h1>
+<p>Once Whonix 14 is released, users can configure Tor to use <code>meek_lite</code> in one of two ways. Both methods have been <a href="https://www.whonix.org/wiki/Bridges#How_to_Use_Bridges_in_Whonix" rel="nofollow noopener">documented in the Whonix Wiki</a>. It is recommended to check the Wiki since it will be up-to-date, unlike this blog post.</p>
+<h4>Option 1: Edit the /etc/torrc.d/50_user.torrc file manually</h4>
+<p>Beginning from Whonix 14, it is <a href="https://www.whonix.org/wiki/Whonix_Configuration_Files#.d_Style_Configuration_Folders" rel="nofollow noopener">recommended</a> to place all user customized Tor configurations into <code>/etc/torrc.d/50_user.torrc</code>.</p>
+<p>Add the following lines to the <code>/etc/torrc.d/50_user.torrc</code> file:</p>
+<blockquote>
+  <p>DisableNetwork 0
+  UseBridges 1
+  ClientTransportPlugin meek<em>lite exec /usr/bin/obfs4proxy 
+  Bridge meek</em>lite 0.0.2.0:2 B9E7141C594AF25699E0079C1F0146F409495296 url=https://d2cly7j4zqgua7.cloudfront.net/ front=a0.awsstatic.com</p>
+</blockquote>
+<p>Then reload Tor.</p>
+<h4>Option 2 (Preferred): Use Anon-Connection-Wizard</h4>
+<p>Open Anon-Connection-Wizard, and select meek-amazon or meek-azure as the bridge type in the Tor Bridges Configuration Page:</p>
+<p><a href="https://www.whonix.org/blog/wp-content/uploads/2017/11/anon_connection_wizard_meek.png" rel="nofollow noopener"><img src="//forums.whonix.org/uploads/default/original/2X/3/37d2bde3919d6a5e1901a7faee0ae8e45192dee8.png" alt="" width="300" height="244"></a></p>
+<h1>Intended Target Group</h1>
+<p>Users should consider the following recommendations when deciding whether or not to use a PT:</p>
+<ul>
+<li>If you are not living in a censored area, it is neither necessary nor recommended to use a PT.</li>
+<li>If you are living in a censored area where obfs4 works, then use it in the first instance.</li>
+<li>If you are living in a censored area where obfs4 does not work, try meek/<code>meek_lite</code>.</li>
+</ul>
+<h1>meek_lite Whonix Development</h1>
+<p>Integration of <code>meek_lite</code> into Whonix 14 would simply not have been possible without the cooperation and support of developers from many different communities, including the Tor Project, Debian, Tails and Whonix. I have attempted to maintain a near-complete record of this project's development in <a href="https://forums.whonix.org/t/graphical-gui-whonix-setup-wizard-anon-connection-wizard-technical-discussion/650/365">this Whonix forum post</a>.</p>
+<p>On a personal level, I have immensely enjoyed making contributions within an efficient, supportive and encouraging environment. I urge my fellow developers to consider joining the collaborative Whonix effort by getting in contact!</p>
+<p>[^1]: BridgeDB has adopted various methods to stymie adversaries. For instance, email requests must come from certain providers, and algorithms were developed that reject requests for a large number of different bridges within a short period.</p>
+          <p><a href="http://forums.whonix.org/t/meek-lite-a-new-pluggable-transport-in-whonix-14/4500/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/meek-lite-a-new-pluggable-transport-in-whonix-14/4500/1</link>
+        <pubDate>Mon, 06 Nov 2017 18:51:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4500-1</guid>
+        <source url="http://forums.whonix.org/t/meek-lite-a-new-pluggable-transport-in-whonix-14/4500.rss">meek_lite: A New Pluggable Transport in Whonix 14</source>
+      </item>
+  </channel>
+</rss>

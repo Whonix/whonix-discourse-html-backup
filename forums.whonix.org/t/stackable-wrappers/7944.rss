@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Stackable Wrappers</title>
+    <link>http://forums.whonix.org/t/stackable-wrappers/7944</link>
+    <description>Ex Debian dev Michael Stapelberg discusses package install hooks and triggers and how they complicate the package manager and potentially slow down the install process. An exciting development he mentions is &quot;hermetic packages&quot; which is discussed briefly under the heading &quot;Implemented in an interpreted language&quot;. This seems to be a framework for defining wrappers in a compiled language instead of bash. Worth reaching out and discussing his views and work which can help with the stacked wrappers proposal.
+
+https://michael.stapelberg.ch/posts/2019-07-20-hooks-and-triggers/</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 30 May 2020 23:40:19 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/stackable-wrappers/7944.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Stackable Wrappers</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="10" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>What would be the disadvantage of having the name or path of the to be wrapped application defined in the config file?</p>
+</blockquote>
+</aside>
+<p>How would both the pre and post wrappers be parsed correctly? Seems more complicated.</p>
+          <p><a href="http://forums.whonix.org/t/stackable-wrappers/7944/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stackable-wrappers/7944/12</link>
+        <pubDate>Sat, 30 May 2020 23:40:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7944-12</guid>
+        <source url="http://forums.whonix.org/t/stackable-wrappers/7944.rss">Stackable Wrappers</source>
+      </item>
+      <item>
+        <title>Stackable Wrappers</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="10" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>What is the advantage of this? What would be the disadvantage of having the name or path of the to be wrapped application defined in the config file?</p>
+</blockquote>
+</aside>
+<p>There’s no specific reason. Having the file path in the config file does sound like a better approach.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="10" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>What do you think about uwt ( <code>/etc/uwt.d/30_uwt_default.conf</code> ) syntax</p>
+<pre><code class="lang-auto">uwtwrapper["/usr/bin/git"]="1"
+</code></pre>
+<p>?</p>
+</blockquote>
+</aside>
+<p>Looks better.</p>
+          <p><a href="http://forums.whonix.org/t/stackable-wrappers/7944/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stackable-wrappers/7944/11</link>
+        <pubDate>Mon, 02 Mar 2020 17:09:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7944-11</guid>
+        <source url="http://forums.whonix.org/t/stackable-wrappers/7944.rss">Stackable Wrappers</source>
+      </item>
+      <item>
+        <title>Stackable Wrappers</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>The modified PATH would also need to apply for invocations through <code>sudo</code>. Fortunately <code>sudo</code> has a setting <code>secure_path</code>.</p>
+<p>madaidan via Whonix Forum:</p>
+<blockquote>
+<aside class="quote no-group" data-username="Patrick" data-post="8" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Changing PATH may also cause AppArmor issues?</p>
+</blockquote>
+</aside>
+<p>I don’t see why it would cause apparmor issues.</p>
+</blockquote>
+<p>Suppose git internally used gpg. Using standard PATH search to find the gpg binary. git simply calling “gpg” not “/usr/bin/gpg”. Then later an apparmor profile is added for git. By modifying the PATH variable and having gpg in any other path then the default “/usr/bin/gpg” could result in an apparmor violation.</p>
+<p>Or perhaps Tor Browser or Firefox would call other binaries. Dunno yet any specific examples.</p>
+<p>Perhaps an AppArmor <code>/etc/apparmor.d/tunables/...</code> or so drop-in configuration snippet could solve that.</p>
+<blockquote>
+<aside class="quote no-group" data-username="Patrick" data-post="8" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Needs more than a single <code>${wrapper_pre}</code> . Needs to be stackable.</p>
+</blockquote>
+</aside>
+<p>No, you can stack commands with a single <code>${wrapper_pre}</code>. See the example above in which <code>torsocks</code> and <code>firejail</code> are both used for <code>gpg</code>.</p>
+<p>If you want multiple drop-in config files,</p>
+</blockquote>
+<p>Yes. For sure.</p>
+<p>Each application that provides a wrapper would provide a configuration snippet. Otherwise it would be very inflexible - not using any component (for testing, Kicksecure, alternatives, whatever) no longer possible - at least not without separate user changes to wrapper configs which is bad usability.</p>
+<blockquote>
+<p>we can modify the script to source <code>${sw_dir}/${program_name}_{0..9}.conf</code>. So for example, to stack <code>torsocks</code> and <code>firejail</code> using multiple config files you can create <code>/etc/wrapper.d/gpg_0.conf</code> and add:</p>
+<pre><code class="lang-auto">wrapper_pre+="torsocks"
+</code></pre>
+</blockquote>
+<p>Maybe needs to add a space before or behind.</p>
+<p>This might be good enough for an initial implementation but would break on more complex inputs perhaps including single quotes, double quotes or command line parameters that contain spaces.</p>
+<p>Instead of setting variables directly with <code>wrapper_pre+=</code> perhaps better to use a shell function because then constructing the actual variable could be done in a shell function (later fixes for white spaces etc) and wouldn’t require later config file changes.</p>
+<p><code>/usr/lib/pbuilder/pdebuild-checkparams</code> uses</p>
+<p>DEBBUILDOPTS="${2:+$DEBBUILDOPTS $2}";<br>
+EXTRA_CONFIGFILE[${<span class="hashtag">#EXTRA_CONFIGFILE</span>[@]}]="$2";</p>
+<p><code>/usr/lib/pbuilder/pbuilder-modules</code></p>
+<pre><code class="lang-auto">function get_source_options() {
+    local source_options
+    local arg
+    # Split and de-escape DEBBUILDOPTS. Can't iterate over it before
+    # de-escaping, as word splitting does not take quotes in the variable into
+    # account. Need eval as $(echo $DEBBUILDOPTS) on its own doesn't perform
+    # quote expansion, since quote expansion operates on the *original* word.
+    eval local args=($DEBBUILDOPTS)
+    for arg in "${args[@]}"; do
+</code></pre>
+<p>Not sure yet but proper handling for quotes, any special characters and white spaces will probably require a bash array. I don’t know any bash scripts as role models from top of my head.</p>
+<blockquote>
+<p>then create <code>/etc/wrapper.d/gpg_1.conf</code> and add</p>
+</blockquote>
+<p>I am not sure yet if the name of the program to be wrapped should be part of the configuration file name. Might work. What is the advantage of this? What would be the disadvantage of having the name or path of the to be wrapped application defined in the config file?</p>
+<p>What do you think about uwt (<code>/etc/uwt.d/30_uwt_default.conf</code>) syntax</p>
+<pre><code>uwtwrapper["/usr/bin/git"]="1"
+</code></pre>
+<p>?</p>
+<p><code>/etc/wrapper.d/gpg_1.conf</code> would mean the first thing that would be run if someone used Debian standard PATH and would execute <code>gpg</code>? Dunno if /path/to/uncommon/location should be supported.</p>
+          <p><a href="http://forums.whonix.org/t/stackable-wrappers/7944/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stackable-wrappers/7944/10</link>
+        <pubDate>Mon, 02 Mar 2020 11:21:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7944-10</guid>
+        <source url="http://forums.whonix.org/t/stackable-wrappers/7944.rss">Stackable Wrappers</source>
+      </item>
+      <item>
+        <title>Stackable Wrappers</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="8" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Changing PATH may also cause AppArmor issues?</p>
+</blockquote>
+</aside>
+<p>I don’t see why it would cause apparmor issues.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="8" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Needs more than a single <code>${wrapper_pre}</code> . Needs to be stackable.</p>
+</blockquote>
+</aside>
+<p>No, you can stack commands with a single <code>${wrapper_pre}</code>. See the example above in which <code>torsocks</code> and <code>firejail</code> are both used for <code>gpg</code>.</p>
+<p>If you want multiple drop-in config files, we can modify the script to source <code>${sw_dir}/${program_name}_*.conf</code>. So for example, to stack <code>torsocks</code> and <code>firejail</code> using multiple config files you can create <code>/etc/wrapper.d/gpg_torsocks.conf</code> and add:</p>
+<pre><code class="lang-auto">wrapper_pre+="torsocks"
+</code></pre>
+<p>then create <code>/etc/wrapper.d/gpg_firejail.conf</code> and add</p>
+<pre><code class="lang-auto">wrapper_pre+="firejail"
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/stackable-wrappers/7944/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stackable-wrappers/7944/9</link>
+        <pubDate>Sun, 01 Mar 2020 14:30:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7944-9</guid>
+        <source url="http://forums.whonix.org/t/stackable-wrappers/7944.rss">Stackable Wrappers</source>
+      </item>
+      <item>
+        <title>Stackable Wrappers</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="madaidan" data-post="6" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Can’t we implement this ourselves without requiring upstream?</p>
+</blockquote>
+</aside>
+<p>For sure possible but then more likely not a solid, sustainable, long term maintainable solution. By asking upstream(s) for input we can avoid running into later one hard to fix issues. Also if we’d manage to make others use this too, then they won’t be inventing their own custom wrappers which then would be incompatible with other wrappers / our wrappers.</p>
+<aside class="quote no-group" data-username="madaidan" data-post="7" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>We don’t have to use /usr/local/bin/. We can create our own directory for this and modify $PATH to check it first.</p>
+</blockquote>
+</aside>
+<p><a href="https://github.com/Whonix/proposals/blob/master/634-stackable-wrappers.txt">https://github.com/Whonix/proposals/blob/master/634-stackable-wrappers.txt</a> on subject of $PATH currently mentions:</p>
+<blockquote>
+<ul>
+<li>amend PATH environment variable …<br>
+** …<br>
+** Does not work for services started by init / systemd.</li>
+</ul>
+</blockquote>
+<p>It’s not easy to change environment variables (PATH) globally in all cases. Such cases include login in virtual console, X, run by systemd services (root), run by systemd services (user), run by cron, and whatnot. Though, that may be possible.</p>
+<p>Changing PATH may also cause AppArmor issues? Dunno yet. Needs investigation. “Ideally” stackable wrappers won’t break existing MAC confinements.</p>
+<p>Related:</p>
+<ul>
+<li><a href="https://www.freedesktop.org/software/systemd/man/environment.d.html">https://www.freedesktop.org/software/systemd/man/environment.d.html</a></li>
+<li><a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=704054#25">https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=704054#25</a></li>
+</ul>
+<aside class="quote no-group" data-username="madaidan" data-post="7" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>${wrapper_pre} ${program_name} ${wrapper_post}</p>
+</blockquote>
+</aside>
+<p>Needs more than a single <code>${wrapper_pre}</code>. Needs to be stackable.</p>
+<blockquote>
+<p>Here are some examples of commands to prepend:</p>
+<ul>
+<li>firejail firefox</li>
+<li>torsocks gpg</li>
+<li>LD_PRELOAD="$LD_PRELOAD":libeatmydata.so rsync [ld preload hardened malloc]</li>
+<li>bindp, timeprivacy and probably a lot more</li>
+<li>probably quite some dpkg diversions used for that purpose</li>
+</ul>
+</blockquote>
+<p>Newer examples:</p>
+<ul>
+<li>hardend kernel apt (hkapt)</li>
+<li>rapt (restricted apt)</li>
+</ul>
+<blockquote>
+<p>Here are some examples of commands to append:</p>
+<ul>
+<li>for ZeroNet it would be useful to always automatically append for example --tor always</li>
+</ul>
+</blockquote>
+<aside class="quote no-group" data-username="HulaHoop" data-post="5" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>You would invoke the master wrapper script by specifying “–mwrap” in a program’s cli command. mwrap is short for mega wrapper.</p>
+</blockquote>
+</aside>
+<p>I don’t understand.<br>
+For now, the idea was the wrappers to be transparent. Adding functionality (such as stream isolation, MAC confinement, etc.) but not requiring laymen user to be aware of it.</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="5" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Somehow preserve the use of mwrap with software across their updates.</p>
+</blockquote>
+</aside>
+<p>For sure. Wrappers absolutely must survive upgrades of applications these are wrapping. Needs to be added to proposal or maybe separate discussion summary document as a defined goal.</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="5" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>mwrap would assume a default “wrapper.d” dir is present in the programs “etc” subfolder.</p>
+</blockquote>
+</aside>
+<p>Could use the same folders as systemd config usually uses.</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="5" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>This can be extended however to add other arbitrary dirs for it to look into and to chain wrappers contained therein in lexical order as you suggested.</p>
+</blockquote>
+</aside>
+<p>A config option to expand which folders will be parsed? That’s extra complexity. Not sure what would that be useful for?</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="5" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>The default wrapper.d location should be overridable in case it is a portable program or one installed in the home folder like TBB or /opt.</p>
+</blockquote>
+</aside>
+<p>/opt (and other uncommon PATHs) is a good point. If we go for PATH variable modification to implement this then all folders should be covered. It however will probably not be possible to wrap direct calls to /opt/pkg-name/binary-name. But that should be OK. Wrappers will probably only be shipped for select applications where we know where these are installed.</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="5" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>If a duplicate wrapper script is found in two different folders, mwrap should exit with an error telling the user to change the file name before it can be applied.</p>
+</blockquote>
+</aside>
+<p>Duplicate detection is hard. Two different config files that both want to prepend torsocks or something? Very few applications guard against messed up configs. The ones who ship wrapper configs need to know what they are doing.</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="5" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>It should be designed to run different instances per each program that uses it to avoid situations of privilege escalation. Think a malicious program in home folder can feed the mwrap instance running under sudo with arbitrary scripts if it is already used by a binary with folders in /etc/</p>
+</blockquote>
+</aside>
+<p>Not sure I fully understood that threat model.<br>
+However, yes, binaries in /home are another interesting question.<br>
+I guess stackable wrappers could parse <code>$HOME/.stackable-wrappers.d</code> or something if that exists.</p>
+<ul>
+<li>if run with sudo: then all bets of off anyhow. A compromised home folder would mean having failed already anyhow.</li>
+<li>if not without sudo: then there’s no privilege escalation. <code>$HOME/.stackable-wrappers.d</code> would not execute anything that the user could not execute manually anyhow.</li>
+<li>if run by root: it would parse <code>/root/.stackable-wrappers.d</code> (if exists) which would be safe too</li>
+<li>if run by systemd / cron: there’s probably in most cases no <code>$HOME</code> and if there was it should not be writeable by those system users having no business there</li>
+</ul>
+<aside class="quote no-group" data-username="HulaHoop" data-post="5" data-topic="7944">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Think a malicious program in home folder</p>
+</blockquote>
+</aside>
+<p>Well, “malicious program in home folder” + sudo = fail anyhow?</p>
+          <p><a href="http://forums.whonix.org/t/stackable-wrappers/7944/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stackable-wrappers/7944/8</link>
+        <pubDate>Sun, 01 Mar 2020 09:34:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7944-8</guid>
+        <source url="http://forums.whonix.org/t/stackable-wrappers/7944.rss">Stackable Wrappers</source>
+      </item>
+      <item>
+        <title>Stackable Wrappers</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Some suggestions for the config language you can potentially use. I am not technically apt in this space so excuse any simplistic suggestions.</p>
+<blockquote>
+<ul>
+<li>How the wrappers would be specified in the config language is yet to be invented, which will be done if this implementation path looks favorable.</li>
+</ul>
+</blockquote>
+<ul>
+<li>
+<p>You would invoke the master wrapper script by specifying “–mwrap” in a program’s cli command. mwrap is short for mega wrapper.</p>
+</li>
+<li>
+<p>Somehow preserve the use of mwrap with software across their updates.</p>
+</li>
+<li>
+<p>mwrap would assume a default “wrapper.d” dir is present in the programs “etc” subfolder. This can be extended however to add other arbitrary dirs for it to look into and to chain wrappers contained therein in lexical order as you suggested.</p>
+</li>
+<li>
+<p>The default wrapper.d  location should be overridable in case it is a portable program or one installed in the home folder like TBB or /opt.</p>
+</li>
+<li>
+<p>The order of custom wrapper folders should be interpreted according to how they are fed to the command.</p>
+</li>
+<li>
+<p>If a duplicate wrapper script is found in two different folders, mwrap should exit with an error telling the user to change the file name before it can be applied.</p>
+</li>
+<li>
+<p>It should be designed to run different instances per each program that uses it to avoid situations of privilege escalation. Think a malicious program in home folder can feed the mwrap instance running under sudo with arbitrary scripts if it is already used by a binary with folders in /etc/</p>
+</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/stackable-wrappers/7944/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stackable-wrappers/7944/5</link>
+        <pubDate>Sat, 29 Feb 2020 19:48:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7944-5</guid>
+        <source url="http://forums.whonix.org/t/stackable-wrappers/7944.rss">Stackable Wrappers</source>
+      </item>
+      <item>
+        <title>Stackable Wrappers</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>An implementation of what I said above would be the following.</p>
+<p>Create a file called <code>/usr/bin/stackable-wrapper</code> and add:</p>
+<pre><code class="lang-auto">#!/bin/bash
+
+sw_dir="/etc/wrapper.d"
+program_name="$(basename $0)"
+
+if [ -f "${sw_dir}/${program_name}.conf" ]; then
+  . "${sw_dir}/${program_name}.conf"
+else
+  echo "ERROR: File ${sw_dir}/${program_name}.conf doesn't exist!"
+  exit 1
+fi
+
+# So we don't execute ourselves.
+PATH="$(echo ${PATH} | sed -e 's/\/usr\/local\/bin\://g')"
+
+${wrapper_pre} ${program_name} ${wrapper_post}
+</code></pre>
+<p>Then create the config file e.g. <code>/etc/wrapper.d/gpg.conf</code>:</p>
+<pre><code class="lang-auto">wrapper_pre="torsocks firejail"
+wrapper_post="--example"
+</code></pre>
+<p>Then symlink it:</p>
+<pre><code class="lang-auto">ln -s /usr/bin/stackable-wrapper /usr/local/bin/gpg
+</code></pre>
+<p>Should work fine.</p>
+<p>We don’t have to use /usr/local/bin/. We can create our own directory for this and modify $PATH to check it first.</p>
+          <p><a href="http://forums.whonix.org/t/stackable-wrappers/7944/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stackable-wrappers/7944/7</link>
+        <pubDate>Sat, 29 Feb 2020 18:12:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7944-7</guid>
+        <source url="http://forums.whonix.org/t/stackable-wrappers/7944.rss">Stackable Wrappers</source>
+      </item>
+      <item>
+        <title>Stackable Wrappers</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="9008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>How would an application by started by default using the sandbox wrapper without needing to prepend on command line? The good old problem of non-existence of stackable wrappers.</p>
+<ul>
+<li><a href="https://phabricator.whonix.org/T634">https://phabricator.whonix.org/T634</a></li>
+<li><a href="https://github.com/Whonix/proposals/blob/master/634-stackable-wrappers.txt">https://github.com/Whonix/proposals/blob/master/634-stackable-wrappers.txt</a></li>
+</ul>
+</blockquote>
+</aside>
+<p>Can’t we implement this ourselves without requiring upstream?</p>
+<p>Create a wrapper that reads from <code>/etc/wrapper.d/</code> and have <code>wrapper_pre</code> (for commands to be added before the actual program) and <code>wrapper_post</code> (for commands to be added after) variables based on the contents of the files there so you have:</p>
+<pre><code>${wrapper_pre}${program_name}${wrapper_post}
+</code></pre>
+<p>Create symlinks to run the program with our stackable wrapper by default and configure the program via <code>wrapper.d</code>.</p>
+<p>So the program has one, configurable wrapper that wraps the program with other wrappers.</p>
+          <p><a href="http://forums.whonix.org/t/stackable-wrappers/7944/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stackable-wrappers/7944/6</link>
+        <pubDate>Sat, 29 Feb 2020 13:16:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7944-6</guid>
+        <source url="http://forums.whonix.org/t/stackable-wrappers/7944.rss">Stackable Wrappers</source>
+      </item>
+      <item>
+        <title>Stackable Wrappers</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>There wasn’t much feedback on stackable wrappers from Michael Stapelberg.</p>
+<ul>
+<li>inquiry: <a href="https://www.whonix.org/pipermail/whonix-devel/2019-August/001423.html">https://www.whonix.org/pipermail/whonix-devel/2019-August/001423.html</a>
+</li>
+<li>reply: <a href="https://www.whonix.org/pipermail/whonix-devel/2019-August/001424.html">https://www.whonix.org/pipermail/whonix-devel/2019-August/001424.html</a>
+</li>
+</ul>
+<p>Other stackable wrappers resources:</p>
+<ul>
+<li><a href="https://github.com/netblue30/firejail/issues/3257">https://github.com/netblue30/firejail/issues/3257</a></li>
+<li><a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=822693">https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=822693</a></li>
+<li><a href="https://www.whonix.org/pipermail/whonix-devel/2020-February/001519.html">https://www.whonix.org/pipermail/whonix-devel/2020-February/001519.html</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/stackable-wrappers/7944/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stackable-wrappers/7944/4</link>
+        <pubDate>Sat, 29 Feb 2020 11:12:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7944-4</guid>
+        <source url="http://forums.whonix.org/t/stackable-wrappers/7944.rss">Stackable Wrappers</source>
+      </item>
+      <item>
+        <title>Stackable Wrappers</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Could you please provide feedback for this stackable wrappers proposal?</p>
+<ul>
+<li><a href="https://github.com/Whonix/proposals/blob/master/634-stackable-wrappers.txt">https://github.com/Whonix/proposals/blob/master/634-stackable-wrappers.txt</a></li>
+<li><a href="https://phabricator.whonix.org/T634">https://phabricator.whonix.org/T634</a></li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/stackable-wrappers/7944/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stackable-wrappers/7944/3</link>
+        <pubDate>Sat, 29 Feb 2020 11:08:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7944-3</guid>
+        <source url="http://forums.whonix.org/t/stackable-wrappers/7944.rss">Stackable Wrappers</source>
+      </item>
+      <item>
+        <title>Stackable Wrappers</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>He had an excellent talk on the subject of package manager speed. German language. Not sure automated translation will be good enough.</p>
+<p><a href="https://www.youtube.com/watch?v=TdfEF0zRIL4" rel="nofollow noopener">https://www.youtube.com/watch?v=TdfEF0zRIL4</a></p>
+<hr>
+<p>Contacted.</p>
+<p><code>stackable wrapper, .d configuration drop-in folders</code>:<br>
+<a href="https://www.whonix.org/pipermail/whonix-devel/2019-August/001423.html" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/pipermail/whonix-devel/2019-August/001423.html</a></p>
+          <p><a href="http://forums.whonix.org/t/stackable-wrappers/7944/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stackable-wrappers/7944/2</link>
+        <pubDate>Sun, 25 Aug 2019 09:11:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7944-2</guid>
+        <source url="http://forums.whonix.org/t/stackable-wrappers/7944.rss">Stackable Wrappers</source>
+      </item>
+      <item>
+        <title>Stackable Wrappers</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Ex Debian dev Michael Stapelberg discusses package install hooks and triggers and how they complicate the package manager and potentially slow down the install process. An exciting development he mentions is “hermetic packages” which is discussed briefly under the heading “Implemented in an interpreted language”. This seems to be a framework for defining wrappers in a compiled language instead of bash. Worth reaching out and discussing his views and work which can help with the stacked wrappers proposal.</p>
+<p><a href="https://michael.stapelberg.ch/posts/2019-07-20-hooks-and-triggers/" class="onebox" target="_blank">https://michael.stapelberg.ch/posts/2019-07-20-hooks-and-triggers/</a></p>
+          <p><a href="http://forums.whonix.org/t/stackable-wrappers/7944/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/stackable-wrappers/7944/1</link>
+        <pubDate>Sat, 24 Aug 2019 20:08:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-7944-1</guid>
+        <source url="http://forums.whonix.org/t/stackable-wrappers/7944.rss">Stackable Wrappers</source>
+      </item>
+  </channel>
+</rss>

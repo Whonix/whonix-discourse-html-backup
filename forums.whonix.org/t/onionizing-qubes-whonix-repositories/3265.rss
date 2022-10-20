@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Onionizing Qubes-Whonix Repositories</title>
+    <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265</link>
+    <description>I understand this is coming up for Whonix 14 - see https://phabricator.whonix.org/T399  - but it is worth re-iterating that hardening the current stable Whonix 13 can be achieved by defaulting the mirrors in sources.list to .onions 
+
+The benefits include:
+
+- protection against MITM attacks due to the use of end-end encryption;
+- protection against downgrade attacks; and
+- reducing the load on exit relays in the Tor network.
+
+Is editing the sources.list already documented? I forget.
+
+https://blog.torproject.org/blog/tor-heart-apt-transport-tor-and-debian-onions
+
+&gt; Hm! Yes, apt uses plain http to fetch its debs (and then checks the signatures afterwards), so it is possible that somebody somewhere on the Internet (the exit relay, an attacker at the repository, or somebody in between) could mess with those.
+
+&gt; That is indeed one of the advantages of using the onion address for reaching the repository -- you get end-to-end authentication and encryption, which pretty much stops all of those types of possible attacks.
+
+&gt; (Another advantage of using the onion address is that it shifts load away from exit relays in the Tor network -- which once thousands of people are using this for their package installs might add up to be a big deal.)
+
+&gt; ...
+
+&gt; Also I think it&#39;s important to note that, like targeted delivery of a malicious package, Tor forces the adversary to deliver malicious data to all users during a downgrade attack. Usually a malicious package will be caught when it&#39;s signature is verified, but during a downgrade attack, the package is (was) a legitimate package so it&#39;s signature is good, except the server delivers an older version of the package (or hides the new one from the victim). 
+
+&gt; Thus, the signature is good but the package is intentionally outdated; very useful for adversaries wanting to exploit vulnerabilities that were present in old packages but have since been patched. Tor means that everyone would receive the old version, making the attack much more detectable. Some package managers already protect against these kind of replay attacks using signed repository (as opposed to just package) files, but many do not.</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 19 Jul 2018 08:25:27 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[mig5]]></dc:creator>
+        <description><![CDATA[
+            <p>Given APT is simple HTTP I think you could solve most load issues by letting Varnish cache the repo data. (We could purge the cache when pushing new data to the repo). Or yes, could look at onionbalance.</p>
+<p>So I think a single APT server is probably sufficient (it has been sufficient to date, right?) but I <em>also</em> agree in the rule of not putting all eggs in one basket. For example, long term I would advocate having a separate server for website/wiki/forum and one for apt repo, also for security/attack surface reasons (no need for a hack of MediaWiki to place the apt repo at risk). It’s the same ‘compartmentalisation by design’ principle that we appreciate of Whonix and QubesOS. The only downside is commercial impact (more servers) and a little extra server maintenance (more of my time).</p>
+<p>Random onion domains is probably overkill/administrative overhead indeed (would rather use onionbalance when it’s available for v3). It would also be then harder for users to confirm with one another that they’re using a legitimate APT source, e.g with 100 different onion domains, hard to ‘google it’ and confirm you’re not using a malicious onion address (hard enough already to read just one long v3 onion address and recognise it as legitimate, Zooko’s triangle, etc etc).</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/23</link>
+        <pubDate>Thu, 19 Jul 2018 08:25:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-23</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Ticket created.<br>
+<code>use onion sources list for apt-get updating by default</code><br>
+<a href="https://phabricator.whonix.org/T812" class="onebox" target="_blank" rel="nofollow noopener">https://phabricator.whonix.org/T812</a></p>
+<hr>
+<p>Status:</p>
+<p>Due to flakiness of onion v4 this should be postponed.</p>
+<aside class="quote quote-modified" data-post="8" data-topic="5360">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/mig5/40/1647_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/unable-to-access-v3-hidden-site-behind-whonix-gateway-14/5360/8">Unable to access V3 hidden site behind Whonix-Gateway 14</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/kvm"><span class="badge-category-bg" style="background-color: #9EB83B;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Everything specific to Whonix KVM. (devs)">KVM</span></a>
+  </div>
+  <blockquote>
+    I’ve seen a few posts here about the mysterious ‘my v3 onion is suddenly unreachable’ (including the <a href="http://Whonix.org" rel="nofollow noopener">Whonix.org</a> v3 onion, which predated my time here), and thought I’d let you know of a known issue about v3 descriptors being re-published to the HSdirs. 
+I first saw this in OnionShare whilst working on persistent v3 onions there, and this led to it being reported upstream. But even have seen it after migrating a simple website to another server (and migrating its v3 keys) and being surprised it w…
+  </blockquote>
+</aside>
+
+<blockquote>
+<p><strong>A fix has been implemented and is expected to arrive in Tor 0.3.5 in December.</strong></p>
+</blockquote>
+<hr>
+<p>While we are at it… Should we separate Whonix webiste onion and Whonix repository onion? We would keep Whonix website onion as is (even functional for apt-get to not break it for anyone) but the next upgrade of Whonix wuould move everyone else to a another, fresh onion address.</p>
+<p>Why?</p>
+<ul>
+<li>separate website and apt-get downloads</li>
+<li>future-proof with respect to future server load</li>
+<li>we could move apt-get downloads to a different server when needed</li>
+</ul>
+<p>Should we even create 2-10 or even 10-100 different onion domains and randomly assign Whonix users one? Why: load balancing. Why not: probably overkill. Debian manages without such gymnastics. But they don’t have onion v3 yet as far as I know.</p>
+<p>Perhaps we’ll wait for onionbalance v3 support?</p>
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/DonnchaC/onionbalance/issues/69" target="_blank" rel="nofollow noopener">github.com/DonnchaC/onionbalance</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/Alicesland" rel="nofollow noopener">
+<img src="//forums.whonix.org/uploads/default/original/2X/e/edb99f7d009eee6c4925cced25e6e2306b4ec7c3.png" class="thumbnail onebox-avatar" width="420" height="420">
+</a>
+
+<h4><a href="https://github.com/DonnchaC/onionbalance/issues/69" target="_blank" rel="nofollow noopener">Issue: Next-Generation onion services (v3) support</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/Alicesland" target="_blank" rel="nofollow noopener">Alicesland</a>
+	on <a href="https://github.com/DonnchaC/onionbalance/issues/69" target="_blank" rel="nofollow noopener">2018-01-09</a>
+	</div>
+	<div class="user">
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">Now that we have a stable release of the 0.3.2 branch next-generation (v3) onion services are hitting the mainstream! onionbalance, in...</pre>
+
+<div class="labels">
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Research on this is low priority due to above status.</p>
+<p>//cc <a class="mention" href="http://forums.whonix.org/u/mig5">@mig5</a></p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/22</link>
+        <pubDate>Thu, 19 Jul 2018 07:05:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-22</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[fortasse]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes, that onion address should be fine.</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/21</link>
+        <pubDate>Tue, 06 Mar 2018 23:04:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-21</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>To move this forward… To fully onionize all default repositories that Whonix is using for Whonix 15…</p>
+<p>Could someone work please on</p>
+<p><a href="https://github.com/QubesOS/qubes-issues/issues/2623" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/QubesOS/qubes-issues/issues/2623</a></p>
+<p>? Should be a rather simple task.</p>
+<p>That would be a prerequisite to get this implemented in Whonix.</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/20</link>
+        <pubDate>Mon, 05 Mar 2018 22:53:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-20</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>There is deb.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion - should be fine to use? <a class="mention" href="http://forums.whonix.org/u/fortasse">@fortasse</a></p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/19</link>
+        <pubDate>Mon, 05 Mar 2018 22:51:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-19</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Making <code>tor+</code> working in Whonix 13 is not simple.</p>
+<p>Any invocation of <code>apt-get</code> - in essence - results in <code>torsocks apt-get</code> for stream isolation. I.e. apt-get gets forced to use a Tor SocksPort. This conflicts with apt-transport-tor which wants to connect to localhost 127.0.0.1 9050, which gets blocked by torsocks. (torsocks by default blocks that, because when not using Whonix, this is better blocked to avoid leaks.)</p>
+<p>Running apt-get.anondist-orig would work for <code>tor+</code>, but that would break non-onion repository access on Whonix-Gateway, because that does not have system DNS.</p>
+<p><code>tor+</code> needs to wait for Whonix 14, because that will be based on Debian stretch, which comes with a recent enough version of <code>torsocks</code> supporting <code>AllowOutboundLocalhost 1</code> which will be <a href="https://github.com/Whonix/uwt/blob/master/etc/tor/torsocks.conf.anondist">enabled</a> by the <a href="https://github.com/Whonix/uwt">uwt</a> package.</p>
+<pre><code class="lang-auto"># Set Torsocks to allow outbound connections to the loopback interface.
+# If set to 1, connect() will be allowed to be used to the loopback interface
+# bypassing Tor. If set to 2, in addition to TCP connect(), UDP operations to
+# the loopback interface will also be allowed, bypassing Tor. This option
+# should not be used by most users. (Default: 0)
+AllowOutboundLocalhost 1
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/18</link>
+        <pubDate>Sun, 29 Jan 2017 17:13:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-18</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>Our wiki instructions to add “tor+” in front of the onion addresses for repositories is wrong, because you get a bunch of these error messages:</p>
+<blockquote>
+<p>W: Failed to fetch tor+http://sgvtcaew4bxjd7ln.onion/dists/jessie/updates/non-free/binary-amd64/Packages  Failed to connect to localhost port 9050: Connection refused</p>
+</blockquote>
+<blockquote>
+<p>E: Some index files failed to download. They have been ignored, or old ones used instead.</p>
+</blockquote>
+<p>Just pointing to the .onion mirrors without “tor+” works fine. So what’s the correct method?</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/17</link>
+        <pubDate>Thu, 26 Jan 2017 05:21:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-17</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[fortasse]]></dc:creator>
+        <description><![CDATA[
+            <p>An option for pulling files in an authenticated manner is something like rsync over <a href="http://www.pizzashack.org/rssh/">rssh</a>. I’m not sure what the implementation difficulty would be on the Qubes side, it may not be worth the effort.</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/16</link>
+        <pubDate>Wed, 04 Jan 2017 01:45:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-16</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="11" data-topic="3265">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/m/df705f/40.png" class="avatar"> marmarek:</div>
+<blockquote>
+<p>Generally there is not much load there, but better not more often thanonce an hour.</p>
+</blockquote>
+</aside>
+<p>Good you say so, because I had in mind to only wait 1 to 3 minutes between checks.</p>
+<aside class="quote" data-post="11" data-topic="3265">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/m/df705f/40.png" class="avatar"> marmarek:</div>
+<blockquote>
+<p>I think that’s wrong assumption. Better assume server is always compromised. HTTPS and/or tor is only for privacy (ISP can’t see what updates are you downloading), but not for updates/metadata integrity.</p>
+</blockquote>
+</aside>
+<p>Agreed.</p>
+<p>“Better assume server is always compromised.” is a very good assumption.</p>
+<p>Unencrypted/unauthenticated rsync also opens up for “trolling attacks”. What in case kkkkkkkkkk63ava6.onion ever delivers a malicious file? Then the investigation would have to cover:</p>
+<ul>
+<li>
+<ol>
+<li>developer machine compromised?</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>upload between developer machine to Qubes server compromised? (ssh has its weaknesses…)</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>unauthenticated rsync between Qubes and Whonix server compromised?</li>
+</ol>
+</li>
+<li>
+<ol start="4">
+<li>Whonix server compromised?</li>
+</ol>
+</li>
+</ul>
+<p>That would cost a lot time to figure out. If there was an authenticated rsync alternative, I would be very much for it. Alternatively, we if could check the integrity on the server before delivering it to users and having them notice a signature is broken would also be better. (avoiding lots of support requests and concerns) I guess it falls into the “very far in the future” milestone.</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/15</link>
+        <pubDate>Sun, 11 Dec 2016 17:48:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-15</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[adw]]></dc:creator>
+        <description><![CDATA[
+            <p>Right. I was replying to the “only for privacy” part. I just thought it<br>
+was worth remembering (reminding myself, really) that there is a<br>
+security benefit to doing updates over Tor in addition to a privacy benefit.</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/14</link>
+        <pubDate>Thu, 08 Dec 2016 22:06:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-14</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[marmarek]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes, that’s right too. But it still does not depend on data integrity on<br>
+the server itself. Rather, makes it harder for attacker to provide<br>
+different data to <em>selected</em> users - so replaced packages can be spotted<br>
+even easier.</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/13</link>
+        <pubDate>Thu, 08 Dec 2016 15:36:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-13</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[adw]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="20" data-topic="3221">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/m/df705f/40.png" class="avatar"><a href="//forums.whonix.org/t/hardening-qubes-whonix/3221/20">Hardening Qubes-Whonix</a>
+</div>
+<blockquote>
+<p>I think that’s wrong assumption. Better assume server is always compromised. HTTPS and/or tor is only for privacy (ISP can’t see whatupdates are you downloading), but not for updates/metadata integrity.</p>
+</blockquote>
+</aside>
+<p>Additional benefits of doing updates via Tor, from <a href="https://blog.torproject.org/blog/tor-heart-apt-transport-tor-and-debian-onions" rel="nofollow noopener">a recent Tor blog post on <code>apt-transport-tor</code></a>:</p>
+<blockquote>
+<p>Doing updates via Tor provides some really compelling security properties. One of the big benefits is that an attacker can’t target you for a malicious update: even if they manage to steal some package signing keys and break into the update server and replace packages, they still can’t tell that it’s you asking for the update. So if they want to be sure you get the malicious update, they’re forced to attack everybody who updates, which means a really noisy attack that is much more likely to get noticed. This anonymity goal is one of the main reasons that Tor Browser does its updates over Tor as well.</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/12</link>
+        <pubDate>Thu, 08 Dec 2016 12:00:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-12</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[marmarek]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>How often could the rsync script run? (Keeping the time the mirror lags<br>
+behind low and not flooding Qubes server.)</p>
+</blockquote>
+<p>Generally there is not much load there, but better not more often than<br>
+once an hour.</p>
+<blockquote>
+<p>Not a blocker, but here is why I brought that up:<br>
+Yes, repository metadata authenticated. But with rsync we are taking<br>
+something from a “somewhat secure” source (https), download it over an<br>
+insecure unencrypted rsync transfer. It would be bad if during that<br>
+unencrypted transfer a mitm introduced a malicious modification that<br>
+later exploits the metadata verification code in <code>dnf</code>.</p>
+</blockquote>
+<p>I think that’s wrong assumption. Better assume server is always<br>
+compromised. HTTPS and/or tor is only for privacy (ISP can’t see what<br>
+updates are you downloading), but not for updates/metadata integrity.</p>
+<blockquote>
+<p>Files then would be available through</p>
+<ul>
+<li>
+<code>https://download.whonix.org/[...]</code> and</li>
+<li>
+<code>http://download.kkkkkkkkkk63ava6.onion/[...]</code> (kkkkkkkkkk63ava6.onion<br>
+is same <a href="http://whonix.org" rel="nofollow noopener">whonix.org</a> server).</li>
+</ul>
+<p>If that sounds alright, then there is no issue.</p>
+</blockquote>
+<p>I think that’s ok. If there is no conflict on directory names.</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/11</link>
+        <pubDate>Thu, 08 Dec 2016 02:42:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-11</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Maybe. But also more work. And depends on if it should be considered a<br>
+mirror or official location.</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/10</link>
+        <pubDate>Wed, 07 Dec 2016 16:34:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-10</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="17" data-topic="3221">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"><a href="//forums.whonix.org/t/hardening-qubes-whonix/3221/17">Hardening Qubes-Whonix</a>
+</div>
+<blockquote>
+<p>Files then would be available through</p>
+<p><a href="https://download.whonix.org/%5B...%5D">https://download.whonix.org/[...]</a> and</p>
+<p><a href="http://download.kkkkkkkkkk63ava6.onion/%5B...%5D">http://download.kkkkkkkkkk63ava6.onion/[...]</a> (kkkkkkkkkk63ava6.onion<br>
+is same <a href="http://whonix.org">whonix.org</a> server).</p>
+</blockquote>
+</aside>
+<p>Would it be cleaner to add another hidden service using <a href="http://qubesosmamapaxpa.onion/">http://qubesosmamapaxpa.onion/</a> or a newly generated <a href="http://qubesosxxxxxxxxx.onion">http://qubesosxxxxxxxxx.onion</a>?</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/9</link>
+        <pubDate>Wed, 07 Dec 2016 16:23:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-9</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>How often could the rsync script run? (Keeping the time the mirror lags<br>
+behind low and not flooding Qubes server.)</p>
+<p>marmarek:</p>
+<blockquote>
+<p>[quote=“Patrick, post:13, topic:3221”] Technical implementation is<br>
+not super simple. Would might require support from Qubes. They<br>
+providing rsync access or so. [/quote]</p>
+<p>There is already rsync service on <a href="http://ftp.qubes-os.org">ftp.qubes-os.org</a> (which is the same<br>
+as <a href="http://yum.qubes-os.org">yum.qubes-os.org</a>). Exactly for this purpose.</p>
+</blockquote>
+<p>Great!</p>
+<blockquote>
+<p>[quote=“Patrick, post:13, topic:3221”] Then we could add a brain dead<br>
+script that downloads from <a href="http://yum.qubes-os.org">yum.qubes-os.org</a> to <a href="http://whonix.org">whonix.org</a> server over<br>
+unencrypted connection (sorry, that is how rsync and mirroring works<br>
+nowadays still). [/quote]</p>
+<p>Repository metadata is authenticated anyway, so it shouldn’t be a<br>
+problem.</p>
+</blockquote>
+<p>Not a blocker, but here is why I brought that up:<br>
+Yes, repository metadata authenticated. But with rsync we are taking<br>
+something from a “somewhat secure” source (https), download it over an<br>
+insecure unencrypted rsync transfer. It would be bad if during that<br>
+unencrypted transfer a mitm introduced a malicious modification that<br>
+later exploits the metadata verification code in <code>dnf</code>.</p>
+<p>So I think very long term, an encrypted/authenticated replacement for<br>
+rsync is desirable. [No such project exists yet to my knowledge.]<br>
+Ideally, packages were uploaded over a secure connection and then<br>
+downloaded by the user through an onion service. Then there are fewer<br>
+chances for a mitm to try exploit the metadata verification code. (Only<br>
+on the upload then server side then.)</p>
+<blockquote>
+<p>[quote=“Patrick, post:13, topic:3221”] If domain name is<br>
+supposed to include <a href="http://qubes-os.org">qubes-os.org</a>, then further help from Qubes would<br>
+be required (they modify DNS, point to <a href="http://whonix.org">whonix.org</a> server) and I’d<br>
+likely could use fortasse’s help for that one <a href="http://whonix.org">whonix.org</a> server<br>
+side. [/quote]</p>
+<p>I don’t understand. If that’s about above mentioned onion service, it<br>
+shouldn’t have anything to do with <a href="http://qubes-os.org">qubes-os.org</a> nor <a href="http://whonix.org">whonix.org</a><br>
+domain, no?</p>
+</blockquote>
+<p>Files then would be available through</p>
+<ul>
+<li>
+<code>https://download.whonix.org/[...]</code> and</li>
+<li>
+<code>http://download.kkkkkkkkkk63ava6.onion/[...]</code> (kkkkkkkkkk63ava6.onion<br>
+is same <a href="http://whonix.org">whonix.org</a> server).</li>
+</ul>
+<p>If that sounds alright, then there is no issue.</p>
+<blockquote>
+<p>One more possible problem - managing sources.list. Onion links needs<br>
+to be placed there, but the file currently is part of<br>
+qubes-core-agent package, which is generic package also for<br>
+non-Whonix.</p>
+</blockquote>
+<p>That could be considered a follow up task. For the context of this<br>
+<code>Hardening Qubes[-Whonix]</code> thread (which would document how to change<br>
+this) it is not a blocker.</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/8</link>
+        <pubDate>Wed, 07 Dec 2016 14:11:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-8</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[marmarek]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="13" data-topic="3221">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"><a href="//forums.whonix.org/t/hardening-qubes-whonix/3221/13">Hardening Qubes-Whonix</a>
+</div>
+<blockquote>
+<p>Technical implementation is not super simple. Would might require support from Qubes. They providing rsync access or so.</p>
+</blockquote>
+</aside>
+<p>There is already rsync service on <a href="http://ftp.qubes-os.org" rel="nofollow noopener">ftp.qubes-os.org</a> (which is the same as <a href="http://yum.qubes-os.org" rel="nofollow noopener">yum.qubes-os.org</a>). Exactly for this purpose.</p>
+<aside class="quote" data-post="13" data-topic="3221">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"><a href="//forums.whonix.org/t/hardening-qubes-whonix/3221/13">Hardening Qubes-Whonix</a>
+</div>
+<blockquote>
+<p>Then we could add a brain dead script that downloads from <a href="http://yum.qubes-os.org" rel="nofollow noopener">yum.qubes-os.org</a> to <a href="http://whonix.org" rel="nofollow noopener">whonix.org</a> server over unencrypted connection (sorry, that is how rsync and mirroring works nowadays still).</p>
+</blockquote>
+</aside>
+<p>Repository metadata is authenticated anyway, so it shouldn’t be a problem.</p>
+<aside class="quote" data-post="13" data-topic="3221">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"><a href="//forums.whonix.org/t/hardening-qubes-whonix/3221/13">Hardening Qubes-Whonix</a>
+</div>
+<blockquote>
+<p>If domain name is supposed to include <a href="http://qubes-os.org" rel="nofollow noopener">qubes-os.org</a>, then further help from Qubes would be required (they modify DNS, point to <a href="http://whonix.org" rel="nofollow noopener">whonix.org</a> server) and I’d likely could use fortasse’s help for that one <a href="http://whonix.org" rel="nofollow noopener">whonix.org</a> server side.</p>
+</blockquote>
+</aside>
+<p>I don’t understand. If that’s about above mentioned onion service, it shouldn’t have anything to do with <a href="http://qubes-os.org" rel="nofollow noopener">qubes-os.org</a> nor <a href="http://whonix.org" rel="nofollow noopener">whonix.org</a> domain, no?</p>
+<p>One more possible problem - managing sources.list. Onion links needs to be placed there, but the file currently is part of qubes-core-agent package, which is generic package also for non-Whonix.</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/7</link>
+        <pubDate>Wed, 07 Dec 2016 05:36:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-7</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="14" data-topic="3221">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/adw/40/686_1.png" class="avatar"><a href="//forums.whonix.org/t/hardening-qubes-whonix/3221/14">Hardening Qubes-Whonix</a>
+</div>
+<blockquote>
+<p><img src="//forums.whonix.org/images/emoji/twitter/unamused.png?v=5" title=":unamused:" class="emoji" alt=":unamused:"></p>
+</blockquote>
+</aside>
+<p>ohnoes… SPIES!!!</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/6</link>
+        <pubDate>Wed, 07 Dec 2016 05:14:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-6</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[adw]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="12" data-topic="3221">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"><a href="//forums.whonix.org/t/hardening-qubes-whonix/3221/12">Hardening Qubes-Whonix</a>
+</div>
+<blockquote>
+<p>What’s wrong with those kids?</p>
+</blockquote>
+</aside>
+<p><img src="//forums.whonix.org/images/emoji/twitter/unamused.png?v=5" title=":unamused:" class="emoji" alt=":unamused:"></p>
+<aside class="quote" data-post="13" data-topic="3221">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"><a href="//forums.whonix.org/t/hardening-qubes-whonix/3221/13">Hardening Qubes-Whonix</a>
+</div>
+<blockquote>
+<p>Free disk space and traffic, yes.</p>
+<p>Technical implementation is not super simple. Would might require support from Qubes. They providing rsync access or so. Then we could add a brain dead script that downloads from <a href="http://yum.qubes-os.org" rel="nofollow noopener">yum.qubes-os.org</a> to <a href="http://whonix.org" rel="nofollow noopener">whonix.org</a> server over unencrypted connection (sorry, that is how rsync and mirroring works nowadays still). If domain name is supposed to include <a href="http://qubes-os.org" rel="nofollow noopener">qubes-os.org</a>, then further help from Qubes would be required (they modify DNS, point to <a href="http://whonix.org" rel="nofollow noopener">whonix.org</a> server) and I’d likely could use fortasse’s help for that one <a href="http://whonix.org" rel="nofollow noopener">whonix.org</a> server side.</p>
+</blockquote>
+</aside>
+<p><a class="mention" href="http://forums.whonix.org/u/marmarek">@marmarek</a>, what do you think?</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/5</link>
+        <pubDate>Wed, 07 Dec 2016 05:02:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-5</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="12" data-topic="3221">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/e/8dc957/40.png" class="avatar"><a href="//forums.whonix.org/t/hardening-qubes-whonix/3221/12">Hardening Qubes-Whonix</a>
+</div>
+<blockquote>
+<p>Is there room on deb.kkkkkkkkkk63ava6.onion to host a <a href="http://yum.qubes-os.org">yum.qubes-os.org</a> mirror?</p>
+</blockquote>
+</aside>
+<p>Free disk space and traffic, yes.</p>
+<p>Technical implementation is not super simple. Would might require support from Qubes. They providing rsync access or so. Then we could add a brain dead script that downloads from <a href="http://yum.qubes-os.org">yum.qubes-os.org</a> to <a href="http://whonix.org">whonix.org</a> server over unencrypted connection (sorry, that is how rsync and mirroring works nowadays still). If domain name is supposed to include <a href="http://qubes-os.org">qubes-os.org</a>, then further help from Qubes would be required (they modify DNS, point to <a href="http://whonix.org">whonix.org</a> server) and I’d likely could use fortasse’s help for that one <a href="http://whonix.org">whonix.org</a> server side.</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/4</link>
+        <pubDate>Tue, 06 Dec 2016 20:01:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-4</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[entr0py]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="10" data-topic="3221">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"><a href="//forums.whonix.org/t/hardening-qubes-whonix/3221/10">Hardening Qubes-Whonix</a>
+</div>
+<blockquote>
+<p>Ultimate Nitpick: General, not Qubes-Whonix specific hardening. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+</blockquote>
+</aside>
+<p>Here’s the Qubes-specific part: I’ve been completely onionized for months - except for Qubes!!! What’s wrong with those kids? I think you need to get involved.</p>
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-issues/issues/2266" target="_blank" rel="nofollow noopener">github.com/QubesOS/qubes-issues</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/andrewdavidwong" rel="nofollow noopener">
+<img src="https://avatars1.githubusercontent.com/u/10417133?v=2&amp;s=96" class="thumbnail onebox-avatar" width="96" height="96">
+</a>
+
+<h4><a href="https://github.com/QubesOS/qubes-issues/issues/2266" target="_blank" rel="nofollow noopener">Issue: yum.qubes-os.org as Tor hidden service (onion)</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/andrewdavidwong" target="_blank" rel="nofollow noopener">andrewdavidwong</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/2266" target="_blank" rel="nofollow noopener">2016-08-23</a>
+	</div>
+	<div class="user">
+	closed by <a href="https://github.com/andrewdavidwong" target="_blank" rel="nofollow noopener">andrewdavidwong</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/2266" target="_blank" rel="nofollow noopener">2017-01-14</a>
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">Implementing #2265 requires the existence of a Qubes hidden service update repo to serve updates from within Tor.</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: other</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">privacy</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">task</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Related:<br>
+<a href="https://github.com/QubesOS/qubes-issues/issues/2265">https://github.com/QubesOS/qubes-issues/issues/2265</a><br>
+<a href="https://github.com/QubesOS/qubes-issues/issues/1352">https://github.com/QubesOS/qubes-issues/issues/1352</a></p>
+<p>Tor is Whonix’s specialty within Qubes. Is there room on deb.kkkkkkkkkk63ava6.onion to host a <a href="http://yum.qubes-os.org">yum.qubes-os.org</a> mirror?</p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/3</link>
+        <pubDate>Tue, 06 Dec 2016 19:50:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-3</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="8" data-topic="3221">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/f9ae1b/40.png" class="avatar"><a href="//forums.whonix.org/t/hardening-qubes-whonix/3221/8">Hardening Qubes-Whonix</a>
+</div>
+<blockquote>
+<p>I understand this is coming up for Whonix 14 - see <a href="https://phabricator.whonix.org/T399">https://phabricator.whonix.org/T399</a>  - but it is worth re-iterating that hardening the current stable Whonix 13 can be achieved by defaulting the mirrors in sources.list to .onions</p>
+</blockquote>
+</aside>
+<p>Yes.</p>
+<p>Ultimate Nitpick: General, not Qubes-Whonix specific hardening. <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<aside class="quote" data-post="8" data-topic="3221">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/f9ae1b/40.png" class="avatar"><a href="//forums.whonix.org/t/hardening-qubes-whonix/3221/8">Hardening Qubes-Whonix</a>
+</div>
+<blockquote>
+<p>Is editing the sources.list already documented?</p>
+</blockquote>
+</aside>
+<ul>
+<li>only <a href="https://www.whonix.org/wiki/Whonix-APT-Repository#Repository_Location_URI">https://www.whonix.org/wiki/Whonix-APT-Repository#Repository_Location_URI</a>
+</li>
+<li>related <a href="https://www.whonix.org/wiki/Install_Software#Backports">https://www.whonix.org/wiki/Install_Software#Backports</a>
+</li>
+<li>in context of Non-Qubes, Debian hosts: <a href="https://www.whonix.org/wiki/Advanced_Security_Guide#apt-transport-tor">https://www.whonix.org/wiki/Advanced_Security_Guide#apt-transport-tor</a>
+</li>
+</ul>
+<p>So in short, no, I don’t think switching to onion sources is documented. But very much worth it. Where to best add it? Security guide?</p>
+<p>Once Whonix 14 is released, that adding onions should be prefered even when adding third party sources - needs to be added somewhere here: <a href="https://www.whonix.org/wiki/Install_Software#Foreign_Sources">https://www.whonix.org/wiki/Install_Software#Foreign_Sources</a></p>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/2</link>
+        <pubDate>Tue, 06 Dec 2016 15:30:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-2</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+      <item>
+        <title>Onionizing Qubes-Whonix Repositories</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>I understand this is coming up for Whonix 14 - see <a href="https://phabricator.whonix.org/T399">https://phabricator.whonix.org/T399</a>  - but it is worth re-iterating that hardening the current stable Whonix 13 can be achieved by defaulting the mirrors in sources.list to .onions</p>
+<p>The benefits include:</p>
+<ul>
+<li>protection against MITM attacks due to the use of end-end encryption;</li>
+<li>protection against downgrade attacks; and</li>
+<li>reducing the load on exit relays in the Tor network.</li>
+</ul>
+<p>Is editing the sources.list already documented? I forget.</p>
+<p><a href="https://blog.torproject.org/blog/tor-heart-apt-transport-tor-and-debian-onions" class="onebox" target="_blank">https://blog.torproject.org/blog/tor-heart-apt-transport-tor-and-debian-onions</a></p>
+<blockquote>
+<p>Hm! Yes, apt uses plain http to fetch its debs (and then checks the signatures afterwards), so it is possible that somebody somewhere on the Internet (the exit relay, an attacker at the repository, or somebody in between) could mess with those.</p>
+</blockquote>
+<blockquote>
+<p>That is indeed one of the advantages of using the onion address for reaching the repository – you get end-to-end authentication and encryption, which pretty much stops all of those types of possible attacks.</p>
+</blockquote>
+<blockquote>
+<p>(Another advantage of using the onion address is that it shifts load away from exit relays in the Tor network – which once thousands of people are using this for their package installs might add up to be a big deal.)</p>
+</blockquote>
+<blockquote>
+<p>…</p>
+</blockquote>
+<blockquote>
+<p>Also I think it’s important to note that, like targeted delivery of a malicious package, Tor forces the adversary to deliver malicious data to all users during a downgrade attack. Usually a malicious package will be caught when it’s signature is verified, but during a downgrade attack, the package is (was) a legitimate package so it’s signature is good, except the server delivers an older version of the package (or hides the new one from the victim).</p>
+</blockquote>
+<blockquote>
+<p>Thus, the signature is good but the package is intentionally outdated; very useful for adversaries wanting to exploit vulnerabilities that were present in old packages but have since been patched. Tor means that everyone would receive the old version, making the attack much more detectable. Some package managers already protect against these kind of replay attacks using signed repository (as opposed to just package) files, but many do not.</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265/1</link>
+        <pubDate>Tue, 06 Dec 2016 10:52:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3265-1</guid>
+        <source url="http://forums.whonix.org/t/onionizing-qubes-whonix-repositories/3265.rss">Onionizing Qubes-Whonix Repositories</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix 14.0.0.0.7 developers-only</title>
+    <link>http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449</link>
+    <description>https://download.whonix.org/linux/14.0.0.0.7/
+
+Networking is broken. No network cards detected on either gateway or workstation. This might be because network interfaces are no longer named eth0 / eth1 but otherwise.
+
+See Predictable Network Interface Names:
+https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/
+
+This might be a good chance to port from ifupdown to systemd-networkd.
+
+Many things are obviously broken. Upgrading these images will not be supported. They&#39;re only useful for development purposes and supposed to be trashed when new images are out.
+
+VirtualBox only.
+
+Building the git tag `14.0.0.0.7 developers-only` from source code should work.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 29 Jan 2017 13:37:56 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix 14.0.0.0.7 developers-only</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            
+          <p><a href="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/6</link>
+        <pubDate>Sun, 29 Jan 2017 13:38:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3449-6</guid>
+        <source url="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449.rss">Whonix 14.0.0.0.7 developers-only</source>
+      </item>
+      <item>
+        <title>Whonix 14.0.0.0.7 developers-only</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Closed in favor of the new thread.</p>
+<a href="https://forums.whonix.org/t/whonix-13-0-0-1-4-developers-only">https://forums.whonix.org/t/whonix-13-0-0-1-4-developers-only</a>
+          <p><a href="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/5</link>
+        <pubDate>Sun, 29 Jan 2017 13:37:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3449-5</guid>
+        <source url="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449.rss">Whonix 14.0.0.0.7 developers-only</source>
+      </item>
+      <item>
+        <title>Whonix 14.0.0.0.7 developers-only</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>IIRC you reported something to upstream on these lines?</p>
+</blockquote>
+<p>That was ifupdown in wheezy or so that did not fail closed when the pre hook (that we set to Whonix firewall) failed or so, not systemd-networkd.</p>
+<blockquote>
+<p>Is systemd guaranteed air-tight for failing closed and not leaking packets?</p>
+</blockquote>
+<p>Getting a network card up is not a that complex task. Theoretically it could have bugs such as using dhcp even if configured to use static networking.</p>
+<p>The conservative approach is to stay with ifupdown since it’s long term stable and - speculation -  slower changing target compared to systemd-networkd.</p>
+<p>systemd-networkd could have some features we don’t want. Requires research.</p>
+<hr>
+<p>As for Predictable Network Interface Names we most likely want to disable them.</p>
+<p>With Predictable Network Interface Names on VirtualBox Whonix-Gateway:</p>
+<ul>
+<li>eth0 became enp0s3</li>
+<li>eth1 became enp0s8</li>
+</ul>
+<p>With Predictable Network Interface Names on VirtualBox Whonix-Workstation:</p>
+<ul>
+<li>eth0 became enp0s3</li>
+</ul>
+<p>I would not be surprised if these have different names in KVM and Qubes.</p>
+<p>Currently eth0 and eth1 are hardcoed in various Whonix components.</p>
+<ul>
+<li>whonix-gw-firewall</li>
+<li>whonix-ws-firewall</li>
+<li>whonix-gw-network-conf</li>
+<li>whonix-ws-network-conf</li>
+<li>control-port-filter-python</li>
+<li>whonixcheck</li>
+<li>qubes-whonix</li>
+</ul>
+<p>All of these components would have to read these values from some config. With platform specific differences this is absolutely horrible. Would be even more horrible if the same different virtualizers produce different network interface names depending on host operating system and virtuzalizer version.</p>
+<p>I am currently searching for a way to disable Predictable Network Interface Names in a clean way:</p>
+<ul>
+<li>without a kernel parameter (may be unreliable, grub dependent)</li>
+<li>without a symlink (cannot be commented) (only one package can own the symlink, what if Qubes also wants to set that symlink)</li>
+<li>using a drop-in</li>
+</ul>
+<hr>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonix-gw-network-conf/blob/master/debian/whonix-gw-network-conf.links" target="_blank" rel="noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonix-gw-network-conf/blob/master/debian/whonix-gw-network-conf.links" target="_blank" rel="noopener">Whonix/whonix-gw-network-conf/blob/master/debian/whonix-gw-network-conf.links</a></h4>
+<pre><code class="lang-links">## Copyright (C) 2012 - 2021 ENCRYPTED SUPPORT LP &lt;adrelanos@whonix.org&gt;
+## See the file COPYING for copying conditions.
+
+#### meta start
+#### project Whonix
+#### category networking
+#### non_qubes_whonix_only yes
+#### gateway_only yes
+#### description
+
+## Disable Predictable Network Interface Names as these are problematic.
+## https://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/4
+## Disabling them as per
+## 'zless /usr/share/doc/udev/README.Debian.gz'.
+/dev/null /etc/systemd/network/99-default.link
+
+#### meta end
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<aside class="quote quote-modified" data-post="1" data-topic="11441">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/bl4ckj4ck/40/2702_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/whonix-gateway-cli-15-0-1-5-4-and-debian-10-9-as-workstation-network-issues/11441">Whonix Gateway CLI-15.0.1.5.4 and Debian 10.9 as Workstation - Network issues</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/support/5"><span class="badge-category-bg" style="background-color: #8C6238;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="User support for the Whonix operating system. (devs)">Support</span></a>
+  </div>
+  <blockquote>
+    Greetings, 
+I imported a fresh Whonix Gateway CLI .ova file on VirtualBox and I tested with a fresh Whonix Workstation XFCE. 
+Then I decided to use as workstation Debian 10.9 (debian-live-10.9.0-amd64-xfce) installing it in a Virtual Machine. 
+I followed the procedure described in the following link: <a href="https://www.whonix.org/wiki/Other_Operating_Systems#Whonix_.E2.84.A2-GNU.2FLinux-Workstation" rel="noopener nofollow ugc">https://www.whonix.org/wiki/Other_Operating_Systems#Whonix_.E2.84.A2-GNU.2FLinux-Workstation</a> 
+In particular, as described in the link, I made a new machine where I attached the .iso file and in the …
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/4</link>
+        <pubDate>Thu, 19 Jan 2017 18:14:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3449-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449.rss">Whonix 14.0.0.0.7 developers-only</source>
+      </item>
+      <item>
+        <title>Whonix 14.0.0.0.7 developers-only</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="1" data-topic="3449">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>This might be a good chance to port from ifupdown to systemd-networkd.</p>
+</blockquote>
+</aside>
+<p>Is systemd guaranteed air-tight for failing closed and not leaking packets? IIRC you reported something to upstream on these lines?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/3</link>
+        <pubDate>Thu, 19 Jan 2017 17:00:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3449-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449.rss">Whonix 14.0.0.0.7 developers-only</source>
+      </item>
+      <item>
+        <title>Whonix 14.0.0.0.7 developers-only</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>These are 64 bit (<code>amd64</code>) images, based on Debian stretch and KDE plasma 5.</p>
+<p>(VirtualBox import says 32 bit Debian, but that is just a cosmetic bug that will be fixed in next release.)</p>
+          <p><a href="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/2</link>
+        <pubDate>Thu, 19 Jan 2017 08:00:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3449-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449.rss">Whonix 14.0.0.0.7 developers-only</source>
+      </item>
+      <item>
+        <title>Whonix 14.0.0.0.7 developers-only</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://download.whonix.org/linux/14.0.0.0.7/" class="onebox" target="_blank">https://download.whonix.org/linux/14.0.0.0.7/</a></p>
+<p>Networking is broken. No network cards detected on either gateway or workstation. This might be because network interfaces are no longer named eth0 / eth1 but otherwise.</p>
+<p>See Predictable Network Interface Names:<br>
+<a href="https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/" class="onebox" target="_blank">https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/</a></p>
+<p>This might be a good chance to port from ifupdown to systemd-networkd.</p>
+<p>Many things are obviously broken. Upgrading these images will not be supported. They’re only useful for development purposes and supposed to be trashed when new images are out.</p>
+<p>VirtualBox only.</p>
+<p>Building the git tag <code>14.0.0.0.7 developers-only</code> from source code should work.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449/1</link>
+        <pubDate>Thu, 19 Jan 2017 07:58:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3449-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-14-0-0-0-7-developers-only/3449.rss">Whonix 14.0.0.0.7 developers-only</source>
+      </item>
+  </channel>
+</rss>

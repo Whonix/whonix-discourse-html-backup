@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy - #17 by Patrick - AppArmor - Whonix Forum</title>
+    <meta name="description" content="Currently, Whonix only has AppArmor profiles for a few high-risk applications. This isn’t the best. It would be much better to have everything confined by default, including init which would greatly increase security. 
+T&amp;hellip;">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="../8339.html" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../../c/news/21.html">NEWS</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy&#39;" href="../8339.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/apparmor-for-complete-system-including-init-pid1-systemd-everything-full-system-mac-policy/8339/17" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/apparmor-for-complete-system-including-init-pid1-systemd-everything-full-system-mac-policy/8339/17" />
+<meta property="og:title" content="AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy" />
+<meta name="twitter:title" content="AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy" />
+<meta property="og:description" content="Other folders / files that might (lots of random guesses in following list, not too much substance yet) be vulnerable in this threat model:    /etc/init.d (these are reinterpreted as systemd unit files?)  /etc/systemd (can hold systemd unit files)  /usr/lib/systemd (can hold systemd unit files)  /usr/lib/sysusers.d (modifying user accounts might weird stuff)  /usr/lib/tmpfiles.d (weird file permissions might open for attack?)  /etc/passwd (do something weird to root account?)  /etc/initramfs-too..." />
+<meta name="twitter:description" content="Other folders / files that might (lots of random guesses in following list, not too much substance yet) be vulnerable in this threat model:    /etc/init.d (these are reinterpreted as systemd unit files?)  /etc/systemd (can hold systemd unit files)  /usr/lib/systemd (can hold systemd unit files)  /usr/lib/sysusers.d (modifying user accounts might weird stuff)  /usr/lib/tmpfiles.d (weird file permissions might open for attack?)  /etc/passwd (do something weird to root account?)  /etc/initramfs-too..." />
+<meta property="article:published_time" content="2019-10-26T13:56:37+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+        <link rel="next" href="../83394658.html?page=2">
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../../index.html">
+          <img src="../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="../8339.html">AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../../c/apparmor/14.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #12A89D'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>AppArmor</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-26T13:14:36Z' class='post-time'>
+                October 26, 2019,  1:14pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-26T13:14:36Z'>
+          <span itemprop='position'>#12</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="11" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>True. Certain configuration options are also likely able to be abused. For example</p>
+</blockquote>
+</aside>
+<p>Didn’t have that idea. I was thinking rather complicated: create a deb package, add to local APT repository, apt update from local, apt install local package which runs the command (such as to modify /boot).</p>
+<aside class="quote no-group" data-post="11" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p><code>apt-get-update-plus</code> wrapper so the <code>-o</code> and <code>-c</code> options have no effect.</p>
+</blockquote>
+</aside>
+<p>It supports extra options.<br>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/usability-misc/blob/master/usr/bin/apt-get-update-plus" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="../../../../external.html?link=https://github.com/Whonix/usability-misc/blob/master/usr/bin/apt-get-update-plus" target="_blank" rel="nofollow noopener">Whonix/usability-misc/blob/master/usr/bin/apt-get-update-plus</a></h4>
+<pre><code class="lang-">#!/bin/bash
+
+## Copyright (C) 2012 - 2018 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+set -e
+
+[ -n "$apt_get_update_wrapper" ] || apt_get_update_wrapper=/usr/lib/security-misc/apt-get-wrapper
+[ -n "$apt_bin" ] || apt_bin=apt-get
+
+$apt_get_wrapper_pre $apt_get_update_wrapper update $apt_get_wrapper_post
+
+$apt_get_pre $apt_bin $apt_get_post "$@"
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+apt-get-update-plus does not have any limitations on passing any arguments anywhere.</p>
+<p><a href="../../../../external.html?link=https://github.com/Whonix/usability-misc/blob/master/usr/bin/upgrade-nonroot" rel="nofollow noopener">https://github.com/Whonix/usability-misc/blob/master/usr/bin/upgrade-nonroot</a> might be more suitable.</p>
+<aside class="quote no-group" data-post="11" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Editing the policy at boot in the initramfs based on a boot parameter sounds really hacky and doesn’t seem like a good idea.</p>
+</blockquote>
+</aside>
+<p>I don’t have a great answer yet. Hopefully apt upgrades to /boot can be done without entirely disabling all apparmor ( <code>apparmor=0</code> )?<br>
+Even during an “admin boot” (if we can implement that one day) where “anything goes” shouldn’t want to entirely disable apparmor?</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+          <meta itemprop='keywords' content=''>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-26T13:23:15Z' class='post-time'>
+                October 26, 2019,  1:23pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-26T13:23:15Z'>
+          <span itemprop='position'>#13</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="12" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>apt-get-update-plus does not have any limitations on passing any arguments anywhere.</p>
+</blockquote>
+</aside>
+<p>It didn’t work for me when I tried it. I must have done it wrong.</p>
+<p>Wouldn’t this be a potential privilege escalation since it has a sudoers exception? E.g.</p>
+<pre><code class="lang-auto">sudo apt-get-update-plus dist-upgrade -o APT::Update::Pre-Invoke::=/bin/bash
+</code></pre>
+<p>It doesn’t work for me though.</p>
+<p>It would probably be a good idea to make it disable any arguments if /etc/apparmor.d/init-systemd exists.</p>
+<aside class="quote no-group" data-post="12" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Hopefully apt upgrades to /boot can be done without entirely disabling all apparmor ( <code>apparmor=0</code> )?</p>
+</blockquote>
+</aside>
+<p>I think we should allow apt access to /boot by default but make sure it cannot be easily abused although even then, vulnerabilities in apt could give malware access to /boot.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-26T13:27:17Z' class='post-time'>
+                October 26, 2019,  1:27pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-26T13:27:17Z'>
+          <span itemprop='position'>#14</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="13" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Wouldn’t this be a potential privilege escalation since it has a sudoers exception? E.g.</p>
+<pre><code class="lang-auto">sudo apt-get-update-plus
+</code></pre>
+</blockquote>
+</aside>
+<p>Does not allow passing arguments / variables.</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/usability-misc/blob/master/etc/sudoers.d/upgrade-passwordless" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="../../../../external.html?link=https://github.com/Whonix/usability-misc/blob/master/etc/sudoers.d/upgrade-passwordless" target="_blank" rel="nofollow noopener">Whonix/usability-misc/blob/master/etc/sudoers.d/upgrade-passwordless</a></h4>
+<pre><code class="lang-d/upgrade-passwordless">## Copyright (C) 2019 - 2019 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+%sudo ALL=NOPASSWD: /usr/bin/apt-get-update-plus dist-upgrade
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group quote-modified" data-post="13" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>[…] but make sure it cannot be easily abused</p>
+</blockquote>
+</aside>
+<p>By making it impossible to pass APT parameters as well as not allowing to write to <code>/etc/apt/sources.list</code> and <code>/etc/apt/sources.list.d/</code>?</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-26T13:31:41Z' class='post-time'>
+                October 26, 2019,  1:31pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-26T13:31:41Z'>
+          <span itemprop='position'>#15</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="14" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Does not allow passing arguments / variables.</p>
+</blockquote>
+</aside>
+<p>Ah, that makes sense.</p>
+<aside class="quote no-group" data-post="14" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>By making it impossible to pass APT parameters as well as not allowing to write to <code>/etc/apt/sources.list</code> and <code>/etc/apt/sources.list.d/</code> ?</p>
+</blockquote>
+</aside>
+<p>Yes as well as not allowing write access to <code>/etc/apt/apt.conf.d</code> as you can specify config options in there too. It may be a good idea to just disallow write access to all of <code>/etc/apt/</code>.</p>
+<p>Is there any other way to sneak in configuration options? Maybe <code>/usr/lib/apt/</code> or <code>/etc/dpkg/</code>?</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-26T13:36:39Z' class='post-time'>
+                October 26, 2019,  1:36pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-26T13:36:39Z'>
+          <span itemprop='position'>#16</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Also, nothing stops an attacker from overwriting <code>/usr/bin/apt</code> or other commands apt uses with a malicious version.</p>
+<p>I can possibly allow apt to only execute a few needed binaries in it’s own apparmor profile then disallow write access to those binaries in the systemd-init profile.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-26T13:56:37Z' class='post-time'>
+                October 26, 2019,  1:56pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-26T13:56:37Z'>
+          <span itemprop='position'>#17</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Other folders / files that <em>might</em> (lots of random guesses in following list, not too much substance yet) be vulnerable in this threat model:</p>
+<ul>
+<li>
+<code>/etc/init.d</code> (these are reinterpreted as systemd unit files?)</li>
+<li>
+<code>/etc/systemd</code> (can hold systemd unit files)</li>
+<li>
+<code>/usr/lib/systemd</code> (can hold systemd unit files)</li>
+<li>
+<code>/usr/lib/sysusers.d</code> (modifying user accounts might weird stuff)</li>
+<li>
+<code>/usr/lib/tmpfiles.d</code> (weird file permissions might open for attack?)</li>
+<li>
+<code>/etc/passwd</code> (do something weird to root account?)</li>
+<li>
+<code>/etc/initramfs-tools</code> (add malicious hooks to infect initramfs)</li>
+<li><code>/etc/default/grub</code></li>
+<li>
+<code>/etc/default/grub.d</code> (grub boot parameters obviously can disable AppArmor)</li>
+<li><code>/etc/grub.d</code></li>
+</ul>
+<aside class="quote no-group" data-post="15" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>It may be a good idea to just disallow write access to all of <code>/etc/apt/</code> .</p>
+</blockquote>
+</aside>
+<p>Yes.</p>
+<aside class="quote no-group" data-post="15" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Maybe <code>/usr/lib/apt/</code> or <code>/etc/dpkg/</code> ?</p>
+</blockquote>
+</aside>
+<p>Yes.<br>
+Also <code>/var/cache/apt</code> and <code>/var/lib/dpkg</code>.</p>
+<p>An attacker could also try tricks such as deleting folders and using symlinks. Not thought through yet that would help an attack or already covered.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-26T14:04:52Z' class='post-time'>
+                October 26, 2019,  2:04pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-26T14:04:52Z'>
+          <span itemprop='position'>#18</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="17" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<ul>
+<li>
+<code>/etc/initramfs-tools</code> (add malicious hooks to infect initramfs)</li>
+<li><code>/etc/default/grub</code></li>
+<li>
+<code>/etc/default/grub.d</code> (grub boot parameters obviously can disable AppArmor)</li>
+<li><code>/etc/grub.d</code></li>
+</ul>
+</blockquote>
+</aside>
+<p>These are definitely dangerous. We need to fully prevent all runtime bootloader and initramfs modifications, otherwise an attacker can easily disable apparmor after a reboot.</p>
+<p>There is also <code>/usr/share/initramfs-tools/</code> and <code>/usr/share/grub/</code>.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-26T14:10:58Z' class='post-time'>
+                October 26, 2019,  2:10pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-26T14:10:58Z'>
+          <span itemprop='position'>#19</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>It might be a good idea to just do</p>
+<pre><code class="lang-auto">deny /**/initramfs-tools/ w,
+deny /**/grub/ w,
+deny /**/grub.d/ w,
+</code></pre>
+<p>To ensure there are no other directories for these that we missed.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-26T15:11:31Z' class='post-time'>
+                October 26, 2019,  3:11pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-26T15:11:31Z'>
+          <span itemprop='position'>#20</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>It might be a good idea to use <code>Pix</code> instead of <code>pix</code> rules so AppArmor <a href="../../../../external.html?link=https://stackoverflow.com/questions/5835664/how-does-apparmor-do-environment-scrubbing" rel="nofollow noopener">scrubs the environment</a> but this will probably break hardened_malloc if we use LD_PRELOAD for it.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-26T17:05:00Z' class='post-time'>
+                October 26, 2019,  5:05pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-26T17:05:00Z'>
+          <span itemprop='position'>#21</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/bootclockrandomization/pull/1" target="_blank" rel="nofollow noopener">github.com/Whonix/bootclockrandomization</a>
+  </header>
+  <article class="onebox-body">
+      <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank" rel="nofollow noopener">
+    <img alt="madaidan" src="../../../../external.html?link=https://avatars0.githubusercontent.com/u/50278627?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="../../../../external.html?link=https://github.com/Whonix/bootclockrandomization/pull/1" target="_blank" rel="nofollow noopener">Add AppArmor profile</a>
+</h4>
+
+<div class="date">
+  by <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank" rel="nofollow noopener">madaidan</a>
+  on <a href="../../../../external.html?link=https://github.com/Whonix/bootclockrandomization/pull/1" target="_blank" rel="nofollow noopener">05:04PM - 26 Oct 19 UTC</a>
+</div>
+
+<div class="github-commit-stats">
+  <strong>1 commits</strong>
+  changed <strong>1 files</strong>
+  with <strong>25 additions</strong>
+  and <strong>0 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-26T17:13:09Z' class='post-time'>
+                October 26, 2019,  5:13pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-26T17:13:09Z'>
+          <span itemprop='position'>#22</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group quote-modified" data-post="8" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/p/898d66/40.png" class="avatar"> Patrick_mobile:</div>
+<blockquote>
+<blockquote>
+<p>No binaries have the <code>ux</code> or <code>Ux</code> rule which would execute them unconfined.</p>
+</blockquote>
+<p>Might have to review our existing profiles and other installed profiles for such holes?</p>
+</blockquote>
+</aside>
+<pre><code>mygrep -r Ux | grep apparmor
++ grep --exclude=README.md --exclude=GPLv2 --exclude=GPLv3 --exclude=COPYING --exclude=changelog.upstream-old1 --exclude-dir=mnt --exclude-dir=qubes-src/linux-template-builder/mnt --exclude=changelog.upstream --exclude-dir=.git -r Ux
+apparmor-profile-xchat/etc/apparmor.d/abstractions/xchat-based:   /usr/lib/firefox-esr/firefox* Ux,
+...
+apparmor-profile-anondist/etc/apparmor.d/abstractions/base.anondist:  /usr/lib/security-misc/permission-lockdown rUx,
+</code></pre>
+<p>A few <code>Ux</code>, <code>uX</code>, <code>cux</code> found in Whonix source code.</p>
+<p><a href="../../../../external.html?link=https://www.whonix.org/wiki/Dev/git#grep_Whonix_source_code" rel="nofollow noopener">https://www.whonix.org/wiki/Dev/git#grep_Whonix_source_code</a></p>
+<ul>
+<li>
+<code>Ux</code> should probably be replaced by at least <code>Cux</code> or better.</li>
+<li>
+<code>ux</code> should probably be replaced by at least <code>cux</code> or better.</li>
+</ul>
+<p>Also environment variables scrubing vs non-environment variables scrubbing needs to be reviewed.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-27T16:05:23Z' class='post-time'>
+                October 27, 2019,  4:05pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-27T16:05:23Z'>
+          <span itemprop='position'>#23</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Should libraries and binaries be read-only by default and only writable by apt?</p>
+<p>It will be harder to install and update your own programs (without using apt) but it will also be harder for malware to compromise a specific program.</p>
+<p><a href="../../../../external.html?link=https://www.rsbac.org/documentation/rsbac_handbook/configuration_basics/system_base" rel="nofollow noopener">https://www.rsbac.org/documentation/rsbac_handbook/configuration_basics/system_base</a> gives some other good ideas.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/ThatNewDude'><span itemprop='name'>ThatNewDude</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-27T17:41:42Z' class='post-time'>
+                October 27, 2019,  5:41pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-27T17:41:42Z'>
+          <span itemprop='position'>#24</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>As simply a user of Whonix, I would say make Whonix as safe as possible for the general user base. Whonix has so many programs included with it, I’ve never needed to install anything myself. But from what you’ve said the option of installing more software is still there for those that have the need and the knowledge to do it. I just think safety and “peace of mind” is what most Whonix users are looking for, and would go that route. Thanks for all the time to put this together!</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-27T21:01:55Z' class='post-time'>
+                October 27, 2019,  9:01pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-27T21:01:55Z'>
+          <span itemprop='position'>#25</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/apparmor-profile-xchat/pull/4" target="_blank" rel="nofollow noopener">github.com/Whonix/apparmor-profile-xchat</a>
+  </header>
+  <article class="onebox-body">
+      <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank" rel="nofollow noopener">
+    <img alt="madaidan" src="../../../../external.html?link=https://avatars0.githubusercontent.com/u/50278627?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="../../../../external.html?link=https://github.com/Whonix/apparmor-profile-xchat/pull/4" target="_blank" rel="nofollow noopener">Comment out Ux permission</a>
+</h4>
+
+<div class="date">
+  by <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank" rel="nofollow noopener">madaidan</a>
+  on <a href="../../../../external.html?link=https://github.com/Whonix/apparmor-profile-xchat/pull/4" target="_blank" rel="nofollow noopener">07:42PM - 27 Oct 19 UTC</a>
+</div>
+
+<div class="github-commit-stats">
+  <strong>1 commits</strong>
+  changed <strong>1 files</strong>
+  with <strong>4 additions</strong>
+  and <strong>1 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/apparmor-profile-anondist/pull/3" target="_blank" rel="nofollow noopener">github.com/Whonix/apparmor-profile-anondist</a>
+  </header>
+  <article class="onebox-body">
+      <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank" rel="nofollow noopener">
+    <img alt="madaidan" src="../../../../external.html?link=https://avatars0.githubusercontent.com/u/50278627?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="../../../../external.html?link=https://github.com/Whonix/apparmor-profile-anondist/pull/3" target="_blank" rel="nofollow noopener">Replace Ux rules in base abstraction</a>
+</h4>
+
+<div class="date">
+  by <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank" rel="nofollow noopener">madaidan</a>
+  on <a href="../../../../external.html?link=https://github.com/Whonix/apparmor-profile-anondist/pull/3" target="_blank" rel="nofollow noopener">08:59PM - 27 Oct 19 UTC</a>
+</div>
+
+<div class="github-commit-stats">
+  <strong>3 commits</strong>
+  changed <strong>3 files</strong>
+  with <strong>67 additions</strong>
+  and <strong>2 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>That should be all of the <code>ux</code> or <code>Ux</code> rules gone now.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-28T09:16:23Z' class='post-time'>
+                October 28, 2019,  9:16am
+              </time>
+              <meta itemprop='dateModified' content='2019-10-28T09:16:23Z'>
+          <span itemprop='position'>#26</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>All merged but not tested yet.</p>
+<aside class="quote no-group" data-post="23" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Should libraries and binaries be read-only by default and only writable by apt?</p>
+</blockquote>
+</aside>
+<p>It all points to different boot modes. A restricted mode and a mode in which upgrades can be done.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-28T09:19:25Z' class='post-time'>
+                October 28, 2019,  9:19am
+              </time>
+              <meta itemprop='dateModified' content='2019-10-28T09:19:25Z'>
+          <span itemprop='position'>#27</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p><a href="../../../../external.html?link=https://github.com/Whonix/apparmor-profile-anondist/pull/3/files#diff-d65871bfecb7696a830296cf19a47f7f" rel="nofollow noopener">etc/apparmor.d/usr.lib.security-misc.pam_tally2-info</a> and <a href="../../../../external.html?link=https://github.com/Whonix/apparmor-profile-anondist/pull/3/files#diff-90a48be4d4516c8a79e07711da95bc4c" rel="nofollow noopener">etc/apparmor.d/usr.lib.security-misc.permission-lockdown</a> actually belong to security-misc?</p>
+<p>Reverted. Could you please add to security-misc? Also license header required.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick_mobile'><span itemprop='name'>Patrick_mobile</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-28T09:48:34Z' class='post-time'>
+                October 28, 2019,  9:48am
+              </time>
+              <meta itemprop='dateModified' content='2019-10-28T09:48:34Z'>
+          <span itemprop='position'>#28</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubcommit">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/bootclockrandomization/commit/7df1e5f58788e2db0dd43356ff39627b948f54e8" target="_blank" rel="nofollow noopener">github.com/Whonix/bootclockrandomization</a>
+  </header>
+  <article class="onebox-body">
+      <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank" rel="nofollow noopener">
+    <img alt="adrelanos" src="../../../../external.html?link=https://avatars3.githubusercontent.com/u/1985040?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="../../../../external.html?link=https://github.com/Whonix/bootclockrandomization/commit/7df1e5f58788e2db0dd43356ff39627b948f54e8" target="_blank" rel="nofollow noopener">apparmor debian packaging</a>
+</h4>
+
+
+<div class="date">
+  by <a href="../../../../external.html?link=https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+  on <a href="../../../../external.html?link=https://github.com/Whonix/bootclockrandomization/commit/7df1e5f58788e2db0dd43356ff39627b948f54e8" target="_blank" rel="nofollow noopener">07:58AM - 27 Oct 19 UTC</a>
+</div>
+
+<div class="github-commit-stats">
+  changed <strong>2 files</strong>
+  with <strong>5 additions</strong>
+  and <strong>1 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>^ This is important. Otherwise the profile won’t work.</p>
+<p>The line <code>#include &lt;local/bootclockrandomization&gt;</code> will make the profile fail to load.</p>
+<p>Above commits makes sure that the postinst script (<code>/var/lib/dpkg/info/bootclockrandomization.postinst</code>) contains the autogenerated debhelper code (bash) to create <code>/etc/apparmor.d/local/bootclockrandomization</code>.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-28T13:23:14Z' class='post-time'>
+                October 28, 2019,  1:23pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-28T13:23:14Z'>
+          <span itemprop='position'>#29</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="26" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>It all points to different boot modes. A restricted mode and a mode in which upgrades can be done.</p>
+</blockquote>
+</aside>
+<p>The binaries/libraries will be writable by apt so things like <code>apt-get dist-upgrade</code> and <code>apt-get install</code> will still work. The only thing that would be broken is if you put your own custom programs in /usr/bin without using the package manager.</p>
+<aside class="quote no-group" data-post="27" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><a href="../../../../external.html?link=https://github.com/Whonix/apparmor-profile-anondist/pull/3/files#diff-d65871bfecb7696a830296cf19a47f7f" rel="nofollow noopener">etc/apparmor.d/usr.lib.security-misc.pam_tally2-info</a> and <a href="../../../../external.html?link=https://github.com/Whonix/apparmor-profile-anondist/pull/3/files#diff-90a48be4d4516c8a79e07711da95bc4c" rel="nofollow noopener">etc/apparmor.d/usr.lib.security-misc.permission-lockdown</a> actually belong to security-misc?</p>
+</blockquote>
+</aside>
+<p>I think it would be better to put them in apparmor-profile-anondist. The only reason they were created is so we don’t have the unconfined rules in the base abstraction that was made by apparmor-profile-anondist. security-misc is also more focused on hardening the OS in general rather than apparmor profiles.</p>
+<aside class="quote no-group" data-post="27" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Also license header required.</p>
+</blockquote>
+</aside>
+<p>I always forget that. I’ll try and remember next time.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-28T13:31:03Z' class='post-time'>
+                October 28, 2019,  1:31pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-28T13:31:03Z'>
+          <span itemprop='position'>#30</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Some other ideas:</p>
+<ul>
+<li>Disable network access by default and make it opt-in for some AppArmor profiles</li>
+<li>Execute every binary in /usr/bin in a special “application” profile that is more restrictive so the profile doesn’t get bloated by system administration stuff</li>
+<li>Remove the net_admin capability from the main profile and only give things that need it the capability. This can help make sure that IP leaks on the gateway are much harder to do even with root as the firewall cannot easily be disabled.</li>
+<li>Disallow writing to /lib/modules to prevent external modules from being loaded.</li>
+<li>Remove the sys_module capability and only give it to systemd-modules-load so root cannot load their own modules without breaking everything.</li>
+<li>Disallow writing to init (/sbin/init, /lib/systemd/* etc.) to prevent rootkits.</li>
+<li>Scrub the environment of everything.</li>
+<li>Implement some <a href="../../../../external.html?link=https://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options#Chroot_jail_restrictions" rel="nofollow noopener">grsec chroot hardening</a> using AppArmor (and maybe a seccomp wrapper) which might make certain sandboxes more secure (firejail uses chroot AFAIK).</li>
+</ul>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../8339.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-10-28T13:34:24Z' class='post-time'>
+                October 28, 2019,  1:34pm
+              </time>
+              <meta itemprop='dateModified' content='2019-10-28T13:34:24Z'>
+          <span itemprop='position'>#31</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="29" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>I think it would be better to put them in apparmor-profile-anondist. The only reason they were created is so we don’t have the unconfined rules in the base abstraction that was made by apparmor-profile-anondist. security-misc is also more focused on hardening the OS in general rather than apparmor profiles.</p>
+</blockquote>
+</aside>
+<p>security-misc provides applications or functionality. If these get contained using a MAC such as AppArmor, don’t these belong into the same package? The new bootclockrandomization apparmor also wasn’t added there.</p>
+<p><code>apparmor-profile-anondist</code> also has nothing to do with <code>security-paranoid</code> (or however this functionality gets coined). Therefore, if it doesn’t belong into <code>security-misc</code>, does it belong into <code>security-paranoid</code>?</p>
+<aside class="quote no-group" data-post="29" data-topic="8339">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>The binaries/libraries will be writable by apt so things like <code>apt-get dist-upgrade</code> and <code>apt-get install</code> will still work. The only thing that would be broken is if you put your own custom programs in /usr/bin without using the package manager.</p>
+</blockquote>
+</aside>
+<p>I see. Not too bad. Kinda minority use case. Would still be nice to have (optional) if this was while <code>security-paranoid</code> is enabled if you can think off a solution.</p>
+        </div>
+
+        <meta itemprop='headline' content='AppArmor for Complete System - Including init, PID1, Systemd, Everything! - Full System MAC policy'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+
+    <div role='navigation' itemscope itemtype='http://schema.org/SiteNavigationElement' class="topic-body crawler-post">
+        <span itemprop='name'><b><a rel="next" itemprop="url" href="../83394658.html?page=2">next page →</a></b></span>
+    </div>
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

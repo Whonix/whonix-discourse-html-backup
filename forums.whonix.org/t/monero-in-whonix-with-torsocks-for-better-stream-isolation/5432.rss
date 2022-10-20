@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>monero in Whonix with torsocks for better stream isolation</title>
+    <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432</link>
+    <description>I&#39;m trying to understand when should **torsocks** be used in Whonix.
+I&#39;ve seen the following as a recommended way to launch Monero client:
+&gt;torsocks ./monero-wallet-cli --daemon-host [node_onion_url:port] --restore-height -1
+
+From https://github.com/dgoulet/torsocks I understand it operates as some kind of tunnel/firewall to torify applications. But why is it necessary if Whonix-Gateway takes care of that anyway? What does it contribute, and how is it related to the uwt package?</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 11 Oct 2022 17:49:33 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>At this complexity, perhaps best to create a config file</p>
+<blockquote>
+<p>/etc/monerod.conf</p>
+</blockquote>
+<p>and then start monerod with</p>
+<blockquote>
+<p>–config-file=/etc/monerod.conf</p>
+</blockquote>
+<p>?</p>
+<p>This config could even be added to <a href="https://github.com/Whonix/anon-apps-config" class="inline-onebox">GitHub - Whonix/anon-apps-config</a>.</p>
+<p>The confusing thing would be that monerod by default does not use any config file unless using <code>--config-file</code>. Not sure that’s worth an upstream feature request.</p>
+<p>I am also wondering how Whonix once that config file exists could add <code>--config-file=/etc/monerod.conf</code> to monerod and/or monero-wallet-cli / monero-wallet-gui by default.</p>
+<p>Resources:</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://monerodocs.org/interacting/monero-config-file/">
+  <header class="source">
+      <img src="https://monerodocs.org/interacting/monero-config-file/../../assets/favicon.png" class="site-icon" width="" height="">
+
+      <a href="https://monerodocs.org/interacting/monero-config-file/" target="_blank" rel="noopener">monerodocs.org</a>
+  </header>
+
+  <article class="onebox-body">
+    
+
+<h3><a href="https://monerodocs.org/interacting/monero-config-file/" target="_blank" rel="noopener">Monero Configuration File - Monero Documentation</a></h3>
+
+  <p>Unofficial Monero Documentation</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubblob" data-onebox-src="https://github.com/monero-project/monero/blob/master/utils/conf/monerod.conf">
+  <header class="source">
+
+      <a href="https://github.com/monero-project/monero/blob/master/utils/conf/monerod.conf" target="_blank" rel="noopener">github.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <h4><a href="https://github.com/monero-project/monero/blob/master/utils/conf/monerod.conf" target="_blank" rel="noopener">monero-project/monero/blob/master/utils/conf/monerod.conf</a></h4>
+
+
+      <pre><code class="lang-conf"># Configuration for monerod
+# Syntax: any command line option may be specified as 'clioptionname=value'.
+#         Boolean options such as 'no-igd' are specified as 'no-igd=1'.
+# See 'monerod --help' for all available options.
+
+data-dir=/var/lib/monero
+log-file=/var/log/monero/monero.log
+log-level=0
+</code></pre>
+
+
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/27">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/27</link>
+        <pubDate>Fri, 07 Oct 2022 19:04:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-27</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[moneroconfig]]></dc:creator>
+        <description><![CDATA[
+            <p>As <a class="mention" href="http://forums.whonix.org/u/jeremyrand">@JeremyRand</a> points out monerod now has the --proxy flag.</p>
+<p>I’ve read through the pull request a few times now and my conclusion is that for Whonix users the optimal monerod command is:</p>
+<blockquote>
+<p>monerod --proxy 10.137.0.8:9180 --p2p-bind-ip 127.0.0.1 --no-igd --hide-my-port --tx-proxy tor,10.137.0.8:9152,10</p>
+</blockquote>
+<p>The reason for the tx-proxy argument is that, according to the information in the pull request discussion, monerod will use it to establish hidden service connections to broadcast txs. Unless one is transacting frequently this will typically mean each transaction gets its own circuit, as opposed to relying on just the proxy setting which would result in multiple transactions sharing the same circuit.</p>
+<p>I could have something wrong, but this is my best understanding of the available information. How can I go about getting this put into the Whonix Monero documentation because the current torsocks commands are dated and barely usable?</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/26">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/26</link>
+        <pubDate>Fri, 07 Oct 2022 01:21:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-26</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[JeremyRand]]></dc:creator>
+        <description><![CDATA[
+            <p>Monero v0.17.3.0 <a href="https://github.com/monero-project/monero/pull/7616" rel="noopener nofollow ugc">added</a> a <code>--proxy</code> flag, e.g. <code>monerod --proxy 127.0.0.1:9050</code>.  I haven’t audited for proxy leaks, but it does work fine in a Whonix VM that has transproxying disabled.  Maybe consider updating the wiki instructions to use this flag instead of <code>torsocks</code>.  I would recommend using a SOCKS port that isolates by both destination IP and destination port, to minimize the risk of eclipse attacks (Bitcoin Core does approximately this by default).</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/25">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/25</link>
+        <pubDate>Sun, 23 Jan 2022 13:19:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-25</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="22" data-topic="5432">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/jpearson/40/2122_2.png" class="avatar"> jpearson:</div>
+<blockquote>
+<p>TORSOCKS_ALLOW_INBOUND=1</p>
+</blockquote>
+</aside>
+<p>Btw this will be the default in Whonix 15 (perhaps even already is in Whonix 14).</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/uwt/blob/master/etc/tor/torsocks.conf.anondist#L28-L30" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/uwt/blob/master/etc/tor/torsocks.conf.anondist#L28-L30" target="_blank" rel="nofollow noopener">Whonix/uwt/blob/master/etc/tor/torsocks.conf.anondist#L28-L30</a></h4>
+<pre class="onebox"><code class="lang-anondist"><ol class="start lines" start="28" style="counter-reset: li-counter 27 ;">
+<li># Set Torsocks to accept inbound connections. If set to 1, listen() and</li>
+<li># accept() will be allowed to be used with non localhost address. (Default: 0)</li>
+<li>AllowInbound 1</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-post="22" data-topic="5432">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/jpearson/40/2122_2.png" class="avatar"> jpearson:</div>
+<blockquote>
+<p>I admit that I don’t understand some of these options. I got it from a tutorial on running monero behind tosocks.</p>
+</blockquote>
+</aside>
+<p>see</p>
+<pre><code>./monerod -h
+./monero-cli -h</code></pre>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/23</link>
+        <pubDate>Sat, 29 Jun 2019 09:39:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-23</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[jpearson]]></dc:creator>
+        <description><![CDATA[
+            <p>I don’t have any problem running <code>monero-cli</code> against a remote node (as suggested in the wiki). However, my connection to remote nodes keep dropping. I sometimes have to refresh several times before the remote node responds. Has anyone experienced this?</p>
+<p>I got monerod working like this: <code>DNS_PUBLIC=tcp://8.8.8.8 TORSOCKS_ALLOW_INBOUND=1 torsocks ./monerod --p2p-bind-ip 127.0.0.1 --no-igd --hide-my-port --data-dir /mnt/blockchain/monero/</code>. I admit that I don’t understand some of these options. I got it from a tutorial on running monero behind tosocks.</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/22</link>
+        <pubDate>Fri, 28 Jun 2019 20:58:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-22</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[sheep]]></dc:creator>
+        <description><![CDATA[
+            <p>I use</p>
+<blockquote>
+<p>DNS_PUBLIC=tcp TORSOCKS_ALLOW_INBOUND=1 torsocks ./monero-wallet-cli --daemon-host [onionurl:port] --restore-height -1</p>
+</blockquote>
+<p>like the above and get a similar error:</p>
+<blockquote>
+<p>libunbound[6560:0] error: outgoing tcp: connect: Connection refused for</p>
+</blockquote>
+<p>shown repeatedly when trying to transfer.</p>
+<p>Is it anything to do with whonix firewall and ports blocking? can’t make any transactions, and it takes forever even to receive the errors.</p>
+<p>Anyone successfuly using monero-wallet-cli 0.13.0.4 on Whonix 14?</p>
+<p>the monero program is (and always been) terrible at handling connection issues. Not only it takes ages (minutes and more) to get an error, it doesn’t respond to CTRL-C as well. One has to close the terminal window to kill the program, then worry about process possibly still running in memory.</p>
+<p>Update: I now tried</p>
+<blockquote>
+<p>./monero-wallet-cli --daemon-host [onionurl:port] --restore-height -1</p>
+</blockquote>
+<p>meaning not using torsocks, no stream isolation, and everything works well!</p>
+<p>Still something to look into!</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/21</link>
+        <pubDate>Sun, 20 Jan 2019 06:50:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-21</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[LakeMonster]]></dc:creator>
+        <description><![CDATA[
+            <p>When I use Monero GUI in Whonix, I run the following command:</p>
+<pre><code>torsocks ~/Monero/start-gui.sh &amp;
+</code></pre>
+<p>In the settings I have instructed it to connect to a hidden service remote node.</p>
+<p>Are there any security or anonymity issues with this?</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/20</link>
+        <pubDate>Mon, 03 Sep 2018 04:15:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-20</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/frozencat">@FrozenCat</a>: I didn’t change any settings.</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/19</link>
+        <pubDate>Sat, 04 Aug 2018 15:55:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-19</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <p>OK, I added the shell variables as in Patrick’s answer, and run the CLI client like so:</p>
+<blockquote>
+<p>DNS_PUBLIC=tcp TORSOCKS_ALLOW_INBOUND=1 torsocks ./monero-wallet-cli --daemon-host [onionurl:port] --restore-height -1</p>
+</blockquote>
+<p>This seems to have solved the problem. I don’t get any error messages and transfers work as before (I did a couple of transfers between two wallets, with small amounts). This is still on Whonix 13  by the way, with Virtual box.</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/18</link>
+        <pubDate>Sat, 04 Aug 2018 15:49:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-18</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[FrozenCat]]></dc:creator>
+        <description><![CDATA[
+            <p>Does monero require separate proxy settings on Whonix Workstation?</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/17</link>
+        <pubDate>Tue, 10 Jul 2018 12:38:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-17</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <p>The following is guide for tails that uses the same command I’m using.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="//forums.whonix.org/uploads/default/original/2X/6/62964150c1fb11c88b0ae55773ef9be4517e055e.png" class="site-icon" width="192" height="192">
+      <a href="https://www.reddit.com/r/Monero/comments/80ucva/best_tails_os_tutorial_for_newbies_for_monero_cli/" target="_blank" rel="nofollow noopener">reddit</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:690/363;"><img src="https://external-preview.redd.it/w2CFvgjPXxG3AtQA7pbTJpbTeaBFgyKuOz_n6R2ijs8.jpg?auto=webp&amp;s=aab59ad79910cecebe0f13779ff510b8e51498ea" class="thumbnail"></div>
+
+<h3><a href="https://www.reddit.com/r/Monero/comments/80ucva/best_tails_os_tutorial_for_newbies_for_monero_cli/" target="_blank" rel="nofollow noopener">r/Monero - Best Tails OS Tutorial for Newbies for Monero CLI</a></h3>
+
+<p>21 votes and 34 comments so far on Reddit</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Here (<a href="https://github.com/monero-project/monero" rel="nofollow noopener">https://github.com/monero-project/monero</a>) there are different instructions for the general case of running behind Tor and for Tails, that includes adding an iptables rule:</p>
+<blockquote>
+<p>Using Tor on Tails<br>
+TAILS ships with a very restrictive set of firewall rules. Therefore, you need to add a rule to allow this connection too, in addition to telling torsocks to allow inbound connections. Full example:</p>
+<blockquote>
+<p>sudo iptables -I OUTPUT 2 -p tcp -d 127.0.0.1 -m tcp --dport 18081 -j ACCEPT<br>
+DNS_PUBLIC=tcp torsocks ./monerod --p2p-bind-ip 127.0.0.1 --no-igd --rpc-bind-ip 127.0.0.1 <br>
+–data-dir /home/amnesia/Persistent/your/directory/to/the/blockchain</p>
+</blockquote>
+</blockquote>
+<p>None of those sources cared to explains what happens with the case of Whonix.</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/16</link>
+        <pubDate>Mon, 09 Jul 2018 15:03:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-16</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <p>I don’t run monerod at all. AFAIK this is required only when run a full node.<br>
+monero-wallet-cli with --daemon-host allows connecting to a remote node instead of running your own.<br>
+The disadvantages of running a full node are mostly the time and space requirements due to synchronization of the blockchain.</p>
+<p>It’s a bit tricky to experiment with the options when it involves real money. I only get the errors when a real transaction is performed, not with any other operation in monero-wallet-cli (for example: checking balance or address, generating a new wallet, listing past transactions).</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/15</link>
+        <pubDate>Mon, 09 Jul 2018 14:42:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-15</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Then you need to research what kind of connections the <code>monero-wallet-gui</code> makes.</p>
+<p>Connections to different Tor [[Onion Services]] are automatically stream isolated. <a href="https://lists.torproject.org/pipermail/tor-talk/2012-September/025432.html">https://lists.torproject.org/pipermail/tor-talk/2012-September/025432.html</a></p>
+<hr>
+<aside class="quote no-group" data-post="13" data-topic="5432">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/l/8baadc/40.png" class="avatar"> LakeMonster:</div>
+<blockquote>
+<p>Best to connect to remote Hidden Service daemon.</p>
+</blockquote>
+</aside>
+<p>About connecting to a remotely running <code>monerod</code> (on an onion service or not) I am not sure about that but researching that topic is difficult and time consuming.</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/14</link>
+        <pubDate>Mon, 09 Jul 2018 05:01:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-14</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[LakeMonster]]></dc:creator>
+        <description><![CDATA[
+            <p>No.</p>
+<p>Best to connect to remote Hidden Service daemon.</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/13</link>
+        <pubDate>Mon, 09 Jul 2018 04:37:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-13</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Gui does connect to existing already running daemon, no?</p>
+<p>Try same command line options. Discuss with monero community.</p>
+<p>Also note:</p>
+<p><a href="https://www.whonix.org/wiki/Free_Support_Principle">https://www.whonix.org/wiki/Free_Support_Principle</a></p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/12</link>
+        <pubDate>Mon, 09 Jul 2018 03:51:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-12</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[LakeMonster]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="9" data-topic="5432">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>DNS_PUBLIC=tcp TORSOCKS_ALLOW_INBOUND=1 torsocks ./monerod --p2p-bind-ip 127.0.0.1 --no-igd --hide-my-port</p>
+</blockquote>
+</aside>
+<p>This only starts the CLI? Can we adjust this for Monero-GUI?</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/11</link>
+        <pubDate>Sun, 08 Jul 2018 13:59:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-11</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="5" data-topic="5432">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/cdc98d/40.png" class="avatar"> torbrowser:</div>
+<blockquote>
+<p>I went through this page, it doesn’t explain what is the connection between SocksPort, TransPort and torsocks.</p>
+</blockquote>
+</aside>
+<p>Just now added some basic info here: <a href="https://www.whonix.org/wiki/Stream_Isolation#Information">https://www.whonix.org/wiki/Stream_Isolation#Information</a></p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/10</link>
+        <pubDate>Sat, 07 Jul 2018 16:01:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-10</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>After some searching… The following looks sensible. Untested. Let alone tested if there is TransPort pollution.</p>
+<pre><code>DNS_PUBLIC=tcp TORSOCKS_ALLOW_INBOUND=1 torsocks ./monerod --p2p-bind-ip 127.0.0.1 --no-igd --hide-my-port
+</code></pre>
+<p>Feel free to try.</p>
+<p>Makes only sense in Whonix 14 since then <code>torsocks</code> has and has by default enabled <code>IsolatePID 1</code>.</p>
+<aside class="quote no-group" data-post="7" data-topic="5432">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/cdc98d/40.png" class="avatar"> torbrowser:</div>
+<blockquote>
+<p>The Monero client connects to an onion address monero node, how can there be a socks proxy in this setup?</p>
+</blockquote>
+</aside>
+<p>Why would that be mutually exclusive? Socks proxy settings pointing to Tor and using onions is generally very good. If onions make sense in case of monero, I don’t know.</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/9</link>
+        <pubDate>Sat, 07 Jul 2018 15:33:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-9</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group quote-modified" data-post="4" data-topic="5432">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Outdated, please update if you can:</p>
+<h3><a href="https://www.whonix.org/wiki/Monero" rel="nofollow noopener">Monero</a></h3>
+<p>How to use Monero in Whonix</p>
+</blockquote>
+</aside>
+<p>Certainly, once I figure out how to do it without the errors popping.</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/8</link>
+        <pubDate>Sat, 07 Jul 2018 14:48:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-8</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="4" data-topic="5432">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Doesn’t monero have socks proxy settings? Please use search engine<br>
+“monero tor”, “monero socks proxy” and you’ll probably find it. Socks<br>
+proxy settings are most times better than torsocks if available.</p>
+</blockquote>
+</aside>
+<p>I didn’t find any mention of socks proxy setting.<br>
+The Monero client connects to an onion address monero node, how can there be a socks proxy in this setup?</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/7</link>
+        <pubDate>Sat, 07 Jul 2018 14:47:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-7</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes.</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/6</link>
+        <pubDate>Sat, 07 Jul 2018 13:58:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-6</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <p>I went through this page, it doesn’t explain what is the connection between SocksPort, TransPort and torsocks.</p>
+<p>Does torsock allow applications to use SocksPort?</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/5</link>
+        <pubDate>Sat, 07 Jul 2018 13:57:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-5</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Doesn’t monero have socks proxy settings? Please use search engine<br>
+“monero tor”, “monero socks proxy” and you’ll probably find it. Socks<br>
+proxy settings are most times better than torsocks if available.</p>
+<p>Outdated, please update if you can:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="" height="">
+      <a href="https://www.whonix.org/wiki/Monero" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:282/75;"><img src="https://www.whonix.org/w/images/7/79/Moneroheader.png" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Monero" target="_blank" rel="nofollow noopener">Monero</a></h3>
+
+<p>How to use Monero in Whonix</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/4</link>
+        <pubDate>Sat, 07 Jul 2018 12:18:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-4</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="" height="">
+      <a href="https://www.whonix.org/wiki/Stream_Isolation" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:386/500;"><img src="//forums.whonix.org/uploads/default/original/2X/d/dd2a9f88dfb70936ec3bc9b43f79f3fe0a19fdf8.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Stream_Isolation" target="_blank" rel="nofollow noopener">Stream Isolation</a></h3>
+
+<p>Prevent Identity Correlation through Circuit Sharing by using Tor Stream Isolation</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/3</link>
+        <pubDate>Sat, 07 Jul 2018 12:16:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-3</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+      <item>
+        <title>monero in Whonix with torsocks for better stream isolation</title>
+        <dc:creator><![CDATA[torbrowser]]></dc:creator>
+        <description><![CDATA[
+            <p>To follow up on that (perhaps related), when I perform a monero transaction with the CLI wallet, I get 20 lines with the error:</p>
+<blockquote>
+<p>libunbound[12335:0] error: can’t create socket: Operation not permitted</p>
+</blockquote>
+<p>However the transaction is successful. Any clues?</p>
+          <p><a href="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432/2</link>
+        <pubDate>Sat, 07 Jul 2018 10:06:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5432-2</guid>
+        <source url="http://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432.rss">monero in Whonix with torsocks for better stream isolation</source>
+      </item>
+  </channel>
+</rss>

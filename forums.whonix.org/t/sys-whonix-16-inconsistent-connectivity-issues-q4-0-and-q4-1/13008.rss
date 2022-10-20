@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+    <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008</link>
+    <description>First off, thanks for whonix, and in-particular qubes-whonix! I, and many others I work with, appreciate and depend on these projects on a daily basis. 
+
+I&#39;m having an issue with qubes whonix 16 on two machines:
+
+1) Machine 1 - Qubes 4.0, used whonix-15 for the 15-releas&#39;s whole lifetime. sys-whonix 15 worked wonderfully, on a number of different internet connections, for the entirety of the release&#39;s lifetime. Upgrade to whonix-16 was seemlingly seamless (fresh install), with no customization, no bridges, defaults. 
+
+2) Machine 2 - Qubes 4.1rc2, sys-whonix-16, defaults, no bridges.
+
+On both machines, with whonix-15, as well as the basic tor browser bundle run in a VM through sys-firewall (clearnet), an attempt to make a tor connection is successful 99% of the time, works great, high speed, reliable.
+
+On both machines, now with sys-whonix 16, one of two things happens: when first enabling tor, it either hangs at 30/45% (on the vast majority of attempts), or succeeds (maybe 5% of the time). After a first successful connection, when attempting re-connection, or startup, Tor reaches 95% and then just hangs. Sometimes it completes, tor status seems connected (100%) but connections through tor are very unreliable (but they do happen sometimes). About 5% of the time, I can connect, but Tor work for minutes, and then dies. Restarting tor works maybe 5% of the time, and a successful connection will last minutes. 
+
+Things I&#39;ve tried:
+* multiple ISPs (cable, wireless, high speed and reliable institutional, etc), all show the problem.
+* enable ICMP in sys-whonix via ICMP fix
+* disable boot clock randomization (and verified it).
+* disable IPv6 for sys-whonix, sys-firewall, and with my ISP/router, forcing ipv4.
+* clock verification (sys-whonix, sys-net, and xen host are all the same).
+* re-installs fresh (both of sys-whonix-16 on my Qubes 4.0 machine, and qubes 4.1 itself, using defaults)
+* clearnet connectivity.
+* running TBB and sys-whonix-15 in VMs that connect through sys-firewall (both other tor methods work great 99% of the time, with high speed and reliability).
+* whonix templates are up-to-date (from connections I was lucky enough to make).
+
+I have been running qubes for many years, used torvm&#39;s since before qubes-whonix was around, and can handle a fair bit of networking, but am a bit puzzled about how to diagnose this. I have seen nothing in any of the logs that pops out as obvious. I have seen hints in the qubes forums, and here, that others are experiencing a similar (or the same issue) with qubes whonix-16, but perhaps have not been able to capture it either.
+
+I&#39;m at a loss as to the best next diagnostic step, given this is an inconsistent issue. That being said, it&#39;s bad enough that it&#39;s been catastrophic for my workflows the past couple weeks. I have been running almost all of my daily traffic and work through qubes-sys-whonix since it&#39;s inception (thanks again!).
+
+Does anyone have any ideas, things to try next?</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 23 Dec 2021 18:36:04 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Great analysis!</p>
+<aside class="quote no-group" data-username="compartmentalized" data-post="13" data-topic="13008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/compartmentalized/40/2850_2.png" class="avatar"> compartmentalized:</div>
+<blockquote>
+<p>In sys-whonix, do:<br>
+<code>sudo vi /usr/bin/whonix-gateway-firewall</code></p>
+<pre><code class="lang-auto">-   $iptables_cmd -A INPUT -m state --state ESTABLISHED -j ACCEPT
++   $iptables_cmd -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+</code></pre>
+</blockquote>
+</aside>
+<ol>
+<li>
+<p>This means that there’s a Qubes specific bug here requiring <code>RELATED</code> since you already confirmed the issue does not happen with Whonix VirtualBox and Whonix KVM on the same hardware. Could you summarize all your findings please and report it on <a href="https://github.com/QubesOS/qubes-issues/issues">qubes-issues</a> please?</p>
+</li>
+<li>
+<p><code>RELATED</code> would be useful as a separate line with an opt-in configuration options as a separate line:</p>
+</li>
+</ol>
+<pre><code class="lang-auto">$iptables_cmd -A INPUT -m state --state RELATED -j ACCEPT
+</code></pre>
+<ol start="3">
+<li>Should be added to <a href="https://www.whonix.org/wiki/Tor#Tor_Generic_Bug_Reproduction">Tor Generic Bug Reproduction</a>.</li>
+</ol>
+<p>Help, patches welcome!</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/16</link>
+        <pubDate>Thu, 23 Dec 2021 18:36:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-16</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[compartmentalized]]></dc:creator>
+        <description><![CDATA[
+            <p>Also, thanks for taking the time to shepherd me through the troubleshooting!</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/15</link>
+        <pubDate>Thu, 23 Dec 2021 17:32:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-15</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[compartmentalized]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve noticed iptables firewall issues like this in the past, when the default final rule is DROP, instead of REJECT. REJECT tends to fail a lot more gracefully than DROP, and imo, be a better option than DROP. The privacy/security reasons for using DROP are exaggerated, in my understanding, though I could be missing some. In fact, just replacing DROP with REJECT in whonix-gateway-firewall fixes the issue, even without the overly permissive RELATED change above. I think this addresses the security issues mentioned above, and yet still functions. <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> This might be a real acceptable solution?</p>
+<p>In retrospect, I notice that this IPtables firewall issue was only causing moderate interference on some networks, severe on others, and minor on some (though still existed). I would not have noticed on some, other than I have been routing all my traffic through tor for many years, and know about how it should behave on the networks I regularly operate on. I have seen other unresolved forum posts which may be explained by this issue as well. In conclusion, while not all networks or installs will likely see this “bug”, I’d guess I’m not the only one with spotty performance due to this firewall configuration.</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/14</link>
+        <pubDate>Thu, 23 Dec 2021 03:24:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-14</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[compartmentalized]]></dc:creator>
+        <description><![CDATA[
+            <p>I wireshark’d sys-whonix, and noticed lots of ICMP and fragmentation issues (as I was suspicious of), and found something of a fix.</p>
+<p>SOLUTION: While allowing ICMP alone did not fix the issue, the originally proposed solution to the ICMP problem did: <a href="https://github.com/Whonix/whonix-firewall/pull/7/files" rel="noopener nofollow ugc">https://github.com/Whonix/whonix-firewall/pull/7/files</a></p>
+<p>In sys-whonix, do:<br>
+<code>sudo vi /usr/bin/whonix-gateway-firewall</code></p>
+<pre><code class="lang-diff">-   $iptables_cmd -A INPUT -m state --state ESTABLISHED -j ACCEPT
++   $iptables_cmd -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+</code></pre>
+<p>followed by:<br>
+<code>sudo whonix_firewall</code><br>
+and it fixes the issue entirely.</p>
+<p>I see the discussion about this being a bit permissive (<a href="https://forums.whonix.org/t/have-firewall-accept-icmp-fragmentation-needed/10233" class="inline-onebox">Have firewall accept ICMP Fragmentation Needed</a>), but clearly ICMP alone was not enough for the LAN to not kill the connections, timing them all out.</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/13</link>
+        <pubDate>Thu, 23 Dec 2021 03:08:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-13</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[compartmentalized]]></dc:creator>
+        <description><![CDATA[
+            <p>To do “Tor Generic Bug Reproduction”<br>
+I cloned debian-11 un-touched, then set up networking:</p>
+<p>debian-11-tor-test → sys-firewall → sys-net</p>
+<pre><code class="lang-auto">sudo apt update
+sudo apt full-upgrade
+sudo apt install --no-install-recommends tor
+sudo apt install --no-install-recommends vanguards
+sudo vi /etc/tor/vanguards.conf # and edit control_socket = /run/tor/control 
+</code></pre>
+<p>Tor process still works great. Firefox socks through tor, and torcheck says congratulations you’re using tor. All seems to work well.</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/12</link>
+        <pubDate>Thu, 23 Dec 2021 02:18:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-12</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[compartmentalized]]></dc:creator>
+        <description><![CDATA[
+            <p>Interesting, thanks. I suspect an issue at the lower network layers. Like that report, in the past, I have tunneled vpn through tor, appvm → sys-vpn → sys-whonix → sys-firewall → sys-net, to hide the exit node from visited services that block tor, but have not tried it lately. Quite interestingly, I just checked tunneling tor through my openvpn, appvm → sys-whonix → sys-vpn → sys-firewall → sys-net, via <code>qvm-prefs sys-whonix netvm sys-vpn</code>, and it seems to work just fine on 4.0 with whonix-16… masking this issue, such that sys-whonix functions reliably. I’ve seen fragmentation or layer 2 issues where packet size parameters caused something like timeouts before… I have a vague suspicion that this is an issue with local networks timing out or killing packets from sys-whonix selectively, but I have no idea why. My LAN is not blocking any ports outgoing, and FascistFirewall does not help. I’ll check out the generic bug reproduction in more detail.</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/11</link>
+        <pubDate>Thu, 23 Dec 2021 01:10:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-11</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="compartmentalized" data-post="5" data-topic="13008" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/c/3d9bf3/40.png" class="avatar"> compartmentalized:</div>
+<blockquote>
+<p>Just one more diagnostic tidbit: If I boot a different hard drive on the same hardware and internet connections, VirtualBox-Whonix-16 and KVM-Whonix-16 work great.</p>
+</blockquote>
+</aside>
+<p>That makes this issue even more weird. For better maintainability Whonix for the different virtualizers has as minimal differences as possible.</p>
+<aside class="quote no-group" data-username="compartmentalized" data-post="4" data-topic="13008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/c/3d9bf3/40.png" class="avatar"> compartmentalized:</div>
+<blockquote>
+<p>After bootstrapping for the first time (on some lucky restart making it past 30%) tor startup often gets stuck at 95%, but even when seemingly connected, tor will not function at all.</p>
+</blockquote>
+</aside>
+<p>For lack of words, I try to put it that way “Whonix does rather simple things”. I wouldn’t know from the top of my head to even cause such a bug on purpose if I wanted. It would require rather complicated research and implementation to cause an issue which is so hard to reliably reproduce in the same manner.</p>
+<hr>
+<p>There was recently a Qubes specific bug that broke connectivity in weird ways with Qubes-Whonix among the affected components.</p>
+<ul>
+<li><a href="https://github.com/QubesOS/qubes-issues/issues/7123">https://github.com/QubesOS/qubes-issues/issues/7123</a></li>
+<li><a href="https://github.com/QubesOS/qubes-core-agent-linux/pull/345">https://github.com/QubesOS/qubes-core-agent-linux/pull/345</a></li>
+<li><a href="https://forums.whonix.org/t/qubes-4-1-tor-openvpn-issues/13006" class="inline-onebox">[Qubes 4.1] Tor -&gt; OpenVPN issues</a></li>
+</ul>
+<p>Therefore the only way forward I can see for now is <a href="https://www.whonix.org/wiki/Tor#Tor_Generic_Bug_Reproduction">Tor Generic Bug Reproduction</a>.</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/10</link>
+        <pubDate>Wed, 22 Dec 2021 23:22:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-10</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Not much ideas now. Maybe later.</p>
+<p>But for sure worthwhile to try:<br>
+<a href="https://www.whonix.org/wiki/Tor#Tor_Generic_Bug_Reproduction">Tor Generic Bug Reproduction</a></p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/9</link>
+        <pubDate>Wed, 22 Dec 2021 23:02:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-9</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[compartmentalized]]></dc:creator>
+        <description><![CDATA[
+            <p>sudo anon-log</p>
+<pre><code class="lang-auto">...
+Dec 22 20:06:16.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
+Dec 22 20:06:16.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
+Dec 22 20:06:21.000 [notice] Bootstrapped 100% (done): Done
+Dec 22 20:07:18.000 [notice] No circuits are opened. Relaxed timeout for circuit 3 (a General-purpose client 3-hop circuit in state doing handshakes with channel state open) to 60000ms. However, it appears the circuit has timed out anyway.
+Dec 22 20:09:26.000 [warn] Guard Unnamed ($CC100DC017A25E244C35C964BB518E4308415ACC) is failing a very large amount of circuits. Most likely this means the Tor network is overloaded, but it could also mean an attack against you or potentially the guard itself. Success counts are 59/171. Use counts are 0/1. 163 circuits completed, 1 were unusable, 103 collapsed, and 145 timed out. For reference, your timeout cutoff is 60 seconds.
+Dec 22 20:09:29.000 [warn] Guard defconorg ($B956A82A9559D482E1ACFEABD898FDC3F2991005) is failing an extremely large amount of circuits. This could indicate a route manipulation attack, extreme network overload, or a bug. Success counts are 43/151. Use counts are 0/0. 143 circuits completed, 0 were unusable, 100 collapsed, and 168 timed out. For reference, your timeout cutoff is 60 seconds.
+Dec 22 20:09:41.000 [warn] Guard defconorg ($B956A82A9559D482E1ACFEABD898FDC3F2991005) is failing a very large amount of circuits. Most likely this means the Tor network is overloaded, but it could also mean an attack against you or potentially the guard itself. Success counts are 48/156. Use counts are 0/0. 148 circuits completed, 0 were unusable, 100 collapsed, and 169 timed out. For reference, your timeout cutoff is 60 seconds.
+
+vanguards.service:
+
+Started Additional protections for Tor onion services.
+NOTICE[Wed Dec 22 20:06:15 2021]: Creating new vanguard state file at: /var/lib/tor/vanguards.state
+NOTICE[Wed Dec 22 20:06:15 2021]: Vanguards 0.3.1 connected to Tor 0.4.6.8 using stem 1.8.0
+</code></pre>
+<p>or another instance:</p>
+<pre><code class="lang-auto">Dec 22 20:12:41.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
+Dec 22 20:12:41.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
+Dec 22 20:12:47.000 [notice] Bootstrapped 100% (done): Done
+Dec 22 20:13:44.000 [warn] Guard Unnamed ($CC100DC017A25E244C35C964BB518E4308415ACC) is failing a very large amount of circuits. Most likely this means the Tor network is overloaded, but it could also mean an attack against you or potentially the guard itself. Success counts are 86/208. Use counts are 0/1. 198 circuits completed, 1 were unusable, 111 collapsed, and 173 timed out. For reference, your timeout cutoff is 60 seconds.
+Dec 22 20:13:49.000 [warn] Guard defconorg ($B956A82A9559D482E1ACFEABD898FDC3F2991005) is failing a very large amount of circuits. Most likely this means the Tor network is overloaded, but it could also mean an attack against you or potentially the guard itself. Success counts are 107/245. Use counts are 0/0. 232 circuits completed, 0 were unusable, 125 collapsed, and 215 timed out. For reference, your timeout cutoff is 60 seconds.
+Dec 22 20:14:16.000 [notice] Guard LittleSister ($E08F2FD44CC16B7015138DC95507A660BEB8851D) is failing more circuits than usual. Most likely this means the Tor network is overloaded. Success counts are 88/151. Use counts are 5/5. 149 circuits completed, 0 were unusable, 61 collapsed, and 114 timed out. For reference, your timeout cutoff is 60 seconds.
+
+vanguards.service:
+
+Started Additional protections for Tor onion services.
+NOTICE[Wed Dec 22 20:12:41 2021]: Vanguards 0.3.1 connected to Tor 0.4.6.8 using stem 1.8.0
+NOTICE[Wed Dec 22 20:13:42 2021]: Tor has been failing all circuits for 30 seconds!
+NOTICE[Wed Dec 22 20:13:43 2021]: Circuit use resumed after 31 seconds.
+WARNING[Wed Dec 22 20:14:25 2021]: Circ 289 exceeded CIRC_MAX_HSDESC_KILOBYTES: 35121 &gt; 30720.
+NOTICE[Wed Dec 22 20:14:25 2021]: We force-closed circuit 289
+</code></pre>
+<p>All while I can easily connect other setups via plain TBB, virtualbox-whonix, etc.</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/8</link>
+        <pubDate>Wed, 22 Dec 2021 20:08:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-8</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[compartmentalized]]></dc:creator>
+        <description><![CDATA[
+            <p>I’m assuming these errors are not relevant:</p>
+<pre><code class="lang-auto">user@host:~$ systemcheck --verbose --leak-tests
+[INFO] [systemcheck] sys-whonix | Whonix-Gateway | whonix-gw-16 TemplateBased ProxyVM | Wed 22 Dec 2021 07:54:45 PM UTC
+[INFO] [systemcheck] Check sudo Result: OK
+[INFO] [systemcheck] Whonix build version: 3:8.1-1
+[INFO] [systemcheck] whonix-gateway-packages-dependencies-cli: 22.1-1
+[INFO] [systemcheck] derivative_major_release_version /etc/whonix_version: 16
+[INFO] [systemcheck] Whonix Support Status of this Major Version: Ok.
+[WARNING] [systemcheck] Hardened Malloc: Disabled.
+[INFO] [systemcheck] Spectre Meltdown Test: skipping since spectre_meltdown_check=false, ok.
+[INFO] [systemcheck] Package Manager Consistency Check Result: Output of command dpkg --audit was empty, ok.
+[INFO] [systemcheck] systemd journal check Result:
+warnings:
+########################################
+
+########################################
+
+failed:
+########################################
+Dec 22 19:28:31 host systemd[1]: apparmor.service: Failed with result 'exit-code'.
+Dec 22 19:28:31 host systemd[1]: Failed to start Load AppArmor profiles.
+########################################
+
+errors:
+########################################
+Dec 22 19:28:31 host kernel: ACPI Error: No handler or method for GPE 00, disabling event (20190816/evgpe-841)
+Dec 22 19:28:31 host kernel: ACPI Error: No handler or method for GPE 01, disabling event (20190816/evgpe-841)
+Dec 22 19:28:31 host kernel: ACPI Error: No handler or method for GPE 03, disabling event (20190816/evgpe-841)
+Dec 22 19:28:31 host kernel: ACPI Error: No handler or method for GPE 04, disabling event (20190816/evgpe-841)
+Dec 22 19:28:31 host kernel: ACPI Error: No handler or method for GPE 05, disabling event (20190816/evgpe-841)
+Dec 22 19:28:31 host kernel: ACPI Error: No handler or method for GPE 06, disabling event (20190816/evgpe-841)
+Dec 22 19:28:31 host kernel: ACPI Error: No handler or method for GPE 07, disabling event (20190816/evgpe-841)
+Dec 22 19:28:31 host kernel: Error: Driver 'pcspkr' is already registered, aborting...
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/7</link>
+        <pubDate>Wed, 22 Dec 2021 19:55:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-7</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[compartmentalized]]></dc:creator>
+        <description><![CDATA[
+            <p>When an existing connection fails (in this case, after an attempted connection from another non-whonix VM routed through sys-whonix):</p>
+<pre><code class="lang-auto">...
+Dec 22 19:43:33.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
+Dec 22 19:43:33.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
+Dec 22 19:43:36.000 [notice] Bootstrapped 100% (done): Done
+
+vanguards.service:
+
+Started Additional protections for Tor onion services.
+NOTICE[Wed Dec 22 19:28:41 2021]: Creating new vanguard state file at: /var/lib/tor/vanguards.state
+NOTICE[Wed Dec 22 19:28:41 2021]: Vanguards 0.3.1 connected to Tor 0.4.6.8 using stem 1.8.0
+NOTICE[Wed Dec 22 19:38:52 2021]: Tor has been failing all circuits for 49 seconds!
+NOTICE[Wed Dec 22 19:38:53 2021]: Circuit use resumed after 50 seconds.
+WARNING[Wed Dec 22 19:40:47 2021]: Circ 434 exceeded CIRC_MAX_HSDESC_KILOBYTES: 35121 &gt; 30720.
+NOTICE[Wed Dec 22 19:40:47 2021]: We force-closed circuit 434
+NOTICE[Wed Dec 22 19:43:32 2021]: Tor daemon connection closed. Trying again...
+NOTICE[Wed Dec 22 19:43:33 2021]: Vanguards 0.3.1 connected to Tor 0.4.6.8 using stem 1.8.0
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/6</link>
+        <pubDate>Wed, 22 Dec 2021 19:49:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-6</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[compartmentalized]]></dc:creator>
+        <description><![CDATA[
+            <p>Just one more diagnostic tidbit: If I boot a different hard drive on the same hardware and internet connections, VirtualBox-Whonix-16 and KVM-Whonix-16 work great.</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/5</link>
+        <pubDate>Wed, 22 Dec 2021 19:27:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-5</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[compartmentalized]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/awokd">@awokd</a> Thanks for the ideas. <code>sudo systemctl stop sdwdate</code> (and disable) had no impact, and <code>sudo anondate-get</code> was ok. ipv6 elsewhere can’t have been it (and was not) – sys-whonix itself has issues connect to Tor, even when it seems to connect.</p>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> If the standard TBB and whonix-15 always work flawlessly on the same machine, then it is really unlikely to be a network obstacle, right? I have tested numerous ISPs, none of which should be blocking in my area of the world (and indeed don’t seem to be, if other Tor options connect and operate fine without bridges). I’ve tried out most of the diagnostics at the links you provided. <code>anondate-get</code> looks ok.</p>
+<p>Upon first start (just after install), or if I clear the consensus via <code>anon-consensus-del</code>, it often hangs with:<br>
+<code>sudo anon-log</code></p>
+<pre><code class="lang-auto">NOTICE[Wed Dec 22 11:23:20 2021]: Vanguards 0.3.1 connected to Tor 0.4.6.8 using stem 1.8.0
+NOTICE[Wed Dec 22 11:23:20 2021]: Tor needs descriptors: Cannot read /var/lib/tor/cached-microdesc-consensus: [Errno 2] No such file or directory: '/var/lib/tor/cached-microdesc-consensus'. Trying again...
+</code></pre>
+<p>which is not a permissions issue, and the file does not exist until bootstrapped.</p>
+<p>But, <code>anon-log</code> and variants of <code>systemcheck</code> illustrate varied issues, depending on the stage at which I get lucky. After bootstrapping for the first time (on some lucky restart making it past 30%) tor startup often gets stuck at 95%, but even when seemingly connected, tor will not function at all.</p>
+<p>I suspect either the new vanguard setup, or something like a packet-size or fragmentation parameter, which is a bit off in gw-16 but not gw-15, and is causing a lower level issue with sys-whonix-16. Indeed, I saw an error about a programmed constant, hsdesc size, causing the connections to be killed, which I think is a hidden service descriptor constant of 30 referenced here (<a href="https://www.whonix.org/wiki/Vanguards" class="inline-onebox" rel="noopener nofollow ugc">Vanguards - Whonix</a>), with relevant logs below. I’m not sure where in Qubes might be best to wireshark the system, but I guess sys-whonix is as good as anything?</p>
+<p>Barring some weird interaction between components, this really appears to me to be a problem living in sys-whonix 16 itself, the debian base, or the tor install/setup within it.</p>
+<p>It’s a bit ironic, but I may have to fall back on something like the old-school qubes torvm instead of whonix.</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/4</link>
+        <pubDate>Wed, 22 Dec 2021 11:50:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-4</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[awokd]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<ul>
+<li>disable boot clock randomization (and verified it).</li>
+<li>disable IPv6 for sys-whonix, sys-firewall, and with my ISP/router, forcing ipv4.</li>
+</ul>
+</blockquote>
+<p>These would have been my top two guesses. Although I see you verified<br>
+time was not an issue, could try disabling the sdwdate service entirely<br>
+in both gateway &amp; workstation. Also try disabling IPv6 on the<br>
+workstation/disp template as well.</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/3</link>
+        <pubDate>Wed, 15 Dec 2021 20:12:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-3</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>That’s going to be difficult, because:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Network_Obstacle" target="_blank" rel="noopener" title="01:04AM - 02 December 2021">Whonix – 2 Dec 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/65;"><img src="https://www.whonix.org/w/images/7/73/Networkobstacle123123455.png" class="thumbnail" width="131" height="65"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Network_Obstacle" target="_blank" rel="noopener">Network Obstacle</a></h3>
+
+  <p>Organizational background on Network Obstacles.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-username="compartmentalized" data-post="1" data-topic="13008">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/c/3d9bf3/40.png" class="avatar"> compartmentalized:</div>
+<blockquote>
+<p>Does anyone have any ideas, things to try next?</p>
+</blockquote>
+</aside>
+<p>There’s a few more items here to check:</p>
+<ul>
+<li><a href="https://www.whonix.org/wiki/Troubleshooting#Connectivity_Troubleshooting">Connectivity Troubleshooting</a></li>
+<li><a href="https://www.whonix.org/wiki/Troubleshooting#Advanced_Connectivity_Troubleshooting_Steps">Advanced Connectivity Troubleshooting Steps</a></li>
+<li>
+<a href="https://www.whonix.org/wiki/Tor#Connectivity_Troubleshooting">Tor Connectivity Troubleshooting</a>.</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/2</link>
+        <pubDate>Wed, 15 Dec 2021 11:17:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-2</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+      <item>
+        <title>sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</title>
+        <dc:creator><![CDATA[compartmentalized]]></dc:creator>
+        <description><![CDATA[
+            <p>First off, thanks for whonix, and in-particular qubes-whonix! I, and many others I work with, appreciate and depend on these projects on a daily basis.</p>
+<p>I’m having an issue with qubes whonix 16 on two machines:</p>
+<ol>
+<li>
+<p>Machine 1 - Qubes 4.0, used whonix-15 for the 15-releas’s whole lifetime. sys-whonix 15 worked wonderfully, on a number of different internet connections, for the entirety of the release’s lifetime. Upgrade to whonix-16 was seemlingly seamless (fresh install), with no customization, no bridges, defaults.</p>
+</li>
+<li>
+<p>Machine 2 - Qubes 4.1rc2, sys-whonix-16, defaults, no bridges.</p>
+</li>
+</ol>
+<p>On both machines, with whonix-15, as well as the basic tor browser bundle run in a VM through sys-firewall (clearnet), an attempt to make a tor connection is successful 99% of the time, works great, high speed, reliable.</p>
+<p>On both machines, now with sys-whonix 16, one of two things happens: when first enabling tor, it either hangs at 30/45% (on the vast majority of attempts), or succeeds (maybe 5% of the time). After a first successful connection, when attempting re-connection, or startup, Tor reaches 95% and then just hangs. Sometimes it completes, tor status seems connected (100%) but connections through tor are very unreliable (but they do happen sometimes). About 5% of the time, I can connect, but Tor work for minutes, and then dies. Restarting tor works maybe 5% of the time, and a successful connection will last minutes.</p>
+<p>Things I’ve tried:</p>
+<ul>
+<li>multiple ISPs (cable, wireless, high speed and reliable institutional, etc), all show the problem.</li>
+<li>enable ICMP in sys-whonix via ICMP fix</li>
+<li>disable boot clock randomization (and verified it).</li>
+<li>disable IPv6 for sys-whonix, sys-firewall, and with my ISP/router, forcing ipv4.</li>
+<li>clock verification (sys-whonix, sys-net, and xen host are all the same).</li>
+<li>re-installs fresh (both of sys-whonix-16 on my Qubes 4.0 machine, and qubes 4.1 itself, using defaults)</li>
+<li>clearnet connectivity.</li>
+<li>running TBB and sys-whonix-15 in VMs that connect through sys-firewall (both other tor methods work great 99% of the time, with high speed and reliability).</li>
+<li>whonix templates are up-to-date (from connections I was lucky enough to make).</li>
+</ul>
+<p>I have been running qubes for many years, used torvm’s since before qubes-whonix was around, and can handle a fair bit of networking, but am a bit puzzled about how to diagnose this. I have seen nothing in any of the logs that pops out as obvious. I have seen hints in the qubes forums, and here, that others are experiencing a similar (or the same issue) with qubes whonix-16, but perhaps have not been able to capture it either.</p>
+<p>I’m at a loss as to the best next diagnostic step, given this is an inconsistent issue. That being said, it’s bad enough that it’s been catastrophic for my workflows the past couple weeks. I have been running almost all of my daily traffic and work through qubes-sys-whonix since it’s inception (thanks again!).</p>
+<p>Does anyone have any ideas, things to try next?</p>
+          <p><a href="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008/1</link>
+        <pubDate>Wed, 15 Dec 2021 01:41:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13008-1</guid>
+        <source url="http://forums.whonix.org/t/sys-whonix-16-inconsistent-connectivity-issues-q4-0-and-q4-1/13008.rss">sys-whonix 16 inconsistent connectivity issues (Q4.0 AND Q4.1)</source>
+      </item>
+  </channel>
+</rss>

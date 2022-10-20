@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>use kernel command line as a source of randomness</title>
+    <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945</link>
+    <description>* https://www.openwall.com/lists/kernel-hardening/2017/08/16/15
+* https://tails.boum.org/blueprint/randomness_seeding/#index3h2
+* https://redmine.tails.boum.org/code/issues/11897
+* https://lore.kernel.org/patchwork/cover/822010/
+* https://lore.kernel.org/patchwork/patch/822011/
+* https://lore.kernel.org/patchwork/patch/822012/
+
+By looking at the kernel source code diff it seems this doesn&#39;t need a kernel parameter (such as hypothetically `entropy=[blob of random data]`.
+
+We could ship an `/etc/default/grub.d` configuration file snippet in package [security-misc](https://github.com/Whonix/security-misc) that reads some random data from `/dev/random` [1] and adds it to kernel command line. [2]
+
+How many bytes should be added?
+
+Sized between 1024 bytes and 4096 bytes are being discussed.
+
+* [ Bug 1386824 ](https://bugzilla.redhat.com/show_bug.cgi?id=1386824) - random-seed size should be 4096 bytes in size
+* [ random-seed: raise POOL_SIZE_MIN to 1024 (#1386824) #84 ](https://github.com/lnykryn/systemd-rhel/pull/84)
+
+How would we encode the random data? (because should not write random characters directly into config file - these can mess up terminal and/or editors)
+
+* sha512? hash using sha512 every x bytes?
+* base64?
+* something better?
+
+Should this kernel parameter be the first in line or last in line? This is because when users want to change kernel command line in grub boot menu (press `E` to edit) they would see a huge random blob of data which is not pretty and bad usability. That makes me wonder if this is a good idea at all.
+
+Isn&#39;t there a &quot;second kernel command line&quot; or similar? Or any saner interface for the bootloader to pass entropy to the kernel? Maybe something similar to https://forums.whonix.org/t/early-rng-init-tools-for-better-entropy/8579 would be a better idea?
+
+`systemd-boot` loader supports passing a random seed file to the kernel when being used with EFI. More on that here:
+
+* https://systemd.io/RANDOM_SEEDS/
+* https://systemd.io/BOOT_LOADER_INTERFACE/
+
+I haven&#39;t found anything for grub and/or non-EFI. Yet have to read that Tails ticket.
+
+----
+
+[1] [`/dev/random` vs. `/dev/urandom`](https://www.whonix.org/wiki/Dev/Entropy#.2Fdev.2Frandom_vs._.2Fdev.2Furandom)
+
+[2] The disadvantages of this implementation are:
+
+* visible in `/proc/cmdline` [Quote](https://systemd.io/RANDOM_SEEDS/):
+  * &gt; *Why not pass the boot loader random seed via kernel command line instead of as EFI variable?*
+  * &gt; The kernel command line is accessible to unprivileged processes via `/proc/cmdline` . It’s not desirable if unprivileged processes can use this information to possibly gain too much information about the current state of the kernel’s entropy pool.
+* stays static until update-grub is re-run (mostly only at kernel upgrade)
+  * non-ideal but not a problem because no entropy added to the kernel mix can in theory worsen the quality of Linux entropy.
+* perhaps better to re-generate this file on every boot but I don&#39;t see yet a way to do so in an atomic way - meaning not break booting if grub config file generation is interrupted due to power loss or reboot</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 22 Feb 2020 13:55:05 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[SokPuppette]]></dc:creator>
+        <description><![CDATA[
+            <p>I think that explains it quite well. I still don’t really <em>agree</em> with it, but I now understand what you’re trying to do. Thank you.</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/15</link>
+        <pubDate>Sat, 22 Feb 2020 13:55:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-15</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Just now added…</p>
+<hr>
+<p>Quote <a href="https://www.whonix.org/wiki/Dev/Entropy#Goal">Goal</a>:</p>
+<blockquote>
+<p>Assumption is that any source of randomness could be (sometimes) flawed (weak / predictable / broken / compromised) (in some situations). Such as either in VMs and/or n the host.</p>
+<p>Therefore the goal was established to - simplified - “make use of as many sources of entropy as possible”.</p>
+<p>Ideally, sources of randomness should also be coming from different devices.</p>
+<p>CPU is already being used as a source of entropy by <a href="https://www.whonix.org/wiki/Dev/Entropy#haveged">haveged</a> and <a href="https://www.whonix.org/wiki/Dev/Entropy#jitterentropy-rng">jitterentropy-rng</a>. That’s two implementations using the same source using the same device. Adding more entropy generation daemons that are based on CPU - or even worse - based on jitter - is therefore undesirable.</p>
+<p>It would be better to tap into other <a href="https://www.whonix.org/wiki/Dev/Entropy#Entropy_Sources">entropy sources</a> such as from noise generated from audio, video, etc. if we can verify these to be good sources of entropy. By implementing that, even if one source of randomness (retrospectively) turns out to be flawed, quality of system entropy should still be excellent.</p>
+</blockquote>
+<hr>
+<p>Quote <a href="https://www.whonix.org/wiki/Dev/Entropy#use_kernel_command_line_as_a_source_of_randomness">use kernel command line as a source of randomness</a>:</p>
+<blockquote>
+<p><strong>Introduction</strong></p>
+<p>[1] Kernel will use kernel command line as a source of randomness in any case - whether a random seed is added to kernel command line or not. Sources:</p>
+<ul>
+<li>
+<a href="https://www.openwall.com/lists/kernel-hardening/2017/08/16/15">https://www.openwall.com/lists/kernel-hardening/2017/08/16/15</a> <a href="https://web.archive.org/web/https://www.openwall.com/lists/kernel-hardening/2017/08/16/15">[archive]</a>
+</li>
+<li>
+<a href="https://lore.kernel.org/patchwork/cover/822010/">https://lore.kernel.org/patchwork/cover/822010/</a> <a href="https://web.archive.org/web/https://lore.kernel.org/patchwork/cover/822010/">[archive]</a>
+</li>
+<li>
+<a href="https://lore.kernel.org/patchwork/patch/822011/">https://lore.kernel.org/patchwork/patch/822011/</a> <a href="https://web.archive.org/web/https://lore.kernel.org/patchwork/patch/822011/">[archive]</a>
+</li>
+<li>
+<a href="https://lore.kernel.org/patchwork/patch/822012/">https://lore.kernel.org/patchwork/patch/822012/</a> <a href="https://web.archive.org/web/https://lore.kernel.org/patchwork/patch/822012/">[archive]</a>
+</li>
+</ul>
+<p><strong>adding a random seed to kernel command line</strong></p>
+<p>Goal: see <a href="https://www.whonix.org/wiki/Dev/Entropy#Goal">goal</a>.</p>
+<p>Design:</p>
+<ul>
+<li>Do not <a href="https://www.whonix.org/wiki/Dev/Entropy#Credit_Entropy">credit entropy</a> since this might be dangerous if something goes wrong.</li>
+<li>Non-goal: Fixing performance related <a href="https://www.whonix.org/wiki/Dev/Entropy#Early_Entropy_Issue">early entropy issue</a> since there is none.</li>
+<li>systemd unit file drop-in for <a href="https://www.freedesktop.org/software/systemd/man/systemd-random-seed.service.html"> <code>systemd-random-seed.service</code> </a> <a href="https://web.archive.org/web/https://www.freedesktop.org/software/systemd/man/systemd-random-seed.service.html">[archive]</a> by adding
+<ul>
+<li>
+<code>ExecStartPost</code> to refresh seed early at boot to avoid re-using the same one.</li>
+<li>
+<code>ExecStopPost</code> to mix in new entropy that was collected since last boot.</li>
+</ul>
+</li>
+<li>add a <code>randomseed=</code> parameter to kernel command line
+<ul>
+<li>The kernel does not support a <code>randomseed=</code> parameter directly. But the kernel uses kernel command line as a source of entropy. The keyword <code>randomseed=</code> could be replaced with any other keyword. This is just for self-documenting purposes. I.e. by reading the web searching for and reading the scripts, clues are given why what is being done.</li>
+</ul>
+</li>
+</ul>
+<p>Similar to:</p>
+<ul>
+<li>Adding a random seed to kernel command line would be similar to <a href="https://www.freedesktop.org/software/systemd/man/systemd-random-seed.service.html"> <code>systemd-random-seed.service</code> </a> <a href="https://web.archive.org/web/https://www.freedesktop.org/software/systemd/man/systemd-random-seed.service.html">[archive]</a> (enabled by systemd and Debian default) but happening earlier already at boot stage of initial ramdisk. <code>systemd-random-seed.service</code> by default also does not credit entropy.</li>
+<li>Also similar to <a href="https://www.whonix.org/wiki/Dev/Entropy#early-rng-init-tools">early-rng-init-tootls</a> but without its potential security issues since not crediting entropy.</li>
+</ul>
+<p>Disadvantages:</p>
+<ul>
+<li>Does not work at first boot.</li>
+<li>Does not work for live boot but no worse than too due to [1].</li>
+</ul>
+<p>Advantages:</p>
+<ul>
+<li>Same as <code>systemd-random-seed.service</code> but already available at boot stage initial ramdisk.</li>
+</ul>
+</blockquote>
+<hr>
+<p>Thanks for the feedback. Could you please review the now documented rationale? All points were addressed?</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/14</link>
+        <pubDate>Fri, 21 Feb 2020 12:02:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-14</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="SokPuppette" data-post="9" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/898d66/40.png" class="avatar"> SokPuppette:</div>
+<blockquote>
+<p>it’d be more satisfying to get the seed from the host via a virtual hardware RNG. My memory is hazy, but I think VirtualBox and KVM both have those.</p>
+</blockquote>
+</aside>
+<p>KVM has virtio-rng which is enabled by default in Whonix KVM but I haven’t found any reference that VirtualBox supports virtio-rng.</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/13</link>
+        <pubDate>Fri, 21 Feb 2020 11:57:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-13</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="SokPuppette" data-post="9" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/898d66/40.png" class="avatar"> SokPuppette:</div>
+<blockquote>
+<p>State-keeping in the workstation VM is also one more thing to break if you ever want to support that VM being amnesic (which I think would be a very <em>high-value</em> move).</p>
+</blockquote>
+</aside>
+<p>Did you know…</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Whonix_Live" target="_blank" title="12:32AM - 30 November 2019">whonix.org – 30 Nov 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:110/61;"><img src="https://www.whonix.org/w/images/b/bf/Live_boot.png" class="thumbnail" width="110" height="61"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Whonix_Live" target="_blank">Whonix ™ Live Mode - Stop Persistent Malware - Whonix</a></h3>
+
+<p>Whonix ™ Live Mode. Read-only mode. Make all writes go to non-persistent memory (RAM) instead of the hard disk. This is NOT an anti-forensics feature!</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Grub-live" target="_blank" title="01:55PM - 21 January 2020">whonix.org – 21 Jan 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:110/74;"><img src="https://www.whonix.org/w/images/a/a6/Grublive123123.jpg" class="thumbnail" width="110" height="74"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Grub-live" target="_blank">Boot your existing, installed Debian Host into Live Mode with GRUB LIVE - Whonix</a></h3>
+
+<p>Add a Live Mode entry to the grub boot menu on your existing Debian host platform. Stop Persistent Malware. Read-only mode. Make all writes go to non-persistent storage (RAM) instead of the hard disk.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>?</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/12</link>
+        <pubDate>Fri, 21 Feb 2020 11:54:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-12</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Kernel will use randomness from kernel command line anyhow. See links in initial post in this forum thread. [1]</p>
+<p>This is similar to systemd-random-seed.service. Just happens earlier.</p>
+<p>Disadvantages:</p>
+<ul>
+<li>does not work for first boot</li>
+<li>does not work for live boot but no worse than too due to [1]</li>
+</ul>
+<p>Rationale: “use as many sources of entropy as possible in case any breaks down”.</p>
+<p>See also: <a href="https://forums.whonix.org/t/twuewand-a-truerand-algorithm-for-generating-entropy-whonix-integration/8880" class="inline-onebox">twuewand - a truerand algorithm for generating entropy - Whonix integration</a></p>
+<aside class="quote no-group" data-username="SokPuppette" data-post="7" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/898d66/40.png" class="avatar"> SokPuppette:</div>
+<blockquote>
+<p>That’s not actually a big problem with reasonably recent Linux on X86 processors, because the kernel will use the CPU’s RDSEED/RDRAND instructions to seed even /dev/urandom before returning any data to userspace. So unless your <em>CPU</em> has been subverted, or unless there’s a bug in what’s actually a pretty simple code path, you’ll never get bad randomness on X86. Really there’s only an issue on ARM.</p>
+</blockquote>
+</aside>
+<p>We distrust (set <code>random.trust_cpu=off</code> kernel boot parameter) RDRAND. See:<br>
+<a href="https://www.whonix.org/wiki/Dev/Entropy#RDRAND">https://www.whonix.org/wiki/Dev/Entropy#RDRAND</a></p>
+<p>I.e. it is used but not <a href="https://www.whonix.org/wiki/Dev/Entropy#Credit_Entropy">credited</a>.</p>
+<aside class="quote no-group" data-username="SokPuppette" data-post="7" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/898d66/40.png" class="avatar"> SokPuppette:</div>
+<blockquote>
+<p>If you still care about the /dev/urandom early read problem, and you are willing to trust /dev/random, then you can always just create an early systemd unit to copy data from /dev/random into /dev/urandom.</p>
+</blockquote>
+</aside>
+<p>We don’t have issues with boot speed / performance thanks to haveged / jitterentropy-rng (user space daemon and kernel module).</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/11</link>
+        <pubDate>Fri, 21 Feb 2020 03:25:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-11</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="SokPuppette" data-post="9" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/898d66/40.png" class="avatar"> SokPuppette:</div>
+<blockquote>
+<p>But you’d be doing an awful lot of work</p>
+</blockquote>
+</aside>
+<p>I’d need to remove <code>,cmdline</code> from <a href="https://github.com/Whonix/apparmor-profile-everything/blob/master/etc/apparmor.d/abstractions/init-systemd#L164">https://github.com/Whonix/apparmor-profile-everything/blob/master/etc/apparmor.d/abstractions/init-systemd#L164</a> and add <code>r</code> to <a href="https://github.com/Whonix/apparmor-profile-everything/blob/master/etc/apparmor.d/abstractions/dangerous-files#L26">https://github.com/Whonix/apparmor-profile-everything/blob/master/etc/apparmor.d/abstractions/dangerous-files#L26</a></p>
+<p>A total change of 9 characters. Not that much work.</p>
+<aside class="quote no-group" data-username="SokPuppette" data-post="9" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/898d66/40.png" class="avatar"> SokPuppette:</div>
+<blockquote>
+<p>and a lot of <em>unreliable</em> work that might leak, might silently (albeit not catastrophically) break when something else in the next release of Debian gives out access to this historically non-secret information</p>
+</blockquote>
+</aside>
+<p>I don’t see how Debian can leak this when we’ve plugged all the kernel APIs that do.</p>
+<p>Unless Debian ships a kernel exploit in the next version, I doubt it can leak this.</p>
+<aside class="quote no-group" data-username="SokPuppette" data-post="9" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/898d66/40.png" class="avatar"> SokPuppette:</div>
+<blockquote>
+<p>and might break something else that relies on having the information.</p>
+</blockquote>
+</aside>
+<p>Boot parameters are only needed for debugging. Normal applications won’t need it.</p>
+<aside class="quote no-group" data-username="SokPuppette" data-post="9" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/898d66/40.png" class="avatar"> SokPuppette:</div>
+<blockquote>
+<p>Since I don’t see why you should do it at all, it’s hard for me to see why you’d want to make the investment to protect it.</p>
+</blockquote>
+</aside>
+<p>I’m just giving ideas on how to protect it if it were to be implemented. I’m not saying it should be implemented.</p>
+<p>Kernel logs and boot parameters were going to be restricted anyway.</p>
+<aside class="quote no-group" data-username="SokPuppette" data-post="9" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/898d66/40.png" class="avatar"> SokPuppette:</div>
+<blockquote>
+<p>… but that relies on the in-VM /dev/random device. If you do it at boot, it’s not clear it’ll provide much more seed entropy than just reading a byte from /dev/random at boot and not trying to keep the state between boots.</p>
+</blockquote>
+</aside>
+<p>GRUB can’t run commands at boot. The value has to be pre-defined.</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/10</link>
+        <pubDate>Thu, 20 Feb 2020 23:17:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-10</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[SokPuppette]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>We can use apparmor-profile-everything to hide /proc/cmdline and grub config files from all processes.</p>
+</blockquote>
+<p>I suppose you could. But you’d be doing an awful lot of work… and a lot of <em>unreliable</em> work that might leak, might silently (albeit not catastrophically) break when something else in the next release of Debian gives out access to this historically non-secret information, and might break something else that relies on having the information. I mean, even if you did put seed on the command line, I’m not sure “not considered good practice” is worth all that effort.</p>
+<p>Maybe that’s colored by my seeing putting seed on the command line as a low-value move to begin with. Since I don’t see why you should do it at all, it’s hard for me to see why you’d want to make the investment to protect it.</p>
+<p>I guess my basic problem is that I’m still not understanding what problem you want to solve. You seem to be willing to take on a lot of complexity for this, and I don’t know what’s motivating that.</p>
+<blockquote>
+<p>The grub config can be regenerated during boot via a systemd service so the next boot would have a unique seed.</p>
+</blockquote>
+<p>… but that relies on the in-VM /dev/random device. If you do it at boot, it’s not clear it’ll provide much more seed entropy than just reading a byte from /dev/random at boot and not trying to keep the state between boots.</p>
+<p>State-keeping in the workstation VM is also one more thing to break if you ever want to support that VM being amnesic (which I think would be a very <em>high-value</em> move). So it doesn’t seem desirable to become reliant on such state for anything you would care about enough to do all this work in the first place.</p>
+<p>In the world I’ve always lived in, persisting random seed from run to run of a program, a VM, a host, or whatever, has been something you did out of desperation when you didn’t have enough good entropy available to you. That’s just not the case on a modern X86 processor, even inside a VM. And even on ARM or whatever, it’d be more satisfying to get the seed from the host via a virtual hardware RNG. My memory is hazy, but I think VirtualBox and KVM both have those.</p>
+<p>But maybe I’m just missing something major.</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/9</link>
+        <pubDate>Thu, 20 Feb 2020 22:30:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-9</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="SokPuppette" data-post="7" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/898d66/40.png" class="avatar"> SokPuppette:</div>
+<blockquote>
+<p>Regardless, it’s “not considered good practice” to rely on seed that can be read by any process in the system,</p>
+</blockquote>
+</aside>
+<p>We can use apparmor-profile-everything to hide /proc/cmdline and grub config files from all processes.</p>
+<p>dmesg is already restricted to root and we can restrict it further with a kernel patch. I’ve already had a patch to do this for a while now.</p>
+<p>I’m not aware of another way to read the boot parameters that we haven’t covered or wouldn’t be trivial to fix.</p>
+<aside class="quote no-group" data-username="SokPuppette" data-post="7" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/s/898d66/40.png" class="avatar"> SokPuppette:</div>
+<blockquote>
+<p>nor to rely on seed that could be the same between two boots.</p>
+</blockquote>
+</aside>
+<p>The grub config can be regenerated during boot via a systemd service so the next boot would have a unique seed.</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/8</link>
+        <pubDate>Thu, 20 Feb 2020 21:33:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-8</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[SokPuppette]]></dc:creator>
+        <description><![CDATA[
+            <p>What problem are you trying to solve with this?</p>
+<p>If you’re only worried about things using /dev/urandom before it’s seeded, then:</p>
+<ol>
+<li>
+<p>That’s not actually a big  problem with reasonably recent Linux on X86 processors, because the kernel will use the CPU’s RDSEED/RDRAND instructions to seed even /dev/urandom before returning any data to userspace. So unless your <em>CPU</em> has been subverted, or unless there’s a bug in what’s actually a pretty simple code path, you’ll never get bad randomness on X86. Really there’s only an issue on ARM.</p>
+</li>
+<li>
+<p>If you still care about the /dev/urandom early read problem, and you are willing to trust /dev/random, then you can always just create an early systemd unit to copy data from /dev/random into /dev/urandom. It’ll slow your boot down a lot, though. Actually you don’t even have to do that; all you really need to do is to wait untily you are able to <em>read</em> a single byte from /dev/urandom, or get data from the getrandom() system call, because neither of those will return until <em>both</em> /dev/random and /dev/urandom are fully seeded (the two are pretty intertwined in the kernel). If you do this, be aware that systemd will use some /dev/urandom data very early, but it only uses it to protect against some weird local denial of service attacks that probably aren’t major threats for Whonix.</p>
+</li>
+</ol>
+<p>Regardless, it’s “not considered good practice” to rely on seed that can be read by any process in the system, nor to rely on seed that could be the same between two boots.</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/7</link>
+        <pubDate>Thu, 20 Feb 2020 19:54:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-7</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I will probable publish a working implementation soon. Using grub <code>load_env</code> with filename and whitelsited variable name.</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="5" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Blake2 is much faster and CPU efficient than SHA-2</p>
+</blockquote>
+</aside>
+<p>I don’t think this needs CPU efficiency. Hashing 4096 bytes with sha512 takes ~ <code>0.002</code> seconds.</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="5" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>*Does grub have python bindings/</p>
+</blockquote>
+</aside>
+<p>I wouldn’t know what that would be useful for here.</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="5" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>*Can grub take more than 1 kernel command line</p>
+</blockquote>
+</aside>
+<p>I’ve not found any references that Linux can take that.</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/6</link>
+        <pubDate>Mon, 17 Feb 2020 19:44:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-6</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="1" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>something better?</p>
+</blockquote>
+</aside>
+<p>Maybe Blake2 can be used here in a roundabout way on Debian since b2sum isn’t packaged for some reason:</p>
+<p><a href="https://packages.debian.org/buster/python3-pycryptodome" class="onebox" target="_blank">https://packages.debian.org/buster/python3-pycryptodome</a><br>
+<a href="https://www.pycryptodome.org/en/latest/src/hash/blake2b.html" class="onebox" target="_blank">https://www.pycryptodome.org/en/latest/src/hash/blake2b.html</a></p>
+<p>Blake2 is much faster and CPU efficient than SHA-2</p>
+<p>Questions:<br>
+*Does grub have python bindings/<br>
+*Can grub take more than 1 kernel command line</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/5</link>
+        <pubDate>Mon, 17 Feb 2020 14:48:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-5</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="3" data-topic="8945">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Would be OK if <code>/proc/cmdline</code> starts with that random string and ends with actual kernel command line parameters?</p>
+</blockquote>
+</aside>
+<p>That’s far too big. I don’t think users want to be harassed by a massive wall of random text when checking their boot parameters.</p>
+<p>32 bytes would be far better. AFAIK, it is enough to achieve cryptographic security hence why AES only uses key sizes between 128-256 bits.</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/4</link>
+        <pubDate>Sun, 16 Feb 2020 17:23:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-4</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Fortunately grub supports variables.</p>
+<aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://askubuntu.com/questions/977419/grub2-using-variables-to-pass-to-linux-entry" target="_blank">askubuntu.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://askubuntu.com/users/540054/paul-knopf" target="_blank">
+    <img alt="Paul Knopf" src="https://www.gravatar.com/avatar/57371bcaddaa3fc46e2095bf947b2cb4?s=128&amp;d=identicon&amp;r=PG" class="thumbnail onebox-avatar" width="60" height="60">
+  </a>
+<h4>
+  <a href="https://askubuntu.com/questions/977419/grub2-using-variables-to-pass-to-linux-entry" target="_blank">grub2, using variables to pass to linux entry</a>
+</h4>
+
+<div class="tags">
+  <strong>grub2</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://askubuntu.com/users/540054/paul-knopf" target="_blank">
+    Paul Knopf
+  </a>
+  on <a href="https://askubuntu.com/questions/977419/grub2-using-variables-to-pass-to-linux-entry" target="_blank">02:00PM - 17 Nov 17 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Therefore probably no usability issue at grub boot menu. Will test soon.</p>
+<p>The question is just how much can we uglify <code>/proc/cmdline</code>?</p>
+<p>See this command:</p>
+<pre><code>hexdump -n "4096" -e '"%02X"' /dev/random
+</code></pre>
+<p>Would be OK if <code>/proc/cmdline</code> starts with that random string and ends with actual kernel command line parameters?</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/3</link>
+        <pubDate>Sun, 16 Feb 2020 15:11:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-3</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <ul>
+<li><a href="https://git-tails.immerda.ch/tails/tree/config/chroot_local-includes/usr/share/initramfs-tools/scripts/init-premount/update-random-seed-sector?h=feature/11897-improve-random-seed-file">https://git-tails.immerda.ch/tails/tree/config/chroot_local-includes/usr/share/initramfs-tools/scripts/init-premount/update-random-seed-sector?h=feature/11897-improve-random-seed-file</a></li>
+<li><a href="https://git-tails.immerda.ch/tails/tree/config/chroot_local-includes/usr/share/initramfs-tools/scripts/init-bottom/update-kernel-command-line-random-seed?h=feature/11897-improve-random-seed-file">https://git-tails.immerda.ch/tails/tree/config/chroot_local-includes/usr/share/initramfs-tools/scripts/init-bottom/update-kernel-command-line-random-seed?h=feature/11897-improve-random-seed-file</a></li>
+<li><a href="https://git-tails.immerda.ch/kurono/tails/log/?h=feature/11897-improve-random-seed-file">https://git-tails.immerda.ch/kurono/tails/log/?h=feature/11897-improve-random-seed-file</a></li>
+<li>
+<a href="https://redmine.tails.boum.org/code/issues/16980">https://redmine.tails.boum.org/code/issues/16980</a> - using a grub variable (not implemented at time of writing)</li>
+<li><a href="https://redmine.tails.boum.org/code/issues/11897">https://redmine.tails.boum.org/code/issues/11897</a></li>
+<li><a href="https://redmine.tails.boum.org/code/issues/16891">https://redmine.tails.boum.org/code/issues/16891</a></li>
+</ul>
+<p>Quote <a href="https://redmine.tails.boum.org/code/issues/11897#note-67">https://redmine.tails.boum.org/code/issues/11897#note-67</a></p>
+<blockquote>
+<p>Updated by <a href="https://redmine.tails.boum.org/code/users/808">cypherpunks</a> <a href="https://redmine.tails.boum.org/code/projects/tails/activity?from=2019-08-14">6 months</a> ago</p>
+</blockquote>
+<blockquote>
+<blockquote>
+<p>Some explanation would help. My sources for using 512 bytes are <a href="https://linux.die.net/man/4/urandom">https://linux.die.net/man/4/urandom</a> and <a href="https://github.com/torvalds/linux/blob/master/drivers/char/random.c#L162">https://github.com/torvalds/linux/blob/master/drivers/char/random.c#L162</a>. Of course restoring any entropy at all is better than none, but why do you think 32 or 16 would be “plenty”?</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>The pool is 512 bytes in size, but you only need 32 or 16 bytes (256 or 128 bits, respectively) to achieve cryptographic security. In fact, /dev/urandom since Linux 4.8 uses ChaCha20 with a 256 bit (32 byte) seed.</p>
+</blockquote>
+<p>Can anyone confirm this from an authoritative source? 32 bit / 4 byte would be more than small enough for being added to kernel command line without breaking usability.</p>
+<p>An answer to that would also help with <a href="https://forums.whonix.org/t/twuewand-a-truerand-algorithm-for-generating-entropy-whonix-integration/8880" class="inline-onebox">twuewand - a truerand algorithm for generating entropy - Whonix integration</a>.</p>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/2</link>
+        <pubDate>Sun, 16 Feb 2020 13:34:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-2</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+      <item>
+        <title>use kernel command line as a source of randomness</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <ul>
+<li><a href="https://www.openwall.com/lists/kernel-hardening/2017/08/16/15">https://www.openwall.com/lists/kernel-hardening/2017/08/16/15</a></li>
+<li><a href="https://tails.boum.org/blueprint/randomness_seeding/#index3h2">https://tails.boum.org/blueprint/randomness_seeding/#index3h2</a></li>
+<li><a href="https://redmine.tails.boum.org/code/issues/11897">https://redmine.tails.boum.org/code/issues/11897</a></li>
+<li><a href="https://lore.kernel.org/patchwork/cover/822010/">https://lore.kernel.org/patchwork/cover/822010/</a></li>
+<li><a href="https://lore.kernel.org/patchwork/patch/822011/">https://lore.kernel.org/patchwork/patch/822011/</a></li>
+<li><a href="https://lore.kernel.org/patchwork/patch/822012/">https://lore.kernel.org/patchwork/patch/822012/</a></li>
+</ul>
+<p>By looking at the kernel source code diff it seems this doesn’t need a kernel parameter (such as hypothetically <code>entropy=[blob of random data]</code>.</p>
+<p>We could ship an <code>/etc/default/grub.d</code> configuration file snippet in package <a href="https://github.com/Whonix/security-misc">security-misc</a> that reads some random data from <code>/dev/random</code> [1] and adds it to kernel command line. [2]</p>
+<p>How many bytes should be added?</p>
+<p>Sized between 1024 bytes and 4096 bytes are being discussed.</p>
+<ul>
+<li>
+<a href="https://bugzilla.redhat.com/show_bug.cgi?id=1386824"> Bug 1386824 </a> - random-seed size should be 4096 bytes in size</li>
+<li><a href="https://github.com/lnykryn/systemd-rhel/pull/84"> random-seed: raise POOL_SIZE_MIN to 1024 (#1386824) #84 </a></li>
+</ul>
+<p>How would we encode the random data? (because should not write random characters directly into config file - these can mess up terminal and/or editors)</p>
+<ul>
+<li>sha512? hash using sha512 every x bytes?</li>
+<li>base64?</li>
+<li>something better?</li>
+</ul>
+<p>Should this kernel parameter be the first in line or last in line? This is because when users want to change kernel command line in grub boot menu (press <code>E</code> to edit) they would see a huge random blob of data which is not pretty and bad usability. That makes me wonder if this is a good idea at all.</p>
+<p>Isn’t there a “second kernel command line” or similar? Or any saner interface for the bootloader to pass entropy to the kernel? Maybe something similar to <a href="https://forums.whonix.org/t/early-rng-init-tools-for-better-entropy/8579" class="inline-onebox">early-rng-init-tools for better entropy?</a> would be a better idea?</p>
+<p><code>systemd-boot</code> loader supports passing a random seed file to the kernel when being used with EFI. More on that here:</p>
+<ul>
+<li><a href="https://systemd.io/RANDOM_SEEDS/">https://systemd.io/RANDOM_SEEDS/</a></li>
+<li><a href="https://systemd.io/BOOT_LOADER_INTERFACE/">https://systemd.io/BOOT_LOADER_INTERFACE/</a></li>
+</ul>
+<p>I haven’t found anything for grub and/or non-EFI. Yet have to read that Tails ticket.</p>
+<hr>
+<p>[1] <a href="https://www.whonix.org/wiki/Dev/Entropy#.2Fdev.2Frandom_vs._.2Fdev.2Furandom"><code>/dev/random</code> vs. <code>/dev/urandom</code></a></p>
+<p>[2] The disadvantages of this implementation are:</p>
+<ul>
+<li>visible in <code>/proc/cmdline</code> <a href="https://systemd.io/RANDOM_SEEDS/">Quote</a>:
+<ul>
+<li>
+<blockquote>
+<p><em>Why not pass the boot loader random seed via kernel command line instead of as EFI variable?</em></p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p>The kernel command line is accessible to unprivileged processes via <code>/proc/cmdline</code> . It’s not desirable if unprivileged processes can use this information to possibly gain too much information about the current state of the kernel’s entropy pool.</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>stays static until update-grub is re-run (mostly only at kernel upgrade)
+<ul>
+<li>non-ideal but not a problem because no entropy added to the kernel mix can in theory worsen the quality of Linux entropy.</li>
+</ul>
+</li>
+<li>perhaps better to re-generate this file on every boot but I don’t see yet a way to do so in an atomic way - meaning not break booting if grub config file generation is interrupted due to power loss or reboot</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945/1</link>
+        <pubDate>Sun, 16 Feb 2020 12:20:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8945-1</guid>
+        <source url="http://forums.whonix.org/t/use-kernel-command-line-as-a-source-of-randomness/8945.rss">use kernel command line as a source of randomness</source>
+      </item>
+  </channel>
+</rss>

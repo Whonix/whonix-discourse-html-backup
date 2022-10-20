@@ -1,0 +1,784 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+    <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988</link>
+    <description>
+
+### Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!  
+(**Note:** This page is a Draft waiting for review by Patrick)
+
+
+
+[Qubes-Whonix](https://whonix.org/wiki/Qubes ) only!
+
+
+For this testers wanted task, users should create fresh Whonix VMs.
+
+**Installing the R3.2 or R4.0 testers Qubes-Whonix 14 TemplateVMs.**
+
+
+Step 1: Clone existing `whonix-gw` and `whonix-ws` templates. It is recommended the newly cloned VMs be given names such as `whonix-gw-13` and `whonix-ws-13`. This is to prevent new templates from being confused with other Whonix templates.
+
+
+Step 2: Change all VMs based on `whonix-ws` and `whonix-gw` templates to the newly cloned templates. 
+
+Step 3: Remove the current `whonix-gw` and `whonix-ws` Qubes-Whonix templates.
+
+In dom0, run.
+
+&gt;  `sudo dnf remove qubes-template-whonix-gw`
+
+&gt;  `sudo dnf remove qubes-template-whonix-ws`
+
+
+Step 4: Reinstall `whonix-gw-14` and `whonix-ws-14` Qubes-Whonix templates release candidate versions. 
+
+* _Warning:_ Reinstalling Whonix templates while using `sys-whonix` as the updateVM could take hours given the 1.2 GB total to download. It may be preferable to change the Global Setting in Qubes VM manager to temporarily use `sys-firewall`. Qubes will then download updates over clearnet and the operation will likely take less than an hour.
+
+In dom0, run.
+
+&gt;   `sudo qubes-dom0-update --enablerepo=qubes-dom0-unstable qubes-template-whonix-gw-14 qubes-template-whonix-ws-14`
+
+  *  _Qubes R3.2 note_ - users might encounter `tar` errors relating to dom0-updates folder not existing in `sys-whonix` (if updates are downloaded over Tor) or `sys-firewall`. If this is the case, before downloading Whonix templates with the command above, the following command should be run in either the `sys-whonix` or `sys-firewall` updateVM.
+
+
+     In updateVM Konsole, run.
+
+     &gt;sudo mkdir -m 775 /var/lib/qubes/dom0-updates
+      sudo chown user:user /var/lib/qubes/dom0-updates
+
+  
+
+  
+
+Step 5:  After re-installling templates, clone the `whonix-gw-14` and `whonix-ws-14` template VMs and name them `whonix-gw` and `whonix-ws`. 
+
+  * Note: This step is necessary if `salt` is to be used in step 8 to create `sys-whonix` and `anon-whonix` VMs.
+
+Step 6: (Optional ) Users can remove  `whonix-gw-14` and `whonix-ws-14` templates. However, retaining clean Whonix 14 template VMs for later testing may be desirable.
+
+In dom0, run.
+
+&gt;`sudo dnf remove qubes-template-whonix-gw-14`
+
+&gt;`sudo dnf remove qubes-template-whonix-ws-14`
+
+
+Step 7: Update[1] `whonix-gw` and `whonix-ws` template VMs.
+
+The following should be applied in both template VM Konsoles.
+
+&gt;`sudo apt-get update &amp;&amp; sudo apt-get dist-upgrade`
+
+Step 8: After updating templates, recreate Whonix VMs from Qubes VM Manager. Optionally, advanced users can create Whonix VMs using `salt`[2][3].
+
+Create VMs from Qubes VM Manager.
+
+ Qubes R4.0
+
+   * Create `sys-whonix` VM.
+
+        `Qubes VM Manager` -&gt; `Qube` -&gt; `create a new qube`.
+
+        * Create new VM with these settings.
+
+          Name and label:    `sys-whonix-14`       ( purple )
+          Type:                    `AppVM`
+          Template:            `whonix-gw`
+          Networking:         `sys-firewall`
+          Advanced:            `provides network` (check)
+
+    * Create `anon-whonix` VM
+
+        `Qubes VM Manager` -&gt; `Qube` -&gt; `create a new qube`.
+
+        * Create new VM with these settings.
+
+          Name and label:     `anon-whonix-14`      ( purple )
+         Type:               `AppVM`
+         Template:           `whonix-ws`
+         Networking:         `sys-whonix-14`
+         Advanced:            `n/a`
+
+Qubes R3.2
+
+   * Create `sys-whonix` VM.
+
+        `Qubes VM Manager` -&gt; `Qube` -&gt; `create a new qube`.
+
+       * Create new VM with these settings.
+
+         Name and label:        `sys-whonix-14`    ( purple )
+         Type:                  `ProxyVM`
+         Template:              `whonix-gw`
+         Networking:            `sys-firewall`
+
+
+    * Create `anon-whonix` VM.
+
+        `Qubes VM Manager` -&gt; `Qube` -&gt; `create a new qube`.
+
+       * Create new VM with these settings.
+
+         Name and label:         `anon-whonix-14`   ( purple )
+         Type:                   `AppVM`
+         Template:               `whonix-ws`
+         Networking:             `sys-whonix-14`
+
+( Optional ) Create Whonix VMs using `salt`. _Advanced users only!_
+
+  Users have the option of using `salt` to recreate `sys-whonix` and `anon-whonix` VMs. Since no two VMs can have identical names. It would require any current Whonix-13 based `sys-whonix` or `anon-whonix` VMs to be renamed prior to using salt.
+
+  In dom0, run.
+
+  &gt;`sudo qubesctl state.sls qvm.anon-whonix`
+
+ * _Note:_ Users should verify `salt` creates VMs `sys-whonix` and `anon-whonix` based on Whonix 14 templates. If problems are encountered such as the newly created VMs are Whonix 13 based. `sys-whonix` ProxyVM and `anon-whonix` AppVM can be created manually from Qubes VM Manager. 
+
+ * Users can verify `sys-whonix` and `anon-whonix` VMs are based on Whonix 14 by listing the Debian apt `sources.list`. Newly created Whonix 14 VMs use Debian stretch (stable) as opposed to Whonix 13 VMs which use Debian jessie (old stable)
+
+    In both `sys-whonix` and `anon-whonix` VM konsoles, run.
+
+    &gt;`cat /etc/apt/sources.list.d/debian.list`
+
+    The first 2 lines of output will show the following for Whonix 14 based VMs.
+
+    &gt; `deb tor+http://sgvtcaew4bxjd7ln.onion stretch/updates main contrib non-free`
+       `deb http://security.debian.org stretch/updates main contrib non-free`
+
+Step 9:  Copy the Whonix 13 Tor State to the newly created Whonix 14 (sys-whonix) VM. Users are encouraged to complete this step to maintain the same Tor entry guard and defend against tracking attempts by advanced adversaries.
+
+**Note:** Steps to copy Tor state to secondary VM are in testing. Once complete, they will be added to the Whonix wiki. This will be completed shortly. [Help welcome!](https://forums.whonix.org/t/long-wiki-edits-thread/3477/558)
+
+
+
+
+
+
+Please report any bugs in the Whonix forums so they can be addressed before the final Whonix 14 release.
+
+It should be noted that users also have the option of doing an in-place upgrade of Whonix 13 to Whonix 14, rather than using the release candidate TemplateVMs. If this is preferable, follow the Testers-only documentation at the link below.
+
+
+[https://whonix.org/wiki/Upgrading_Whonix_13_to_Whonix_14](https://whonix.org/wiki/Upgrading_Whonix_13_to_Whonix_14)
+
+Detailed release notes for Whonix 14 can be found here: https://whonix.org/wiki/Whonix_Release_Notes#Whonix_14
+
+
+
+[1] [https://www.whonix.org/wiki/Qubes/Update](https://www.whonix.org/wiki/Qubes/Update)
+[2] [ https://www.whonix.org/wiki/Dev/Qubes#salt]( https://www.whonix.org/wiki/Dev/Qubes#salt)
+[3] [ https://www.qubes-os.org/doc/salt/]( https://www.qubes-os.org/doc/salt/)</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 22 Jul 2018 14:01:20 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/108">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/108</link>
+        <pubDate>Sun, 22 Jul 2018 14:01:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-108</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="1" data-topic="5529">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar">
+    <a href="https://forums.whonix.org/t/qubes-whonix-14-0-0-7-9-templatevms-for-r3-2-and-r4-testers-wanted/5529">Qubes-Whonix 14.0.0.7.9 TemplateVMs for R3.2 and R4 -- Testers Wanted!</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/news"><span class="badge-category-bg" style="background-color: #AB9364;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="News posted by Whonix staff.">News</span></a>
+  </div>
+  <blockquote>
+    
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/107">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/107</link>
+        <pubDate>Sun, 22 Jul 2018 14:01:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-107</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Making good progress. For now, developers-only since not fully tested yet by me. Call for testing with these new instruction in new thread coming soon.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="" height="">
+      <a href="https://www.whonix.org/wiki/Qubes/Install/Testing" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:200/215;"><img src="//forums.whonix.org/uploads/default/original/2X/e/e2461eab72ca4919cde74fadee7f466018729977.png" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Qubes/Install/Testing" target="_blank" rel="nofollow noopener">Qubes/Install/Testing</a></h3>
+
+<p>HowTo: Install the Testers-Only Version of Qubes-Whonix</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/106">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/106</link>
+        <pubDate>Mon, 16 Jul 2018 07:16:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-106</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>choose 1 or use TBB to view images. but not 4 paths to view images:-</p>
+<ul>
+<li>Gwenview</li>
+<li>Okular</li>
+<li>Imagemagick</li>
+<li>Using Tor Browser</li>
+</ul>
+<p>all these to view images ? i think leaving it to TBB or TBB + Okular is enough. no need for all of them together.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/105">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/105</link>
+        <pubDate>Wed, 18 Apr 2018 22:24:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-105</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>torjunkie:</p>
+<blockquote>
+<p>The only thing I wasn’t sure about was after running the “env” command, there is no <code>TOR_CONTROL_PORT=9151</code> output there.</p>
+<p>However, it does show in a couple of places:</p>
+<blockquote>
+<p>TOR_CONTROL_IPC_PATH=/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9151.sock</p>
+</blockquote>
+</blockquote>
+<p>This is ok.</p>
+<p>(Tor Browser now using SocksSocket related:<br>
+<a href="https://phabricator.whonix.org/T192">https://phabricator.whonix.org/T192</a>)</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/104">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/104</link>
+        <pubDate>Sat, 14 Apr 2018 11:04:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-104</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This is blocked.</p>
+<p>Can anyone help with salt?</p>
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-issues/issues/3765" target="_blank" rel="nofollow noopener">github.com/QubesOS/qubes-issues</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/adrelanos" rel="nofollow noopener">
+<img src="//forums.whonix.org/uploads/default/original/2X/7/770a15f475a1de4a6ba4d68ffb96bd85c7274aa0.jpg" class="thumbnail onebox-avatar" width="96" height="96">
+</a>
+
+<h4><a href="https://github.com/QubesOS/qubes-issues/issues/3765" target="_blank" rel="nofollow noopener">Issue: Qubes-Whonix 14 SaltStack state files required</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/3765" target="_blank" rel="nofollow noopener">2018-03-30</a>
+	</div>
+	<div class="user">
+	closed by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/3765" target="_blank" rel="nofollow noopener">2018-07-15</a>
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">I am not sure it was a good idea to go for versioned (suffixing -14) Whonix template names.
+We now have the...</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: Whonix</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: mgmt</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">P: major</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">task</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/103">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/103</link>
+        <pubDate>Sat, 14 Apr 2018 08:23:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-103</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks, fixed!</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/102">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/102</link>
+        <pubDate>Sat, 14 Apr 2018 08:21:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-102</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[iry]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="100" data-topic="4988">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<p>Stretch In-Release has an expired release file i.e. the one pointing to the Whonix v3 onion.</p>
+</blockquote>
+</aside>
+<p>confirmed.</p>
+<p>I tried all four available repository via <code>kdesudo whonix-repository-wizard</code>. The only repository suffers from this problem is <code>stretch-proposed-updates InRelease</code>.</p>
+<pre><code>user@host:~$ sudo apt-get update              
+Hit:1 http://security.debian.org stretch/updates InRelease                                       
+Hit:2 http://deb.torproject.org/torproject.org stretch InRelease                                 
+Hit:3 tor+http://sgvtcaew4bxjd7ln.onion stretch/updates InRelease                                
+Hit:4 http://deb.qubes-os.org/r3.2/vm stretch InRelease                                          
+Get:5 tor+http://deb.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion stretch-proposed-updates InRelease [13.2 kB]
+Ign:6 http://ftp.us.debian.org/debian stretch InRelease                                          
+Ign:7 tor+http://vwakviie2ienjx6t.onion/debian stretch InRelease                                 
+Get:8 http://deb.whonix.org stretch-proposed-updates InRelease [13.2 kB]                       
+Hit:9 http://ftp.us.debian.org/debian stretch Release                                            
+Hit:10 tor+http://vwakviie2ienjx6t.onion/debian stretch Release          
+Reading package lists... Done                     
+E: Release file for tor+http://deb.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/dists/stretch-proposed-updates/InRelease is expired (invalid since 5d 10h 31min 55s). Updates for this repository will not be applied.
+E: Release file for http://deb.whonix.org/dists/stretch-proposed-updates/InRelease is expired (invalid since 5d 10h 31min 55s). Updates for this repository will not be applied.
+</code></pre>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a></p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/101">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/101</link>
+        <pubDate>Sat, 14 Apr 2018 02:39:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-101</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>Stretch In-Release has an expired release file i.e. the one pointing to the Whonix v3 onion.</p>
+<p>So, when trying to update, you get the same problem as this issue below, which was previously a server side issue-&gt;</p>
+<p><a href="https://github.com/QubesOS/qubes-issues/issues/3323">https://github.com/QubesOS/qubes-issues/issues/3323</a></p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/100">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/100</link>
+        <pubDate>Sat, 14 Apr 2018 02:11:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-100</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[iry]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="97" data-topic="4988">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>At the moment the Whonix specific parts are as much as possible nicely sourced out to WSW.</p>
+</blockquote>
+</aside>
+<p>Got you! Thank you for the explaination!</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/99">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/99</link>
+        <pubDate>Sat, 07 Apr 2018 22:50:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-99</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> change the shortcuts links (Contribute, Donate, Documentation …etc) on the desktop from clearnet to onion v3.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/98">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/98</link>
+        <pubDate>Sat, 07 Apr 2018 20:08:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-98</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Duplicate starter will be removed, thanks! <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=6" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<p><a href="https://github.com/Whonix/whonix-setup-wizard/commit/3ef22611875a09b4f3a3e24831fab72b1877b6f9" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/Whonix/whonix-setup-wizard/commit/3ef22611875a09b4f3a3e24831fab72b1877b6f9</a></p>
+<hr>
+<blockquote>
+<p>I guess Whonix-Setup-Wizard will soon become deprecated (correct? <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> ). Currently, its behaviors are as follows:</p>
+</blockquote>
+<p>We discussed in the ACW thread what it’s still needed for.</p>
+<p>What the source files of <a href="https://github.com/Whonix/whonix-setup-wizard" rel="nofollow noopener">https://github.com/Whonix/whonix-setup-wizard</a> do is not implemented elsewhere. Not sure it should be implemented elsewhere. If implemented in ACW (possible of course) then ACW could become too Whonix specific. ACW source code would get bigger and less beautiful. At the moment the Whonix specific parts are as much as possible nicely sourced out to WSW.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/97">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/97</link>
+        <pubDate>Sat, 07 Apr 2018 08:10:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-97</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[iry]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you for reporting, <a class="mention" href="http://forums.whonix.org/u/tnt_bom_bom">@TNT_BOM_BOM</a> !</p>
+<p>This is actually expected behaviors.</p>
+<p>I guess Whonix-Setup-Wizard will soon become deprecated (correct? <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> ). Currently, its behaviors are as follows:</p>
+<p><code>kdesudo whonix-setup-wizard setup</code> will:</p>
+<ol>
+<li>if it is in Whonix-Gateway, start anon-connection-wizard</li>
+<li>if it is in Whonix-Workstation, do nothing</li>
+</ol>
+<p><code>kdesudo whonix-setup-wizard repository</code> will open <code>Whonix Repository</code> whose shortcut has been provided separately.</p>
+<p><code>kdesudo whonix-setup-wizard locale_settings</code> will open locale settings, which are not very helpful considering Whonix does not support multi-languages currently.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/96">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/96</link>
+        <pubDate>Fri, 06 Apr 2018 19:18:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-96</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/iry">@iry</a> Duplicate shortcuts Contents:-</p>
+<ul>
+<li>Anon Connection Wizard</li>
+<li>Whonix Setup - Whonix connection wizard</li>
+</ul>
+<p>showing the same thing:-</p>
+<p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/5/5e4e316af4dec0e74b92ddf449ac2f0ee1260d35.png" data-download-href="//forums.whonix.org/uploads/default/5e4e316af4dec0e74b92ddf449ac2f0ee1260d35" title="dublicate.png"><img src="//forums.whonix.org/uploads/default/original/2X/5/5e4e316af4dec0e74b92ddf449ac2f0ee1260d35.png" alt="dublicate" width="690" height="276" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/5/5e4e316af4dec0e74b92ddf449ac2f0ee1260d35_2_10x10.png"></a></div><p></p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/95">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/95</link>
+        <pubDate>Fri, 06 Apr 2018 14:39:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-95</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <ul>
+<li>problem cant upgrade whonix:-</li>
+</ul>
+<p><code>sudo apt update</code></p>
+<p>showing</p>
+<p><img src="//forums.whonix.org/uploads/default/original/2X/c/cdde6831ac05c9a8f096e3a04925ba464ca38d8d.png" alt="whonixupgrade" width="486" height="332"></p>
+<ul>
+<li>what should be added/changed here:-</li>
+</ul>
+<p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/e/eb890d564f297ea23fcdaab363e42163f3424533.png" data-download-href="//forums.whonix.org/uploads/default/eb890d564f297ea23fcdaab363e42163f3424533" title="whonixupgrade2.png"><img src="//forums.whonix.org/uploads/default/original/2X/e/eb890d564f297ea23fcdaab363e42163f3424533.png" alt="whonixupgrade2" width="690" height="429" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/e/eb890d564f297ea23fcdaab363e42163f3424533_2_10x10.png"></a></div><p></p>
+<p>any further steps should be taken?</p>
+<p>the answer is adding these lines at the top of all text:-</p>
+<pre><code>nameofwhonix-gwtemplate $default allow,target=nameofappvmbasedongw 
+
+nameofwhonix-wstemplate $default allow,target=nameofappvmbasedongw</code></pre>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/94">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/94</link>
+        <pubDate>Fri, 06 Apr 2018 14:18:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-94</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>OnionShare - tested and working in Whonix 14 (see Long Wiki Edits thread).</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/93">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/93</link>
+        <pubDate>Fri, 06 Apr 2018 12:12:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-93</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="85" data-topic="4988" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<p>Hi iry,</p>
+<p>Already reported by Patrick to the Tor Project (no response as of yet).</p>
+<p><a href="https://trac.torproject.org/projects/tor/ticket/25677">https://trac.torproject.org/projects/tor/ticket/25677</a></p>
+</blockquote>
+</aside>
+<p>Seccomp problem has been fixed in Tor v3.3 final.</p>
+<p><a href="https://trac.torproject.org/projects/tor/ticket/22605">https://trac.torproject.org/projects/tor/ticket/22605</a></p>
+<p>Since Whonix users are currently on Tor 3.2.9 or 3.2.10, this results in the crash when setting Sandbox 1 in the torrc user.conf</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/92">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/92</link>
+        <pubDate>Thu, 05 Apr 2018 13:44:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-92</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/0brand">@0brand</a> - Realized that for greater tester safety, we really should have a step where they explicitly copy &amp; paste the Tor state file from Whonix 13 into the Whonix 14 VM before any Tor connections are made, to resist adversary efforts in tracking testers i.e. maintain same Tor guard.</p>
+<p>Unapologetically tinfoil, I know. <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=5" title=":wink:" class="emoji" alt=":wink:"></p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/91">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/91</link>
+        <pubDate>Tue, 03 Apr 2018 12:27:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-91</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="86" data-topic="4988">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/f9ae1b/40.png" class="avatar"> torjunkie:</div>
+<blockquote>
+<p>I guess it’s up to the core team to decide now ie whether the simple testers guide as per no1’s 3 steps is preferred, or the full blown guide as per your entry. Or, the blog post could be a combination of:</p>
+<p>Easy - quick testers guide with 3 steps<br>
+Advanced - full testers guide with 8 steps</p>
+</blockquote>
+</aside>
+<p>For a “Testers Wanted” , its assumed users come to the table with the basic knowledge on how to use Qubes-Whonix – IMHO. The way the blog is written know is similar to how a wiki chapter is written. It would be helpful for inexperienced users but for the most part unnecessary. That is if you look at the current testers reporting back with issues. I’m not sure they need a detailed guide? Well, maybe <code>unman</code> but thats about it . <img src="//forums.whonix.org/images/emoji/twitter/smile.png?v=5" title=":smile:" class="emoji" alt=":smile:"></p>
+<p>If the previous testers guide is sufficient (<a href="https://www.whonix.org/blog/qubes-whonix-13-0-0-1-2-testers-wanted"> https://www.whonix.org/blog/qubes-whonix-13-0-0-1-2-testers-wanted</a> ) i.e works well, uncomplicated. I think maybe we should stick with that format ?</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/90">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/90</link>
+        <pubDate>Mon, 02 Apr 2018 10:17:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-90</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>See also Whonix related bugs on Qubes issue tracker.</p>
+<p><a href="https://github.com/QubesOS/qubes-issues/labels/C%3A%20Whonix">https://github.com/QubesOS/qubes-issues/labels/C%3A%20Whonix</a></p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/89">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/89</link>
+        <pubDate>Mon, 02 Apr 2018 09:24:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-89</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>torjunkie:</p>
+<blockquote>
+<ul>
+<li>plethora of socks ports listening</li>
+<li>“loopback interface” warnings etc</li>
+</ul>
+</blockquote>
+<p>Could call it false positives. This warnings don’t apply to Whonix. Many<br>
+SocksPorts for stream isolation. Listening on non-localhost so these are<br>
+reachable from Whonix-Workstations.</p>
+<blockquote>
+<ul>
+<li>apparmor warnings on some profiles</li>
+</ul>
+</blockquote>
+<p>Low priority. Might have been previously discussed. Please report<br>
+separately to Whonix AppArmor forums.</p>
+<blockquote>
+<ul>
+<li>“anon vm” tag issues in Qubes 4 with manual creation of VMs when not<br>
+resorting to salt</li>
+</ul>
+</blockquote>
+<p><a href="https://github.com/QubesOS/qubes-issues/issues/3595" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/QubesOS/qubes-issues/issues/3595</a></p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/88">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/88</link>
+        <pubDate>Mon, 02 Apr 2018 09:14:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-88</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks everyone for all your help! <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=6" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<p>torjunkie:</p>
+<blockquote>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> - please publish 0brand’s blog entry once this change is made.</p>
+</blockquote>
+<p>Salt has to be sorted out first. Currently 13 vs 14 vs testing vs salt<br>
+is very messy.</p>
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-issues/issues/3765" target="_blank" rel="nofollow noopener">github.com/QubesOS/qubes-issues</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/adrelanos" rel="nofollow noopener">
+<img src="//forums.whonix.org/uploads/default/original/2X/7/770a15f475a1de4a6ba4d68ffb96bd85c7274aa0.jpg" class="thumbnail onebox-avatar" width="96" height="96">
+</a>
+
+<h4><a href="https://github.com/QubesOS/qubes-issues/issues/3765" target="_blank" rel="nofollow noopener">Issue: Qubes-Whonix 14 SaltStack state files required</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/3765" target="_blank" rel="nofollow noopener">2018-03-30</a>
+	</div>
+	<div class="user">
+	closed by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/3765" target="_blank" rel="nofollow noopener">2018-07-15</a>
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">I am not sure it was a good idea to go for versioned (suffixing -14) Whonix template names.
+We now have the...</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: Whonix</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: mgmt</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">P: major</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">task</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Salt has to be mandatory. No support to do it manually without salt.</p>
+<p><a href="https://github.com/QubesOS/qubes-issues/issues/3447" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/QubesOS/qubes-issues/issues/3447</a></p>
+<p>What salt does has just gotten too comprehensive.</p>
+<p><a href="https://www.whonix.org/wiki/Dev/Qubes#salt" rel="nofollow noopener">https://www.whonix.org/wiki/Dev/Qubes#salt</a></p>
+<p>(We could have instructions on how to do things manually without salt<br>
+for educative purposes but it shouldn’t be relied on.)</p>
+<p>Any salt issues should be reported to<br>
+<a href="https://github.com/QubesOS/qubes-issues/issues" rel="nofollow noopener">https://github.com/QubesOS/qubes-issues/issues</a>.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/87">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/87</link>
+        <pubDate>Mon, 02 Apr 2018 08:08:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-87</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="82" data-topic="4988">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/0/ec9cab/40.png" class="avatar"> 0brand:</div>
+<blockquote>
+<p>How many times have we changed the instructions?</p>
+</blockquote>
+</aside>
+<p>Hi 0brand,</p>
+<p>Looks like you’ve covered everything off (now you know why I dodged this task <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"> ).</p>
+<p>I guess it’s up to the core team to decide now ie whether the simple testers guide as per no1’s 3 steps is preferred, or the full blown guide as per your entry. Or, the blog post could be a combination of:</p>
+<ol>
+<li>Easy - quick testers guide with 3 steps</li>
+<li>Advanced - full testers guide with 8 steps</li>
+</ol>
+<p>I’m happy to further test Whonix 14 for full functionality, but it would be good for the experts to chime in with a simple yah or neh whether some of the things we are identifying are security risks or nothing to worry about e.g:</p>
+<ul>
+<li>plethora of socks ports listening</li>
+<li>“anon vm” tag issues in Qubes 4 with manual creation of VMs when not resorting to salt</li>
+<li>“loopback interface” warnings etc</li>
+<li>apparmor warnings on some profiles</li>
+<li>etc.</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/86">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/86</link>
+        <pubDate>Mon, 02 Apr 2018 04:34:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-86</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[torjunkie]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi iry,</p>
+<p>Already reported by Patrick to the Tor Project (no response as of yet).</p>
+<p><a href="https://trac.torproject.org/projects/tor/ticket/25677">https://trac.torproject.org/projects/tor/ticket/25677</a></p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/85">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/85</link>
+        <pubDate>Mon, 02 Apr 2018 04:18:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-85</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</title>
+        <dc:creator><![CDATA[iry]]></dc:creator>
+        <description><![CDATA[
+            <p>torjunkie:</p>
+<blockquote>
+<p><strong>3)</strong> The remaining main problem is tor config changes.</p>
+<p>Can anybody else get <code>Sandbox 1</code> and <code>ConnectionPadding 1</code> to work in Whonix 14 and have Tor connect?</p>
+</blockquote>
+<p>Hi <a class="mention" href="http://forums.whonix.org/u/torjunkie">@torjunkie</a> !</p>
+<p>I tested both <code>ConnectionPadding 1</code> and <code>Sandbox 1</code>.</p>
+<p>It turns out <code>ConnectionPadding 1</code> will not cause any trouble.</p>
+<p>Using Sandbox 1 will git the following complains:</p>
+<blockquote>
+<p>Apr 02 00:35:24.000 [notice] Read configuration file “/usr/share/tor/tor-service-defaults-torrc”.<br>
+Apr 02 00:35:24.000 [notice] Read configuration file “/etc/tor/torrc”.<br>
+Apr 02 00:35:24.000 [warn] sandbox_intern_string(): Bug: No interned sandbox parameter found for /etc/torrc.d/95_whonix.conf (on Tor 0.3.2.10 )<br>
+Apr 02 00:35:24.000 [warn] sandbox_intern_string(): Bug: No interned sandbox parameter found for /etc/torrc.d/95_whonix.conf (on Tor 0.3.2.10 )<br>
+Apr 02 00:35:24.000 [warn] Could not open “/etc/torrc.d/95_whonix.conf”: Permission denied<br>
+Apr 02 00:35:24.000 [warn] Error reading included configuration file or directory: “/etc/torrc.d/95_whonix.conf”.<br>
+Apr 02 00:35:24.000 [err] Reading config failed–see warnings above. For usage, try -h.<br>
+Apr 02 00:35:24.000 [warn] Restart failed (config error?). Exiting<br>
+I do not know what does “No interned sandbox parameter” means. Would you<br>
+like to ask on the tor-talk@ mailing list?</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/84">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988/84</link>
+        <pubDate>Mon, 02 Apr 2018 02:21:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-4988-84</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-0-0-6-9-templatevms-for-r3-2-and-r4-testers-wanted/4988.rss">Qubes-Whonix 14.0.0.6.9 TemplateVMs for R3.2 and R4--Testers Wanted!</source>
+      </item>
+  </channel>
+</rss>

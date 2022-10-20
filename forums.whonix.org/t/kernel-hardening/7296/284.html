@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>Kernel Hardening - #284 by madaidan - Development - Whonix Forum</title>
+    <meta name="description" content="Whonix should implement more kernel hardening. All of these settings add no or a very minimal performance decrease. 
+Setting “kernel.kptr_restrict=1” makes kernel symbols in /proc/kallsyms only accessible to root which c&amp;hellip;">
+    <meta name="generator" content="Discourse 2.8.9 - https://github.com/discourse/discourse version 1503ec07c57898a507395552b765b6808b4e1db9">
+<link rel="icon" type="image/png" href="../../../uploads/default/optimized/2X/3/37fe81e592143b0c01c9656c44069b4bfdd3990e_2_32x32.ico">
+<link rel="apple-touch-icon" type="image/png" href="../../../uploads/default/optimized/2X/2/222b7257d0600f2bc69cf77e6bc273aa0074ed4e_2_180x180.png">
+<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<link rel="canonical" href="../72968c93.html?page=13" />
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://forums.whonix.org","potentialAction":{"@type":"SearchAction","target":"https://forums.whonix.org/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<link rel="search" type="application/opensearchdescription+xml" href="../../../opensearch.xml" title="Whonix Forum Search">
+
+      <link href="../../../stylesheets/desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5.css_%3b%20filename_%3dUTF-8%27%27desktop_eaead85939ea2f99650f56b40c8681f4e1cb68d5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop"  />
+      <link href="../../../stylesheets/desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6c.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_3_f7af26cfd21c1d79bdb82342526b638dccef9d6cd2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="3" data-theme-name="header"/>
+<link href="../../../stylesheets/desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5.css_%3b%20filename_%3dUTF-8%27%27desktop_theme_4_56ca71d15f2048e2e474553f0c3928756f57aec5d2c8.css?__ws=forums.whonix.org" media="all" rel="stylesheet" data-target="desktop_theme" data-theme-id="4" data-theme-name="default"/>
+    <center>
+[<a href="../../../../external.html?link=https://www.whonix.org/">HOME</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Download">DOWNLOAD</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Documentation">DOCS</a>]
+[<a href="../../../c/news/21.html">NEWS</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Support">SUPPORT</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Forum_Best_Practices">TIPS</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Reporting_Bugs#Issue_Tracker">ISSUES</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Contribute">CONTRIBUTE</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Donate">DONATE</a>]
+</center>
+    
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of &#39;Kernel Hardening&#39;" href="../7296.rss" />
+    <meta property="og:site_name" content="Whonix Forum" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://forums.whonix.org/uploads/default/original/2X/a/ac61071d4245560068a380cd1c08c97d1da2201d.jpeg" />
+<meta property="og:image" content="https://forums.whonix.org/uploads/default/original/2X/5/5ac973ff4302e69269667e09e67d850c0b628c7a.jpeg" />
+<meta property="og:url" content="https://forums.whonix.org/t/kernel-hardening/7296/284" />
+<meta name="twitter:url" content="https://forums.whonix.org/t/kernel-hardening/7296/284" />
+<meta property="og:title" content="Kernel Hardening" />
+<meta name="twitter:title" content="Kernel Hardening" />
+<meta property="og:description" content="We can use this for things like Disable SUID Binaries too.  Since the script just passes the arguments into chmod, we can wipe out all SUID binaries/libraries by adding this to permission-hardening.conf as long as an exception is made in the error checking.  /{,usr/,usr/local/}{,s}bin/ -R u-s root root /{,usr/,usr/local/}{,s}bin/ -R g-s root root /{,usr/,usr/local/}lib{,32,64}/ -R u-s root root /{,usr/,usr/local/}lib{,32,64}/ -R g-s root root" />
+<meta name="twitter:description" content="We can use this for things like Disable SUID Binaries too.  Since the script just passes the arguments into chmod, we can wipe out all SUID binaries/libraries by adding this to permission-hardening.conf as long as an exception is made in the error checking.  /{,usr/,usr/local/}{,s}bin/ -R u-s root root /{,usr/,usr/local/}{,s}bin/ -R g-s root root /{,usr/,usr/local/}lib{,32,64}/ -R u-s root root /{,usr/,usr/local/}lib{,32,64}/ -R g-s root root" />
+<meta property="article:published_time" content="2019-12-08T16:55:50+00:00" />
+<meta property="og:ignore_canonical" content="true" />
+
+        <link rel="prev" href="../7296ce37.html?page=12">
+        <link rel="next" href="../7296a7f1.html?page=14">
+
+    
+  </head>
+  <body class="crawler">
+    
+    <header>
+      <a href="../../../index.html">
+          <img src="../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png" alt="Whonix Forum" id="site-logo" style="max-width: 150px;">
+      </a>
+    </header>
+    <div id="main-outlet" class="wrap">
+        <div id="topic-title">
+    <h1>
+      <a href="../7296.html">Kernel Hardening</a>
+    </h1>
+
+      <div class="topic-category" itemscope itemtype="../../../../external.html?link=http://schema.org/BreadcrumbList">
+          <span itemprop="itemListElement" itemscope itemtype="../../../../external.html?link=http://schema.org/ListItem">
+            <a href="../../../c/development/8.html" class="badge-wrapper bullet" itemprop="item">
+              <span class='badge-category-bg' style='background-color: #25AAE2'></span>
+              <span class='badge-category clear-badge'>
+                <span class='category-name' itemprop='name'>Development</span>
+              </span>
+            </a>
+            <meta itemprop="position" content="1" />
+          </span>
+      </div>
+
+  </div>
+
+  
+
+
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T16:27:20Z' class='post-time'>
+                December 8, 2019,  4:27pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T16:27:20Z'>
+          <span itemprop='position'>#279</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="277" data-topic="7296" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<pre><code class="lang-auto">while read line; do command; done &lt;${config_file}
+</code></pre>
+<p>This isn’t working. It keeps empty lines which the script thinks are actual lines so it fails with</p>
+<pre><code class="lang-auto">ERROR: File '' does not exist!
+</code></pre>
+<p>Dunno how to solve that.</p>
+</blockquote>
+</aside>
+<p><a href="../../../../external.html?link=https://mywiki.wooledge.org/BashFAQ/001" class="onebox" target="_blank">https://mywiki.wooledge.org/BashFAQ/001</a><br>
+but no worries about that one. I can change once first version is in git.</p>
+<aside class="quote no-group" data-post="278" data-topic="7296" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>I also need to find a better way of detecting if the mode is valid or not. Currently, it greps the output of <code>seq -w 000 4777</code> but this isn’t good as it allows for some invalid modes e.g. <code>0692</code> .</p>
+</blockquote>
+</aside>
+<p>Could be added later if we figure that out.<br>
+It could look at each number individually and reject those which are invalid?<br>
+Might also not be too important as wrong permissions would throw error.</p>
+<p>If a line is malformed, I’d say let’s use <code>continue</code> (i.e. show an error and skip that line) rather than <code>break</code> (stopping parsing, not parsing other lines).</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+          <meta itemprop='keywords' content=''>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T16:31:44Z' class='post-time'>
+                December 8, 2019,  4:31pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T16:31:44Z'>
+          <span itemprop='position'>#280</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="279" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>I can change once first version is in git.</p>
+</blockquote>
+</aside>
+<p>What should the file be called? Should it be part of permission-lockdown or its own file?</p>
+<aside class="quote no-group" data-post="279" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>It could look at each number individually and reject those which are invalid?</p>
+</blockquote>
+</aside>
+<p>Yes, but I don’t know how to determine if it is invalid.</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T16:39:29Z' class='post-time'>
+                December 8, 2019,  4:39pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T16:39:29Z'>
+          <span itemprop='position'>#281</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="280" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Yes, but I don’t know how to determine if it is invalid.</p>
+</blockquote>
+</aside>
+<p>You already did the right thing with error checking.</p>
+<pre><code>if ! [ -e "${file}" ]; then
+  echo "ERROR: File '${file}' does not exist!"
+  break
+fi
+
+if ! seq -w 000 4777 | grep -qw "${mode}"; then
+  echo "ERROR: Mode '${mode}' is invalid!"
+  break
+fi
+</code></pre>
+<p>Just change from <code>break</code> to “<code>continue</code>” (meaning “continue the loop with the next iteration” rather than “break this loop right now”).</p>
+<aside class="quote no-group" data-post="280" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>What should the file be called? Should it be part of permission-lockdown or its own file?</p>
+</blockquote>
+</aside>
+<p>No strong opinion. Could be there.<br>
+Or own file maybe better? Otherwise the existing apparmor profile needs too many changes?<br>
+/usr/lib/security-misc/permission-lockdown currently works on folders inside /home.<br>
+The new script is more for files outside of /home.<br>
+I am not worried much since we can always refactor the code after testing it a bit.</p>
+<p>/usr/lib/security-misc/permission-lockdown is currently only run by debian/security-misc.postinst but other hooks could call it too. (Such as a systemd unit file which runs it before sysinit.target.)</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T16:44:12Z' class='post-time'>
+                December 8, 2019,  4:44pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T16:44:12Z'>
+          <span itemprop='position'>#282</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="281" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>You already did the right thing with error checking.</p>
+</blockquote>
+</aside>
+<p>I meant with the mode. It’s not the best way of checking it as it allows some invalid ones.</p>
+<aside class="quote no-group" data-post="281" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>No strong opinion. Could be there.<br>
+Or own file maybe better? Otherwise the existing apparmor profile needs too many changes?<br>
+/usr/lib/security-misc/permission-lockdown currently works on folders inside /home.<br>
+The new script is more for files outside of /home.<br>
+I am not worried much since we can always refactor the code after testing it a bit.</p>
+</blockquote>
+</aside>
+<p>I think it would be best for it to be its own separate file. Is just “permission-hardening” a good name?</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T16:44:47Z' class='post-time'>
+                December 8, 2019,  4:44pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T16:44:47Z'>
+          <span itemprop='position'>#283</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="282" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Is just “permission-hardening” a good name?</p>
+</blockquote>
+</aside>
+<p>Perfect.</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T16:55:50Z' class='post-time'>
+                December 8, 2019,  4:55pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T16:55:50Z'>
+          <span itemprop='position'>#284</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="../../../../external.html?link=https://github.com/Whonix/security-misc/pull/42" target="_blank">github.com/Whonix/security-misc</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewbox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../../external.html?link=https://github.com/Whonix/security-misc/pull/42" target="_blank">File permission hardening</a>
+    </h4>
+
+    <div class="branches">
+      <code>Whonix:master</code> ← <code>madaidan:permission-hardening</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2019-12-08" data-time="16:51:51" data-timezone="UTC">04:51PM - 08 Dec 19 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="../../../../external.html?link=https://github.com/madaidan" target="_blank">
+          <img alt="madaidan" src="../../../../external.html?link=https://avatars0.githubusercontent.com/u/50278627?v=4" class="onebox-avatar-inline" width="20" height="20">
+          madaidan
+        </a>
+      </div>
+
+      <div class="lines" title="3 commits changed 3 files with 90 additions and 0 deletions">
+        <a href="../../../../external.html?link=https://github.com/Whonix/security-misc/pull/42/files" target="_blank">
+          <span class="added">+90</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>We can use this for things like <a href="../../suid-disabler-and-permission-hardener/7706.html" class="inline-onebox">Disable SUID Binaries</a> too.</p>
+<p>Since the script just passes the arguments into chmod, we can wipe out all SUID binaries/libraries by adding this to permission-hardening.conf as long as an exception is made in the error checking.</p>
+<pre><code class="lang-auto">/{,usr/,usr/local/}{,s}bin/ -R u-s root root
+/{,usr/,usr/local/}{,s}bin/ -R g-s root root
+/{,usr/,usr/local/}lib{,32,64}/ -R u-s root root
+/{,usr/,usr/local/}lib{,32,64}/ -R g-s root root
+</code></pre>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T17:17:58Z' class='post-time'>
+                December 8, 2019,  5:17pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T17:17:58Z'>
+          <span itemprop='position'>#285</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Yes. Solving <a href="../../suid-disabler-and-permission-hardener/7706.html" class="inline-onebox">Disable SUID Binaries</a> too would be amazing! Yes, stuff we don’t use (such as <code>pkexec</code>) should surely have SUID removed. But we’ll need a SUID whitelist too? For now, we shouldn’t remove SUID from <code>sudo</code>, right? I don’t understand how such a whitelist would be possible with above code? Maybe first remove all SUID, then opt-in re-add <code>sudo</code>?</p>
+<p>For the upcoming <code>boot to auto login into admin vs limited user</code> boot option (<a href="../../multiple-boot-modes-for-better-security-persistent-user-live-user-persistent-secureadmin-persistent-superadmin-persistent-recovery-mode/7708.html" class="inline-onebox">multiple boot modes for better security: persistent + root | persistent + noroot | live + root | live + noroot</a>) it would be great to automatically create a configuration file snippet that whitelists <code>sudo</code> or removes <code>sudo</code> from whitelist. My idea was for <code>boot to auto login into limited user</code> to even have SUID on sudo removed. (And re-add when booting into <code>admin mode</code>.)</p>
+<p>I would also like to have an <a href="../../../../external.html?link=https://phabricator.whonix.org/T941">interpreter lock</a> opt-in. Dropping a configuration snippet (opt-in interpreter lock) vs deleting a configuration snippet (opt-out interpreter lock) would be great too for that.</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T17:31:53Z' class='post-time'>
+                December 8, 2019,  5:31pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T17:31:53Z'>
+          <span itemprop='position'>#286</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="285" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Yes, stuff we don’t use (such as <code>pkexec</code> ) should surely have SUID removed.</p>
+</blockquote>
+</aside>
+<p><code>pkexec</code> is used internally by a bunch of applications like <a href="../../cannot-use-pkexec/8129/3.html" class="inline-onebox">cannot use pkexec</a></p>
+<aside class="quote no-group" data-post="285" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>For now, we shouldn’t remove SUID from <code>sudo</code> , right?</p>
+</blockquote>
+</aside>
+<p>Yes, SUID in <code>sudo</code> should stay.</p>
+<aside class="quote no-group" data-post="285" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Maybe first remove all SUID, then opt-in re-add <code>sudo</code> ?</p>
+</blockquote>
+</aside>
+<p>Yes, the commands are executed in order so as long as the <code>sudo</code> line is below the lines that remove SUID, we’ll be fine.</p>
+<aside class="quote no-group" data-post="285" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>For the upcoming <code>boot to auto login into admin vs limited user</code> boot option (<a href="../../multiple-boot-modes-for-better-security-persistent-user-live-user-persistent-secureadmin-persistent-superadmin-persistent-recovery-mode/7708.html">multiple boot modes for better security: persistent + root | persistent + noroot | live + root | live + noroot</a>) it would be great to automatically create a configuration file snippet that whitelists <code>sudo</code> or removes <code>sudo</code> from whitelist. My idea was for <code>boot to auto login into limited user</code> to even have SUID on sudo removed.</p>
+</blockquote>
+</aside>
+<p>We can create a <code>/etc/permission-hardening.d/</code> directory for configuration snippets. Maybe create a systemd service to create <code>/etc/permission-hardening.d/no-sudo.conf</code> or similar.</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T17:36:16Z' class='post-time'>
+                December 8, 2019,  5:36pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T17:36:16Z'>
+          <span itemprop='position'>#287</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Sounds good!</p>
+<aside class="quote no-group quote-modified" data-post="286" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<blockquote>
+<p>Yes, stuff we don’t use (such as <code>pkexec</code> ) should surely have SUID removed.</p>
+</blockquote>
+<p><code>pkexec</code> is used internally by a bunch of applications like <a href="../../cannot-use-pkexec/8129/3.html">cannot use pkexec</a></p>
+</blockquote>
+</aside>
+<p>hidepid broke pkexec. Therefore we’re using a wrapper, pkexec wrapper. It should solve most if not all issues. I am not sure about the remaining issues with pkexec.</p>
+<ul>
+<li><a href="../../cannot-access-encrypted-usb-drive-with-thunar-in-whonix-15/8131.html" class="inline-onebox">cannot access encrypted USB drive with Thunar in Whonix 15</a></li>
+<li><a href="../../cannot-use-pkexec/8129/15.html" class="inline-onebox">cannot use pkexec</a></li>
+</ul>
+<p>Maybe pkexec wrapper issues. Didn’t get to debug these yet. Could be unrelated to pkexec.</p>
+<p>Either way, we’re not using real pkexec so pkexec can have its SUID removed until it becomes compatible with hidepid.</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="2" />
+           <span class='post-likes'>2 Likes</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T17:55:05Z' class='post-time'>
+                December 8, 2019,  5:55pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T17:55:05Z'>
+          <span itemprop='position'>#288</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>To allow for the <code>-R</code> option, all the variables need to be shifted over as $2 is now <code>-R</code> instead of the mode.</p>
+<p>Is this a good way to fix it?</p>
+<pre><code class="lang-auto">if [ "${mode}" = "-R" ]; then
+  recursive="-R"
+  mode="${owner}"
+  owner="${group}"
+  group="${capability}"
+  capability="$(awk '{print $6}' &lt;&lt;&lt; ${line})"
+fi
+</code></pre>
+<pre><code class="lang-auto">chmod "${recursive}" "${mode}" "${file}"
+</code></pre>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T20:45:35Z' class='post-time'>
+                December 8, 2019,  8:45pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T20:45:35Z'>
+          <span itemprop='position'>#289</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Not sure I got that. Maybe change syntax of the file since we’re inventing a new file format anyhow. Have no “maybe” / optional fields in the file format. All file format entries can be mandatory. Easier to parse. Change from:</p>
+<blockquote>
+<p>[filename] [mode] [owner] [group] [capability]</p>
+</blockquote>
+<p>recursive yes:</p>
+<blockquote>
+<p>y [filename] [mode] [owner] [group] [capability]</p>
+</blockquote>
+<p>recursive no:</p>
+<blockquote>
+<p>n [filename] [mode] [owner] [group] [capability]</p>
+</blockquote>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T20:58:00Z' class='post-time'>
+                December 8, 2019,  8:58pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T22:42:09Z'>
+          <span itemprop='position'>#290</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>How about adding “-R” to the end of an entry to make it recursive? e.g.</p>
+<pre><code> /{,usr/,usr/local/}{,s}bin/ u-s root root -R
+</code></pre>
+<p>We can then just use</p>
+<pre><code>recursive="$(awk '{print $6}' &lt;&lt;&lt; ${line})"
+
+chmod "${recursive}" "${mode}" "${file}"</code></pre>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T22:54:31Z' class='post-time'>
+                December 8, 2019, 10:54pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T22:54:31Z'>
+          <span itemprop='position'>#291</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>That won’t work as the $5 is taken by capabilities. It will only work when capabilities are being set.</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-08T23:43:12Z' class='post-time'>
+                December 8, 2019, 11:43pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-08T23:43:12Z'>
+          <span itemprop='position'>#292</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I’ve decided to just use whether the entry starts with a Y to indicate recursion.</p>
+<p>dpkg-statoverride complicates a lot of things with recursion and u-s/g-s rules.</p>
+<ol>
+<li>It can’t store <code>u-s</code> or <code>g-s</code> as a mode. I’ve worked around this by getting the current permission of the file and setting that as $mode:</li>
+</ol>
+<pre><code class="lang-auto">if [ "${mode}" = "u-s" ] || [ "${mode}" = "g-s" ]; then
+  mode="$(stat -c %a ${file})"
+fi
+</code></pre>
+<ol start="2">
+<li>With recursion, dpkg-statoverride will only save the value of the directory. This does nothing for if /usr/bin/sudo gets updated for example. I’ve worked around this by looping over every single file in $file if recursion is enabled, and adding each file to the database:</li>
+</ol>
+<p><a href="../../../../external.html?link=https://paste.debian.net/hidden/95291f85/" class="onebox" target="_blank">https://paste.debian.net/hidden/95291f85/</a></p>
+<p>Number 2 seems especially bad and hacky.</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="2" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-09T08:00:10Z' class='post-time'>
+                December 9, 2019,  8:00am
+              </time>
+              <meta itemprop='dateModified' content='2019-12-09T08:00:10Z'>
+          <span itemprop='position'>#293</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>Added some enhancements as suggested by <a href="../../../../external.html?link=http://wooledge.org/">wooledge.org</a> and shellcheck.</p>
+<blockquote>
+<p>[[ “$line” =~ ^#.*$ ]] &amp;&amp; continue</p>
+</blockquote>
+<p>That is a good idea. However, a blacklist of bad characters is impossible. There are too many weird, even binary characters to know them all. What about all whitelist…</p>
+<blockquote>
+<p>if ! [[ “$line” =~ ^[0-9a-zA-Z_-]+$ ]]; then</p>
+</blockquote>
+<p>?</p>
+<p>Maybe we can safe a call to chmod / chown for better (boot) speed? dpkg-statoverride supports:</p>
+<blockquote>
+<p>If --update is specified and path exists, it is immediately set to the new owner and mode.</p>
+</blockquote>
+<p><code>--update</code> tested. Works for me.</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-09T08:46:08Z' class='post-time'>
+                December 9, 2019,  8:46am
+              </time>
+              <meta itemprop='dateModified' content='2019-12-09T08:46:08Z'>
+          <span itemprop='position'>#294</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p>I might not be following…</p>
+<aside class="quote no-group" data-post="292" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>dpkg-statoverride complicates a lot of things with recursion and u-s/g-s rules.</p>
+<ol>
+<li>It can’t store <code>u-s</code> or <code>g-s</code> as a mode. I’ve worked around this by getting the current permission of the file and setting that as $mode:</li>
+</ol>
+<pre><code class="lang-auto">if [ "${mode}" = "u-s" ] || [ "${mode}" = "g-s" ]; then
+  mode="$(stat -c %a ${file})"
+fi
+</code></pre>
+</blockquote>
+</aside>
+<blockquote>
+<p>user@disp1376:~$ ls -la /bin/su<br>
+-rwsr-xr-x 1 root root 63568 Jan 10  2019 /bin/su<br>
+user@disp1376:~$ stat -c %a /bin/su<br>
+4755<br>
+user@disp1376:~$ sudo dpkg-statoverride --add --update root root 0755 /bin/su<br>
+user@disp1376:~$ ls -la /bin/su<br>
+-rwxr-xr-x 1 root root 63568 Jan 10  2019 /bin/su<br>
+user@disp1376:~$ stat -c %a /bin/su<br>
+755</p>
+</blockquote>
+<p>Do you mean you’d preferred to express things things as <code>u-s</code> (“human readable”) rather than octal (for example <code>755</code>)? I would agree. I don’t like octal at all. I use human readable version whenever possible. Octal does not work well with my brain at all. When I see octal, I always have to double check using chmod calculator, <code>ls</code> and <code>stat</code> and then actually test things to work as expected. If dpkg-statoverride supported human readable, I’d already request to use that in the config file rather than octal.</p>
+<aside class="quote no-group quote-modified" data-post="292" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>if [ “${mode}” = “u-s” ] || [ “${mode}” = “g-s” ]; then mode="$(stat -c %a ${file})" fi</p>
+</blockquote>
+</aside>
+<p>Not bad.</p>
+<aside class="quote no-group" data-post="292" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>With recursion, dpkg-statoverride will only save the value of the directory.</p>
+</blockquote>
+</aside>
+<p>When <code>/root</code> is owned by user <code>root</code> and group <code>root</code> and using permission “others-all” (<code>o-rwx</code>), then users other than <code>root</code> such as user <code>user</code> cannot read any file inside <code>/root/some-file</code> because the higher level folder (<code>/root</code>) already keeps them out.</p>
+<p>What do we need recursion for? For example to remove SUID from all files residing in <code>/bin</code>? First, recursive remove all SUID from <code>/bin</code>. Then re-add SUID for whitelisted (specifically mentioned in config below or in a lexical higher configuration file) binaries?</p>
+<p>Would it help if we simplified the config file syntax? Perhaps for recursion for SUID removal, don’t support the full syntax? Have specific variables or a separate config file with folders which are parses in recursive order to remove all SUID?</p>
+<p>And then file-by-file (non-recursion) re-adding of SUID could be the existing file format? Maybe no need to express everything in the same config file? Would that help?</p>
+<aside class="quote no-group" data-post="292" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>I’ve worked around this by looping over every single file in $file if recursion is enabled, and adding each file to the database:</p>
+</blockquote>
+</aside>
+<p>Not sure we should create a huge database adding every file? This could slow down things when the script runs (considering we’ll run at boot time) (and might even slow down apt upgrades?). This database could have a lot entries of files which are obsolete after release upgrade. Ever growing database. Maybe when using recursion (therefore mentioned a “special” recursion feature) it would be better to detect only actual SUID binaries and then add these to <code>dpkg-statoverwrite --add --update</code>? <code>stat</code> seems very efficient. A single call.</p>
+<pre><code>stat -c "%n %a" /bin/*
+</code></pre>
+<p>Quickly lists all permissions that a folder.</p>
+<blockquote>
+<p>…<br>
+/bin/zless 755<br>
+/bin/zmore 755<br>
+/bin/znew 755</p>
+</blockquote>
+<p>Then we’d just process those files that need it.</p>
+<p>I also don’t think we need to recurse some folders that are already handled elsewhere such as <code>/home</code>. It’s mounted with nosuid/nodev anyhow.<br>
+(<a href="../../re-mount-home-and-other-with-noexec-and-nosuid-among-other-useful-mount-options-for-better-security/7707/2.html" class="inline-onebox">(re-)mount home [and other?] with noexec (and nosuid [among other useful mount options]) for better security?</a>)</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-09T08:49:28Z' class='post-time'>
+                December 9, 2019,  8:49am
+              </time>
+              <meta itemprop='dateModified' content='2019-12-09T08:49:28Z'>
+          <span itemprop='position'>#295</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="292" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p><a href="../../../../external.html?link=https://paste.debian.net/hidden/95291f85/">https://paste.debian.net/hidden/95291f85/</a></p>
+</blockquote>
+</aside>
+<blockquote>
+<p>for real_file in $(find ${file})</p>
+</blockquote>
+<p>That needs some work:<br>
+<a href="../../../../external.html?link=https://mywiki.wooledge.org/UsingFind" class="onebox" target="_blank">https://mywiki.wooledge.org/UsingFind</a></p>
+<p>Or maybe bash <code>globstar</code> would be easier?<br>
+<a href="../../../../external.html?link=https://mywiki.wooledge.org/glob#globstar_.28since_bash_4.0-alpha.29" class="onebox" target="_blank">https://mywiki.wooledge.org/glob#globstar_.28since_bash_4.0-alpha.29</a></p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-09T16:42:35Z' class='post-time'>
+                December 9, 2019,  4:42pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-09T16:42:35Z'>
+          <span itemprop='position'>#296</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group" data-post="293" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>That is a good idea. However, a blacklist of bad characters is impossible. There are too many weird, even binary characters to know them all. What about all whitelist…</p>
+</blockquote>
+</aside>
+<p>I only added that so the script would ignore comments in permission-hardening.conf. Whitelisting only good characters doesn’t seem that useful.</p>
+<aside class="quote no-group" data-post="293" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Maybe we can safe a call to chmod / chown for better (boot) speed? dpkg-statoverride supports:</p>
+</blockquote>
+</aside>
+<p><code>--update</code> sounds like a better replacement for the part where it removes and adds entries again.</p>
+<p>To save calls to chmod/chown we can check if the file is already set at that mode:</p>
+<pre><code>if ! [ "$(stat -c %a ${file})" = "${mode}" ]
+</code></pre>
+<aside class="quote no-group" data-post="294" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Do you mean you’d preferred to express things things as <code>u-s</code> (“human readable”) rather than octal (for example <code>755</code> )?</p>
+</blockquote>
+</aside>
+<p>No. <code>chmod 755 -R /bin</code> sets everything in /bin to <code>755</code> which will probably mess up permissions for tons of things.</p>
+<p>But <code>chmod u-s -R /bin</code> will only remove the setuid bit from everything in /bin and leave other permissions the exact same.</p>
+<p><code>u-s</code> is far less likely to break things and a better approach,</p>
+<p>I actually prefer octal over human readable. It’s simpler IMO.</p>
+<aside class="quote no-group" data-post="294" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>When <code>/root</code> is owned by user <code>root</code> and group <code>root</code> and using permission “others-all” ( <code>o-rwx</code> ), then users other than <code>root</code> such as user <code>user</code> cannot read any file inside <code>/root/some-file</code> because the higher level folder ( <code>/root</code> ) already keeps them out.</p>
+</blockquote>
+</aside>
+<p>Yes, but recursion isn’t needed just for keeping things out.</p>
+<p>If for example, we want non-owner users to read everything in <code>/usr/example/</code> but not execute anything, we can add:</p>
+<pre><code>/usr/example/ 744 root root -R
+</code></pre>
+<p>Or if we want to remove the SUID bit from everything <code>/bin/</code> but still allow anyone to execute it, we can add:</p>
+<pre><code>/bin u-s root root -R
+</code></pre>
+<aside class="quote no-group" data-post="294" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>For example to remove SUID from all files residing in <code>/bin</code> ? First, recursive remove all SUID from <code>/bin</code> . Then re-add SUID for whitelisted (specifically mentioned in config below or in a lexical higher configuration file) binaries?</p>
+</blockquote>
+</aside>
+<p>Yes but the setuid bit can be reset during updates if we don’t also use dpkg-statoverride recursively.</p>
+<aside class="quote no-group" data-post="294" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Would it help if we simplified the config file syntax? Perhaps for recursion for SUID removal, don’t support the full syntax? Have specific variables or a separate config file with folders which are parses in recursive order to remove all SUID?</p>
+</blockquote>
+</aside>
+<p>The way the syntax is now seems fine. It’s just dpkg-statoverride which is the main problem.</p>
+<aside class="quote no-group" data-post="294" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Not sure we should create a huge database adding every file?</p>
+</blockquote>
+</aside>
+<p>Yes, that’s why it’s bad.</p>
+<aside class="quote no-group" data-post="294" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Then we’d just process those files that need it.</p>
+</blockquote>
+</aside>
+<p>Sounds better. Maybe something like:</p>
+<pre><code>stat -c "%n %a" /bin/* | awk '$2 == "4755"'
+</code></pre>
+<p>Although this will miss files like <code>4711</code>.</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="0" />
+           <span class='post-likes'></span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/madaidan'><span itemprop='name'>madaidan</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-09T17:07:16Z' class='post-time'>
+                December 9, 2019,  5:07pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-09T17:07:16Z'>
+          <span itemprop='position'>#297</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <p><a href="../../../../external.html?link=http://lkml.iu.edu/hypermail/linux/kernel/1011.2/01436.html" class="onebox" target="_blank">http://lkml.iu.edu/hypermail/linux/kernel/1011.2/01436.html</a></p>
+<p>This lists a few more possible infoleaks.</p>
+<blockquote>
+<ol>
+<li>/proc/&lt;PID&gt;/stack</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2">
+<li>/proc/mtrr</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="3">
+<li>/proc/asound/cards</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="4">
+<li>/sys/devices/*/*/resources</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="5">
+<li>/proc/net/ptype</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="6">
+<li>/sys/kernel/slab/*/ctor</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="7">
+<li>/sys/module/*/sections/*</li>
+</ol>
+</blockquote>
+<p>They’re probably mitigated by kptr_restrict anyway though.</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="0" />
+          </div>
+
+      </div>
+      <div itemscope itemtype='http://schema.org/DiscussionForumPosting' class='topic-body crawler-post'>
+        <div class='crawler-post-meta'>
+          <div itemprop='publisher' itemscope itemtype="../../../../external.html?link=http://schema.org/Organization">
+            <meta itemprop='name' content='Whonix - Anonymous Operating System'>
+              <div itemprop='logo' itemscope itemtype="../../../../external.html?link=http://schema.org/ImageObject">
+                <meta itemprop='url' content='../../../uploads/default/original/2X/d/d66e6a1341d872ca984eb1f23d30009afef57a4c.png'>
+              </div>
+          </div>
+          <span class="creator" itemprop="author" itemscope itemtype="../../../../external.html?link=http://schema.org/Person">
+            <a itemprop="url" href='../../../../external.html?link=https://forums.whonix.org/u/Patrick'><span itemprop='name'>Patrick</span></a>
+            
+          </span>
+
+          <link itemprop="mainEntityOfPage" href="../7296.html">
+
+
+          <span class="crawler-post-infos">
+              <time itemprop='datePublished' datetime='2019-12-09T17:36:23Z' class='post-time'>
+                December 9, 2019,  5:36pm
+              </time>
+              <meta itemprop='dateModified' content='2019-12-09T17:36:23Z'>
+          <span itemprop='position'>#298</span>
+          </span>
+        </div>
+        <div class='post' itemprop='articleBody'>
+          <aside class="quote no-group quote-modified" data-post="296" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<blockquote>
+<p>That is a good idea. However, a blacklist of bad characters is impossible. There are too many weird, even binary characters to know them all. What about all whitelist…</p>
+</blockquote>
+<p>I only added that so the script would ignore comments in permission-hardening.conf. Whitelisting only good characters doesn’t seem that useful.</p>
+</blockquote>
+</aside>
+<p>Indeed. Since all inputs of that script are trusted. Could only be done by root users or if this is protected by apparmor-profile-everything even - how do we call this - superroot users?<br>
+Just useful in case a user accidentally copies weird characters there.</p>
+<aside class="quote no-group quote-modified" data-post="296" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<blockquote>
+<p>Maybe we can safe a call to chmod / chown for better (boot) speed? dpkg-statoverride supports:</p>
+</blockquote>
+<p><code>--update</code> sounds like a better replacement for the part where it removes and adds entries again.</p>
+</blockquote>
+</aside>
+<p><code>--update</code> isn’t for updating dpkg-statoverride database.</p>
+<blockquote>
+<p>user@disp5873:~$ sudo dpkg-statoverride --add root root 0755 /bin/su<br>
+user@disp5873:~$ sudo dpkg-statoverride --add --update root root 0755 /bin/su<br>
+dpkg-statoverride: error: an override for ‘/bin/su’ already exists; aborting</p>
+</blockquote>
+<p>As per dpkg-statoverride man page <code>--update</code> can only be used in combination with <code>--add</code>.</p>
+<ul>
+<li>Not using <code>--update</code>: dpkg-statoverride won’t apply the actual mode change. chown/chmod has still to be used manually.</li>
+<li>Using <code>--update</code>: dpkg-statoverride runs “chown/chmod” for us.</li>
+</ul>
+<aside class="quote no-group" data-post="296" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>No. <code>chmod 755 -R /bin</code> sets everything in /bin to <code>755</code> which will probably mess up permissions for tons of things.</p>
+</blockquote>
+</aside>
+<p>Indeed.</p>
+<aside class="quote no-group" data-post="296" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>But <code>chmod u-s -R /bin</code> will only remove the setuid bit from everything in /bin and leave other permissions the exact same.</p>
+<p><code>u-s</code> is far less likely to break things and a better approach,</p>
+</blockquote>
+</aside>
+<p>Indeed. So let’s use stat first and then only process the files that need processing.</p>
+<aside class="quote no-group" data-post="296" data-topic="7296">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt width="20" height="20" src="../../../letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Sounds better. Maybe something like:</p>
+<pre><code class="lang-auto">stat -c "%n %a" /bin/* | awk '$2 == "4755"'
+</code></pre>
+<p>Although this will miss files like <code>4711</code> .</p>
+</blockquote>
+</aside>
+<p>I’ve wrote a snippet to identify SUID. Only one external call to <code>stat</code>.<br>
+There are no octal permissions with 2 or less numbers.<br>
+There are no octal permissions more than 4 numbers.<br>
+It’s either 3 numbers for non-SUID or 4 for SUID.<br>
+Therefore looking at the string length of the octal permission 3 vs 4 (and having error cases in case its ever less or more).</p>
+<pre><code>#!/bin/bash
+
+set -e
+
+while read -r line ; do
+   if ! read -r file_name existing_mode ; then
+      continue
+   fi
+
+   string_length_existing_mode="${#existing_mode}"
+
+   if [ "$string_length_existing_mode" = "4" ]; then
+      echo "file_name: '$file_name' | existing_mode: '$existing_mode'"
+   fi
+   if [ "$string_length_existing_mode" -gt "4" ]; then
+      error_code=2
+      echo "error 2..." &gt;&amp;2
+      continue
+   fi
+   if [ "$string_length_existing_mode" -lt "3" ]; then
+      error_code=3
+      echo "error 3..." &gt;&amp;2
+      continue
+   fi
+
+done &lt; &lt;( stat -c "%n %a" /usr/bin/* )
+</code></pre>
+<blockquote>
+<p>file_name: ‘/usr/bin/at’ | existing_mode: ‘6755’<br>
+file_name: ‘/usr/bin/bsd-write’ | existing_mode: ‘2755’<br>
+file_name: ‘/usr/bin/chage’ | existing_mode: ‘2755’<br>
+file_name: ‘/usr/bin/crontab’ | existing_mode: ‘2755’<br>
+file_name: ‘/usr/bin/dotlockfile’ | existing_mode: ‘2755’<br>
+file_name: ‘/usr/bin/expiry’ | existing_mode: ‘2755’<br>
+file_name: ‘/usr/bin/newgidmap’ | existing_mode: ‘4755’<br>
+file_name: ‘/usr/bin/newuidmap’ | existing_mode: ‘4755’<br>
+file_name: ‘/usr/bin/passwd’ | existing_mode: ‘4755’<br>
+file_name: ‘/usr/bin/pkexec.security-misc-orig’ | existing_mode: ‘4755’<br>
+file_name: ‘/usr/bin/sudo’ | existing_mode: ‘4755’</p>
+</blockquote>
+<p>On those we could run for example…</p>
+<pre><code>chmod ug-s /usr/bin/at
+stat -c "%a" /usr/bin/at
+</code></pre>
+<blockquote>
+<p>755</p>
+</blockquote>
+<p>And then feed that to dpkg-statoverwrite.</p>
+<p>Does that help?<br>
+If not, could you please (half/somewhat/mostly) populate the permission files (perhaps just examples of each case)? Maybe that would help me to understand the issue better. Then I can see what I can do to finish that script.</p>
+        </div>
+
+        <meta itemprop='headline' content='Kernel Hardening'>
+
+        <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+           <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/LikeAction"/>
+           <meta itemprop="userInteractionCount" content="1" />
+           <span class='post-likes'>1 Like</span>
+         </div>
+
+         <div itemprop="interactionStatistic" itemscope itemtype="../../../../external.html?link=http://schema.org/InteractionCounter">
+            <meta itemprop="interactionType" content="../../../../external.html?link=http://schema.org/CommentAction"/>
+            <meta itemprop="userInteractionCount" content="1" />
+          </div>
+
+      </div>
+
+    <div role='navigation' itemscope itemtype='http://schema.org/SiteNavigationElement' class="topic-body crawler-post">
+        <span itemprop='name'><a rel="prev" itemprop="url" href="../7296ce37.html?page=12">← previous page</a></span>
+        <span itemprop='name'><b><a rel="next" itemprop="url" href="../7296a7f1.html?page=14">next page →</a></b></span>
+    </div>
+
+
+
+
+
+    </div>
+    <footer class="container wrap">
+      <nav class='crawler-nav'>
+        <ul>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../index.html' itemprop="url">Home </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../categories.html' itemprop="url">Categories </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../guidelines.html' itemprop="url">FAQ/Guidelines </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../../external.html?link=https://forums.whonix.org/tos' itemprop="url">Terms of Service </a>
+          </span>
+        </li>
+        <li itemscope itemtype='../../../../external.html?link=http://schema.org/SiteNavigationElement'>
+          <span itemprop='name'>
+            <a href='../../../../external.html?link=https://forums.whonix.org/privacy' itemprop="url">Privacy Policy </a>
+          </span>
+        </li>
+        </ul>
+      </nav>
+      <p class='powered-by-link'>Powered by <a href="../../../../external.html?link=https://www.discourse.org/">Discourse</a>, best viewed with JavaScript enabled</p>
+    </footer>
+    <center>
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Imprint">Imprint</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Privacy_Policy">Privacy Policy</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Cookie_Policy">Cookie Policy</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Terms_of_Use">Terms of Use</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/E-Sign_Consent">E-Sign Consent</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/DMCA">DMCA</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Contributors">Contributors</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Investors">Investors</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Priority_Support">Priority Support</a>]
+[<a href="../../../../external.html?link=https://www.whonix.org/wiki/Professional_Support">Professional Support</a>]
+</center>
+    
+  </body>
+  
+</html>

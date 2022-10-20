@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+    <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868</link>
+    <description>Continuing the discussion from [aa-genprof is broken on Whonix.](https://forums.whonix.org/t/aa-genprof-is-broken-on-whonix/5731/2):
+
+Doesn&#39;t only break aa-genproof.
+
+    sudo aa-enforce /etc/apparmor.d/home.tor-browser.start-tor-browser ; echo $?
+
+&gt;     ERROR: Values added to a non-existing variable @{HOMEDIRS}: /rw/home/ in tunables/home.d/live-mode
+&gt;     1
+
+https://github.com/Whonix/apparmor-profile-anondist/blob/master/etc/apparmor.d/tunables/home.d/live-mode
+
+This makes debugging apparmor issues (currently on https://forums.whonix.org/t/tor-browser-8-wont-launch/5863/3) cumbersome. Any workaround?
+
+//cc @Algernon</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 13 Sep 2019 02:28:06 +0000</lastBuildDate>
+    <category>AppArmor</category>
+    <atom:link href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>madaidan via Whonix Forum:</p>
+<blockquote>
+<p>When updating (with the developer repository), I now get this message</p>
+<blockquote>
+<p>Configuration file ‘/etc/apparmor.d/tunables/home.d/live-mode’<br>
+==&gt; Modified (by you or by a script) since installation.<br>
+==&gt; Package distributor has shipped an updated version.<br>
+What would you like to do about it ?  Your options are:<br>
+Y or I  : install the package maintainer’s version<br>
+N or O  : keep your currently-installed version<br>
+D     : show the differences between the versions<br>
+Z     : start a shell to examine the situation<br>
+The default action is to keep your current version.<br>
+*** live-mode (Y/I/N/O/D/Z) [default=N] ?</p>
+</blockquote>
+<p>Similar to /etc/machine-id.</p>
+</blockquote>
+<p>Didn’t happen to me. Probably happen because you modified the file locally before the upgrade.</p>
+<p>[1] This prompt would still happen when upgrading in live-mode since then “Modified (by you or by a script) since installation.” is true.</p>
+<p>Should not happen in persistent-mode since then package default config gets replaced with newer package default config.</p>
+<blockquote>
+<p>We should probably figure out a way to skip this if possible.</p>
+</blockquote>
+<p>Would be worth figuring out anyhow generally. [1] is a good enough reason to do so.</p>
+<hr>
+<p>It’s happening because the file is placed in /etc, therefore considered a configuration file.</p>
+<p>Root causes: Debian isn’t stateless. Doesn’t have clean separation of distribution shipped files and user generated/modified files. It’s not possible to simply wipe /etc and /var to be back at the same state as everyone else using the same version. See these two blog posts for more detail to see what I mean:</p>
+<ul>
+<li><a href="https://docs.01.org/clearlinux/latest/guides/clear/stateless.html" rel="nofollow noopener">https://docs.01.org/clearlinux/latest/guides/clear/stateless.html</a></li>
+<li><a href="http://0pointer.net/blog/projects/stateless.html" rel="nofollow noopener">http://0pointer.net/blog/projects/stateless.html</a></li>
+</ul>
+<hr>
+<p>Other root causes:</p>
+<ul>
+<li>apparmor profiles aren’t in non-/etc. Apparmor profiles by packages in /usr or /lib (not sure) would not cause this issue. Then package default would be installed.</li>
+<li>original apparmor bug which makes this required in first place.</li>
+</ul>
+<hr>
+<p>There is one approach (just an approach, not a solution).</p>
+<p>Well, there is apt-get-noninteractive. See <code>man apt-get-noninteractive</code>.</p>
+<ul>
+<li><a href="https://github.com/Whonix/usability-misc/blob/master/man/apt-get-noninteractive.8.ronn" rel="nofollow noopener">https://github.com/Whonix/usability-misc/blob/master/man/apt-get-noninteractive.8.ronn</a></li>
+<li><a href="https://github.com/Whonix/usability-misc/blob/master/usr/bin/apt-get-noninteractive" rel="nofollow noopener">https://github.com/Whonix/usability-misc/blob/master/usr/bin/apt-get-noninteractive</a></li>
+</ul>
+<hr>
+<p>In other words apt can pass option(s) to dpkg to make it run non-interactively. Question can be answered beforehand.</p>
+<pre><code>sudo apt-get -o Dpkg::Options::=--force-confnew
+</code></pre>
+<p>This (apt-get-noninteractive) works for most packages. Well, there are some non-free firmware packages which ask special questions which are non-trivial to cover (but covered in Whonix).</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonix-legacy/blob/master/debian/whonix-legacy.preinst#L487-L491" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonix-legacy/blob/master/debian/whonix-legacy.preinst#L487-L491" target="_blank" rel="nofollow noopener">Whonix/whonix-legacy/blob/master/debian/whonix-legacy.preinst#L487-L491</a></h4>
+<pre class="onebox"><code class="lang-preinst"><ol class="start lines" start="487" style="counter-reset: li-counter 486 ;">
+<li>## https://git-tails.immerda.ch/tails/tree/config/chroot_local-preseed/firmware</li>
+<li>echo b43-fwcutter b43-fwcutter/cut_firmware boolean true | debconf-set-selections</li>
+<li>echo firmware-ipw2x00 firmware-ipw2x00/license/accepted boolean true | debconf-set-selections</li>
+<li>echo firmware-iwlwifi firmware-iwlwifi/license/accepted boolean true | debconf-set-selections</li>
+<li>echo firmware-ralink firmware-ralink/license/accepted boolean true | debconf-set-selections</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Could also be set through a dpkg option but that would apply to all packages always installing package version and deactivating (move to backup file <code>.dpkg-old</code> (?) of locally modified configuration file version).</p>
+<p>Something like <code>/etc/dpkg/dpkg.cfg.d/50_user.cfg</code>…</p>
+<pre><code>Dpkg::Options:: --force-unsafe-io;
+</code></pre>
+<p>… might work. But not a great solution.</p>
+<p>Other than that, I currently have no idea how to avoid this.</p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/14</link>
+        <pubDate>Fri, 13 Sep 2019 02:28:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-14</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>madaidan via Whonix Forum:</p>
+<blockquote>
+<aside class="quote no-group" data-post="9" data-topic="5868">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/p/898d66/40.png" class="avatar"> Patrick_mobile:</div>
+<blockquote>
+<p>I’ll port to <code>str_replace</code> .</p>
+</blockquote>
+</aside>
+<p>What are the advantages over sed?</p>
+</blockquote>
+<p>No interpretation of special characters. Therefore and generally much<br>
+more easy to grasp syntax.</p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/13</link>
+        <pubDate>Fri, 13 Sep 2019 01:59:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-13</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>When updating (with the developer repository), I now get this message</p>
+<blockquote>
+<p>Configuration file ‘/etc/apparmor.d/tunables/home.d/live-mode’<br>
+==&gt; Modified (by you or by a script) since installation.<br>
+==&gt; Package distributor has shipped an updated version.<br>
+What would you like to do about it ?  Your options are:<br>
+Y or I  : install the package maintainer’s version<br>
+N or O  : keep your currently-installed version<br>
+D     : show the differences between the versions<br>
+Z     : start a shell to examine the situation<br>
+The default action is to keep your current version.<br>
+*** live-mode (Y/I/N/O/D/Z) [default=N] ?</p>
+</blockquote>
+<p>Similar to /etc/machine-id. We should probably figure out a way to skip this if possible.</p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/12</link>
+        <pubDate>Thu, 12 Sep 2019 17:25:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-12</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="9" data-topic="5868">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/p/898d66/40.png" class="avatar"> Patrick_mobile:</div>
+<blockquote>
+<p>I’ll port to <code>str_replace</code> .</p>
+</blockquote>
+</aside>
+<p>What are the advantages over sed?</p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/11</link>
+        <pubDate>Thu, 12 Sep 2019 17:00:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-11</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks!</p>
+<p>Merged. And added a serious of commits on top.</p>
+<p><a href="https://github.com/Whonix/apparmor-profile-anondist/compare/4.7-1...4.8-1" rel="nofollow noopener">https://github.com/Whonix/apparmor-profile-anondist/compare/4.7-1...4.8-1</a></p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/10</link>
+        <pubDate>Thu, 12 Sep 2019 12:51:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-10</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[Patrick_mobile]]></dc:creator>
+        <description><![CDATA[
+            <p>But grep is also good since then I can add an else to undo.</p>
+<p>I’ll port to <code>str_replace</code>.</p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/9</link>
+        <pubDate>Thu, 12 Sep 2019 05:03:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-9</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[Patrick_mobile]]></dc:creator>
+        <description><![CDATA[
+            <p>systemd<br>
+<code>ConditionKernelCommandLine</code></p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/8</link>
+        <pubDate>Thu, 12 Sep 2019 05:01:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-8</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubpullrequest">
+  <header class="source">
+      <a href="https://github.com/Whonix/apparmor-profile-anondist/pull/2" target="_blank" rel="nofollow noopener">github.com/Whonix/apparmor-profile-anondist</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://github.com/madaidan" target="_blank" rel="nofollow noopener">
+    <img alt="madaidan" src="https://avatars0.githubusercontent.com/u/50278627?v=4" class="thumbnail onebox-avatar" width="90" height="90">
+  </a>
+
+<h4>
+  <a href="https://github.com/Whonix/apparmor-profile-anondist/pull/2" target="_blank" rel="nofollow noopener">Fix AppArmor when not in live mode</a>
+</h4>
+
+<div class="date">
+  by <a href="https://github.com/madaidan" target="_blank" rel="nofollow noopener">madaidan</a>
+  on <a href="https://github.com/Whonix/apparmor-profile-anondist/pull/2" target="_blank" rel="nofollow noopener">08:02PM - 11 Sep 19 UTC</a>
+</div>
+
+<div class="github-commit-stats">
+  <strong>3 commits</strong>
+  changed <strong>3 files</strong>
+  with <strong>19 additions</strong>
+  and <strong>1 deletions</strong>.
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>I’m not sure if grepping /proc/cmdline for <code>boot=live</code> is the correct way to test for live mode or not but it works.</p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/7</link>
+        <pubDate>Wed, 11 Sep 2019 20:03:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-7</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicon.ico" class="site-icon" width="32" height="32">
+      <a href="https://github.com/Whonix/apparmor-profile-anondist" target="_blank" rel="nofollow noopener">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars3.githubusercontent.com/u/4500165?s=400&amp;amp;v=4" class="thumbnail onebox-avatar" width="400" height="400">
+
+<h3><a href="https://github.com/Whonix/apparmor-profile-anondist" target="_blank" rel="nofollow noopener">Whonix/apparmor-profile-anondist</a></h3>
+
+<p>AppArmor profile for Anonymity Linux Distributions - https://www.whonix.org/wiki/AppArmor - for better security (hardening). - Whonix/apparmor-profile-anondist</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>since that package ships the offending file. Seems best fit.</p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/6</link>
+        <pubDate>Wed, 11 Sep 2019 17:56:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-6</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="4" data-topic="5868">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Could you implement a systemd unit file that does that please?</p>
+</blockquote>
+</aside>
+<p>What package?</p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/5</link>
+        <pubDate>Wed, 11 Sep 2019 16:52:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-5</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>madaidan via Whonix Forum:</p>
+<blockquote>
+<p>Why not keep it commented and only uncomment it when in live mode?</p>
+<p>Then, users who aren’t using live mode won’t be affected by this bug.</p>
+</blockquote>
+<p>Sounds great!</p>
+<p>Also that line could be moved to a separate file to make editing through<br>
+scripts easier.</p>
+<p>Could you implement a systemd unit file that does that please?</p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/4</link>
+        <pubDate>Wed, 11 Sep 2019 07:44:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-4</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>Why not keep it commented and only uncomment it when in live mode?</p>
+<p>Then, users who aren’t using live mode won’t be affected by this bug.</p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/3</link>
+        <pubDate>Tue, 10 Sep 2019 19:53:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-3</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[Algernon]]></dc:creator>
+        <description><![CDATA[
+            <p>Beyond commenting the lines or removing the file, currently not.</p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/2</link>
+        <pubDate>Thu, 06 Sep 2018 12:04:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-2</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+      <item>
+        <title>live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Continuing the discussion from <a href="https://forums.whonix.org/t/aa-genprof-is-broken-on-whonix/5731/2">aa-genprof is broken on Whonix.</a>:</p>
+<p>Doesn’t only break aa-genproof.</p>
+<pre><code>sudo aa-enforce /etc/apparmor.d/home.tor-browser.start-tor-browser ; echo $?
+</code></pre>
+<blockquote>
+<pre><code>ERROR: Values added to a non-existing variable @{HOMEDIRS}: /rw/home/ in tunables/home.d/live-mode
+1
+</code></pre>
+</blockquote>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/apparmor-profile-anondist/blob/master/etc/apparmor.d/tunables/home.d/live-mode" target="_blank">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/apparmor-profile-anondist/blob/master/etc/apparmor.d/tunables/home.d/live-mode" target="_blank">Whonix/apparmor-profile-anondist/blob/master/etc/apparmor.d/tunables/home.d/live-mode</a></h4>
+<pre><code class="lang-d/live-mode">## Copyright (C) 2018 - 2018 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## Copyright (C) 2018 Algernon &lt;33966997+Algernon-01@users.noreply.github.com&gt;
+## See the file COPYING for copying conditions.
+
+@{HOMEDIRS}+=/rw/home/
+alias / -&gt; /rw/,
+alias /var/lib/ -&gt; /rw/var/lib/,
+alias /var/lib/tor/ -&gt; /rw/var/lib/tor/,
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>This makes debugging apparmor issues (currently on <a href="https://forums.whonix.org/t/tor-browser-8-wont-launch/5863/3">Tor Browser 8.* won't launch</a>) cumbersome. Any workaround?</p>
+<p>//cc <a class="mention" href="http://forums.whonix.org/u/algernon">@Algernon</a></p>
+          <p><a href="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868/1</link>
+        <pubDate>Thu, 06 Sep 2018 07:24:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5868-1</guid>
+        <source url="http://forums.whonix.org/t/live-mode-etc-apparmor-d-tunables-home-d-live-mode-breaks-aa-enforce/5868.rss">live mode /etc/apparmor.d/tunables/home.d/live-mode breaks aa-enforce</source>
+      </item>
+  </channel>
+</rss>

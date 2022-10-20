@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>USB passthrough failure</title>
+    <link>http://forums.whonix.org/t/usb-passthrough-failure/8813</link>
+    <description>Hi, 
+I am trying to get Whonix working for me, and for this I tried to enable USB Passthrough as described in the wiki-docs of Whonix for KVM. My host system is Ubuntu 18.04.3. Now when I follow instructions I use the USB redirection feature. 
+But my external hdd Western Digital My Passport is not showing (in file manager).
+I copied part of my /var/log/syslog:
+
+Jan 20 14:47:27 host kernel: [   68.362096] usb 1-1: new high-speed USB device number 2 using ehci-pci
+Jan 20 14:47:27 host kernel: [   68.505903] usb 1-1: device descriptor read/64, error 18
+Jan 20 14:47:27 host kernel: [   68.742073] usb 1-1: device descriptor read/64, error 18
+Jan 20 14:47:27 host kernel: [   68.986008] usb 1-1: new high-speed USB device number 3 using ehci-pci
+Jan 20 14:47:27 host kernel: [   69.125968] usb 1-1: device descriptor read/64, error 18
+Jan 20 14:47:28 host kernel: [   69.362015] usb 1-1: device descriptor read/64, error 18
+Jan 20 14:47:28 host kernel: [   69.474135] usb usb1-port1: attempt power cycle
+Jan 20 14:47:28 host kernel: [   69.922032] usb 1-1: new high-speed USB device number 4 using ehci-pci
+Jan 20 14:47:28 host kernel: [   69.955362] usb 1-1: Invalid ep0 maxpacket: 9
+Jan 20 14:47:28 host kernel: [   70.093917] usb 1-1: new high-speed USB device number 5 using ehci-pci
+Jan 20 14:47:28 host kernel: [   70.190298] usb 1-1: Invalid ep0 maxpacket: 9
+Jan 20 14:47:28 host kernel: [   70.197220] usb usb1-port1: unable to enumerate USB device
+Jan 20 14:47:29 host kernel: [   70.465930] usb 2-1: new full-speed USB device number 2 using uhci_hcd
+Jan 20 14:47:29 host kernel: [   70.621999] usb 2-1: device descriptor read/64, error 18
+Jan 20 14:47:29 host kernel: [   70.866001] usb 2-1: device descriptor read/64, error 18
+Jan 20 14:47:29 host kernel: [   71.103318] usb 2-1: new full-speed USB device number 3 using uhci_hcd
+Jan 20 14:47:29 host kernel: [   71.238019] usb 2-1: device descriptor read/64, error 18
+Jan 20 14:47:30 host kernel: [   71.481998] usb 2-1: device descriptor read/64, error 18
+Jan 20 14:47:30 host kernel: [   71.590127] usb usb2-port1: attempt power cycle
+Jan 20 14:47:30 host kernel: [   72.033988] usb 2-1: new full-speed USB device number 4 using uhci_hcd
+Jan 20 14:47:30 host kernel: [   72.060413] usb 2-1: Invalid ep0 maxpacket: 9
+Jan 20 14:47:30 host kernel: [   72.190002] usb 2-1: new full-speed USB device number 5 using uhci_hcd
+Jan 20 14:47:30 host kernel: [   72.216924] usb 2-1: Invalid ep0 maxpacket: 9
+Jan 20 14:47:30 host kernel: [   72.218959] usb usb2-port1: unable to enumerate USB device
+
+Lots of errors there, but what to do with it?
+
+I followed a second route to passthrough my usb-disk (someone who was trying to connect a webcam): I removed the redirectors, and chose in the Details window: &#39;add hardware&#39; -&gt; USB Host Device -&gt; my WD hdd. Although my disk does not show again, I did find a reference to it in file manager: /dev/bus/usb. So I used udevadm info /dev/bus/usb/001/006 and got this result:
+
+P: /devices/pci0000:00/0000:00:09.7/usb1/1-1
+N: bus/usb/001/006
+L: 0
+E: DEVPATH=/devices/pci0000:00/0000:00:09.7/usb1/1-1
+E: DEVNAME=/dev/bus/usb/001/006
+E: DEVTYPE=usb_device
+E: DRIVER=usb
+E: PRODUCT=1058/7a8/1049
+E: TYPE=0/0/0
+E: BUSNUM=001
+E: DEVNUM=006
+E: MAJOR=189
+E: MINOR=5
+E: SUBSYSTEM=usb
+E: USEC_INITIALIZED=424814926
+E: ID_VENDOR=Western_Digital
+E: ID_VENDOR_ENC=Western\x20Digital
+E: ID_VENDOR_ID=1058
+E: ID_MODEL=My_Passport_07A8
+E: ID_MODEL_ENC=My\x20Passport\x2007A8
+E: ID_MODEL_ID=07a8
+E: ID_REVISION=1049
+E: ID_SERIAL=Western_Digital_My_Passport_07A8_575843314543324B4B363438
+E: ID_SERIAL_SHORT=575843314543324B4B363438
+E: ID_BUS=usb
+E: ID_USB_INTERFACES=:080650:
+E: ID_VENDOR_FROM_DATABASE=Western Digital Technologies, Inc.
+E: ID_MODEL_FROM_DATABASE=My Passport (WDBBEP), My Passport for Mac (WDBLUZ)
+
+and I got this in /var/log/syslog:
+
+Jan 20 14:53:23 host kernel: [  424.594108] usb 1-1: new high-speed USB device number 6 using ehci-pci
+Jan 20 14:53:23 host kernel: [  424.919564] usb 1-1: config 1 interface 0 altsetting 0 bulk endpoint 0x83 has invalid maxpacket 1024
+Jan 20 14:53:23 host kernel: [  424.927217] usb 1-1: config 1 interface 0 altsetting 0 bulk endpoint 0xA has invalid maxpacket 1024
+Jan 20 14:53:23 host kernel: [  424.933105] usb 1-1: New USB device found, idVendor=1058, idProduct=07a8, bcdDevice=10.49
+Jan 20 14:53:23 host kernel: [  424.936589] usb 1-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Jan 20 14:53:23 host kernel: [  424.939484] usb 1-1: Product: My Passport 07A8
+Jan 20 14:53:23 host kernel: [  424.941275] usb 1-1: Manufacturer: Western Digital
+Jan 20 14:53:23 host kernel: [  424.943272] usb 1-1: SerialNumber: 575843314543324B4B363438
+Jan 20 14:53:23 host kernel: [  424.964492] usb-storage 1-1:1.0: USB Mass Storage device detected
+Jan 20 14:53:23 host kernel: [  424.968100] scsi host2: usb-storage 1-1:1.0
+Jan 20 14:53:23 host kernel: [  424.971778] usbcore: registered new interface driver usb-storage
+Jan 20 14:53:23 host kernel: [  424.976459] usbcore: registered new interface driver uas
+Jan 20 14:53:24 host kernel: [  425.990356] scsi 2:0:0:0: Direct-Access     WD       My Passport 07A8 1049 PQ: 0 ANSI: 6
+Jan 20 14:53:24 host kernel: [  425.997043] scsi 2:0:0:1: Enclosure         WD       SES Device       1049 PQ: 0 ANSI: 6
+Jan 20 14:53:24 host kernel: [  426.038728] scsi 2:0:0:0: Attached scsi generic sg0 type 0
+Jan 20 14:53:24 host kernel: [  426.044584] scsi 2:0:0:1: Attached scsi generic sg1 type 13
+Jan 20 14:53:24 host kernel: [  426.054518] sd 2:0:0:0: [sda] 1953458176 512-byte logical blocks: (1.00 TB/931 GiB)
+Jan 20 14:53:24 host kernel: [  426.064979] sd 2:0:0:0: [sda] Write Protect is off
+Jan 20 14:53:24 host kernel: [  426.066922] sd 2:0:0:0: [sda] Mode Sense: 53 00 10 08
+Jan 20 14:53:24 host kernel: [  426.072482] sd 2:0:0:0: [sda] No Caching mode page found
+Jan 20 14:53:24 host kernel: [  426.074765] sd 2:0:0:0: [sda] Assuming drive cache: write through
+Jan 20 14:53:24 host kernel: [  426.084115] scsi 2:0:0:1: Wrong diagnostic page; asked for 1 got 8
+Jan 20 14:53:24 host kernel: [  426.087071] scsi 2:0:0:1: Failed to get diagnostic page 0x1
+Jan 20 14:53:24 host kernel: [  426.089580] scsi 2:0:0:1: Failed to bind enclosure -19
+Jan 20 14:53:24 host kernel: [  426.096357] ses 2:0:0:1: Attached Enclosure device
+Jan 20 14:53:24 host kernel: [  426.167922]  sda: sda1
+Jan 20 14:53:24 host kernel: [  426.189861] sd 2:0:0:0: [sda] Attached SCSI disk
+
+So, thusfar no luck with USB. If anyone can direct me how to proceed to get this USB passthrough working, would be obliged.</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 24 Jan 2020 17:21:57 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/usb-passthrough-failure/8813.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>USB passthrough failure</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Ubuntu userbase is made of Llamas while Debian powers a third of the internet and has the largest dev base for any OS.</p>
+          <p><a href="http://forums.whonix.org/t/usb-passthrough-failure/8813/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/usb-passthrough-failure/8813/5</link>
+        <pubDate>Fri, 24 Jan 2020 17:21:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8813-5</guid>
+        <source url="http://forums.whonix.org/t/usb-passthrough-failure/8813.rss">USB passthrough failure</source>
+      </item>
+      <item>
+        <title>USB passthrough failure</title>
+        <dc:creator><![CDATA[rk1]]></dc:creator>
+        <description><![CDATA[
+            <p>That might be the solution. On the other hand Ubuntu has a bigger user base, and having a privacy conscious system may be important to those users as well…</p>
+          <p><a href="http://forums.whonix.org/t/usb-passthrough-failure/8813/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/usb-passthrough-failure/8813/4</link>
+        <pubDate>Fri, 24 Jan 2020 09:48:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8813-4</guid>
+        <source url="http://forums.whonix.org/t/usb-passthrough-failure/8813.rss">USB passthrough failure</source>
+      </item>
+      <item>
+        <title>USB passthrough failure</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Ditch Ubuntu and try again?</p>
+          <p><a href="http://forums.whonix.org/t/usb-passthrough-failure/8813/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/usb-passthrough-failure/8813/3</link>
+        <pubDate>Tue, 21 Jan 2020 22:00:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8813-3</guid>
+        <source url="http://forums.whonix.org/t/usb-passthrough-failure/8813.rss">USB passthrough failure</source>
+      </item>
+      <item>
+        <title>USB passthrough failure</title>
+        <dc:creator><![CDATA[rk1]]></dc:creator>
+        <description><![CDATA[
+            <p>Well after some research I doubt this problem has anything to do with Whonix. I found the same kind of problem here: https bugs launchpad net/qemu/+bug/1385934/ and that was in 2014. So, I think it is rather a qemu-kvm thing. I checked qemu on my Ubuntu 18.04 system with command: apt show qemu-system-x86, which gives me:<br>
+Package: qemu-system-x86<br>
+Version: 1:2.11+dfsg-1ubuntu7.21<br>
+Priority: optional<br>
+Section: misc<br>
+Source: qemu<br>
+Origin: Ubuntu<br>
+Maintainer: Ubuntu Developers <a href="mailto:ubuntu-devel-discuss@lists.ubuntu.com">ubuntu-devel-discuss@lists.ubuntu.com</a><br>
+Original-Maintainer: Debian QEMU Team <a href="mailto:pkg-qemu-devel@lists.alioth.debian.org">pkg-qemu-devel@lists.alioth.debian.org</a><br>
+Bugs: https bugs launchpad net/ubuntu/+filebug</p>
+<p>So, it is probably qemu-kvm as implemented by Ubuntu.<br>
+In some other sources it was suggested that it might have to do something with the USB ports (2.0 or 3.0) on the computer. Well, I tried different ports on the back as well as the front, but they all give the same, saddening result.<br>
+Still, funny that my USB keyboard does work on the Whonix guest system.</p>
+          <p><a href="http://forums.whonix.org/t/usb-passthrough-failure/8813/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/usb-passthrough-failure/8813/2</link>
+        <pubDate>Mon, 20 Jan 2020 22:02:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8813-2</guid>
+        <source url="http://forums.whonix.org/t/usb-passthrough-failure/8813.rss">USB passthrough failure</source>
+      </item>
+      <item>
+        <title>USB passthrough failure</title>
+        <dc:creator><![CDATA[rk1]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi,<br>
+I am trying to get Whonix working for me, and for this I tried to enable USB Passthrough as described in the wiki-docs of Whonix for KVM. My host system is Ubuntu 18.04.3. Now when I follow instructions I use the USB redirection feature.<br>
+But my external hdd Western Digital My Passport is not showing (in file manager).<br>
+I copied part of my /var/log/syslog:</p>
+<p>Jan 20 14:47:27 host kernel: [   68.362096] usb 1-1: new high-speed USB device number 2 using ehci-pci<br>
+Jan 20 14:47:27 host kernel: [   68.505903] usb 1-1: device descriptor read/64, error 18<br>
+Jan 20 14:47:27 host kernel: [   68.742073] usb 1-1: device descriptor read/64, error 18<br>
+Jan 20 14:47:27 host kernel: [   68.986008] usb 1-1: new high-speed USB device number 3 using ehci-pci<br>
+Jan 20 14:47:27 host kernel: [   69.125968] usb 1-1: device descriptor read/64, error 18<br>
+Jan 20 14:47:28 host kernel: [   69.362015] usb 1-1: device descriptor read/64, error 18<br>
+Jan 20 14:47:28 host kernel: [   69.474135] usb usb1-port1: attempt power cycle<br>
+Jan 20 14:47:28 host kernel: [   69.922032] usb 1-1: new high-speed USB device number 4 using ehci-pci<br>
+Jan 20 14:47:28 host kernel: [   69.955362] usb 1-1: Invalid ep0 maxpacket: 9<br>
+Jan 20 14:47:28 host kernel: [   70.093917] usb 1-1: new high-speed USB device number 5 using ehci-pci<br>
+Jan 20 14:47:28 host kernel: [   70.190298] usb 1-1: Invalid ep0 maxpacket: 9<br>
+Jan 20 14:47:28 host kernel: [   70.197220] usb usb1-port1: unable to enumerate USB device<br>
+Jan 20 14:47:29 host kernel: [   70.465930] usb 2-1: new full-speed USB device number 2 using uhci_hcd<br>
+Jan 20 14:47:29 host kernel: [   70.621999] usb 2-1: device descriptor read/64, error 18<br>
+Jan 20 14:47:29 host kernel: [   70.866001] usb 2-1: device descriptor read/64, error 18<br>
+Jan 20 14:47:29 host kernel: [   71.103318] usb 2-1: new full-speed USB device number 3 using uhci_hcd<br>
+Jan 20 14:47:29 host kernel: [   71.238019] usb 2-1: device descriptor read/64, error 18<br>
+Jan 20 14:47:30 host kernel: [   71.481998] usb 2-1: device descriptor read/64, error 18<br>
+Jan 20 14:47:30 host kernel: [   71.590127] usb usb2-port1: attempt power cycle<br>
+Jan 20 14:47:30 host kernel: [   72.033988] usb 2-1: new full-speed USB device number 4 using uhci_hcd<br>
+Jan 20 14:47:30 host kernel: [   72.060413] usb 2-1: Invalid ep0 maxpacket: 9<br>
+Jan 20 14:47:30 host kernel: [   72.190002] usb 2-1: new full-speed USB device number 5 using uhci_hcd<br>
+Jan 20 14:47:30 host kernel: [   72.216924] usb 2-1: Invalid ep0 maxpacket: 9<br>
+Jan 20 14:47:30 host kernel: [   72.218959] usb usb2-port1: unable to enumerate USB device</p>
+<p>Lots of errors there, but what to do with it?</p>
+<p>I followed a second route to passthrough my usb-disk (someone who was trying to connect a webcam): I removed the redirectors, and chose in the Details window: ‘add hardware’ -&gt; USB Host Device -&gt; my WD hdd. Although my disk does not show again, I did find a reference to it in file manager: /dev/bus/usb. So I used udevadm info /dev/bus/usb/001/006 and got this result:</p>
+<p>P: /devices/pci0000:00/0000:00:09.7/usb1/1-1<br>
+N: bus/usb/001/006<br>
+L: 0<br>
+E: DEVPATH=/devices/pci0000:00/0000:00:09.7/usb1/1-1<br>
+E: DEVNAME=/dev/bus/usb/001/006<br>
+E: DEVTYPE=usb_device<br>
+E: DRIVER=usb<br>
+E: PRODUCT=1058/7a8/1049<br>
+E: TYPE=0/0/0<br>
+E: BUSNUM=001<br>
+E: DEVNUM=006<br>
+E: MAJOR=189<br>
+E: MINOR=5<br>
+E: SUBSYSTEM=usb<br>
+E: USEC_INITIALIZED=424814926<br>
+E: ID_VENDOR=Western_Digital<br>
+E: ID_VENDOR_ENC=Western\x20Digital<br>
+E: ID_VENDOR_ID=1058<br>
+E: ID_MODEL=My_Passport_07A8<br>
+E: ID_MODEL_ENC=My\x20Passport\x2007A8<br>
+E: ID_MODEL_ID=07a8<br>
+E: ID_REVISION=1049<br>
+E: ID_SERIAL=Western_Digital_My_Passport_07A8_575843314543324B4B363438<br>
+E: ID_SERIAL_SHORT=575843314543324B4B363438<br>
+E: ID_BUS=usb<br>
+E: ID_USB_INTERFACES=:080650:<br>
+E: ID_VENDOR_FROM_DATABASE=Western Digital Technologies, Inc.<br>
+E: ID_MODEL_FROM_DATABASE=My Passport (WDBBEP), My Passport for Mac (WDBLUZ)</p>
+<p>and I got this in /var/log/syslog:</p>
+<p>Jan 20 14:53:23 host kernel: [  424.594108] usb 1-1: new high-speed USB device number 6 using ehci-pci<br>
+Jan 20 14:53:23 host kernel: [  424.919564] usb 1-1: config 1 interface 0 altsetting 0 bulk endpoint 0x83 has invalid maxpacket 1024<br>
+Jan 20 14:53:23 host kernel: [  424.927217] usb 1-1: config 1 interface 0 altsetting 0 bulk endpoint 0xA has invalid maxpacket 1024<br>
+Jan 20 14:53:23 host kernel: [  424.933105] usb 1-1: New USB device found, idVendor=1058, idProduct=07a8, bcdDevice=10.49<br>
+Jan 20 14:53:23 host kernel: [  424.936589] usb 1-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3<br>
+Jan 20 14:53:23 host kernel: [  424.939484] usb 1-1: Product: My Passport 07A8<br>
+Jan 20 14:53:23 host kernel: [  424.941275] usb 1-1: Manufacturer: Western Digital<br>
+Jan 20 14:53:23 host kernel: [  424.943272] usb 1-1: SerialNumber: 575843314543324B4B363438<br>
+Jan 20 14:53:23 host kernel: [  424.964492] usb-storage 1-1:1.0: USB Mass Storage device detected<br>
+Jan 20 14:53:23 host kernel: [  424.968100] scsi host2: usb-storage 1-1:1.0<br>
+Jan 20 14:53:23 host kernel: [  424.971778] usbcore: registered new interface driver usb-storage<br>
+Jan 20 14:53:23 host kernel: [  424.976459] usbcore: registered new interface driver uas<br>
+Jan 20 14:53:24 host kernel: [  425.990356] scsi 2:0:0:0: Direct-Access     WD       My Passport 07A8 1049 PQ: 0 ANSI: 6<br>
+Jan 20 14:53:24 host kernel: [  425.997043] scsi 2:0:0:1: Enclosure         WD       SES Device       1049 PQ: 0 ANSI: 6<br>
+Jan 20 14:53:24 host kernel: [  426.038728] scsi 2:0:0:0: Attached scsi generic sg0 type 0<br>
+Jan 20 14:53:24 host kernel: [  426.044584] scsi 2:0:0:1: Attached scsi generic sg1 type 13<br>
+Jan 20 14:53:24 host kernel: [  426.054518] sd 2:0:0:0: [sda] 1953458176 512-byte logical blocks: (1.00 TB/931 GiB)<br>
+Jan 20 14:53:24 host kernel: [  426.064979] sd 2:0:0:0: [sda] Write Protect is off<br>
+Jan 20 14:53:24 host kernel: [  426.066922] sd 2:0:0:0: [sda] Mode Sense: 53 00 10 08<br>
+Jan 20 14:53:24 host kernel: [  426.072482] sd 2:0:0:0: [sda] No Caching mode page found<br>
+Jan 20 14:53:24 host kernel: [  426.074765] sd 2:0:0:0: [sda] Assuming drive cache: write through<br>
+Jan 20 14:53:24 host kernel: [  426.084115] scsi 2:0:0:1: Wrong diagnostic page; asked for 1 got 8<br>
+Jan 20 14:53:24 host kernel: [  426.087071] scsi 2:0:0:1: Failed to get diagnostic page 0x1<br>
+Jan 20 14:53:24 host kernel: [  426.089580] scsi 2:0:0:1: Failed to bind enclosure -19<br>
+Jan 20 14:53:24 host kernel: [  426.096357] ses 2:0:0:1: Attached Enclosure device<br>
+Jan 20 14:53:24 host kernel: [  426.167922]  sda: sda1<br>
+Jan 20 14:53:24 host kernel: [  426.189861] sd 2:0:0:0: [sda] Attached SCSI disk</p>
+<p>So, thusfar no luck with USB. If anyone can direct me how to proceed to get this USB passthrough working, would be obliged.</p>
+          <p><a href="http://forums.whonix.org/t/usb-passthrough-failure/8813/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/usb-passthrough-failure/8813/1</link>
+        <pubDate>Mon, 20 Jan 2020 15:18:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8813-1</guid>
+        <source url="http://forums.whonix.org/t/usb-passthrough-failure/8813.rss">USB passthrough failure</source>
+      </item>
+  </channel>
+</rss>

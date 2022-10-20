@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+    <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886</link>
+    <description>It somewhat clashes with Whonix&#39;s stream isolation design. (https://www.whonix.org/wiki/Stream_Isolation)
+The issue is documented here:
+https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#uwt_and_Tor_Browser
+
+There is an idea to simplify this:
+https://phabricator.whonix.org/T142
+
+I got a local git branch, that implements the VPN_FIREWALL feature in Whonix-Workstation Firewall. But it currently breaks applications, that are configured to use a SocksPort.
+
+Let&#39;s take for example XChat. How should XChat connect when VPN_FIREWALL has been enabled on Whonix-Workstation? Certainly, user -&gt; Tor -&gt; destination would be wrong? So best VPN_FIREWALL could do for now is cutting off its internet access until XChat gets configured to use &quot;no proxy&quot;, i.e. &quot;use system defaults&quot;, which would go through the VPN, i.e. then it would go user -&gt; Tor -&gt; VPN -&gt; destination. (Setting to &quot;no proxy&quot; for VPN users could be done at a later point and is not part of this issue. Much later.)
+
+But what about a few other &quot;likely-fingerprintable-if-using-the-same-Tor-or-VPN-exit&quot; connections? Such as:
+- whonixcheck: Tor SocksPort Test (documented here: https://www.whonix.org/wiki/whonixcheck)
+- whonixcheck: Tor Browser Update Check
+- whonixcheck: Whonix News Check
+- tb-updater: Tor Browser Download
+- sdwdate
+
+Should those go user -&gt; Tor -&gt; VPN -&gt; destination? Or just user -&gt; Tor -&gt; destination?
+
+What speaks against letting them exit through the VPN (user -&gt; Tor -&gt; VPN -&gt; destination)? Then the VPN might be able to identify the user as a Whonix user.
+
+What speaks against those not going through the VPN (user -&gt; Tor -&gt; destination)? Some users add the VPNs for eventual better anonymity/privacy/security. (Eventual as in, it&#39;s not part of this topic, see: also https://trac.torproject.org/projects/tor/wiki/doc/TorPlusVPN) Those users would expect the VPN to be always used and would not worry about fingerprinting so much. Skipping the VPN would be unexpected.
+
+Both defaults would be bad.
+
+At the moment I think it would be best to cut off all Tor SocksPort access by default, i.e. make sure applications not configured to use a Tor SocksPort, i.e. configured to use system defaults would result in using user -&gt; Tor -&gt; VPN -&gt; destination and everything else (XChat still configured to use a Tor SocksPort, whonixcheck, tb-updater) would just fail closed. And then give an option (or as a mid term solution just documentation) on how users can allow direct Tor SocksPort (i.e. user -&gt; Tor &gt; destination) exceptions. And another option (or as a mid term solution just documentation), on how to configure the &quot;likely-fingerprintable-if-using-the-same-Tor-or-VPN-exit&quot; applications to not use a proxy, i.e. so they also use user -&gt; Tor -&gt; VPN -&gt; destination?
+
+Except for sdwdate. Since it will only use Tor Hidden Services in Whonix 10, there is no way to make it exit through VPNs.
+
+Ticket:
+https://phabricator.whonix.org/T158
+
+Thoughts?</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 18 Jan 2016 21:17:23 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[halo9en]]></dc:creator>
+        <description><![CDATA[
+            <p>I agree with this. I think the Whonix-specific packages and updaters should go through Tor only. I think there should be an option notification and selection panel to go over Tor or VPN for XChat / Pidgin / the other specifically-configured apps that have a high probability of fingerprinting. When VPN_FIREWALL is configured, all OTHER apps (those not specifically bundled or configured for TransPort usage) should default to user -&gt; Tor -&gt; VPN -&gt; destination.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/20</link>
+        <pubDate>Mon, 18 Jan 2016 21:17:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-20</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/killswitch">@killswitch</a> this is very off the original topic. And the quote markup is broken.</p>
+<hr>
+<p>Back the the original question:</p>
+<p>I am working on this at the moment. Still not clear how to best implement it. Trying to adhere the principle of the least surprise. What tunnel lovers want in this case is user -&gt; Tor -&gt; tunnel -&gt; destination to have a longer tunnel length. Once they made the decision, then they want it. I don’t want to rehash the actual positive or negative effects on anonymity. They want this most likely without having thought through too much of the Whonix specifics. That’s the thing the user decided, so I don’t want to go back through discussion the previous stuff at this point.</p>
+<p>So I conclude, that it would be best to disallow any local socksified connections [circumventing the tunnel] by default.  Unable to connect by default when VPN_FIREWALL=1 inside workstation:</p>
+<p>(a)</p>
+<ul>
+<li>whonixcheck SocksPort test</li>
+<li>whonixcheck Whonix News Check</li>
+<li>Tor Browser Downloader by Whonix developers</li>
+</ul>
+<p>(b)</p>
+<ul>
+<li>default uwt wrapped applications (curl, wget, ssh, gpg, …) as per list ( <a href="https://www.whonix.org/wiki/Stream_Isolation#List">https://www.whonix.org/wiki/Stream_Isolation#List</a> )</li>
+<li>default proxy settings applications (Tor Browser, XChat, …) as per list ^</li>
+</ul>
+<p>There is already documentation on how to make these applications work again, i.e. to (b) use the system default. I.e. how to make them go user -&gt; Tor -&gt; tunnel -&gt; destination.<br>
+Here:<br>
+<a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#Prevent_Bypassing_the_Tunnel-Link">https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_VPN#Prevent_Bypassing_the_Tunnel-Link</a><br>
+And here<br>
+<a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_proxy">https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_a_proxy</a></p>
+<p>X: As for (a) I can add instructions on how to make them work again also. I.e. how to make them user -&gt; Tor -&gt; tunnel -&gt; destination. Not hard and already possible. Just needs configuration and documentation.</p>
+<p>Y: Optionally, it also would not be too hard to modify /usr/bin/whonix_firewall to make those go user -&gt; Tor -&gt; destination. I think for the first iteration it will be required to modify /usr/bin/whonix_firewall on the workstation to make those go those go user -&gt; Tor -&gt; destination. If that gets a popular use case, that can get a config option.</p>
+<p>All of that stuff will be documented on the related sub pages of <a href="https://www.whonix.org/wiki/Tunnels/Introduction">https://www.whonix.org/wiki/Tunnels/Introduction</a> anyhow. It probably always will be complex, but this lies in the nature of the subject.</p>
+<p>What I am unsure about at the moment are two things.</p>
+<ul>
+<li>
+<p>sdwdate: Cannot be configured to go user -&gt; Tor -&gt; tunnel -&gt; destination because it connects to Tor hidden services only. I think allowing user sdwdate to connect even if VPN_FIREWALL=1 could be okay okay. Could be mentioned in the documentation, and how to disable sdwdate. Or would it be better to have it fail by default and then let users opt-in to have it go user -&gt; Tor -&gt; destination only?</p>
+</li>
+<li>
+<p>control port filter proxy access: When VPN_FIREWALL=1 in the workstation, the workstation should still be allowed to access the gateway cpfp? Tor Browser (using the VPN then) sending signal newnym would have no the expected effect. Signal newnym generally would only effect applications to “only” got user -&gt; Tor -&gt; destination. whonixcheck Tor bootstrap test would still be useful (requires cpfp access). Perhaps connection failing by default, with opt-in to enable also?</p>
+</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/19</link>
+        <pubDate>Sat, 09 Jan 2016 19:01:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-19</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[killswitch]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:12, topic:886”][quote author=mitm link=topic=976.msg7098#msg7098 date=1424824680]<br>
+Can uwt ever be automated?<br>
+[/quote]<br>
+It’s not on the horizon, doesn’t look like, but no one knows with what great ideas and code someone comes up with.</p>
+<aside class="quote">
+<blockquote>
+<p>What about Tor do they plan on adding automatic stream isolation to every new connection detected?</p>
+</blockquote>
+</aside>
+<p>I don’t think so. The closest they provide is IsolateDestPort and IsolateDestAddr but it is recommended against enabling this by default. At the level on which Tor is operating, it’s not possible to reliably distinguish by application.[/quote]</p>
+<p>There is a well reasoned post about this on the TAILS site:</p>
+<p><a href="https://tails.boum.org/contribute/design/stream_isolation/" class="onebox" target="_blank" rel="nofollow noopener">https://tails.boum.org/contribute/design/stream_isolation/</a></p>
+<p>Summarizing:</p>
+<p>IsolateDestPort is good for a chat client that has multiple accounts, spreading the streams would thwart attempts to correlate names across networks.</p>
+<p>IsolateDestAddr is good for web browsers, given that there are multiple TCP streams generated when one loads a web page it would be a negative to use IsolateDestPort, self-flagging as a traffic source using the IsolateDestAddr feature.</p>
+<p>I strongly recommend reading their page, it’s not long and the writing is much clearer than what I’ve produced here. This is how they implemented the principles - separate SOCKS5 ports based on the type of application using them.</p>
+<h2>Default SocksPort</h2>
+<p>SocksPort 127.0.0.1:9050 IsolateDestAddr IsolateDestPort</p>
+<h2>SocksPort for the MUA</h2>
+<p>SocksPort 127.0.0.1:9061 IsolateDestAddr</p>
+<h2>SocksPort for Tails-specific applications</h2>
+<p>SocksPort 127.0.0.1:9062 IsolateDestAddr IsolateDestPort</p>
+<h2>SocksPort for the default web browser</h2>
+<p>SocksPort 127.0.0.1:9150</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/18</link>
+        <pubDate>Fri, 10 Jul 2015 04:19:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-18</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Good forward thinking. Then the name you picked is the best one I can see.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/17</link>
+        <pubDate>Mon, 30 Mar 2015 13:35:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-17</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I would like to prevent “vpn” in its name. Because in long term that feature is probably not tied to vpn. From perspective of iptables, it doesn’t really understand anything about vpn.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/16</link>
+        <pubDate>Mon, 30 Mar 2015 07:59:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-16</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>+1</p>
+<p>I was thinking “bypassvpn” for a name?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/15</link>
+        <pubDate>Mon, 30 Mar 2015 00:53:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-15</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>A user similar to the “clearnet” user would be easy to implement. Similar to this:</p>
+<ul>
+<li><a href="https://github.com/Whonix/whonix-gw-firewall/blob/5ebca43416269a5fd42c98a80af1b0b3d38adecf/usr/bin/whonix_firewall#L81">https://github.com/Whonix/whonix-gw-firewall/blob/5ebca43416269a5fd42c98a80af1b0b3d38adecf/usr/bin/whonix_firewall#L81</a></li>
+<li><a href="https://github.com/Whonix/whonix-gw-firewall/blob/5ebca43416269a5fd42c98a80af1b0b3d38adecf/usr/bin/whonix_firewall#L543">https://github.com/Whonix/whonix-gw-firewall/blob/5ebca43416269a5fd42c98a80af1b0b3d38adecf/usr/bin/whonix_firewall#L543</a></li>
+<li><a href="https://github.com/Whonix/whonix-gw-firewall/blob/5ebca43416269a5fd42c98a80af1b0b3d38adecf/usr/bin/whonix_firewall#L616">https://github.com/Whonix/whonix-gw-firewall/blob/5ebca43416269a5fd42c98a80af1b0b3d38adecf/usr/bin/whonix_firewall#L616</a></li>
+</ul>
+<p>Then that user “noforce” or however it call it?</p>
+<p>Then that user use Tor SocksPorts. System DNS (Tor’s TransPort) might be more difficult. (Remotely related: <a href="https://www.whonix.org/wiki/Whonix-Gateway_System_DNS">https://www.whonix.org/wiki/Whonix-Gateway_System_DNS</a>)</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/14</link>
+        <pubDate>Sun, 29 Mar 2015 15:18:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-14</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>On Android there is an app that’s a wrapper around scripts written by Mike Perry. It forces selected apps through Tor and can make bypass exceptions for the Orbot transparent proxy. Would Mike’s scripts work on Debian with some modification?</p>
+<p>What I’m looking for here is an easy way for Whonix users to configure exceptions to the VPN tunnel when its running, forcing them thru Tor instead.</p>
+<hr>
+<p><a href="https://people.torproject.org/~mikeperry/android-hardening/android-firewall.zip" class="onebox" target="_blank">https://people.torproject.org/~mikeperry/android-hardening/android-firewall.zip</a></p>
+<p><a href="http://linuxpoison.blogspot.com/2010/11/how-to-limit-network-access-by-user.html">http://linuxpoison.blogspot.com/2010/11/how-to-limit-network-access-by-user.html</a> (iptables module: ipt_owner )</p>
+<p><a href="http://orwall.org" class="onebox" target="_blank">orwall.org</a></p>
+<p>“The redirection is based on the application user id. Each android application runs as a dedicated user, and iptables has support for traffic filtering based on the process owner, meaning it’s really easy and pretty safe to do this kind of thing on an Android device.”</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/13</link>
+        <pubDate>Thu, 26 Mar 2015 03:27:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-13</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="11" data-topic="886">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/m/7ea924/40.png" class="avatar"> mitm:</div>
+<blockquote>
+<p>Can uwt ever be automated?</p>
+</blockquote>
+</aside>
+<p>It’s not on the horizon, doesn’t look like, but no one knows with what great ideas and code someone comes up with.</p>
+<aside class="quote" data-post="11" data-topic="886">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/m/7ea924/40.png" class="avatar"> mitm:</div>
+<blockquote>
+<p>What about Tor do they plan on adding automatic stream isolation to every new connection detected?</p>
+</blockquote>
+</aside>
+<p>I don’t think so. The closest they provide is IsolateDestPort and IsolateDestAddr but it is recommended against enabling this by default. At the level on which Tor is operating, it’s not possible to reliably distinguish by application.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/12</link>
+        <pubDate>Wed, 25 Feb 2015 00:44:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-12</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[mitm]]></dc:creator>
+        <description><![CDATA[
+            <p>Can uwt ever be automated? What about Tor do they plan on adding automatic stream isolation to every new connection detected?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/11</link>
+        <pubDate>Wed, 25 Feb 2015 00:38:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-11</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>A lot from this list are proprietary, outdated or unmaintained. I don’t think there is a holy grale in custom package automatic socksification for stream isolation yet.</p>
+<p>In context of stream isolation, it makes it is not useful to socksify the system wide, the whole system - because then all would go through the same Tor SocksPort - identity would correlate - what stream isolation is preventing.</p>
+<p>If you want to socksify the whole system, i.e. user -&gt; Tor -&gt; proxy -&gt; destination [except for pre-configured applications using a Tor SocksPort, same discrepancy] I found redsocks useful. (Doesn’t help with stream isolation.) It’s somewhat documented here:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#Transparent_Proxying" target="_blank" title="10:04AM - 08 April 2020">Whonix – 8 Apr 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/452;"><img src="https://www.whonix.org/w/images/8/86/Beyond-1087922640.jpg" class="thumbnail" width="640" height="452"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#Transparent_Proxying" target="_blank">Combining Tunnels with Tor</a></h3>
+
+<p>Information on whether Tor gets more or less secure when combining Tor with tunnels such as VPN, SSH, proxies. (User → Tor → proxy/VPN/SSH → Internet) (User → proxy/VPN/SSH → Tor → Internet)</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Related, “ProxyBOX”:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/Inspiration#Proxy" target="_blank" title="11:04AM - 04 March 2020">Whonix – 4 Mar 20</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="" height="">
+
+<h3><a href="https://www.whonix.org/wiki/Dev/Inspiration#Proxy" target="_blank">Dev/Inspiration - Whonix</a></h3>
+
+<p>Inspiration for developing new Whonix ™ Features.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/10</link>
+        <pubDate>Tue, 24 Feb 2015 23:50:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-10</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[mitm]]></dc:creator>
+        <description><![CDATA[
+            <p>Do you find any of the socksifiers good enough for an automatic way to anonymize custom insyalled packages on demand?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/9</link>
+        <pubDate>Tue, 24 Feb 2015 23:41:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-9</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[mitm]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes I know its not your argument. All I was saying is you should present research papers like the one I linked to provide fact based advice.</p>
+<p>I found a list of good free software socksifiers. Tun2socks and torsocks maybe others are good for system wide.</p>
+<p><a href="https://en.wikipedia.org/wiki/Comparison_of_proxifiers#Proxy_protocols_and_methods" class="onebox" target="_blank" rel="nofollow noopener">https://en.wikipedia.org/wiki/Comparison_of_proxifiers#Proxy_protocols_and_methods</a></p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/8</link>
+        <pubDate>Tue, 24 Feb 2015 23:32:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-8</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“mitm, post:6, topic:886”]That’s a wrong argument. Users should be educated on misleading ideas. VPNs are not sophisticated enough to deploy defences against traffic analysis, they are a simple SSL connection and are easily fingerprinted. They are a way to get around Tor exit bans at best, and that could be useful. But they don’t add extra anonymity protection from dragnet surveillance.</p>
+<aside class="onebox pdf">
+  <header class="source">
+      <a href="https://www.usenix.org/system/files/conference/foci12/foci12-final8.pdf" target="_blank" rel="nofollow noopener">usenix.org</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://www.usenix.org/system/files/conference/foci12/foci12-final8.pdf" target="_blank" rel="nofollow noopener"><span class="pdf-onebox-logo"></span></a>
+<h3><a href="https://www.usenix.org/system/files/conference/foci12/foci12-final8.pdf" target="_blank" rel="nofollow noopener">foci12-final8.pdf</a></h3>
+
+<p class="filesize">158.08 KB</p>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>If the security facts are thought over, you will see Whonix specific packages shouldn’t use vpns because they won’t be getting any extra security, they’ll omake wave a large red flag to the operator that so and so is a Whonix user.[/quote]<br>
+Well, it’s not my argument. So I am not going to defend it. But a very common one. Perhaps I should have said that. That’s a different discussion with very diverse opinions. One, that I am not eager to have. A summary is here <a href="https://trac.torproject.org/projects/tor/wiki/doc/TorPlusVPN">https://trac.torproject.org/projects/tor/wiki/doc/TorPlusVPN</a> and it has been discussed recently on the tor-talk mailing list. I don’t feel appointed to end this discussion and to defend a final, totalitarian standpoint that post-Tor-VPNs are always useless or even counterproductive for better anonymity/security/privacy in all cases. If someone, ideally knowing all this, disagrees with me, wants to use a post-Tor-VPN, fine. Then I don’t want to include any technical hurdles preventing them.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/7</link>
+        <pubDate>Tue, 24 Feb 2015 23:29:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-7</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[mitm]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>The argument of many is, longer chain, better security</blockquote>
+<p>That’s a wrong argument. Users should be educated on misleading ideas. VPNs are not sophisticated enough to deploy defences against traffic analysis, they are a simple SSL connection and are easily fingerprinted. They are a way to get around Tor exit bans at best, and that could be useful. But they don’t add extra anonymity protection from dragnet surveillance.</p>
+<aside class="onebox pdf">
+  <header class="source">
+      <a href="https://www.usenix.org/system/files/conference/foci12/foci12-final8.pdf" target="_blank" rel="nofollow noopener">usenix.org</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://www.usenix.org/system/files/conference/foci12/foci12-final8.pdf" target="_blank" rel="nofollow noopener"><span class="pdf-onebox-logo"></span></a>
+<h3><a href="https://www.usenix.org/system/files/conference/foci12/foci12-final8.pdf" target="_blank" rel="nofollow noopener">foci12-final8.pdf</a></h3>
+
+<p class="filesize">158.08 KB</p>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>If the security facts are thought over, you will see Whonix specific packages shouldn’t use vpns because they won’t be getting any extra security, they’ll omake wave a large red flag to the operator that so and so is a Whonix user.</p>
+<blockquote>Or excempt from VPN?</blockquote>
+<p>Whichever makes more sense programatically. Same effect.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/6</link>
+        <pubDate>Tue, 24 Feb 2015 23:15:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-6</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes, complex topic indeed.</p>
+<blockquote>All whonix related packages and updaters, strictly the packages with whonix in their name should always use Tor only and directly. There is no benefit I can see from driving them through a VPN and they will cause the user to be fingerprinted.</blockquote>
+The argument of many is, longer chain, better security.
+<aside class="quote" data-post="2" data-topic="886">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/m/7ea924/40.png" class="avatar"> mitm:</div>
+<blockquote>
+<p>Say someone turns on the VPN firewall feature, it would prompt the user to choose which internet facing programs shipped with Whonix they would like to exempt from Tor socks.</p>
+</blockquote>
+</aside>
+<p>Or excempt from VPN?</p>
+<p>That grade of usability is left for later. Much later.</p>
+<blockquote>As for anything extra they install, it probably isn't configured to use stream isolation anyway and so they will be redirected into the VPN. For this just put a note that other applications that aren't using uwt will by default be using the VPN.</blockquote>
+That is something that could be added here:
+https://phabricator.whonix.org/T142
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/5</link>
+        <pubDate>Tue, 24 Feb 2015 20:24:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-5</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="3" data-topic="886">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/m/7ea924/40.png" class="avatar"> mitm:</div>
+<blockquote>
+<p>Related question, is it difficult or impossible to configure outside software on the fly to use stream isolation?</p>
+</blockquote>
+</aside>
+<p>I don’t think there is a socksifier that works that well yet. It’s on a by case base. (Ex: not much point socksifing an apache web server.) Probably not feasible.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/4</link>
+        <pubDate>Tue, 24 Feb 2015 19:50:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-4</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[mitm]]></dc:creator>
+        <description><![CDATA[
+            <p>Related question, is it difficult or impossible to configure outside software on the fly to use stream isolation?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/3</link>
+        <pubDate>Tue, 24 Feb 2015 16:19:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-3</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[mitm]]></dc:creator>
+        <description><![CDATA[
+            <p>I might be repeating the gist of your post but here is how I see things. It is a complex subject.</p>
+<p>All whonix related packages and updaters, strictly the packages with whonix in their name should always use Tor only and directly. There is no benefit I can see from driving them through a VPN and they will cause the user to be fingerprinted.</p>
+<p>The rest of the packages shipped with Whonix like xchat should only use VPN if selected to do so.<br>
+Say someone turns on the VPN firewall feature, it would prompt the user to choose which internet facing programs shipped with Whonix they would like to exempt from Tor socks.</p>
+<p>As for anything extra they install, it probably isn’t configured to use stream isolation anyway and so they will be redirected into the VPN. For this just put a note that other applications that aren’t using uwt will by default be using the VPN.</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/2</link>
+        <pubDate>Tue, 24 Feb 2015 16:16:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-2</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+      <item>
+        <title>Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>It somewhat clashes with Whonix’s stream isolation design. (<a href="https://www.whonix.org/wiki/Stream_Isolation">https://www.whonix.org/wiki/Stream_Isolation</a>)<br>
+The issue is documented here:<br>
+<a href="https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#uwt_and_Tor_Browser">https://www.whonix.org/wiki/Tunnel_Proxy_or_SSH_or_VPN_through_Tor#uwt_and_Tor_Browser</a></p>
+<p>There is an idea to simplify this:<br>
+<a href="https://phabricator.whonix.org/T142" class="onebox" target="_blank">https://phabricator.whonix.org/T142</a></p>
+<p>I got a local git branch, that implements the VPN_FIREWALL feature in Whonix-Workstation Firewall. But it currently breaks applications, that are configured to use a SocksPort.</p>
+<p>Let’s take for example XChat. How should XChat connect when VPN_FIREWALL has been enabled on Whonix-Workstation? Certainly, user -&gt; Tor -&gt; destination would be wrong? So best VPN_FIREWALL could do for now is cutting off its internet access until XChat gets configured to use “no proxy”, i.e. “use system defaults”, which would go through the VPN, i.e. then it would go user -&gt; Tor -&gt; VPN -&gt; destination. (Setting to “no proxy” for VPN users could be done at a later point and is not part of this issue. Much later.)</p>
+<p>But what about a few other “likely-fingerprintable-if-using-the-same-Tor-or-VPN-exit” connections? Such as:</p>
+<ul>
+<li>whonixcheck: Tor SocksPort Test (documented here: <a href="https://www.whonix.org/wiki/whonixcheck">https://www.whonix.org/wiki/whonixcheck</a>)</li>
+<li>whonixcheck: Tor Browser Update Check</li>
+<li>whonixcheck: Whonix News Check</li>
+<li>tb-updater: Tor Browser Download</li>
+<li>sdwdate</li>
+</ul>
+<p>Should those go user -&gt; Tor -&gt; VPN -&gt; destination? Or just user -&gt; Tor -&gt; destination?</p>
+<p>What speaks against letting them exit through the VPN (user -&gt; Tor -&gt; VPN -&gt; destination)? Then the VPN might be able to identify the user as a Whonix user.</p>
+<p>What speaks against those not going through the VPN (user -&gt; Tor -&gt; destination)? Some users add the VPNs for eventual better anonymity/privacy/security. (Eventual as in, it’s not part of this topic, see: also <a href="https://trac.torproject.org/projects/tor/wiki/doc/TorPlusVPN">https://trac.torproject.org/projects/tor/wiki/doc/TorPlusVPN</a>) Those users would expect the VPN to be always used and would not worry about fingerprinting so much. Skipping the VPN would be unexpected.</p>
+<p>Both defaults would be bad.</p>
+<p>At the moment I think it would be best to cut off all Tor SocksPort access by default, i.e. make sure applications not configured to use a Tor SocksPort, i.e. configured to use system defaults would result in using user -&gt; Tor -&gt; VPN -&gt; destination and everything else (XChat still configured to use a Tor SocksPort, whonixcheck, tb-updater) would just fail closed. And then give an option (or as a mid term solution just documentation) on how users can allow direct Tor SocksPort (i.e. user -&gt; Tor &gt; destination) exceptions. And another option (or as a mid term solution just documentation), on how to configure the “likely-fingerprintable-if-using-the-same-Tor-or-VPN-exit” applications to not use a proxy, i.e. so they also use user -&gt; Tor -&gt; VPN -&gt; destination?</p>
+<p>Except for sdwdate. Since it will only use Tor Hidden Services in Whonix 10, there is no way to make it exit through VPNs.</p>
+<p>Ticket:<br>
+<a href="https://phabricator.whonix.org/T158" class="onebox" target="_blank">https://phabricator.whonix.org/T158</a></p>
+<p>Thoughts?</p>
+          <p><a href="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886/1</link>
+        <pubDate>Mon, 23 Feb 2015 22:44:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-886-1</guid>
+        <source url="http://forums.whonix.org/t/whonix-workstation-firewall-vpn-firewall-feature-design-discussion/886.rss">Whonix-Workstation Firewall - VPN_FIREWALL feature - design discussion</source>
+      </item>
+  </channel>
+</rss>

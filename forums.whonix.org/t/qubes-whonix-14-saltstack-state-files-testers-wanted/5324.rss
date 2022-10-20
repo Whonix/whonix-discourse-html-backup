@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Qubes-Whonix 14 SaltStack state files - Testers Wanted!</title>
+    <link>http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324</link>
+    <description>Qubes ticket:
+
+https://github.com/QubesOS/qubes-issues/issues/3765
+
+Available for Qubes `current-testing`.</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 08 Aug 2018 09:41:24 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Qubes-Whonix 14 SaltStack state files - Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://github.com/QubesOS/qubes-core-admin/pull/223" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/QubesOS/qubes-core-admin/pull/223</a></p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/8</link>
+        <pubDate>Wed, 08 Aug 2018 09:41:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5324-8</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324.rss">Qubes-Whonix 14 SaltStack state files - Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14 SaltStack state files - Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="6" data-topic="5324">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/awokd/40/1556_2.png" class="avatar"> awokd:</div>
+<blockquote>
+<p>Can Salt search for the first (not commented out) <code>$type:TemplateVM $default allow,target=</code> in the file, then update it instead? Not really sure of its capabilities.</p>
+</blockquote>
+</aside>
+<p>I guess so. Could you open a qubes-issue please?</p>
+<p>What about salt commenting out the offending ones rather then keeping them?</p>
+<aside class="quote no-group" data-post="6" data-topic="5324">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/awokd/40/1556_2.png" class="avatar"> awokd:</div>
+<blockquote>
+<p>I confirmed <code>qubesctl state.sls qvm.anon-whonix</code> will create a sys-whonix with the -14 template if it does not already exist, but not update it to -14 if it does. Guess this would be difficult to automate because it would have to search out everything set to use the old sys-whonix and temporarily disable it before it could update to new.</p>
+</blockquote>
+</aside>
+<p>You mean this one…?</p>
+<p><a href="https://github.com/QubesOS/qubes-issues/issues/4177" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/QubesOS/qubes-issues/issues/4177</a></p>
+<hr>
+<p>Added Whonix settings to Qubes base file versions:</p>
+<p><a href="https://github.com/QubesOS/qubes-core-admin/pull/222" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/QubesOS/qubes-core-admin/pull/222</a></p>
+<p><a href="https://github.com/QubesOS/qubes-core-admin/pull/221" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/QubesOS/qubes-core-admin/pull/221</a></p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-core-admin/blob/master/qubes-rpc-policy/qubes.UpdatesProxy.policy" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/QubesOS/qubes-core-admin/blob/master/qubes-rpc-policy/qubes.UpdatesProxy.policy" target="_blank" rel="nofollow noopener">QubesOS/qubes-core-admin/blob/master/qubes-rpc-policy/qubes.UpdatesProxy.policy</a></h4>
+<pre><code class="lang-policy">## Note that policy parsing stops at the first match,
+## so adding anything below "$anyvm $anyvm action" line will have no effect
+
+## Please use a single # to start your custom comments
+
+# Upgrade all TemplateVMs through sys-whonix.
+#$type:TemplateVM $default allow,target=sys-whonix
+
+# Upgrade Whonix TemplateVMs through sys-whonix.
+$tag:whonix-updatevm $default allow,target=sys-whonix
+
+# Deny Whonix TemplateVMs using UpdatesProxy of any other VM.
+$tag:whonix-updatevm $anyvm deny
+
+# Default rule for all TemplateVMs - direct the connection to sys-net
+$type:TemplateVM $default allow,target=sys-net
+
+$anyvm $anyvm deny
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-core-admin/blob/master/qubes-rpc-policy/qubes.GetDate.policy" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/QubesOS/qubes-core-admin/blob/master/qubes-rpc-policy/qubes.GetDate.policy" target="_blank" rel="nofollow noopener">QubesOS/qubes-core-admin/blob/master/qubes-rpc-policy/qubes.GetDate.policy</a></h4>
+<pre><code class="lang-policy">## Note that policy parsing stops at the first match,
+## so adding anything below "$anyvm $anyvm action" line will have no effect
+
+## Please use a single # to start your custom comments
+
+$tag:anon-vm	$anyvm	deny
+$anyvm	$anyvm	allow,target=dom0
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/7</link>
+        <pubDate>Wed, 08 Aug 2018 09:32:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5324-7</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324.rss">Qubes-Whonix 14 SaltStack state files - Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14 SaltStack state files - Testers Wanted!</title>
+        <dc:creator><![CDATA[awokd]]></dc:creator>
+        <description><![CDATA[
+            <p>Can Salt search for the first (not commented out) <code>$type:TemplateVM $default allow,target=</code> in the file, then update it instead? Not really sure of its capabilities.</p>
+<p>I confirmed <code>qubesctl state.sls qvm.anon-whonix</code> will create a sys-whonix with the -14 template if it does not already exist, but not update it to -14 if it does. Guess this would be difficult to automate because it would have to search out everything set to use the old sys-whonix and temporarily disable it before it could update to new.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/6</link>
+        <pubDate>Wed, 25 Jul 2018 07:50:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5324-6</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324.rss">Qubes-Whonix 14 SaltStack state files - Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14 SaltStack state files - Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="4" data-topic="5324">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/awokd/40/1556_2.png" class="avatar"> awokd:</div>
+<blockquote>
+<p>It’s first match so technically will work, but not very clean.</p>
+</blockquote>
+</aside>
+<p>What would you suggest?</p>
+<p>Related:<br>
+<a href="https://github.com/QubesOS/qubes-issues/issues/3994" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/QubesOS/qubes-issues/issues/3994</a></p>
+<aside class="quote no-group" data-post="4" data-topic="5324">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/awokd/40/1556_2.png" class="avatar"> awokd:</div>
+<blockquote>
+<p>Is there also a Salt command to update sys-whonix to 14, or does that just need a template change to whonix-gw-14?</p>
+</blockquote>
+</aside>
+<aside class="quote quote-modified" data-post="1" data-topic="5529">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/qubes-whonix-14-0-0-7-9-templatevms-for-r3-2-and-r4-testers-wanted/5529">Qubes-Whonix 14.0.0.7.9 TemplateVMs for R3.2 and R4 -- Testers Wanted!</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/news"><span class="badge-category-bg" style="background-color: #AB9364;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="News posted by Whonix staff. The Whonix Blog.">News</span></a>
+  </div>
+  <blockquote>
+    <a href="https://www.whonix.org/wiki/Qubes/Install/Testing" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/wiki/Qubes/Install/Testing</a>
+  </blockquote>
+</aside>
+
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="" height="">
+      <a href="https://www.whonix.org/wiki/Qubes/Install/Testing" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:200/215;"><img src="//forums.whonix.org/uploads/default/original/2X/e/e2461eab72ca4919cde74fadee7f466018729977.png" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Qubes/Install/Testing" target="_blank" rel="nofollow noopener">Qubes/Install/Testing</a></h3>
+
+<p>HowTo: Install the Testers-Only Version of Qubes-Whonix</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="" height="">
+      <a href="https://www.whonix.org/wiki/Upgrading_Whonix_13_to_Whonix_14" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/426;"><img src="//forums.whonix.org/uploads/default/original/2X/e/e9cb90c4f911ee2e0c6036925a2512bcd7567b94.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Upgrading_Whonix_13_to_Whonix_14" target="_blank" rel="nofollow noopener">Upgrading Whonix 13 to Whonix 14</a></h3>
+
+<p>How to Upgrade from Whonix 13.x to Whonix 14.x</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/5</link>
+        <pubDate>Wed, 25 Jul 2018 07:29:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5324-5</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324.rss">Qubes-Whonix 14 SaltStack state files - Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14 SaltStack state files - Testers Wanted!</title>
+        <dc:creator><![CDATA[awokd]]></dc:creator>
+        <description><![CDATA[
+            <p>Updated to latest testing and <code>sudo qubesctl state.sls qvm.anon-whonix</code> and <code>sudo qubesctl state.sls qvm.whonix-ws-dvm</code> work now.</p>
+<p><code>sudo qubesctl state.sls qvm.updates-via-whonix</code> is still glitchy. For example, if the first line of <code>qubes.UpdatesProxy</code> is <code>$type:TemplateVM $default allow,target=sys-net</code>, running the Salt command results in it prepending <code>$type:TemplateVM $default allow,target=sys-whonix</code> to the file. It’s first match so technically will work, but not very clean.</p>
+<p>Is there also a Salt command to update sys-whonix to 14, or does that just need a template change to whonix-gw-14?</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/4</link>
+        <pubDate>Wed, 25 Jul 2018 07:12:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5324-4</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324.rss">Qubes-Whonix 14 SaltStack state files - Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14 SaltStack state files - Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-issues/issues/4082" target="_blank" rel="nofollow noopener">github.com/QubesOS/qubes-issues</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/adrelanos" rel="nofollow noopener">
+<img src="//forums.whonix.org/uploads/default/original/2X/7/770a15f475a1de4a6ba4d68ffb96bd85c7274aa0.jpg" class="thumbnail onebox-avatar" width="96" height="96">
+</a>
+
+<h4><a href="https://github.com/QubesOS/qubes-issues/issues/4082" target="_blank" rel="nofollow noopener">Issue: Qubes-Whonix salt failing - sudo qubesctl state.sls qvm.anon-whonix dom0</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/4082" target="_blank" rel="nofollow noopener">2018-07-15</a>
+	</div>
+	<div class="user">
+	closed by <a href="https://github.com/andrewdavidwong" target="_blank" rel="nofollow noopener">andrewdavidwong</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/4082" target="_blank" rel="nofollow noopener">2018-07-15</a>
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">Qubes OS version:
+R4
+Affected component(s):
+Qubes-Whonix
+Steps to reproduce the behavior:
+sudo qubesctl state.sls qvm.anon-whonix dom0
+Expected behavior:
+Functional, anon-whonix created, no error messages.
+Actual behavior:
+[WARNING ] /var/cache/salt/minion/extmods/states/ext_state_qvm.py:142:...</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: Whonix</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: mgmt</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">bug</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">resolved</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/3</link>
+        <pubDate>Sun, 15 Jul 2018 15:37:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5324-3</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324.rss">Qubes-Whonix 14 SaltStack state files - Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14 SaltStack state files - Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Please first <a href="https://www.whonix.org/wiki/Update">https://www.whonix.org/wiki/Update</a> as usual since many fixes are in the repository such as Tor Browser in DispVM preinstallation.</p>
+<hr>
+<p>This one every tester might like to test.</p>
+<blockquote>
+<p>Installs ‘anon-whonix’ AppVM.</p>
+</blockquote>
+<pre><code>sudo qubesctl state.sls qvm.anon-whonix
+</code></pre>
+<hr>
+<p>This one every tester might like to test.</p>
+<blockquote>
+<p>Installs ‘whonix-ws-dvm’ AppVM as a base for Disposable VMs.</p>
+</blockquote>
+<pre><code>sudo qubesctl state.sls qvm.whonix-ws-dvm
+</code></pre>
+<hr>
+<p>This depends on your personal preference.</p>
+<blockquote>
+<p>Setup UpdatesProxy to always use sys-whonix all TemplateVMs are upgraded over Tor.</p>
+</blockquote>
+<pre><code>sudo qubesctl state.sls qvm.updates-via-whonix
+</code></pre>
+<hr>
+<p>( <a href="https://www.whonix.org/wiki/Dev/Qubes#salt">https://www.whonix.org/wiki/Dev/Qubes#salt</a> )</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/2</link>
+        <pubDate>Thu, 14 Jun 2018 07:45:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5324-2</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324.rss">Qubes-Whonix 14 SaltStack state files - Testers Wanted!</source>
+      </item>
+      <item>
+        <title>Qubes-Whonix 14 SaltStack state files - Testers Wanted!</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Qubes ticket:</p>
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-issues/issues/3765" target="_blank" rel="nofollow noopener">github.com/QubesOS/qubes-issues</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/adrelanos" rel="nofollow noopener">
+<img src="//forums.whonix.org/uploads/default/original/2X/7/770a15f475a1de4a6ba4d68ffb96bd85c7274aa0.jpg" class="thumbnail onebox-avatar" width="96" height="96">
+</a>
+
+<h4><a href="https://github.com/QubesOS/qubes-issues/issues/3765" target="_blank" rel="nofollow noopener">Issue: Qubes-Whonix 14 SaltStack state files required</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/3765" target="_blank" rel="nofollow noopener">2018-03-30</a>
+	</div>
+	<div class="user">
+	closed by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/3765" target="_blank" rel="nofollow noopener">2018-07-15</a>
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">I am not sure it was a good idea to go for versioned (suffixing -14) Whonix template names.
+We now have the...</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: Whonix</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">C: mgmt</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">P: major</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">task</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Available for Qubes <code>current-testing</code>.</p>
+          <p><a href="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324/1</link>
+        <pubDate>Wed, 13 Jun 2018 07:23:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-5324-1</guid>
+        <source url="http://forums.whonix.org/t/qubes-whonix-14-saltstack-state-files-testers-wanted/5324.rss">Qubes-Whonix 14 SaltStack state files - Testers Wanted!</source>
+      </item>
+  </channel>
+</rss>

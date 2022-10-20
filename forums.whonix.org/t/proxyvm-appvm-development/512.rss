@@ -1,0 +1,1384 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>ProxyVM + AppVM Development</title>
+    <link>http://forums.whonix.org/t/proxyvm-appvm-development/512</link>
+    <description>I don&#39;t know how far you have gotten in getting Whonix working as an appvm but I thought I would share my code to build it as a appvm / proxyvm if you were interested.
+
+I couldn&#39;t figure out how to get the HVM to go full screen (greater than 1280x800 or something like that) and was also having the same issue of TorTransport not reachable so I decided to build Whonix as an AppVM and set the Gateway up as a Qubes Proxy VM using the Qubes template builder.
+
+I have successfully been able to build both the workstation and gateway as an AppVM which can then be used to create a ProxyVM.
+
+To build, just clone my repo [url=http://git@github.com:nrgaway/qubes-builder.git]git@github.com:nrgaway/qubes-builder.git[/url]in a fedora appvm (with lots of private user space... I used 40GB; 15-20 may work) and run ./wheezy-install in the qubes-builder directory.  It should set up all the fedora depends you need and start building.  I tried to make the build process as simple as possible for myself and it will patch qubes and whonix where needed.
+
+The original template builder had issues build a wheezy template, so I added tweaks to make it build a wheezy template.  The Whonix gateway / workstation build options are as follows: 
+[code]
+sudo ~/Whonix/whonix_build \
+  --build &quot;$1&quot; \
+  --64bit-linux \
+  --current-sources \
+  --enable-whonix-apt-repository \
+  --whonix-apt-repository-distribution stable \
+  --bare-metal \
+  --skip-verifiable \
+  --skip-sanity-tests
+[/code]
+
+The build process is still WIP.  For instance, when Whonix is building, you have to manually interject twice at this point.   The first time it will fail on grub-pc even though I marked it as a held package, so you need to uninstall grub-pc at that point (instructions in wheezy-install.README).  Also for some reason I cant umount the directory after installing Whonix (working on that issue today) so you may need to shutdown the development appvm (or umount -l /qubes-builder/qubes-src/linux-template-builder/mnt) and comment out the part in Makefile that calls qubeize.
+
+Once the template is built, install it in dom0 (instructions in README).  Run it as a normal VM (not custom).  Also, at least for now, when creating your AppVM or ProxyVM from the template, choose as a standalone, as it is easier to debug.  The first time you start the appvm/proxyvm, wait until the vm stops (look in logs for this indication) since thats when Whonix does its initialization thing.  Then restart it again and use Terminal to access (All Whonix programs also available from menu).
+
+I am now currently working on configuring the ProxyVM so it actually works :)  This will take tweaking since it expects to have a eth0 of 10.152.152.x and ProxyVM has one of 10.137.X.X (most likely 10.137.3.X if this is the 3rd netvm you installed).  I already wrote a script for torrc as follows that needs to be run, and have to search the Whonix code to see where it is relying on an interface of eth0 (proxyvm creates a new interface (vifX.0) for each appvm connecting.
+
+I am unsure at this point what else needs to be tweaked, but will dig into it further over the weekend.
+[code]
+#!/bin/bash
+
+# TODO: Obtain automatically
+IP=10.137.3.1
+
+cp /usr/share/tor/tor-service-defaults-torrc /etc/tor/torrc
+sed -i &#39;s/10.152.152.10/&#39;$IP&#39;/g&#39; /etc/tor/torrc
+cat /etc/tor/torrc
+service tor restart
+[/code]
+
+Anyway, I can be available on IRC or here to help you though the build process if you are interested.  I only started using Qubes a few weeks ago after learning about your release of Whonix on it so there may be better ways of doing things than what I have done.  Since I only started coding this three days ago, expect build errors; although I have been able to build with only manually interject 3 times.  Will get better as time progresses.
+
+I also am going to be adding encryption the the workstation appvm as part of the Whonix build process so it will be available to other platforms as well.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 18 Aug 2019 10:46:04 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Using this as general Qubes-Whonix development thread. The following is supposed as notification. It didn’t fit elsewhere and wasn’t worth a new forum thread.</p>
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-issues/issues/5254" target="_blank" rel="nofollow noopener">github.com/QubesOS/qubes-issues</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/adrelanos" rel="nofollow noopener">
+<img src="https://avatars1.githubusercontent.com/u/1985040?v=2&amp;s=96" class="thumbnail onebox-avatar" width="60" height="60">
+</a>
+
+<h4><a href="https://github.com/QubesOS/qubes-issues/issues/5254" target="_blank" rel="nofollow noopener">Issue: Qubes start menu - add support for show only in DispVM - OnlyShowIn=X-QUBES-DispVM;</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/5254" target="_blank" rel="nofollow noopener">2019-08-18</a>
+	</div>
+	<div class="user">
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">As discussed in https://groups.google.com/forum/#!topic/qubes-devel/DEQNltD2_kc upcoming change in tb-starter:
+add Tor Browser first startup popup to ask whether security slider should be set...</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">P: default</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">T: enhancement</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/QubesOS/qubes-issues/issues/5254" target="_blank" rel="nofollow noopener">github.com/QubesOS/qubes-issues</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://github.com/adrelanos" rel="nofollow noopener">
+<img src="https://avatars1.githubusercontent.com/u/1985040?v=2&amp;s=96" class="thumbnail onebox-avatar" width="60" height="60">
+</a>
+
+<h4><a href="https://github.com/QubesOS/qubes-issues/issues/5254" target="_blank" rel="nofollow noopener">Issue: Qubes start menu - add support for show only in DispVM - OnlyShowIn=X-QUBES-DispVM;</a></h4>
+
+<div class="date" style="margin-top:10px;">
+	<div class="user" style="margin-top:10px;">
+	opened by <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">adrelanos</a>
+	on <a href="https://github.com/QubesOS/qubes-issues/issues/5254" target="_blank" rel="nofollow noopener">2019-08-18</a>
+	</div>
+	<div class="user">
+	</div>
+</div>
+
+<pre class="content" style="white-space: pre-wrap;">As discussed in https://groups.google.com/forum/#!topic/qubes-devel/DEQNltD2_kc upcoming change in tb-starter:
+add Tor Browser first startup popup to ask whether security slider should be set...</pre>
+
+<div class="labels">
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">P: default</span>
+ 	<span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">T: enhancement</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/120">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/120</link>
+        <pubDate>Sun, 18 Aug 2019 10:46:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-120</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="118" data-topic="512">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"> nrgaway:</div>
+<blockquote>
+<p>So, last step is to link files whonix writes to to (like [font=courier]/root/.whonix/first_run_initializer.done[/font]) [font=courier]/rw[/font] so they will persist on reboot</p>
+</blockquote>
+</aside>
+<p>This is unfortunate, but it will not be needed anymore in more recent versions of whonix-initializer.<br>
+(Said this here <a href="https://www.whonix.org/forum/index.php/topic,707.msg5315.html#msg5315">https://www.whonix.org/forum/index.php/topic,707.msg5315.html#msg5315</a> just for the record in case someone missed that.)<br>
+([Probably] fixed in whonix-inizializer 0.9-1 and above as well as 10.0.0.1.8-developers-only and above.)</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/119">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/119</link>
+        <pubDate>Wed, 12 Nov 2014 17:40:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-119</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:111, topic:512”]Maybe no additional iptables rules are required. Depends. Because on Whonix-Gateway you can do something like this.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>It will work, because that custom SocksPort has already been prepared and connections to those are allowed.</p>
+<p>Now since using uwt for servers that shall accept connections from local network also… You’d need to figure out if the proxy you want to use supports a setting for using a SocksPort for it’s outgoing connections.[/quote]</p>
+<p>I have the updating working via Tor for tinyproxy now.  I injected these rules to [font=courier]whonix_firewall[/font]:</p>
+<pre><code class="lang-auto">## --- THE FOLLOWING WS INJECTED ---
+##     Qubes Tiny Proxy Updater
+iptables -t nat -N PR-QBS-SERVICES
+iptables -A INPUT -i vif+ -p tcp -m tcp --dport 8082 -j ACCEPT
+iptables -A OUTPUT -o vif+ -p tcp -m tcp --sport 8082 -j ACCEPT
+iptables -t nat -A PREROUTING -j PR-QBS-SERVICES
+iptables -t nat -A PR-QBS-SERVICES -d 10.137.255.254/32 -i vif+ -p tcp -m tcp --dport 8082 -j REDIRECT
+iptables -t nat -A OUTPUT -p udp -m owner --uid-owner tinyproxy -m conntrack --ctstate NEW -j DNAT --to ${ip}:53
+iptables -t nat -A OUTPUT -p tcp -m owner --uid-owner tinyproxy -m conntrack --ctstate NEW -j DNAT --to ${ip}:9040</code></pre>
+<p>So, last step is to link files whonix writes to to (like [font=courier]/root/.whonix/first_run_initializer.done[/font]) [font=courier]/rw[/font] so they will persist on reboot</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/118">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/118</link>
+        <pubDate>Wed, 12 Nov 2014 16:59:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-118</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="116" data-topic="512">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/w/c5a1d2/40.png" class="avatar"> WhonixQubes:</div>
+<blockquote>
+<p>Thanks for making this nice verbose update. I will try again with the “whonix” git branch.</p>
+</blockquote>
+</aside>
+<p>I should have done it before but was too busy with the templates.  And I am also working on the wheezy and debian templates and added many features to them.</p>
+<blockquote>Regarding this Tor Browser launching issue you're having:
+<aside class="quote">
+<blockquote>
+<p>Some issues with Whonix applications:</p>
+<p>[ul][li]Stuff like tor browser may need to be started from terminal at this point[/li][/ul]</p>
+</blockquote>
+</aside>
+<p>Just a blind stab at it, but just wanted to make sure you’re aware that pre-9.3 Whonix was having this problem of not successfully launching the Tor Browser, except from the command line. Was fixed just recently in Whonix 9.3.</p>
+<p>Not sure if that’s the issue here, but wanted to mention it in case you hadn’t seen it yet and/or are using an earlier version.</p>
+<p>Could have to do with same or related code in the “tb-starter” package…</p>
+<p><a href="https://github.com/Whonix/tb-starter" rel="nofollow noopener">https://github.com/Whonix/tb-starter</a></p>
+</blockquote>
+<p>Good to know.  I am still using the 9.2 version.  I don’t want to update to 9.3 since everything is working right now and I want to wait until most changes get merged upstream as well as being able to take advantage of the new GUI modules being written for repo maintenance and setup.</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/117">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/117</link>
+        <pubDate>Wed, 05 Nov 2014 09:11:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-117</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[WhonixQubes]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for making this nice verbose update. I will try again with the “whonix” git branch.</p>
+<p>I see the new dedicated build thread you made and will segment out those issues here:</p>
+<p><span class="bbcode-b"><a href="https://www.whonix.org/forum/index.php/topic,694.0.html" rel="nofollow noopener">https://www.whonix.org/forum/index.php/topic,694.0.html</a></span></p>
+<p>[hr]</p>
+<p>Regarding this Tor Browser launching issue you’re having:</p>
+<p>[quote=“nrgaway, post:115, topic:512”]Some issues with Whonix applications:</p>
+<p>[ul][li]Stuff like tor browser may need to be started from terminal at this point[/li][/ul][/quote]</p>
+<p>Just a blind stab at it, but just wanted to make sure you’re aware that pre-9.3 Whonix was having this problem of not successfully launching the Tor Browser, except from the command line. Was fixed just recently in Whonix 9.3.</p>
+<p>Not sure if that’s the issue here, but wanted to mention it in case you hadn’t seen it yet and/or are using an earlier version.</p>
+<p>Could have to do with same or related code in the “tb-starter” package…</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="32" height="32">
+      <a href="https://github.com/Whonix/tb-starter" target="_blank" rel="nofollow noopener">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars3.githubusercontent.com/u/4500165?s=400&amp;v=4" class="thumbnail onebox-avatar" width="400" height="400">
+
+<h3><a href="https://github.com/Whonix/tb-starter" target="_blank" rel="nofollow noopener">Whonix/tb-starter</a></h3>
+
+<p>Tor Browser Starter. Hardening support (firejail); Security Slider Choice Prompt; Open Link Confirmation; Qubes integration; Command line --new-tab, --new-window; start menu entry; Can optionally m...</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/116">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/116</link>
+        <pubDate>Wed, 05 Nov 2014 03:35:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-116</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“WhonixQubes, post:114, topic:512”]Here’s the ordered build steps I’m using:</p>
+<p><code>
+git clone https://github.com/nrgaway/qubes-builder
+cd ./qubes-builder
+git fetch
+git pull origin wheezy
+mkdir ./keyrings
+mkdir ./keyrings/git
+git checkout wheezy
+./README.whonix
+</code>[/quote]</p>
+<p>Close, the pull is in the wrong order.</p>
+<p>I just re-ran the following steps and confirm they worked for me:</p>
+<p>[ul][li]First I suggest you start completely over with a brand new AppVM.  I named mine <span class="bbcode-i">development-qubes</span>.  Base it on the ‘<span class="bbcode-i">Fedora-20-x64</span>’ template.[/li]<br>
+[li]Start AppVM from Qubes Manager[/li]<br>
+[li]Start a <span class="bbcode-b">Dom0</span> Konsole session[/li]<br>
+[li]Increase disk size to 10GB per VM you going to build, so in Dom0 Konsole type ‘[font=courier]qvm-grow-private devleopment-qubes 25GB[/font]’[/li]<br>
+[li]Start a Terminal session for new AppVM (development-qubes) and enter the following:[/li][/ul]</p>
+<pre><code class="lang-auto">git clone https://github.com/nrgaway/qubes-builder
+cd qubes-builder/
+git fetch
+git checkout whonix
+./README.whonix
+  - Answer y &lt;enter&gt; to yum update question</code></pre>
+<p>Do not create the keyrings directory, it will be created for you.</p>
+<p>Those steps will build both the gateway and workstation.  You can edit ‘[font=courier]examples/whonix.conf[/font]’ (which will be linked as ‘[font=courier]builder.conf[/font]’ after running script) to change build options to build wheezy or jessie or add gnome to those as well (just un-comment out lines you want to build).</p>
+<p>There should be no issues listed previously in this thread for any distro except Whonix can not yet update from template and you SHOULD run both the gateway and workstation as standalone until the update situation is resolved.</p>
+<p>So, once the templates are built, the last line explains how to get them to Dom0.  I actually save that line and created a script in Dom0 I use anytime I need to grab templates I built.  So you can edit a file named ‘get-templates.sh’ on dom0 and include the following"</p>
+<pre><code class="lang-auto">#!/bin/bash
+
+qvm-run --pass-io development-qubes 'cat /home/user/qubes-builder/qubes-src/linux-template-builder/rpm/install-templates.sh' &gt; install-templates.sh
+chmod a+x install-templates.sh</code></pre>
+<p>Then make the file executable and run it to grab and install the templates on dom0</p>
+<pre><code class="lang-auto">cd ~
+mkdir bin
+cd bin
+vi get-templates.sh # Add text above
+chattr a+x get-templates.sh
+./get-templates.sh
+cd /tmp
+/home/user/bin/get-templates.sh # Grabs install script
+./install-template.sh # Will download template rpm; remove old one (if installed); install new ones</code></pre>
+<p>In order to get the text I listed to dom0, here is a trick I figured out.</p>
+<pre><code class="lang-auto">- Highlight text you want to copy.
+- Right click with mouse and select 'copy'
+- Press &lt;SHIFT&gt;+&lt;CTRL&gt;+&lt;C&gt;
+- in dom0 Konsole type 'cat /run/qubes/qubes-clipboard.bin'
+- the text you just copied will be displayed in dom0 terminal so now you can highlight it from dom0 terminal and paste it where ever</code></pre>
+<p>[HR]</p>
+<p>Qubes manager options to select for gateway:</p>
+<p>[ul][li]Name: whonix-gateway[/li]<br>
+[li]Template: whonix-gateway-experimental[/li]<br>
+[li]Type: Proxy VM[/li]<br>
+[li]NetVM: firewallvm[/li]<br>
+[li]Check Standalone[/li][/ul]</p>
+<p>[ul][li]Name: whonix-workstation[/li]<br>
+[li]Template: whonix-workstation-experimental[/li]<br>
+[li]Type: AppVM[/li]<br>
+[li]NetVM: whonix-gateway[/li]<br>
+[li]Check Standalone[/li][/ul]</p>
+<p>[HR]</p>
+<p>Start the gateway from Qubes Manager.  The setup screen should come up and ask you about repo and starting Tor.  Note that the first two screens where it displays disclaimer that the buttons are not visible, so just press [font=courier][/font], then [font=courier][/font] again for second screen.  If you happen to not press [font=courier][/font], or somehow focus gets messed up, VM will power off so you will need to try again.</p>
+<p>When you are finished setup, if you get an error message from time proxy or that tor can not do a check since bootstrap not complete, try running ‘[font=courier]whonixcheck[/font]’ again, and it should succeed.</p>
+<p>Do same for Workstation.  Or you can use a regular AppVM and just select ‘[font=courier]whonix-gateway[/font]’ as its netvm.</p>
+<p>Note the first run dialog says the  password is ‘[font=courier]changeme[/font]’ when there is actually no password as per Qubes defaults.</p>
+<p>[HR]</p>
+<p>Some issues with Whonix applications:</p>
+<p>[ul][li]Some don’t run maybe?[/li]<br>
+[li]Stuff like tor browser may need to be started from terminal at this point[/li]<br>
+[li]???[/li][/ul]</p>
+<p>[HR]</p>
+<p><span class="bbcode-b">So now you have your whonix-gateway and whonix-workstation installed remember it is <span class="bbcode-u"><span class="bbcode-i">experimental</span></span> at this point.</span></p>
+<p>[HR]</p>
+<p>Test and keep a log of issues that need to be addressed and things that work compared to HVM version.</p>
+<p>Do leak tests and report results.  This is important.</p>
+<p>Don’t use it for anything important yet until leak tests, etc are confirmed.</p>
+<p>Document as must as possible, including steps here since I will rely on you for that since I still busy with completing updating template and need to move a ton of whonix code around so it saves all user configurable files in one directory structure under ‘[font=courier]/srv/whonix[/font]’ and ‘[font=courier]/srv/whonix/.whonix[/font]’ (for anything whonix writes like setup.done).  I find it more useful to have any configuration related options in one spot to make it easier to find and to get templates so they don’t need to be standalone, this will make it easier to link (bind) from the ‘[font=courier]/rw[/font]’ directory since AppVMs are essentially read-only (any data that gets written to root partition gets destroyed after VM is shut off).</p>
+<p>Please start a new thread for issues.  Maybe a few threads.  One for gateway, One for workstation and maybe one for building (like this post can be copied to that one).  I want to keep this thread to interact with progress and issues I am facing.</p>
+<p>EDIT:  Changed branch to use back to whonix.  I will update the whonix branch with stable commits.</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/115">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/115</link>
+        <pubDate>Wed, 05 Nov 2014 00:38:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-115</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[WhonixQubes]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“nrgaway, post:106, topic:512”]Keys are not being updated…</p>
+<p>In the ./qubes-builder directory where you are running the README.whonix script, type the following to update to the newest version of qubes-builder (or just delete the directory and re-clone it):</p>
+<pre><code class="lang-auto">git pull origin wheezy</code></pre>
+<p>I added some changes that will add the developers keys automatically before Whonix ones get added and tested it on a new VM here.  I am testing the complete script now from start to end as well with the new build environment.[/quote]</p>
+<p>Still encountering a fatal error with a failed signed tag verification.</p>
+<p>Error Output:</p>
+<blockquote>+ echo '--&gt; Verifying tags...'
+--&gt; Verifying tags...
++ /home/user/qubes-builder/verify-git-tag.sh qubes-src/vmm-xen FETCH_HEAD
+---&gt; One of signed tag cannot be verified:
+object d91422d53fce81e273ee21a189b4cccb88bec667
+type commit
+tag v4.1.6.1-17
+tagger Marek Marczykowski-G��recki  1414194831 +0200
+<p>version 4.1.6.1-17<br>
+gpg: WARNING: unsafe permissions on homedir `/home/user/qubes-builder/keyrings/git’<br>
+gpg: Signature made Fri Oct 24 23:53:51 2014 UTC using RSA key ID 42CFA724<br>
+gpg: Good signature from "Marek Marczykowski-G�recki (Qubes OS signing key) &lt;marmarek@&gt;"<br>
+gpg: WARNING: This key is not certified with a trusted signature!<br>
+gpg:          There is no indication that the signature belongs to the owner.<br>
+Primary key fingerprint: 0064 428F 4554 51B3 EBE7  8A7F 0639 38BA 42CF A724<br>
+No valid signed tag found!</p>
+<ul>
+<li>exit 1<br>
+make: *** [get-sources] Error 1<br>
+[user@vm qubes-builder]$</li>
+</ul>
+</blockquote>
+
+<p>Here’s the ordered build steps I’m using:</p>
+<pre><code class="lang-auto">git clone https://github.com/nrgaway/qubes-builder
+cd ./qubes-builder
+git fetch
+git pull origin wheezy
+mkdir ./keyrings
+mkdir ./keyrings/git
+git checkout wheezy
+./README.whonix</code></pre>
+<p>A signed tag could not be verified and exited with a fatal error:</p>
+<blockquote>---&gt; One of signed tag cannot be verified:
+object d91422d53fce81e273ee21a189b4cccb88bec667</blockquote>
+<blockquote>No valid signed tag found!
++ exit 1
+make: *** [get-sources] Error 1</blockquote>
+<p>Also:</p>
+<p>The “mkdir ./keyrings” and “mkdir ./keyrings/git” commands can surely be handled by the build script. In fact, gpg also complains about “unsafe permissions”, so maybe the permissions could be better tweaked as well. But automating directory creation is the basic need.</p>
+<blockquote>gpg: WARNING: unsafe permissions on homedir `/home/user/qubes-builder/keyrings/git'</blockquote>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/114">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/114</link>
+        <pubDate>Tue, 04 Nov 2014 19:49:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-114</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:108, topic:512”]Fixed typo, thanks!<br>
+</p><aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/uwt/commit/b5bb328adfa3c07e78bbf99cfb42223933a8af9b" target="_blank" rel="nofollow noopener">github.com/Whonix/uwt</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/uwt/commit/b5bb328adfa3c07e78bbf99cfb42223933a8af9b" target="_blank" rel="nofollow noopener">Fixed apt-get stream isolation port, thanks to nrgaway for the report!</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2014-11-04" data-time="16:14:57" data-timezone="UTC">04:14PM - 04 Nov 14 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="nofollow noopener">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 1 deletions">
+        <a href="https://github.com/Whonix/uwt/commit/b5bb328adfa3c07e78bbf99cfb42223933a8af9b" target="_blank" rel="nofollow noopener">
+          <span class="added">+1</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>[hr]</p>
+<p>Where to you get the {ip} variable from?[/quote]</p>
+<p>I wrote the startup script that brings up the internal interface since it is not brought up by network manager or using the ‘/etc/network/interfaces’ configuration file.  Right before the iptables are injected I created the internal interface with the address of {ip}, then I do a search and replace on ips a bit of housekeeping then afterwards call ‘whonix_firewall’</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/113">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/113</link>
+        <pubDate>Tue, 04 Nov 2014 16:55:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-113</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="109" data-topic="512">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>I don’t know yet, what you need tinyproxy for? Is it’s purpose to do some kind of caching? For saving apt traffic? For the latter a proxy that understands apt such as apt-cacher-ng would be more suitable? apt-cacher-ng can be socksified. (So it can go through Tor. Did that once, dunno anymore how, but its in git history, I could figure out again if required.)</p>
+</blockquote>
+</aside>
+<p>The proxy is not for caching or saving traffic.  Its sole purpose is to filter and limit traffic to only update repos for apt-get and yum and prevent any other type of traffic from proceeding though.</p>
+<p>[quote=“Marek”]This HTTP proxy is to block access to everything but updates - to not let the<br>
+user to use the template to anything else but software installation/update.</p>
+<p>Details about the reasoning are here:<br>
+<a href="https://wiki.qubes-os.org/ticket/568" data-bbcode="true" rel="nofollow noopener">https://wiki.qubes-os.org/ticket/568</a>[/quote]</p>
+<aside class="quote">
+<div class="title">
+<div class="quote-controls"></div>
+ Qubes-FAQ:</div>
+<blockquote>
+<p>Each AppVM is created from a TemplateVM and shares the root filesystem with this TemplateVM (in a read-only manner). This means that each AppVM needs only as much disk space as is necessary to store its own private data. This also means that it is possible to update the software for several AppVMs simultaneously by running a single update process in the TemplateVM upon which those AppVMs are based. (These AppVMs will then have to be restarted in order for the update to take effect in them.)</p>
+</blockquote>
+</aside>
+<p>The base templates in Qubes do not have access to the network to keep them isolated since many AppVM’s used on top of the base template.  For instance there is a Fedora-20-x86 base template and one would use it as a base to create an Email, Web, Work, Home, etc AppVM.  The AppVM use a copy of the base template and when the AppVM is shutdown any data that was written to the root is lost.  This helps keep the AppVM’s clean from malicious software and keeps them light weight.</p>
+<p>Since the base templates have no network access by default, the developers created a proxy that allows very restricted access to the base templates for updating only.   Here are the filter rules that are in effect to prevent the template from being able to access anything else but repositories:</p>
+<pre><code class="lang-auto">/repodata/[A-Za-z0-9-]*\(primary\|filelists\|comps\(-[a-z0-9]*\)\?\|other\|prestodelta\|updateinfo\|pkgtags\)\.\(sqlite\|xml\)\(\.bz2\|\.gz\)\?$
+/repodata/repomd\.xml$
+\.rpm$
+\.drpm$
+^mirrors\.fedoraproject\.org:443$
+^http://mirrors\..*/mirrorlist\?
+\.deb$
+/dists/[a-z-]*/\(InRelease\|Release\|Release.gpg\)$
+/dists/[a-z-]*/.*/\(Packages\|Sources\|Release\)\(\|\.gz\|\.bz2\|\.xz\|\.lzma\)$
+/dists/[a-z-]*/.*/\(Contents\|Translation\)-.*\(\|\.gz\|\.xz\|\.bz2\|\.lzma\)$
+/dists/[a-z-]*/.*/\(Contents-.*\|Translation-.*\|Packages\)\.diff/\(Index\|[0-9.-]*\)\(\|\.gz\|\.xz\|\.bz2\|\.lzma\)$</code></pre>
+<p>So</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/112">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/112</link>
+        <pubDate>Tue, 04 Nov 2014 16:51:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-112</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Maybe no additional iptables rules are required. Depends. Because on Whonix-Gateway you can do something like this.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>It will work, because that custom SocksPort has already been prepared and connections to those are allowed.</p>
+<p>Now since using uwt for servers that shall accept connections from local network also… You’d need to figure out if the proxy you want to use supports a setting for using a SocksPort for it’s outgoing connections.</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/111">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/111</link>
+        <pubDate>Tue, 04 Nov 2014 16:47:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-111</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="107" data-topic="512">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"> nrgaway:</div>
+<blockquote>
+<p>The tinyproxy software listens on the internal interface port 8082 and is run by the tinyproxy user and group.  I initially created a uwt wrapper for it, but then the workstation could not see it anymore <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+</blockquote>
+</aside>
+<p>Because with a uwt wrapper all connections are forced though torsocks thereby through a Tor SocksPort and therefore you cannot access the local network anymore. (Unless you figure out to switch some settings in torsocks or other trickery or so.)</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/110">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/110</link>
+        <pubDate>Tue, 04 Nov 2014 16:33:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-110</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I don’t know yet, what you need tinyproxy for? Is it’s purpose to do some kind of caching? For saving apt traffic? For the latter a proxy that understands apt such as apt-cacher-ng would be more suitable? apt-cacher-ng can be socksified. (So it can go through Tor. Did that once, dunno anymore how, but its in git history, I could figure out again if required.)</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/109">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/109</link>
+        <pubDate>Tue, 04 Nov 2014 16:27:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-109</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Fixed typo, thanks!<br>
+</p><aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/uwt/commit/b5bb328adfa3c07e78bbf99cfb42223933a8af9b" target="_blank">github.com/Whonix/uwt</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/uwt/commit/b5bb328adfa3c07e78bbf99cfb42223933a8af9b" target="_blank">Fixed apt-get stream isolation port, thanks to nrgaway for the report!</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2014-11-04" data-time="16:14:57" data-timezone="UTC">04:14PM - 04 Nov 14 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 1 files with 1 additions and 1 deletions">
+        <a href="https://github.com/Whonix/uwt/commit/b5bb328adfa3c07e78bbf99cfb42223933a8af9b" target="_blank">
+          <span class="added">+1</span>
+          <span class="removed">-1</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>[hr]</p>
+<p>Where to you get the {ip} variable from?</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/108">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/108</link>
+        <pubDate>Tue, 04 Nov 2014 16:17:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-108</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:104, topic:512”](Going to link to a specific git commit. Line numbers may change in later revisions.) [Not addressing you, you probably know that, but I try to keep my answers generic, so someone who does not know that and reads it much alter cannot be confused.]</p>
+<p>Essentially after the “Flush old rules.” (line 218 <a href="https://github.com/Whonix/whonix-gw-firewall/blob/827ea83bed41256bda33ab69c173df2878966a30/usr/bin/whonix_firewall#L218" rel="nofollow noopener">https://github.com/Whonix/whonix-gw-firewall/blob/827ea83bed41256bda33ab69c173df2878966a30/usr/bin/whonix_firewall#L218</a>) or eventually after the “IPv4 DROP INVALID INCOMING PACKAGES” (line 240 <a href="https://github.com/Whonix/whonix-gw-firewall/blob/827ea83bed41256bda33ab69c173df2878966a30/usr/bin/whonix_firewall#L240" rel="nofollow noopener">https://github.com/Whonix/whonix-gw-firewall/blob/827ea83bed41256bda33ab69c173df2878966a30/usr/bin/whonix_firewall#L240</a>) would be a good place for experimentally adding your firewall rules.</p>
+<p>Ideally your iptables firewall rules are already functioning under a wheezy iptables drop all by default situation.</p>
+<p><code>iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP</code></p>
+<p>(You could also undo this, but I guess it be much better for deeper understanding to leave that as is.)</p>
+<p>If that works, we can perhaps add some kind of hook mechanism so you don’t have to patch it.</p>
+<p>What else could go wrong… You still have no functional system DNS and I hope you won’t need it. A solution can be found either way.[/quote]</p>
+<p>Yup, you were right, that was the perfect spot to inject the tinyproxy rules!</p>
+<p>I was able to get the iptables rules working properly so now the workstation can talk to the gateway proxy server without an issue.  Now I need to figure out how get get the proxy server on the gateway to be able to connect through Tor to outside world to the Debian servers.  What firewall rule would be required?</p>
+<p>The tinyproxy software listens on the internal interface port 8082 and is run by the tinyproxy user and group.  I initially created a uwt wrapper for it, but then the workstation could not see it anymore <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<p>Here is the firewall code I am using to inject the rules into ‘whonix_firewall’:</p>
+<pre><code class="lang-auto">       # Inject custom firewall rules into whonix_firewall
+        sed -i -f - /usr/bin/whonix_firewall &lt;&lt;-EOF
+                /^## IPv4 DROP INVALID INCOMING PACKAGES/,/######################################/c \\
+                ## IPv4 DROP INVALID INCOMING PACKAGES \\
+                ## \\
+                ## --- THE FOLLOWING WS INJECTED --- \\
+                ##     Qubes Tiny Proxy Updater \\
+                iptables -t nat -N PR-QBS-SERVICES \\
+                iptables -A INPUT -i vif+ -p tcp -m tcp --dport 8082 -j ACCEPT \\
+                iptables -A OUTPUT -o vif+ -p tcp -m tcp --sport 8082 -j ACCEPT \\
+                iptables -t nat -A PREROUTING -j PR-QBS-SERVICES \\
+                iptables -t nat -A PR-QBS-SERVICES -d 10.137.255.254/32 -i vif+ -p tcp -m tcp --dport 8082 -j REDIRECT \\
+                \\
+                # Route any traffic FROM netvm TO netvm BACK-TO localhost \\
+                # Allows localhost access to tor network \\ 
+                iptables -t nat -A OUTPUT -s ${ip} -d ${ip} -j DNAT --to-destination 127.0.0.1 \\
+                ###################################### 
+                EOF</code></pre>
+<p>PS.  In ‘/etc/uwt.d/30_uwt_default’, there is a typo:</p>
+<pre><code class="lang-auto">uwtport["/usr/bin/apt-get"]="9105"</code></pre>
+<p>Should be (as defined in ‘whonix_firewall’ and ‘apt-get.anondist’:</p>
+<pre><code class="lang-auto">uwtport["/usr/bin/apt-get"]="9104"</code></pre>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/107">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/107</link>
+        <pubDate>Tue, 04 Nov 2014 15:54:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-107</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“WhonixQubes, post:105, topic:512”]Build issues:</p>
+<p>[hr]</p>
+<p>First confirming that the “wheezy” branch should now be used to build Whonix, and NOT the “whonix” branch?</p>
+<p>According to:</p>
+<aside class="quote">
+<blockquote>
+<p>If you decide to build this, grab my ‘qubes-builder’ repo and git fetch; git checkout wheezy to use wheezy branch, not whonix.  Then you just have to run the ./README.whonix file to build.</p>
+</blockquote>
+</aside>
+<p>Using to build:</p>
+<pre><code class="lang-auto">git clone https://github.com/nrgaway/qubes-builder
+cd ./qubes-builder
+git fetch
+git checkout wheezy
+./README.whonix</code></pre>
+<p>[hr]</p>
+<p>Error: /home/user/qubes-builder/keyrings/git directory does not exist</p>
+<aside class="quote">
+<blockquote>
+<h1>Whonix Keyring</h1>
+<h1>XXX: Check where this is being stored… Keyrings make sense</h1>
+<p>DIR="$(readlink -m .)"; <br>
+KEYRING_DIR_GIT="$DIR/keyrings/git"; <br>
+export GNUPGHOME="$(readlink -m $KEYRING_DIR_GIT)"; <br>
+echo ‘916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA:6:’ | gpg --import-ownertrust; <br>
+gpg --import keys_debian/whonix-developer-patrick.asc; <br>
+gpg --list-keys; <br>
+touch “$GNUPGHOME/pubring.gpg”;<br>
+gpg: keyblock resource <code>/home/user/qubes-builder/keyrings/git/secring.gpg': file open error gpg: keyblock resource</code>/home/user/qubes-builder/keyrings/git/pubring.gpg’: file open error<br>
+gpg: fatal: /home/user/qubes-builder/keyrings/git: directory does not exist!<br>
+secmem usage: 0/0 bytes in 0/0 blocks of pool 0/32768<br>
+gpg: keyblock resource <code>/home/user/qubes-builder/keyrings/git/secring.gpg': file open error gpg: keyblock resource</code>/home/user/qubes-builder/keyrings/git/pubring.gpg’: file open error<br>
+gpg: no writable keyring found: eof<br>
+gpg: error reading <code>keys_debian/whonix-developer-patrick.asc': general error gpg: import from</code>keys_debian/whonix-developer-patrick.asc’ failed: general error<br>
+gpg: Total number processed: 0<br>
+gpg: keyblock resource `/home/user/qubes-builder/keyrings/git/pubring.gpg’: file open error<br>
+gpg: fatal: /home/user/qubes-builder/keyrings/git: directory does not exist!<br>
+secmem usage: 0/0 bytes in 0/0 blocks of pool 0/32768<br>
+touch: cannot touch ‘/home/user/qubes-builder/keyrings/git/pubring.gpg’: No such file or directory<br>
+make: *** [get-sources] Error 1<br>
+[user@vm qubes-builder]$</p>
+</blockquote>
+</aside>
+<p>Workaround used to bypass this fatal error of creating empty “./keyrings” and “./keyrings/git” directories before running the build script.</p>
+<p>[hr]</p>
+<p>Error: One of signed tag cannot be verified<br>
+Error: gpg: Can’t check signature: public key not found<br>
+Error: error: could not verify the tag ‘v4.1.6.1-17’</p>
+<aside class="quote">
+<blockquote>
+<ul>
+<li>echo ‘–&gt; Verifying tags…’<br>
+–&gt; Verifying tags…</li>
+<li>/home/user/qubes-builder/verify-git-tag.sh qubes-src/vmm-xen HEAD<br>
+—&gt; One of signed tag cannot be verified:<br>
+object d91422d53fce81e273ee21a189b4cccb88bec667<br>
+type commit<br>
+tag v4.1.6.1-17<br>
+tagger Marek Marczykowski-G��recki &lt;marmarek@&gt; 1414194831 +0200</li>
+</ul>
+<p>version 4.1.6.1-17<br>
+gpg: WARNING: unsafe permissions on homedir `/home/user/qubes-builder/keyrings/git’<br>
+gpg: Signature made Fri Oct 24 23:53:51 2014 UTC using RSA key ID 42CFA724<br>
+gpg: Can’t check signature: public key not found<br>
+error: could not verify the tag 'v4.1.6.1-17’<br>
+No valid signed tag found!</p>
+<ul>
+<li>exit 1<br>
+make: *** [get-sources] Error 1<br>
+[user@vm qubes-builder]$</li>
+</ul>
+</blockquote>
+</aside>
+<p>Experienced each time on multiple build attempts. Haven’t resolved yet.</p>
+<p>[hr][/quote]</p>
+<p>Keys are not being updated…</p>
+<p>In the ./qubes-builder directory where you are running the README.whonix script, type the following to update to the newest version of qubes-builder (or just delete the directory and re-clone it):</p>
+<pre><code class="lang-auto">git pull origin wheezy</code></pre>
+<p>I added some changes that will add the developers keys automatically before Whonix ones get added and tested it on a new VM here.  I am testing the complete script now from start to end as well with the new build environment.</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/106">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/106</link>
+        <pubDate>Tue, 04 Nov 2014 15:39:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-106</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[WhonixQubes]]></dc:creator>
+        <description><![CDATA[
+            <p>Build issues:</p>
+<p>[hr]</p>
+<p>First confirming that the “wheezy” branch should now be used to build Whonix, and NOT the “whonix” branch?</p>
+<p>According to:</p>
+<aside class="quote" data-post="76" data-topic="512">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"> nrgaway:</div>
+<blockquote>
+<p>If you decide to build this, grab my ‘qubes-builder’ repo and git fetch; git checkout wheezy to use wheezy branch, not whonix.  Then you just have to run the ./README.whonix file to build.</p>
+</blockquote>
+</aside>
+<p>Using to build:</p>
+<pre><code class="lang-auto">git clone https://github.com/nrgaway/qubes-builder
+cd ./qubes-builder
+git fetch
+git checkout wheezy
+./README.whonix</code></pre>
+<p>[hr]</p>
+<p>Error: /home/user/qubes-builder/keyrings/git directory does not exist</p>
+<blockquote># Whonix Keyring
+# XXX: Check where this is being stored... Keyrings make sense
+DIR="$(readlink -m .)"; \
+KEYRING_DIR_GIT="$DIR/keyrings/git"; \
+export GNUPGHOME="$(readlink -m $KEYRING_DIR_GIT)"; \
+echo '916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA:6:' | gpg --import-ownertrust; \
+gpg --import keys_debian/whonix-developer-patrick.asc; \
+gpg --list-keys; \
+touch "$GNUPGHOME/pubring.gpg";
+gpg: keyblock resource `/home/user/qubes-builder/keyrings/git/secring.gpg': file open error
+gpg: keyblock resource `/home/user/qubes-builder/keyrings/git/pubring.gpg': file open error
+gpg: fatal: /home/user/qubes-builder/keyrings/git: directory does not exist!
+secmem usage: 0/0 bytes in 0/0 blocks of pool 0/32768
+gpg: keyblock resource `/home/user/qubes-builder/keyrings/git/secring.gpg': file open error
+gpg: keyblock resource `/home/user/qubes-builder/keyrings/git/pubring.gpg': file open error
+gpg: no writable keyring found: eof
+gpg: error reading `keys_debian/whonix-developer-patrick.asc': general error
+gpg: import from `keys_debian/whonix-developer-patrick.asc' failed: general error
+gpg: Total number processed: 0
+gpg: keyblock resource `/home/user/qubes-builder/keyrings/git/pubring.gpg': file open error
+gpg: fatal: /home/user/qubes-builder/keyrings/git: directory does not exist!
+secmem usage: 0/0 bytes in 0/0 blocks of pool 0/32768
+touch: cannot touch '/home/user/qubes-builder/keyrings/git/pubring.gpg': No such file or directory
+make: *** [get-sources] Error 1
+[user@vm qubes-builder]$</blockquote>
+<p>Workaround used to bypass this fatal error of creating empty “./keyrings” and “./keyrings/git” directories before running the build script.</p>
+<p>[hr]</p>
+<p>Error: One of signed tag cannot be verified<br>
+Error: gpg: Can’t check signature: public key not found<br>
+Error: error: could not verify the tag ‘v4.1.6.1-17’</p>
+<blockquote>+ echo '--&gt; Verifying tags...'
+--&gt; Verifying tags...
++ /home/user/qubes-builder/verify-git-tag.sh qubes-src/vmm-xen HEAD
+---&gt; One of signed tag cannot be verified:
+object d91422d53fce81e273ee21a189b4cccb88bec667
+type commit
+tag v4.1.6.1-17
+tagger Marek Marczykowski-G��recki  1414194831 +0200
+<p>version 4.1.6.1-17<br>
+gpg: WARNING: unsafe permissions on homedir `/home/user/qubes-builder/keyrings/git’<br>
+gpg: Signature made Fri Oct 24 23:53:51 2014 UTC using RSA key ID 42CFA724<br>
+gpg: Can’t check signature: public key not found<br>
+error: could not verify the tag 'v4.1.6.1-17’<br>
+No valid signed tag found!</p>
+<ul>
+<li>exit 1<br>
+make: *** [get-sources] Error 1<br>
+[user@vm qubes-builder]$</li>
+</ul>
+</blockquote>
+
+<p>Experienced each time on multiple build attempts. Haven’t resolved yet.</p>
+<p>[hr]</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/105">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/105</link>
+        <pubDate>Tue, 04 Nov 2014 09:14:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-105</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>So the rule works in wheezy without firewall, but I am having problems sorting though the Whonix firewall code to get the firewall not to drop the connection.  What is happening is the template VM connects and immediately get disconnected.</blockquote>
+Whonix's firewall /usr/bin/whonix_firewall in a nutshell:
+1) goes up before the network goes up
+2) if it fails to load (non-zero exit codes), network does not get up
+3) first of all, it sets all iptabels policies to drop as a safety net and because a traffic white listing approach is best
+4) having that said: next is to remove any iptables rules so we can cleanly load eventually changed rules (we're still protected by iptables default policy drop)
+5) then it loads all firewall rules useful for Whonix
+<p>After 4) would be a good time to conditionally use your alternative iptables rules.</p>
+<p>(Going to link to a specific git commit. Line numbers may change in later revisions.) [Not addressing you, you probably know that, but I try to keep my answers generic, so someone who does not know that and reads it much alter cannot be confused.]</p>
+<p>Essentially after the “Flush old rules.” (line 218 <a href="https://github.com/Whonix/whonix-gw-firewall/blob/827ea83bed41256bda33ab69c173df2878966a30/usr/bin/whonix_firewall#L218">https://github.com/Whonix/whonix-gw-firewall/blob/827ea83bed41256bda33ab69c173df2878966a30/usr/bin/whonix_firewall#L218</a>) or eventually after the “IPv4 DROP INVALID INCOMING PACKAGES” (line 240 <a href="https://github.com/Whonix/whonix-gw-firewall/blob/827ea83bed41256bda33ab69c173df2878966a30/usr/bin/whonix_firewall#L240">https://github.com/Whonix/whonix-gw-firewall/blob/827ea83bed41256bda33ab69c173df2878966a30/usr/bin/whonix_firewall#L240</a>) would be a good place for experimentally adding your firewall rules.</p>
+<p>Ideally your iptables firewall rules are already functioning under a wheezy iptables drop all by default situation.</p>
+<p><code>iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP</code></p>
+<p>(You could also undo this, but I guess it be much better for deeper understanding to leave that as is.)</p>
+<p>If that works, we can perhaps add some kind of hook mechanism so you don’t have to patch it.</p>
+<p>What else could go wrong… You still have no functional system DNS and I hope you won’t need it. A solution can be found either way.</p>
+<blockquote>I think this error may have something to do with it
+[code]
+Nov  2 18:59:56 host Tor[4388]: Rejecting request for anonymous connection to private address [scrubbed] on a TransPort or NATDPort.  Possible loop in your NAT rules? [4 similar message(s) suppressed in last 300 seconds]
+[/code]</blockquote>
+Yes.
+(Not exactly it, but a related message is documented here: https://www.whonix.org/wiki/Arm#Arm_FAQ)
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/104">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/104</link>
+        <pubDate>Mon, 03 Nov 2014 06:04:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-104</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“nrgaway, post:102, topic:512”]Sure, I will take a look at implementing some type of Makefile.  I hate them too, but they are useful.  Mostly they will just call whatever existing scripts you already have anyway except for the newer features I plan to add.</p>
+<p>[HR]</p>
+<p>I have figured out how to update the template by just adding another 50_uwt_default rule with a conditional within it to detect if its a template and if it is disable uwt for apt-get and then apt-get will use a proxy.[/quote]<br>
+Great!</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/103">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/103</link>
+        <pubDate>Mon, 03 Nov 2014 05:50:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-103</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>Sure, I will take a look at implementing some type of Makefile.  I hate them too, but they are useful.  Mostly they will just call whatever existing scripts you already have anyway except for the newer features I plan to add.</p>
+<p>[HR]</p>
+<p>I have figured out how to update the template by just adding another 50_uwt_default rule with a conditional within it to detect if its a template and if it is disable uwt for apt-get and then apt-get will use a proxy.</p>
+<p>I have placed an update proxy (tinyproxy) on the gateway, port 8082 internal interface only using these iptable rules (they are defined by Qubes).  Basically the rules allow a standard proxy IP address of 10.137.255.254 on all AppVM’s and since the template has no network access the proxy IP is intercepted by the network vm, in this case Whonix gateway).</p>
+<pre><code class="lang-auto">iptables -t nat -N PR-QBS-SERVICES
+
+&lt;script called with $1=start or ""&gt;
+RULE_FILTER="INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT"
+RULE_NAT="PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIRECT"
+
+if [ "$1" == "start" ]; then
+cat &lt;&lt;__EOF__ | iptables-restore -n
+*filter
+-I $RULE_FILTER
+COMMIT
+*nat
+-I $RULE_NAT
+COMMIT
+__EOF__
+else
+    # Remove rules
+    iptables -D $RULE_FILTER
+    iptables -t nat -D $RULE_NAT
+    exit 0
+fi</code></pre>
+<p>So the rule works in wheezy without firewall, but I am having problems sorting though the Whonix firewall code to get the firewall not to drop the connection.  What is happening is the template VM connects and immediately get disconnected.</p>
+<p>I think this error may have something to do with it</p>
+<pre><code class="lang-auto">Nov  2 18:59:56 host Tor[4388]: Rejecting request for anonymous connection to private address [scrubbed] on a TransPort or NATDPort.  Possible loop in your NAT rules? [4 similar message(s) suppressed in last 300 seconds]</code></pre>
+<p>So I am hoping somebody will be able to help me figure out how to get this working; its the second last step before its all ready to be merged in Qubes code.</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/102">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/102</link>
+        <pubDate>Sun, 02 Nov 2014 20:33:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-102</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><code>make gateway          -- would read form a configuration file for options
+make workstation      -- same ---^</code><br>
+Or just add the command line options you want? Either way. Config files are supported, cmd switches and even env vars. Go for it.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>I’d be curious to look at the implementation.<br>
+Git submodules are a mess. Still a TODO.<br>
+(<a href="https://www.whonix.org/forum/index.php/topic,538.0.html">https://www.whonix.org/forum/index.php/topic,538.0.html</a>)<br>
+If you have any suggestions…</p>
+<pre><code class="lang-auto"></code></pre>
+<p>Related to above.</p>
+<pre><code class="lang-auto"></code></pre>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonix-developer-meta-files/blob/master/debug-steps/packaging-helper-script#L496" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonix-developer-meta-files/blob/master/debug-steps/packaging-helper-script#L496" target="_blank" rel="nofollow noopener">Whonix/whonix-developer-meta-files/blob/master/debug-steps/packaging-helper-script#L496</a></h4>
+<pre class="onebox"><code class="lang-"><ol class="start lines" start="486" style="counter-reset: li-counter 485 ;">
+<li>git status</li>
+<li>}</li>
+<li>
+</li>
+<li>pkg_git_commit_changelog() {</li>
+<li>git add debian/changelog</li>
+<li>git add changelog.upstream</li>
+<li>msg="bumped changelog version"</li>
+<li>git commit -m "$msg"</li>
+<li>git status</li>
+<li>true</li>
+<li class="selected">}</li>
+<li>
+</li>
+<li>pkg_git_commit_packaging() {</li>
+<li>git add Makefile</li>
+<li>git add make-helper.bsh</li>
+<li>#git add debian/changelog</li>
+<li>#git add changelog.upstream</li>
+<li>#git add -u</li>
+<li>msg="updated makefile generic to version 1.5"</li>
+<li>git commit -m "$msg"</li>
+<li>git status</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<pre><code class="lang-auto"></code></pre>
+<p>Probably would just need a shortcut to:<br>
+</p><aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/Whonix/blob/master/help-steps/cleanup-files" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/Whonix/blob/master/help-steps/cleanup-files" target="_blank" rel="nofollow noopener">Whonix/Whonix/blob/master/help-steps/cleanup-files</a></h4>
+<pre><code class="lang-">#!/bin/bash
+
+## Copyright (C) 2012 - 2018 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+set -x
+set -e
+
+true "INFO: Currently running script: $BASH_SOURCE $@"
+
+MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &amp;&amp; pwd )"
+
+cd "$MYDIR"
+cd ..
+cd help-steps
+
+whonix_build_one_parsed="1"
+ROOT_CHECK="0"
+VMNAME="internalrun"
+
+</code></pre>
+
+  This file has been truncated. <a href="https://github.com/Whonix/Whonix/blob/master/help-steps/cleanup-files" target="_blank" rel="nofollow noopener">show original</a>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<pre><code class="lang-auto"></code></pre>
+<p>For the former I just use “git status”. But if a make shortcut helps you, feel free to add such a feature. Usually there are no unsigned git tags. Never forgot that. But feel free to also provide that feature.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>check-depend for Whonix/Whonix or individual packages? For the former:<br>
+build-steps.d/1100_prepare-build-machine does that and more. Well, not check, but also install those.<br>
+But if you think a make check-depend would help?</p>
+<pre><code class="lang-auto"></code></pre>
+<p>Just run “git diff”? But if the shortcut helps you, go for it.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>If the shortcut helps you, go for it.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>I have that somewhat, but implemented in a rather personal way:<br>
+</p><aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/whonix-developer-meta-files/blob/master/debug-steps/packaging-helper-script#L364" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/whonix-developer-meta-files/blob/master/debug-steps/packaging-helper-script#L364" target="_blank" rel="nofollow noopener">Whonix/whonix-developer-meta-files/blob/master/debug-steps/packaging-helper-script#L364</a></h4>
+<pre class="onebox"><code class="lang-"><ol class="start lines" start="354" style="counter-reset: li-counter 353 ;">
+<li>}</li>
+<li>
+</li>
+<li>pkg_packaging_files_diff() {</li>
+<li>local compare_with_path</li>
+<li>## Some arbitrary package used as template for comparison.</li>
+<li>compare_with_path="../anon-apt-sources-list"</li>
+<li>compare_with_full_path="$(realpath "$compare_with_path")"</li>
+<li>
+</li>
+<li>if [ "$reponame" = "qubes-whonix" ]; then</li>
+<li>   test -f "$repo_full_path/CONTRIBUTING.md"</li>
+<li class="selected">elif [ "$reponame" = "corridor" ]; then</li>
+<li>   ## Corridor has no CONTRIBUTING.md file.</li>
+<li>   true</li>
+<li>else</li>
+<li>   diff "$compare_with_full_path/CONTRIBUTING.md" "$repo_full_path/CONTRIBUTING.md"</li>
+<li>fi</li>
+<li>
+</li>
+<li>if [ "$reponame" = "corridor" ]; then</li>
+<li>   ## Corridor is not GPLv3 but public domain.</li>
+<li>   true</li>
+<li>else</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+(I comment in the function I want to use, then run that script.)<br>
+Feel free to implement that.<p></p>
+<pre><code class="lang-auto">make show-vtags       -- list components version tags (only when HEAD have such) and branches
+make show-authors     -- list authors of Qubes code based on commit log of each component
+make prepare-merge    -- fetch the sources from git, but only show new commits instead of merging
+make show-unmerged    -- list fetched but unmerged commits (see make prepare-merge)
+make do-merge         -- merge fetched commits</code></pre>
+<p>Should like just git shortcuts. I personally don’t need it, but if you find that useful, go for it.</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/101">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/101</link>
+        <pubDate>Fri, 31 Oct 2014 07:22:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-101</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>About the makefile… I am not good at writing makefiles. Having difficulties debugging them. Since there is no xtrace and since I always step through all code and options, make doesn’t play well with me.</p>
+<p>For Whonix packages we already have an in my opinion awesome makefile.</p>
+<pre><code class="lang-auto">cd anon-apt-sources-list/
+make help </code></pre>
+<pre><code class="lang-auto">make help
+   Show this help.
+make dist
+   Create package-version.tar.gz from source files in $DISTDIR (default "..").
+make undist
+   Delete package-version.tar.gz from source files in $DISTDIR (default "..").
+make debdist
+   Create debian.tar.gz from source files in $DISTDIR (default "..").
+make undebdist
+   Delete debian.tar.gz from source files in $DISTDIR (default "..").
+make manpages
+   Create man page from man source folder, which will be stored in debian/tmp-man folder.
+make uch
+   Store upstream changelog from git log in debian/changelog.upstream.
+make install
+   Copying the files from the source tree to system-wide directories.
+make installsim
+   Simulate copying the files from the source tree to system-wide directories.
+make deb-pkg
+   Create a deb, which will be stored in parent folder.
+make deb-pkg-install
+   Create a deb, which will be stored in parent folder, and install it.
+make deb-install
+   Install deb from parent folder.
+make deb-icup
+   Combination of make deb-pkg, make deb-pkg-install and make deb-pkg-cleanup.
+make deb-remove
+   apt-get remove make_main_package_name
+make deb-purge
+   apt-get purge make_main_package_name
+make deb-clean
+   Delete temporary debhelper files.
+make deb-cleanup
+   Same as make deb-clean and deletes debuild artifacts from parent folder.
+make dput-ubuntu-ppa
+   Upload to Ubuntu ppa. Requires functional .dput.cf.
+make clean
+   Currently same as make deb-clean.
+make distclean
+   Currently same as make clean.
+make checkout
+   Fetch from git.
+make installcheck
+   Check if source files match installed files.
+make uninstallcheck
+   Check if make uninstall removed all files.
+make uninstall
+   Delete all installed files.
+make uninstallsim
+   Simulate what make uninstall would do.
+make deb-chl-bumpup
+   Bump upstream version number in debian/changelog.</code></pre>
+<p>Here is the code:</p>
+<ul>
+<li><a href="https://github.com/Whonix/anon-apt-sources-list/blob/master/Makefile">https://github.com/Whonix/anon-apt-sources-list/blob/master/Makefile</a></li>
+<li><a href="https://github.com/Whonix/anon-apt-sources-list/blob/master/make-helper.bsh">https://github.com/Whonix/anon-apt-sources-list/blob/master/make-helper.bsh</a></li>
+</ul>
+<p>The Makefile is minimal. Because I find doing such tasks using Make super difficult. The syntax is ugly.</p>
+<p>Would you be interested to implement it in a similar way? Minimal make file? Rest implemented as shell script (or?)?</p>
+<p>But before you start… Some functionality you are proposing is already implemented one way or another.</p>
+<p>In this package:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="32" height="32">
+      <a href="https://github.com/Whonix/whonix-developer-meta-files/" target="_blank">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars3.githubusercontent.com/u/4500165?s=400&amp;v=4" class="thumbnail onebox-avatar" width="400" height="400">
+
+<h3><a href="https://github.com/Whonix/whonix-developer-meta-files/" target="_blank">Whonix/whonix-developer-meta-files</a></h3>
+
+<p>Scripts for managing Whonix's offical repository and Whonix News; debug scripts; developer documentation https://github.com/Whonix/Whonix - Whonix/whonix-developer-meta-files</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>I’ll say more soon.</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/100">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/100</link>
+        <pubDate>Fri, 31 Oct 2014 07:09:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-100</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="98" data-topic="512">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"> nrgaway:</div>
+<blockquote>
+<p>It could have been since that I did not commit after adding files or links.</p>
+</blockquote>
+</aside>
+<p>No. run-parts doesn’t mind about git. The worry about uncommitted changes is just…<br>
+The check is here:<br>
+</p><aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/1200_create-debian-packages#L115" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/Whonix/blob/master/build-steps.d/1200_create-debian-packages#L115" target="_blank" rel="nofollow noopener">Whonix/Whonix/blob/master/build-steps.d/1200_create-debian-packages#L115</a></h4>
+<pre class="onebox"><code class="lang-d/1200_create-debian-packages"><ol class="start lines" start="105" style="counter-reset: li-counter 104 ;">
+<li>   sudo $SUDO_OPTS -E "$whonix_dev_meta_files_folder/debug-steps/reprepro-wrapper" includedsc "$WHONIX_BUILD_APT_CODENAME" "$package_absolute_path"</li>
+<li>done</li>
+<li>
+</li>
+<li>## Get rid of $whonix_build_sources_list_primary package list, while keeping</li>
+<li>## regular package lists. In other words, prevent needlessly forgetting</li>
+<li>## about regular package lists.</li>
+<li>apt-get update \</li>
+<li>   --no-download \</li>
+<li>   --list-cleanup</li>
+<li>
+</li>
+<li class="selected">popd</li>
+<li>
+</li>
+<li>true "${cyan}$BASH_SOURCE INFO: Got extra packages. ${reset}"</li>
+<li>}</li>
+<li>
+</li>
+<li>get_tpo_packages() {</li>
+<li>if [ "$whonix_build_pkg_apparmor_only" = "true" ]; then</li>
+<li>   true "${cyan}$BASH_SOURCE INFO: Skipping $FUNCNAME, because whonix_build_pkg_apparmor_only is set to $whonix_build_pkg_apparmor_only. ${reset}"</li>
+<li>   return 0</li>
+<li>fi</li>
+<li>
+</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Debian toolchain still relies on upstream tarballs, git format is coming at some point in future that will make thing simpler to grasp. To create upstream tarballs, git archive is being used:<br>
+<a href="https://github.com/Whonix/anon-apt-sources-list/blob/master/make-helper.bsh#L352" class="onebox" target="_blank">https://github.com/Whonix/anon-apt-sources-list/blob/master/make-helper.bsh#L352</a><br>
+(And git-archive only exports files that are committed.)</p>
+<p>Also that uncommitted git check ensures consistent results. So builders have not accidentally changed something. Or still having temporary files in the source laying around. Making triaging of the resulting reports a hell.</p>
+<blockquote>Yes, this feature I can use real soon :)</blockquote>
+Would you like to write a patch for the "build-step.d cache folder" feature?
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/99">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/99</link>
+        <pubDate>Fri, 31 Oct 2014 07:00:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-99</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:97, topic:512”][quote author=nrgaway link=topic=537.msg5074#msg5074 date=1414694105]<br>
+One other question relating to Whonix build-steps.d.  I created some custom build step files ‘1000_qubes-pre-config’ and ‘2900_qubes-post-config’.  I noticed that there was no way to just include a ‘~/build-steps.d’  directory and place the files there although that would be a good option to have.  On build, you could first move the default Whonix build-steps.d files into a ‘build-steps.d-cache’ directory (after removing anything in the cache directory), then copy files from ‘~/build-steps.d’ and even ‘/etc/build-steps.d’ into the cache directory (would allow us to over-write an existing build step that way) and then run-steps from the cache directory.</p>
+<p>I also tried just creating a softlink to my files from the Whonix/build-steps.d directory and copying them there but they did not seem to get pickup up.<br>
+[/quote]</p>
+<p>Processing the build-steps.d is currently using a very simple implementation. Implemented in function whonix_build_machine in help-steps/whonix_build_one. Here:<br>
+<a href="https://github.com/Whonix/Whonix/blob/master/help-steps/whonix_build_one#L42" class="onebox" target="_blank" rel="nofollow noopener">https://github.com/Whonix/Whonix/blob/master/help-steps/whonix_build_one#L42</a></p>
+<p>Perhaps add some sleep there to figure out what its doing.</p>
+<p>Or run this.</p>
+<pre><code class="lang-auto">run-parts --verbose --test ./build-steps.d</code></pre>
+<p>And check if your script would be run. <code>run-parts</code> runs those in lexical order. Scripts are executed, not sourced. So they need to be executable. Unlikely, but perhaps that was it?</p>
+<p>Just tested. Symlinks work for me.</p>
+<pre><code class="lang-auto">ln -s ~/a build-steps.d/1000_x</code></pre>
+<p>There is a related issue with adding custom build steps. It essentially is a source code change:<br>
+<a href="https://www.whonix.org/wiki/Dev/Build_Documentation/10_full#Source_Code_Changes" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/wiki/Dev/Build_Documentation/10_full#Source_Code_Changes</a><br>
+So you either have to commit it or use the ignore uncommitted build switch. So the cache dir is an interesting idea.[/quote]</p>
+<p>It could have been since that I did not commit after adding files or links.  Yes they scripts were also executable hehe, but I created the links from a bound mount into a chroot, so there could be problems with that.  For now I just abandoned the build-steps code and reverted to having it back within the Qubes template scripts.</p>
+<blockquote>As for /etc/build-steps.d... It would be better if it contained some word like. Well. Dunno. Since I am almost done with the more generic command line parser (https://www.whonix.org/forum/index.php/topic,633.0.html)... Whonix's build script is slowely developing into a general tool to build VM images as well as "--install-to-root" builds. What about be a good name for such a combined tool?</blockquote>
+<p>I’m the worst at naming stuff; I will sit for 15 minutes just to name a variable at times!  Whonix Imager, Whonix Doctor lol.</p>
+<blockquote>And as a related question, I am thinking for some time now if it made sense to package Whonix's build script as a regular Debian package? Then we could use build depends using the usual debian/control mechanism.</blockquote>
+<p>I really think a general Makefile would make things much simpler with a configuration file for options.  Then you could load what ever conf file in you want like ‘CONF=gateway-rootfs make gateway’.  And the Makefile would take care of all dependencies and only grab the required ones for the modules you are building. For a end user, they download git package, verify it (can be self verified if key is provided?) then they can build by just ‘make gateway’ and all dependencies will get downloaded, all git submodules cleaned and init.</p>
+<blockquote>Related to /etc/build-steps.d there is a similar mechanism.
+[code]    buildconfig.d or in
+    /etc/whonix_buildconfig.d
+    ../buildconfig.d[/code]
+https://www.whonix.org/wiki/Dev/Source_Code_Intro#Build_Configuration_Folder
+(I don't like the ../buildconfig.d folder name much, because it does not contain the name of the tool that is yet to be named.
+<p>A good place for the cache dir would be probably:</p>
+<pre><code class="lang-auto">$WHONIX_BINARY/build-steps_temp.d</code></pre>
+<p>help-steps/whonix_build_one could then populate that folder with scripts from various locations. (build-steps.d, /etc/…, ~/…)</p>
+</blockquote>
+<p>Yes, this feature I can use real soon <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/98">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/98</link>
+        <pubDate>Fri, 31 Oct 2014 06:29:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-98</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“nrgaway, post:94, topic:512”]One other question relating to Whonix build-steps.d.  I created some custom build step files ‘1000_qubes-pre-config’ and ‘2900_qubes-post-config’.  I noticed that there was no way to just include a ‘~/build-steps.d’  directory and place the files there although that would be a good option to have.  On build, you could first move the default Whonix build-steps.d files into a ‘build-steps.d-cache’ directory (after removing anything in the cache directory), then copy files from ‘~/build-steps.d’ and even ‘/etc/build-steps.d’ into the cache directory (would allow us to over-write an existing build step that way) and then run-steps from the cache directory.</p>
+<p>I also tried just creating a softlink to my files from the Whonix/build-steps.d directory and copying them there but they did not seem to get pickup up.[/quote]</p>
+<p>Processing the build-steps.d is currently using a very simple implementation. Implemented in function whonix_build_machine in help-steps/whonix_build_one. Here:<br>
+<a href="https://github.com/Whonix/Whonix/blob/master/help-steps/whonix_build_one#L42" class="onebox" target="_blank">https://github.com/Whonix/Whonix/blob/master/help-steps/whonix_build_one#L42</a></p>
+<p>Perhaps add some sleep there to figure out what its doing.</p>
+<p>Or run this.</p>
+<pre><code class="lang-auto">run-parts --verbose --test ./build-steps.d</code></pre>
+<p>And check if your script would be run. <code>run-parts</code> runs those in lexical order. Scripts are executed, not sourced. So they need to be executable. Unlikely, but perhaps that was it?</p>
+<p>Just tested. Symlinks work for me.</p>
+<pre><code class="lang-auto">ln -s ~/a build-steps.d/1000_x</code></pre>
+<p>There is a related issue with adding custom build steps. It essentially is a source code change:<br>
+<a href="https://www.whonix.org/wiki/Dev/Build_Documentation/10_full#Source_Code_Changes" class="onebox" target="_blank">https://www.whonix.org/wiki/Dev/Build_Documentation/10_full#Source_Code_Changes</a><br>
+So you either have to commit it or use the ignore uncommitted build switch. So the cache dir is an interesting idea.</p>
+<p>As for /etc/build-steps.d… It would be better if it contained some word like. Well. Dunno. Since I am almost done with the more generic command line parser (<a href="https://www.whonix.org/forum/index.php/topic,633.0.html">https://www.whonix.org/forum/index.php/topic,633.0.html</a>)… Whonix’s build script is slowely developing into a general tool to build VM images as well as “–install-to-root” builds. What about be a good name for such a combined tool?</p>
+<p>And as a related question, I am thinking for some time now if it made sense to package Whonix’s build script as a regular Debian package? Then we could use build depends using the usual debian/control mechanism.</p>
+<p>Related to /etc/build-steps.d there is a similar mechanism.</p>
+<p><code>    buildconfig.d or in
+    /etc/whonix_buildconfig.d
+    ../buildconfig.d</code><br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/Source_Code_Intro#Build_Configuration_Folder" target="_blank" title="05:19PM - 01 March 2020">Whonix – 1 Mar 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:598/500;"><img src="https://www.whonix.org/w/images/f/fa/Accept-47587640.png" class="thumbnail" width="598" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Dev/Source_Code_Intro#Build_Configuration_Folder" target="_blank">Dev/Source Code Intro - Whonix</a></h3>
+
+<p>Introduction into Whonix ™ source code.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+(I don’t like the …/buildconfig.d folder name much, because it does not contain the name of the tool that is yet to be named.<p></p>
+<p>A good place for the cache dir would be probably:</p>
+<pre><code class="lang-auto">$WHONIX_BINARY/build-steps_temp.d</code></pre>
+<p>help-steps/whonix_build_one could then populate that folder with scripts from various locations. (build-steps.d, /etc/…, ~/…)</p>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/97">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/97</link>
+        <pubDate>Fri, 31 Oct 2014 00:58:28 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-97</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+      <item>
+        <title>ProxyVM + AppVM Development</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Oh, and apt-get also supports the http_proxy environment variable. 100% sure of this, because Whonix’s build script integrates use of apt-cacher-ng.</p>
+<pre><code class="lang-auto"></code></pre>
+          <p><a href="http://forums.whonix.org/t/proxyvm-appvm-development/512/96">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/proxyvm-appvm-development/512/96</link>
+        <pubDate>Thu, 30 Oct 2014 23:24:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-512-96</guid>
+        <source url="http://forums.whonix.org/t/proxyvm-appvm-development/512.rss">ProxyVM + AppVM Development</source>
+      </item>
+  </channel>
+</rss>

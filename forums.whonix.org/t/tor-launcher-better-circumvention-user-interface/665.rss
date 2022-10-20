@@ -1,0 +1,768 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Tor-launcher - Better Circumvention User Interface</title>
+    <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665</link>
+    <description>Prerequisite knowledge:
+https://www.whonix.org/wiki/Tor_Browser#tor-launcher_vs_torbrowser-launcher
+
+Ticket:
+https://phabricator.whonix.org/T118
+
+Related:
+https://www.whonix.org/forum/index.php/topic,705.0.html
+
+---
+
+[quote=&quot;troubadour, post:447, topic:108&quot;][quote author=Patrick link=topic=97.msg5328#msg5328 date=1415400889]
+Working on https://github.com/Whonix/Whonix/issues/167 at the moment.
+
+Getting this.
+
+[code]Nov  7 22:51:47 host kernel: [ 2923.658653] type=1400 audit(1415400707.346:32): apparmor=&quot;DENIED&quot; operation=&quot;rename_src&quot; parent=1 profile=&quot;system_tor&quot; name=&quot;/etc/tor/torrc&quot; pid=12507 comm=&quot;tor&quot; requested_mask=&quot;wd&quot; denied_mask=&quot;wd&quot; fsuid=106 ouid=0[/code]
+
+What must I add to fix it? Trying like crazy...
+
+[code]/etc/apparmor.d/local/system_tor[/code]
+
+[code]
+  /etc/tor/torrc rwmixkl,
+  /etc/tor/torrc.anondist rwmixkl,
+[/code]
+
+Restarted Tor...
+
+Doesn&#39;t help.
+[/quote]
+
+Most likely, the problem does not come from system-tor profile. Could you check that tor-launcher (what did you install, by the way?) has not installed its own profile. There is a bug in Vidalia. https://bugs.launchpad.net/ubuntu/+source/vidalia/+bug/680192[/quote]
+TBB for Linux from The Tor Project does not ship its own AppArmor profile. Throughly searched for any signs of AppArmor. And it makes sense. Otherwise Micah Lee wouldn&#39;t have developed AppArmor profiles for torbrowser-launcher.
+
+I am very certain it&#39;s causes by system_tor, because when I set in /etc/default/tor
+
+[code]# USE_AA_EXEC=&quot;yes&quot;  # default
+USE_AA_EXEC=&quot;no&quot;[/code]
+
+then the AppArmor denied messages vanished.
+
+I downloaded TBB using tb-updater using these instructions:
+https://www.whonix.org/wiki/Bridges#Using_Tor_.2F_Pluggable_Transports_from_the_Tor_Browser_Bundle
+
+Then started experimenting. Put a script named &quot;a&quot; (any name would work) into ~/tor-browser_en-US.
+
+Credits go to Tails.
+(Original source: https://git-tails.immerda.ch/tails/plain/config/chroot_local-includes/usr/local/sbin/tails-tor-launcher)
+
+[code]
+#!/bin/sh
+
+## This file is part of Whonix.
+## Copyright (C) Amnesia &lt;amnesia at boum dot org&gt;
+## Copyright (C) 2012 - 2014 Patrick Schleizer &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+## Original source from Tails:
+## https://git-tails.immerda.ch/tails/plain/config/chroot_local-includes/usr/local/sbin/tails-tor-launcher
+
+set -x
+set -e
+
+unset TOR_CONTROL_PASSWD
+unset TOR_FORCE_NET_CONFIG
+TOR_CONFIGURE_ONLY=1
+TOR_CONTROL_PORT=9051
+TOR_CONTROL_COOKIE_AUTH_FILE=/var/run/tor/control.authcookie
+export TOR_CONFIGURE_ONLY
+export TOR_CONTROL_PORT
+export TOR_CONTROL_COOKIE_AUTH_FILE
+
+#if echo &quot;$@&quot; | grep -qw -- --force-net-config; then
+    TOR_FORCE_NET_CONFIG=1
+    export TOR_FORCE_NET_CONFIG
+#fi
+
+# Get LIVE_USERNAME
+#. /etc/live/config.d/username.conf
+LIVE_USERNAME=user
+
+# Get LANG
+. /etc/default/locale
+
+#until pgrep -u &quot;${LIVE_USERNAME}&quot; nm-applet &gt;/dev/null ; do
+#   sleep 5
+#done
+
+export LANG
+#export DISPLAY=&#39;:0.0&#39;
+#export XAUTHORITY=&quot;`echo /var/run/gdm3/auth-for-${LIVE_USERNAME}-*/database`&quot;
+#sudo -u ${LIVE_USERNAME} xhost +SI:localuser:user
+#gksudo -u user /usr/bin/tor-launcher
+./start-tor-browser
+RET=${?}
+#sudo -u ${LIVE_USERNAME} xhost -SI:localuser:user
+
+# Save ~10 RAM (due to the tmpfs) by removing this unused file
+#rm -f /usr/Data/Browser/*.default/places.sqlite
+
+exit ${RET}
+[/code]
+
+(Still need to pretty that up. IF we can go that route. Just an experiment for now.)
+
+Got that message when running.
+
+[code]./a[/code]
+
+Looks like reboot was required. Stopping/starting Tor didn&#39;t do.
+
+Then I got another denied message.
+
+[code]type=1400 audit(1415567983.905:23): apparmor=&quot;DENIED&quot; operation=&quot;rename_dest&quot; parent=1 profile=&quot;system_tor&quot; name=&quot;/etc/tor/torrc.orig.1&quot; pid=18142 comm=&quot;tor&quot; requested_mask=&quot;wc&quot; denied_mask=&quot;wc&quot; fsuid=106 ouid=0[/code]
+
+Fixed by using /etc/apparmor.d/local/system_tor with.
+
+[code]
+  /etc/tor rwmixkl,
+  /etc/tor/** rwmixkl,
+[/code]
+
+Reboot required again. Why?
+
+No more AppArmor issues after reboot.
+
+[
+After relaxing file permissions.
+
+[code]
+sudo chmod o+rw /etc/tor
+sudo chmod o+rw /etc/tor/**
+[/code]
+
+Using the above script, tor-launcher was able to manipulate /etc/tor/torrc.
+
+It doesn&#39;t work yet. And I don&#39;t know it&#39;s a sane idea yet. Discussion about that should probably go into a separate thread.
+]</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 21 Sep 2019 06:49:35 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="26" data-topic="665">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Maybe tor-launcher configures that.</p>
+</blockquote>
+</aside>
+<p>Or not. Seems like Tor is doing that even when told to ignore all Tor Browser folder torrc settings files.</p>
+<pre><code class="lang-auto">debian-tor@host:~/.tb/tor-browser$ ./Browser/TorBrowser/Tor/tor -f /etc/tor/torrc
+</code></pre>
+<blockquote>
+<p>Sep 21 06:30:11.450 [notice] Tor 0.4.1.5 (git-439ca48989ece545) running on Linux with Libevent 2.1.8-stable, OpenSSL 1.1.1c, Zlib 1.2.11, Liblzma N/A, and Libzstd N/A.<br>
+Sep 21 06:30:11.450 [notice] Tor can’t help you if you use it wrong! Learn how to be safe at <a href="https://www.torproject.org/download/download#warning" rel="nofollow noopener">https://www.torproject.org/download/download#warning</a><br>
+Sep 21 06:30:11.450 [notice] Read configuration file “/etc/tor/torrc”.<br>
+Sep 21 06:30:11.456 [notice] Included configuration file or directory at recursion level 2: “/usr/local/etc/torrc.d/40_tor_control_panel.conf”.<br>
+Sep 21 06:30:11.456 [notice] Included configuration file or directory at recursion level 2: “/usr/local/etc/torrc.d/50_user.conf”.<br>
+Sep 21 06:30:11.456 [notice] Included configuration file or directory at recursion level 1: “/etc/torrc.d/95_whonix.conf”.<br>
+Sep 21 06:30:11.457 [notice] Opening Socks listener on 127.0.0.1:9050<br>
+Sep 21 06:30:11.457 [notice] Opened Socks listener on 127.0.0.1:9050</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/27">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/27</link>
+        <pubDate>Sat, 21 Sep 2019 06:49:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-27</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Instructions for using Tor shipped by Tor Browser on Whonix-Gateway.</p>
+<p>On Whonix-Gateway.</p>
+<p>Disable apparmor for Tor Browser as we want to to access /etc/tor/torrc.</p>
+<pre><code>sudo aa-disable /etc/apparmor.d/home.tor-browser.firefox
+</code></pre>
+<p>Install tb-updater.</p>
+<pre><code>sudo apt --no-install-recommends install tb-updater
+</code></pre>
+<p>Login as user debian-tor.</p>
+<pre><code>sudo -u debian-tor bash
+</code></pre>
+<p>Change to the homer folder of debian-tor.</p>
+<pre><code>cd /var/lib/tor
+</code></pre>
+<p>Download Tor Browser.</p>
+<pre><code>update-torbrowser
+</code></pre>
+<p>Tor Browser will be installed in folder <code>/var/lib/tor/.tb/tor-browser</code> by now.</p>
+<p>Go to another terminal emulator tab owned so it will use login user <code>user</code>. Stop system Tor. This is required so Tor shipped by Tor Browser can be used.</p>
+<p>sudo systemctl stop tor@default</p>
+<p>Go back to a terminal emulator running with login user <code>debian-tor</code>. Change directolry to the Tor Browser folder.</p>
+<pre><code>cd ~/.tb/tor-browser/
+</code></pre>
+<p>Start Tor Browser.</p>
+<pre><code>./start-tor-browser.desktop --debug
+</code></pre>
+<p>Here I am stuck. I tried to edit both files</p>
+<ul>
+<li><code>./Browser/TorBrowser/Data/Tor/torrc-defaults</code></li>
+<li><code>./Browser/TorBrowser/Data/Tor/torrc</code></li>
+</ul>
+<p>To add at the very top of the file:</p>
+<pre><code>%include /etc/tor/torrc
+</code></pre>
+<p>The idea was simply load the Whonix Tor configuration so all SocksPorts etc. that Whonix configured gets load as usual. In theory, Tor shipped by Tor Browser at that point would be in use as system Tor.</p>
+<p>In practice somehow only Tor Browser default SocksPorts are opened. Maybe tor-launcher configures that.</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/26">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/26</link>
+        <pubDate>Sat, 21 Sep 2019 06:25:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-26</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><code>[tbb-dev] future of tor-launcher? - Firefox XPCOM / XUL based add-ons deprecation</code><br>
+<a href="https://lists.torproject.org/pipermail/tbb-dev/2017-January/000436.html">https://lists.torproject.org/pipermail/tbb-dev/2017-January/000436.html</a></p>
+<p><code>Investigate new WebExtensions API requirements for our extensions</code><br>
+<a href="https://trac.torproject.org/projects/tor/ticket/17248" class="onebox" target="_blank">https://trac.torproject.org/projects/tor/ticket/17248</a></p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/25">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/25</link>
+        <pubDate>Mon, 09 Jan 2017 08:49:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-25</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>headless, unattended TBB updates [by script]<br>
+<a href="https://trac.torproject.org/projects/tor/ticket/17136" class="onebox" target="_blank">https://trac.torproject.org/projects/tor/ticket/17136</a></p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/24">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/24</link>
+        <pubDate>Wed, 23 Sep 2015 17:44:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-24</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>xvfb would have to discriminate the browser window vs the tor-launcher window. Since tor-launcher is started by Tor Browser, starting Tor Browser hidden will never show the tor-launcher window. It doesn't look like it has such a feature.</blockquote>
+<p>True.</p>
+<p>I’ll discuss our choices and the tradeoffs we can make with the situation now in T118.</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/23</link>
+        <pubDate>Sun, 02 Aug 2015 13:05:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-23</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>xvfb would have to discriminate the browser window vs the tor-launcher window. Since tor-launcher is started by Tor Browser, starting Tor Browser hidden will never show the tor-launcher window. It doesn’t look like it has such a feature.</p>
+<p>firefox / iceweasel --app has been discussed before in this thread.</p>
+<p>No, tor-launcher has no working standalone support. If it had, we wouldn’t need xvfb.</p>
+<p>This could be either implemented using javascript patches or xvfb.</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/22</link>
+        <pubDate>Sun, 02 Aug 2015 11:33:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-22</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>I don’t know how helpful it is but here is a post about running application.ini standalone with xvfb, defining a window size for the addon (so it can be seen). Xulrunner is dead but the same can be done with “firefox -app”. We can wrap TBB on GW with another script that runs it under xvfb with window size 0:</p>
+<p><a href="http://techno-barje.fr/post/2009/09/30/Headless-xulrunner/" class="onebox" target="_blank">http://techno-barje.fr/post/2009/09/30/Headless-xulrunner/</a></p>
+<p>I’m not sure it will work because this presupposes that torlauncher has working standalone support but it doesn’t. I would be surprised if it works its too easy <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/21</link>
+        <pubDate>Sun, 02 Aug 2015 00:50:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-21</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>In <a href="https://phabricator.whonix.org/T386#6194">https://phabricator.whonix.org/T386#6194</a>, <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a> wrote:</p>
+<blockquote>* The problems discussed in https://trac.torproject.org/projects/tor/ticket/14121 can be solved even if the features requested are never developed. Running TBB Tor headlessly is possible thru using xvfb (pkg that tricks a gui application into thinking its connected to a X-server) and something like selenium.
+<p></p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="32" height="32">
+      <a href="https://github.com/webfp/tor-browser-crawler" target="_blank">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars2.githubusercontent.com/u/11998411?s=400&amp;v=4" class="thumbnail onebox-avatar" width="420" height="420">
+
+<h3><a href="https://github.com/webfp/tor-browser-crawler" target="_blank">webfp/tor-browser-crawler</a></h3>
+
+<p>A crawler based on Tor Browser and Selenium. Contribute to webfp/tor-browser-crawler development by creating an account on GitHub.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<br>
+<a href="https://github.com/isislovecruft/tor-browser-selenium">https://github.com/isislovecruft/tor-browser-selenium</a><p></p>
+</blockquote><br>
+I don’t know. Likely by default when you run it through xvfb, not only the Tor Browser window will be hidden, but also the tor-launcher gui. TODO: research if it is possible to distinguish these two windows. Hide browser window, keep tor-launcher visible.
+<blockquote>Even when we can run TBB headlessly and still take advanatge of torlauncher-gui I forsee problems that will make the entire idea a non-starter. We cannot redistribute TBB binaries.</blockquote>
+<p>On the gateway this is less problematic. Likely will not be an issue. Just now updated reasoning why:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Tor_Browser#Not_installed_by_Default_Footnote" target="_blank" title="05:27PM - 03 May 2020">Whonix – 3 May 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:666/500;"><img src="https://www.whonix.org/w/images/1/19/Torbrowser.png" class="thumbnail" width="666" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Tor_Browser#Not_installed_by_Default_Footnote" target="_blank">Tor Browser Basics</a></h3>
+
+<p>Using Tor Browser in Whonix ™. Anonymity vs Pseudonymity, HTTPS Everywhere, Torbutton, Protection against dangerous JavaScript, NoScript, Tips, Update Tor Browser, Browser Plugins, Change Language</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<blockquote>They must be downloaded. Imagine users in censored areas where they can't connect with Tor how will they be able to fetch TBB when connections to TPO are censored? Downloading from alternative distribution channels using GetTor will leave all kinds of network fingerprints.</blockquote>
+Therefore does not apply.
+<blockquote>The only sane solution is for TPO to spin off torlauncher-gui into its own independent package along with all pluggable transports, all in their repo so we can redistribute them freely and generate builds that include them without problems.</blockquote>
+Would be a very good solution, but I guess TPO is unlikely to go this route anytime soon.
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/20</link>
+        <pubDate>Sat, 01 Aug 2015 07:53:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-20</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[troubadour]]></dc:creator>
+        <description><![CDATA[
+            <p>Some (may be) good news here.</p>
+<p>In TBB 5.0a1, there is a new option in tor-launcher preferences (<a href="mailto:tor-launcher@torproject.org">tor-launcher@torproject.org</a>/defaults/preferences/prefs.js) extracted from TBB.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>The default (as per today) is set to true. It means that tor-launcher is started before tor browser and we have access to the buttons “Connect” and “Congigure”.</p>
+<p>The pereference, like all the other in tor-launcher, can be overridden in [TBB-directory]/Browser/TorBrowser/Data/Browser/profile.default/preferences/extension-overrides.js. When set to false, it behaves as before (you have try and catch the “Open Settings” button before the browser is loaded).</p>
+<p>Started to play with some settings (for torrc especially) without much progress, but at least we have a starting point.</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/19</link>
+        <pubDate>Tue, 26 May 2015 19:31:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-19</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>No more progress so far. This isn’t the most simple task. There is a political / upstream discussion part involved.</p>
+<p><a href="https://trac.torproject.org/projects/tor/ticket/14121">https://trac.torproject.org/projects/tor/ticket/14121</a> still hasn’t received any feedback.</p>
+<p>[quote=“Patrick, post:17, topic:665”]Posted on tor-talk mailing list:<br>
+<a href="https://lists.torproject.org/pipermail/tor-talk/2015-January/036581.html%5B/quote%5D" class="onebox" target="_blank">https://lists.torproject.org/pipermail/tor-talk/2015-January/036581.html[/quote]</a><br>
+TODO: The post needs to be improved. The initial confusion that the above post generated needs to be prevented. And then it should be reposted on <a href="https://lists.torproject.org/cgi-bin/mailman/listinfo/tbb-dev" data-bbcode="true">tbb-dev</a></p>
+<p>Both neo123 and linostar are inactive.</p>
+<p>Someone needs to take the lead here, otherwise I don’t know if it ever gets implemented.</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/18</link>
+        <pubDate>Fri, 22 May 2015 21:28:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-18</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Posted on tor-talk mailing list:<br>
+<a href="https://lists.torproject.org/pipermail/tor-talk/2015-January/036581.html" class="onebox" target="_blank">https://lists.torproject.org/pipermail/tor-talk/2015-January/036581.html</a></p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/17</link>
+        <pubDate>Sat, 24 Jan 2015 16:09:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-17</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="14" data-topic="665">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/neo13/40/32_1.png" class="avatar"> neo13:</div>
+<blockquote>
+<p>I checked torrc and it doesn’t seem to have any error, so i’m still working on it.</p>
+</blockquote>
+</aside>
+<p>Any updates?</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/16</link>
+        <pubDate>Sat, 24 Jan 2015 15:59:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-16</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks neo13, that will move us a big step further.</p>
+<p>[hr]</p>
+<p>Small comment on the folder</p>
+<pre><code class="lang-auto"></code></pre>
+<p>Apparently is a .d style alike(?) folder.</p>
+<p>(".d style" concept explained for something else: <a href="https://www.whonix.org/wiki/Whonix_Configuration_Files#.d_style_configuration_folders">https://www.whonix.org/wiki/Whonix_Configuration_Files#.d_style_configuration_folders</a>)</p>
+<p>Unrelated: In next version of tb-updater / Whonix 10, we will be creating a file. (<a href="https://www.whonix.org/forum/index.php/topic,810">https://www.whonix.org/forum/index.php/topic,810</a>)</p>
+<pre><code class="lang-auto"></code></pre>
+<p>My critical point here: for testing purposes we could try to just create a file</p>
+<pre><code class="lang-auto"></code></pre>
+<p>or</p>
+<pre><code class="lang-auto"></code></pre>
+<p>and populate it.</p>
+<p>(I don’t know yet if those are processed in lexical order.)</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/15</link>
+        <pubDate>Mon, 12 Jan 2015 15:51:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-15</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[neo13]]></dc:creator>
+        <description><![CDATA[
+            <p>To resolve this problem:</p>
+<pre><code class="lang-auto">Unable to start Tor.
+
+The Tor executable is missing.</code></pre>
+<p>we need to provide tor paths. Tor paths are part of TBB preference (which are not so clear to me yet) but they can also be set in tor-luncher preferences.</p>
+<p>if you open this file:</p>
+<pre><code class="lang-auto">/home/user/tor-browser_en-US/Browser/TorBrowser/Data/Browser/profile.default/extensions/tor-launcher@torproject.org/defaults/preferences/prefs.js</code></pre>
+<p>what you see:</p>
+<pre><code class="lang-auto">pref("extensions.torlauncher.loglevel", 4);  // 1=verbose, 2=debug, 3=info, 4=note, 5=warn
+pref("extensions.torlauncher.logmethod", 1);  // 0=stdout, 1=errorconsole, 2=debuglog
+pref("extensions.torlauncher.max_tor_log_entries", 1000);
+
+pref("extensions.torlauncher.control_host", "127.0.0.1");
+pref("extensions.torlauncher.control_port", 9151);
+
+pref("extensions.torlauncher.start_tor", true);
+pref("extensions.torlauncher.prompt_at_startup", true);
+
+// All path prefs. are relative to the firefox executable's directory
+pref("extensions.torlauncher.tor_path", "");
+pref("extensions.torlauncher.torrc_path", "");
+pref("extensions.torlauncher.tordatadir_path", "");
+pref("extensions.torlauncher.transportproxy_path", "");
+
+// Recommended default bridge type (can be set per localized bundle).
+// pref("extensions.torlauncher.default_bridge_recommended_type", "obfs3");
+
+// Default bridges.
+// pref("extensions.torlauncher.default_bridge.TYPE.1", "TYPE x.x.x.x:yy");
+// pref("extensions.torlauncher.default_bridge.TYPE.2", "TYPE x.x.x.x:yy");</code></pre>
+<p>i know it’s bad practice but for test purposes if you fill ‘tor_path’, ‘torrc_path’, ‘tordatadir_path’ like this:</p>
+<pre><code class="lang-auto">pref("extensions.torlauncher.tor_path", "/home/user/tor-browser_en-US/Browser/TorBrowser/Tor/tor");
+pref("extensions.torlauncher.torrc_path", "/home/user/tor-browser_en-US/Browser/TorBrowser/Data/Tor/tor");
+pref("extensions.torlauncher.tordatadir_path", "/home/user/tor-browser_en-US/Browser/TorBrowser/Data/Tor");</code></pre>
+<p>the tor path would be resolved and if you run it again (like how <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> said before):</p>
+<blockquote>iceweasel --app /home/user/tor-browser_en-US/Browser/TorBrowser/Data/Browser/profile.default/extensions/tor-launcher@torproject.org/application.ini</blockquote>
+<p>it would run without error. yet it won’t completley work. it has no default-bridge.</p>
+<p>the thing is it seems that TBB is overriding this preference file with some other options and values, for example some of option are in:</p>
+<pre><code class="lang-auto">/home/user/tor-browser_en-US/Browser/TorBrowser/Data/Browser/profile.default/preferences/extension-overrides.js</code></pre>
+<p>for example all default_bridges are defined in this file but eventually will override the tor-luncher preference file. if you copy this part of it:</p>
+<pre><code class="lang-auto">// Default bridges.
+pref("extensions.torlauncher.default_bridge.obfs3.1", "obfs3 83.212.101.3:80 A09D536DD1752D542E1FBB3C9CE4449D51298239");
+pref("extensions.torlauncher.default_bridge.obfs3.2", "obfs3 169.229.59.74:31493 AF9F66B7B04F8FF6F32D455F05135250A16543C9");
+pref("extensions.torlauncher.default_bridge.obfs3.3", "obfs3 169.229.59.75:46328 AF9F66B7B04F8FF6F32D455F05135250A16543C9");
+pref("extensions.torlauncher.default_bridge.obfs3.4", "obfs3 109.105.109.163:38980 1E05F577A0EC0213F971D81BF4D86A9E4E8229ED");
+pref("extensions.torlauncher.default_bridge.obfs3.5", "obfs3 109.105.109.163:47779 4C331FA9B3D1D6D8FB0D8FBBF0C259C360D97E6A");
+
+pref("extensions.torlauncher.default_bridge.flashproxy.1", "flashproxy 0.0.1.0:1");
+pref("extensions.torlauncher.default_bridge.flashproxy.2", "flashproxy 0.0.1.0:2");
+pref("extensions.torlauncher.default_bridge.flashproxy.3", "flashproxy 0.0.1.0:3");
+pref("extensions.torlauncher.default_bridge.flashproxy.4", "flashproxy 0.0.1.0:4");
+pref("extensions.torlauncher.default_bridge.flashproxy.5", "flashproxy 0.0.1.0:5");
+
+pref("extensions.torlauncher.default_bridge.fte.1", "fte 192.240.101.106:80 B629B0B607C8AC9349B5646C24E9D242184F5B6E");
+pref("extensions.torlauncher.default_bridge.fte.2", "fte 50.7.176.114:80 2BD466989944867075E872310EBAD65BC88C8AEF");
+pref("extensions.torlauncher.default_bridge.fte.3", "fte 131.252.210.150:8080 0E858AC201BF0F3FA3C462F64844CBFFC7297A42");
+pref("extensions.torlauncher.default_bridge.fte.4", "fte 128.105.214.161:8080 1E326AAFB3FCB515015250D8FCCC8E37F91A153B");
+pref("extensions.torlauncher.default_bridge.fte.5", "fte 128.105.214.162:8080 FC562097E1951DCC41B7D7F324D88157119BB56D");
+pref("extensions.torlauncher.default_bridge.fte.6", "fte 128.105.214.163:8080 A17A40775FBD2CA1184BF80BFC330A77ECF9D0E9");
+
+pref("extensions.torlauncher.default_bridge.fte-ipv6.1", "fte [2001:49f0:d002:1::2]:80 B629B0B607C8AC9349B5646C24E9D242184F5B6E");
+pref("extensions.torlauncher.default_bridge.fte-ipv6.2", "fte [2001:49f0:d00a:1::c]:80 2BD466989944867075E872310EBAD65BC88C8AEF");
+
+pref("extensions.torlauncher.default_bridge.scramblesuit.1", "scramblesuit 188.226.213.208:54278 AA5A86C1490296EF4FACA946CC5A182FCD1C5B1E password=MD2VRP7WXAMSG7MKIGMHI4CB4BMSNO7T");
+pref("extensions.torlauncher.default_bridge.scramblesuit.2", "scramblesuit 83.212.101.3:443 A09D536DD1752D542E1FBB3C9CE4449D51298239 password=XTCXLG2JAMJKZW2POLBAOWOQETQSMASH");
+
+pref("extensions.torlauncher.default_bridge.meek-google.1", "meek 0.0.2.0:1 url=https://meek-reflect.appspot.com/ front=www.google.com");
+pref("extensions.torlauncher.default_bridge.meek-amazon.1", "meek 0.0.2.0:2 url=https://d2zfqthxsdq309.cloudfront.net/ front=a0.awsstatic.com");
+pref("extensions.torlauncher.default_bridge.meek-azure.1", "meek 0.0.2.0:3 url=https://az668014.vo.msecnd.net/ front=ajax.aspnetcdn.com");</code></pre>
+<p>(I don’t know if it’s the same for all of us or it differs, so fill free to check your machine setting too) and append it to tor-luncher preference file, and then run it again, it would contain the bridge config options too.</p>
+<p>however, after all this, it’s not working smoothly yet (however i didn’t test it without bridge, because i can’t), it gives the following error:</p>
+<pre><code class="lang-auto">Jan 12 16:01:22.000 [warn] Could not launch managed proxy executable at './TorBrowser/Tor/PluggableTransports/obfsproxy.bin' ('No such file or directory').</code></pre>
+<p>I checked torrc and it doesn’t seem to have any error, so i’m still working on it.</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/14</link>
+        <pubDate>Mon, 12 Jan 2015 14:18:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-14</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Links to Tails implementation:</p>
+<ul>
+<li><a href="https://git-tails.immerda.ch/tails/tree/config/chroot_local-includes/usr/share/tor-launcher-standalone">https://git-tails.immerda.ch/tails/tree/config/chroot_local-includes/usr/share/tor-launcher-standalone</a></li>
+<li><a href="https://git-tails.immerda.ch/tails/plain/config/chroot_local-includes/usr/local/sbin/tails-tor-launcher">https://git-tails.immerda.ch/tails/plain/config/chroot_local-includes/usr/local/sbin/tails-tor-launcher</a></li>
+</ul>
+<p>[hr]</p>
+<p>Linostar and I figured out some interesting stuff:<br>
+tor-launcher’s makefile contains a standalone target, i.e. “make standalone”:<br>
+<a href="https://gitweb.torproject.org/tor-launcher.git/tree/Makefile" class="onebox" target="_blank">https://gitweb.torproject.org/tor-launcher.git/tree/Makefile</a></p>
+<p>Differences of “make standalone”:</p>
+<ul>
+<li>creates a tarball instead of xpi (which is a zip)</li>
+<li>adds application.ini</li>
+</ul>
+<p>Considerations:</p>
+<ul>
+<li>
+<p>We might suggest to TPO to add the application.ini by default to tor-launcher. The file would be unnecessary for browser users, but useful for application.ini users. Doesn’t seem to affect normal TBB use. (Tested by me.)</p>
+</li>
+<li>
+<p>We might suggest to TPO, to ship folders rather than shipping xpi’s. Example xpi:</p>
+</li>
+</ul>
+<pre><code class="lang-auto"></code></pre>
+<p>Example folder:</p>
+<pre><code class="lang-auto"></code></pre>
+<p>[hr]</p>
+<p>This could be a way to proceed:</p>
+<pre><code class="lang-auto"></code></pre>
+<p>Getting an error for now.</p>
+<pre><code class="lang-auto">Unable to start Tor.
+
+The Tor executable is missing.</code></pre>
+<p>But that’s the part linostar might be able to help with.</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/13</link>
+        <pubDate>Sat, 10 Jan 2015 19:03:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-13</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Tails design documentation mentioning tor-launcher:<br>
+<a href="https://tails.boum.org/contribute/design/Tor_network_configuration/" class="onebox" target="_blank">https://tails.boum.org/contribute/design/Tor_network_configuration/</a></p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/12</link>
+        <pubDate>Sat, 10 Jan 2015 18:37:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-12</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>tor-launcher already has some standalone support.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://mailman.boum.org/pipermail/tails-dev/2014-February/004834.html">https://mailman.boum.org/pipermail/tails-dev/2014-February/004834.html</a></li>
+<li><a href="https://trac.torproject.org/projects/tor/ticket/11076">https://trac.torproject.org/projects/tor/ticket/11076</a></li>
+</ul>
+<p>[hr]</p>
+<p>This is somewhat what Tails is/was doing.</p>
+<pre><code class="lang-auto"></code></pre>
+<p>References:</p>
+<ul>
+<li><a href="https://labs.riseup.net/code/issues/7237">https://labs.riseup.net/code/issues/7237</a></li>
+<li><a href="https://labs.riseup.net/code/issues/7236">https://labs.riseup.net/code/issues/7236</a></li>
+</ul>
+<p>Although apparently they do something quite different. Looks like they somehow limited tor-launcher to only support obfs3 and not meek and others. And their version of tor-launcher apparently uses system Tor instead of using the Tor that comes with the TBB  folder as system Tor.</p>
+<p>[hr]</p>
+<p>One way that won’t work. Would have been way too simple.  <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=5" title=":wink:" class="emoji" alt=":wink:"></p>
+<pre><code class="lang-auto"></code></pre>
+<pre><code class="lang-auto"></code></pre>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/11</link>
+        <pubDate>Sat, 10 Jan 2015 18:07:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-11</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="8" data-topic="665">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Yeah. That’s it basically. You can also do “live” edits within TBB source folder. I am going to write some instructions on how to do this now. To help you get started with debugging and stuff.</p>
+</blockquote>
+</aside>
+<p>Here it is:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/Firefox_Add-On" target="_blank" title="10:08AM - 27 May 2019">Whonix – 27 May 19</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="" height="">
+
+<h3><a href="https://www.whonix.org/wiki/Dev/Firefox_Add-On" target="_blank">Dev/Firefox Add-On - Whonix</a></h3>
+
+<p>Firefox Add-On Development</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/10</link>
+        <pubDate>Tue, 06 Jan 2015 23:15:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-10</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Clone link here <a href="https://gitweb.torproject.org/tor-launcher.git/">https://gitweb.torproject.org/tor-launcher.git/</a> at the bottom:<br>
+<a href="https://git.torproject.org/tor-launcher.git">https://git.torproject.org/tor-launcher.git</a></p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/9</link>
+        <pubDate>Tue, 06 Jan 2015 21:37:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-9</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Yeah. That’s it basically. You can also do “live” edits within TBB source folder. I am going to write some instructions on how to do this now. To help you get started with debugging and stuff.</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/8</link>
+        <pubDate>Tue, 06 Jan 2015 21:37:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-8</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[troubadour]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="6" data-topic="665">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_1.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Although I really think if you would help us sorting out the hopefully robust and long term solution, i.e. tor-launcher, that would be a much better use of time.</p>
+</blockquote>
+</aside>
+<p>Certainly, for a long term solution. Has anybody really started on it yet? Had a quick look, and… where to look first? <a href="https://gitweb.torproject.org/tor-launcher.git/tree/" rel="nofollow noopener">https://gitweb.torproject.org/tor-launcher.git/tree/</a> ? Somewhere else?</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/7</link>
+        <pubDate>Tue, 06 Jan 2015 21:20:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-7</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Hm. Good question. I don’t know. I am torn. If you want. We could always refer to it as an alternative. Have a separate menu entry just for it perhaps.</p>
+<p>Although I really think if you would help us sorting out the hopefully robust and long term solution, i.e. tor-launcher, that would be a much better use of time.</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/6</link>
+        <pubDate>Tue, 06 Jan 2015 20:53:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-6</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[troubadour]]></dc:creator>
+        <description><![CDATA[
+            <p>As a reminder, we can use obfs3 and scramblesuit just by editing /etc/tor/torrc. Perhaps a temporary implementation in the wizard would be better than nothing?</p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/5</link>
+        <pubDate>Tue, 06 Jan 2015 19:04:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-5</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>A sub task:<br>
+add environment variable to hide TBB’s logo:<br>
+<a href="https://trac.torproject.org/projects/tor/ticket/14122" class="onebox" target="_blank">https://trac.torproject.org/projects/tor/ticket/14122</a></p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/4</link>
+        <pubDate>Tue, 06 Jan 2015 16:21:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-4</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+      <item>
+        <title>Tor-launcher - Better Circumvention User Interface</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Talked about this with linostar on IRC. We agreed on the modified draft.</p>
+<p>Posted:<br>
+<a href="https://trac.torproject.org/projects/tor/ticket/14121" class="onebox" target="_blank">https://trac.torproject.org/projects/tor/ticket/14121</a></p>
+          <p><a href="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665/3</link>
+        <pubDate>Tue, 06 Jan 2015 15:30:21 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-665-3</guid>
+        <source url="http://forums.whonix.org/t/tor-launcher-better-circumvention-user-interface/665.rss">Tor-launcher - Better Circumvention User Interface</source>
+      </item>
+  </channel>
+</rss>

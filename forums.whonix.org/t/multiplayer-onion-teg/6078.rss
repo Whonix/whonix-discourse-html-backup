@@ -1,0 +1,700 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>multiplayer onion &gt; TEG</title>
+    <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078</link>
+    <description>TEG or &quot;Tenes Empanadas Graciela&quot; is a [turn-based strategy video game](https://www.wikidata.org/wiki/Q335874) which is played through a server / client system.
+
+Whonix 14 is what this guide is about regarding when you host a TEG server. If you are only a player it shouldn&#39;t matter much what Whonix version you run, though Whonix 13 is no longer supported so try to run version 14 if you can.
+You can play the game even if you aren&#39;t running Whonix 14, but this guide will focus mostly on that and specifically running Whonix 14 on VirtualBox.
+
+&gt; CONNECTING TO THE GAME
+
+If you are on Whonix 14 you first need to install teg so type this in a terminal:
+
+`sudo apt-get install teg` (if it asks for a password type &quot;`changeme`&quot; if you haven&#39;t changed it already and hit enter)
+
+After it&#39;s installed open up the game from the system menu &quot;K&quot; =&gt; Applications =&gt; Games =&gt; Tactics &amp; Strategy =&gt; Tenes Empanadas Graciela client or type this in a terminal window:
+`tegclient`
+
+When it starts it should open a &quot;Connect to server&quot; window. Otherwise open it from the menu &quot;Game&quot; =&gt; &quot;Connect&quot; or press &quot;Connect&quot;.
+
+If it already says &quot;2000&quot; in the Server port field leave it as is.
+Where it says &quot;Server name&quot; add the onion address, ie. `w7jnpxhu3re5qarr.onion`
+Then choose a &quot;Name&quot; in that field for your playername and you&#39;re good to go, press OK if you want to join the server.
+
+In case you are the shy type hit the checkbox &quot;Dont play, just observe&quot; and then hit the OK button. This concludes this guide...if you want to host a teg server  continue reading the guide by following the instructions below.
+
+&gt; TEG SERVER
+
+The initial setup is based on instructions from the Whonix Wiki called &quot;[Onion Services](http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services)&quot;
+
+&gt;&gt; Go to the VirtualBox Whonix **Gateway** 14.x &gt;&gt; 
+
+and open up a terminal and type
+`sudo kwrite /usr/local/etc/torrc.d/50_user.conf` (after which you type your password which if not changed from the original is &quot;changeme&quot;)
+and modify that file so it looks
+like this:
+
+    HiddenServiceDir /var/lib/tor/hidden_service/
+    HiddenServicePort 2000 10.152.152.11:2000
+
+    DisableNetwork 0
+
+Save and close the file. For the changes to take effect open a terminal and type  this command:
+`sudo service tor@default reload` (enter the password mentioned previously if it asks for it)
+
+To check if everything is ok type this command in a terminal:
+`sudo service tor@default status` (enter the password if it asks for it)
+
+If it says &quot;`Active: active (running) since`&quot; where &quot;`active (running)`&quot; should be in green, that means everything is just fine. If something went wrong please [troubleshoot](http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services#Step_3:_make_changes_to_Tor_config_take_effect)
+
+Now it&#39;s time to find out which .onion address you can share with your friends so open up a terminal and type the command:
+`sudo cat /var/lib/tor/hidden_service/hostname` (might ask for password)
+
+The output of that command should be an .onion address with alphanumeric characters like this example that you can share with your friends so they can play on your server:
+`w7jnpxhu3re5qarr.onion`
+
+Everything you did here was in Whonix Gateway 14. Now it is time to go to Whonix **Workstation** 14 to edit the firewall!
+
+&gt;&gt; Go to the VirtualBox Whonix **Workstation** 14.x &gt;&gt; 
+
+Open a terminal and type this command:
+`sudo kwrite /etc/whonix_firewall.d/50_user.conf` (enter the password if it asks for one)
+
+then enter this:
+`EXTERNAL_OPEN_PORTS+=&quot; 2000 &quot;` and save.
+in case you already have a webserver on port 80 and you also want to have this
+game server then just change it to
+`EXTERNAL_OPEN_PORTS+=&quot; 80 2000 &quot;`
+
+Now time to reload the firewall so type this command for that:
+`sudo whonix_firewall` (enter the password if it asks for it)
+
+Ok...now we are ready to begin starting the actual game server software because most of the previous section was related to setting up your whonix gateway so let&#39;s begin!
+
+Still in the Whonix Workstation 14.x open a console and type:
+`tegserver`
+
+The server is running now and you can share the .onion address that you got earlier.
+In this example it is `w7jnpxhu3re5qarr.onion` but for you it will(most probably) be different. If you do these instructions too quickly the link that was generated for you might not work...in such a case you will have to be more patient and wait until your onion link has been copied enough times across the Tor network. Patience is a good attribute ;) when dealing with Tor.
+
+&gt; &quot;Some DDOS protection&quot; guide
+
+Very basic protection against DDOS attacks done versus your server so follow this guide if you want to abandon the &#39;single point of failure&#39; that is your only .onion address that all your players know(as of the previous &quot;normal guide&quot;). This section is to protect you against at least 1 bad player who wants to ddos your game server(regardless of reason). Let&#39;s get to how this extra protection is gonna be set in motion:
+
+&gt;&gt; Go to the VirtualBox Whonix **Gateway** 14.x &gt;&gt; 
+
+and open up a terminal and type
+`sudo kwrite /usr/local/etc/torrc.d/50_user.conf` (after which you type your password which if not changed from the original is “changeme”)
+and modify that file so it looks
+like this:
+
+    HiddenServiceDir /var/lib/tor/hidden_service/
+    HiddenServicePort 2000 10.152.152.11:2000
+
+    #1234567890123400 ends with 00 because this I plan to be the &#39;public address&#39;
+    #In the event the server gets a ddos attack the public address should be disabled
+    #and if not done already give individual players that you trust
+    #the addresses that are generated from the numbers ending with 01,02 etc.
+    #max amount of addresses is until 1234567890123415 is reached because that amount+00
+    #means 16 different .onion addresses which is the current max 
+    #on this specific anti ddos design
+    HiddenServiceAuthorizeClient stealth 1234567890123400,1234567890123401,1234567890123402,1234567890123403,1234567890123404,1234567890123405,1234567890123406,1234567890123407,1234567890123408,1234567890123409,1234567890123410,1234567890123411,1234567890123412,1234567890123413,1234567890123414,1234567890123415
+
+    #The above long line is a total of 16 numbers. If you add another number 
+    #Tor will refuse to reload so stick with 16.
+
+    #not sure if we really need &quot;DisableNetwork 0&quot; but let&#39;s leave it as is. I didn&#39;t have it before but I re-added it just in case it is needed.
+    DisableNetwork 0
+
+Save and close the file. For the changes to take effect open a terminal and type this command:
+`sudo service tor@default reload` (enter the password mentioned previously if it asks for it)
+**or open the K menu, search for reload and click on &quot;Reload Tor&quot;(this is basically _sudo service tor@default reload_ +  _sudo service tor@default status_ in one go)**
+
+Now it&#39;s time to find out which .onion addresses you can share with your friends so open up a terminal and type the command:
+`sudo cat /var/lib/tor/hidden_service/hostname` (might ask for password)
+
+Since I&#39;m going to regenerate all my .onion addresses by making new ones I&#39;m posting what this might actually look like when you try it yourself. Your &#39;player invites&#39; will look something like this:
+
+    aokofajrpe4g2zrf.onion QlQlXlPdXyTUf6WIOf1tfR # client: 1234567890123400
+    3wsajgpzqxytcsjo.onion Whi+D0Y/352YqMK3uTJNWx # client: 1234567890123401
+    umaenixqbqevdk5a.onion TE1Biv1JFjveN/mQqWOmSh # client: 1234567890123402
+    gwumcsrrfkc3kne5.onion VYzN3LVk9DVhbp3TRQuDXB # client: 1234567890123403
+    vuhiosfqgegorbkh.onion P5ns2xtCC+VJAVeW3FrC+x # client: 1234567890123404
+    jye4cftpe6xq2eka.onion vnCPwf6RWWMkv9iCKDZHlh # client: 1234567890123405
+    gvzl37orywkzxtr7.onion H+izJm1pwnt+FMdJnL2MWh # client: 1234567890123406
+    hdtjcfdpcnnnxws3.onion H6XIO5+ts0mz2AtBcbEJOx # client: 1234567890123407
+    gdgj2p5k7jqgv3k7.onion RvnG94Blww6jDLSpQSZW1B # client: 1234567890123408
+    6np4ynkdqg7e2cmx.onion X1st9nX4486nwJ9LmbJDNx # client: 1234567890123409
+    ywabarc6ziuwdhbl.onion ym9me7GXGUctLJwTgyWhgh # client: 1234567890123410
+    agyinmgx7qeodrx2.onion 6YUDbaghoXr0LWSoso7MeR # client: 1234567890123411
+    6xsjhpgrmf2rbnka.onion JP7giIIzLmhhn2r3EcbWWB # client: 1234567890123412
+    5fixfx3mvvj5cu7u.onion wmxp4ZoPmFb31WoCS2d/8B # client: 1234567890123413
+    rczg4s5reivwhd7p.onion pl/3phzLLB4hHsknnfOOxB # client: 1234567890123414
+    yl6ulm2lzvtsvdfx.onion G0v/YtNeaCgBuvFw6QfTTR # client: 1234567890123415
+
+I posted the above because I&#39;ve already changed the client numbers for all my 16 addresses already to begin with and reloading Tor after changing something in your client numbers makes Tor regenerating a new address for each of those 16 possible clients/&#39;groups of players&#39; where you changed an id. Right now I don&#39;t have the above addresses so I took the step to post how it actually looked like when I followed the guide myself and that&#39;s what you see above. Also when Tor generates new addresses it also generates the &#39;gibberish&#39; that you see right next to each .onion address, let&#39;s take the .onion address yl6ulm2lzvtsvdfx.onion as an example. To the right of that address there is this number &quot;G0v/YtNeaCgBuvFw6QfTTR&quot; which is going to be explained later in this guide.
+
+The guide will be expanded on later but for now cheers and don&#39;t forget that if you&#39;re interested in the guide you can subscribe to the thread or like the post. Thanks
+
+&gt; _Credits_
+
+This guide wouldn&#39;t be possible without [Tor Onion Services - EASY guide](http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services#Tor_Onion_Services_-_EASY)</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 08 Jun 2019 10:54:06 +0000</lastBuildDate>
+    <category>General Tor and Anonymity Talk</category>
+    <atom:link href="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[Tor_Gaming]]></dc:creator>
+        <description><![CDATA[
+            <p>I’d be honored! Is the offer still standing considering my short absence from the community?</p>
+<aside class="quote no-group" data-post="19" data-topic="6078">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Was moved to <a href="https://www.whonix.org/wiki/Onion_Gaming" rel="nofollow noopener">https://www.whonix.org/wiki/Onion_Gaming </a> by <a class="mention" href="http://forums.whonix.org/u/torjunkie">@torjunkie</a>.</p>
+<p>Can we add you as maintainer of that page?</p>
+</blockquote>
+</aside>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/20</link>
+        <pubDate>Sat, 08 Jun 2019 10:54:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-20</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Was moved to <a href="https://www.whonix.org/wiki/Onion_Gaming" rel="nofollow noopener">https://www.whonix.org/wiki/Onion_Gaming</a> by <a class="mention" href="http://forums.whonix.org/u/torjunkie">@torjunkie</a>.</p>
+<p>Can we add you as maintainer of that page?</p>
+<p><a href="https://www.whonix.org/wiki/Template:Maintainer" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/wiki/Template:Maintainer</a></p>
+<p>Examples how this template is used here:<br>
+<a href="https://www.whonix.org/wiki/Special:WhatLinksHere/Template:Maintainer" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/wiki/Special:WhatLinksHere/Template:Maintainer</a></p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/19</link>
+        <pubDate>Sun, 07 Apr 2019 10:21:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-19</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[Tor_Gaming]]></dc:creator>
+        <description><![CDATA[
+            <p>I found some bad news: teg does not seem to support .onion v3 address length, neither in gui nor terminal. In the gui it refuses to connect using the last 6 alphanumeric symbols + the last 6 “.onion”.</p>
+<p>My attempts in the terminal I based on <code>man tegclient</code> and it just opened up tegclient with  my efforts proving fruitless, ignoring my options and behaving as if I had just started the game with <code>tegclient</code>. Well… looks like I have to add other games that support v3 .onion addresses. One day I hope to write a proper bug report upstream but for now that has to wait.</p>
+<p>If anybody manages to connect to such an address without extra complications please let me know</p>
+<aside class="quote no-group quote-modified" data-post="17" data-topic="6078">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<blockquote>
+<p>Will I use information from <a href="http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services#Server_Setup" rel="nofollow noopener">this section</a> to learn how to do that?(though it might be outdated, cause Tor refused to re-start after</p>
+</blockquote>
+<p>No you would refer to this section instead. Authorizing clients is not needed. Make sure you disable the whonix workstation firewall or change its rules to accommodate your port numbers.</p>
+<p><a href="http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services#Whonix-Gateway" rel="nofollow noopener">http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services#Whonix-Gateway</a></p>
+</blockquote>
+</aside>
+<p>Ok, I made it work. I was worried for a while I wouldn’t make it but thanks to the wiki guide + <a href="https://www.torproject.org/docs/tor-onion-service.html.en#four" rel="nofollow noopener">Set up next-gen (v3) onions</a>(torproject dot org) and some own experimenting I managed to do that. This is how it could look like.(in</p>
+<blockquote>
+<p>/usr/local/etc/torrc.d/50_user.conf</p>
+</blockquote>
+<p>located in Whonix Gateway)</p>
+<pre><code>HiddenServiceDir /var/lib/tor/hidden_service/
+HiddenServicePort 80 10.152.152.11:80
+HiddenServiceVersion 3
+
+HiddenServiceDir /var/lib/tor/player1/
+HiddenServicePort 2001 10.152.152.11:2000
+HiddenServiceVersion 3
+
+HiddenServiceDir /var/lib/tor/player2/
+HiddenServicePort 2002 10.152.152.11:2000
+HiddenServiceVersion 3
+</code></pre>
+<p>To see which addresses you give each player/group of players you just do(also in Whonix Gateway!)</p>
+<p><code>sudo cat /var/lib/tor/player1/hostname</code>(.onion for player 1)<br>
+<code>sudo cat /var/lib/tor/player2/hostname</code>(.onion for player 2)</p>
+<p>In this example player/group 1 connects with their .onion on port 2001. Once they connect they are redirected to the gameserver port 2000.</p>
+<p>Player/group 2 connects with their specific .onion which is different from player/group 1’s .onion but with the port 2002 which is redirected to the server port 2000. That means both players can use a different .onion and can meet in the multiplayer game experience.</p>
+<p>What follows is that I now know how to upgrade the guide to v3 .onion multiplayer! Yay! Thanks everybody for your encouragement, I couldn’t do it without a little bit of experimenting. Next gen Tor Gaming on the way!</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/18</link>
+        <pubDate>Mon, 10 Dec 2018 12:50:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-18</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="13" data-topic="6078">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/6f9a4e/40.png" class="avatar"> Tor_Gaming:</div>
+<blockquote>
+<p>Will I use information from <a href="http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services#Server_Setup">this section</a> to learn how to do that?(though it might be outdated, cause Tor refused to re-start after</p>
+</blockquote>
+</aside>
+<p>No you would refer to this section instead. Authorizing clients is not needed. Make sure you disable the whonix workstation firewall or change its rules to accommodate your port numbers.</p>
+<p><a href="http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services#Whonix-Gateway" class="onebox" target="_blank">http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services#Whonix-Gateway</a></p>
+<aside class="quote no-group" data-post="13" data-topic="6078">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/6f9a4e/40.png" class="avatar"> Tor_Gaming:</div>
+<blockquote>
+<p>Actually it would be super cool to learn how to make multiple Onion v3 addresses for my game servers like I managed to do with my Onion v2 ones in stealth authentication mode.</p>
+</blockquote>
+</aside>
+<p>It should be the same process except you are adding one more line to define onion version.</p>
+<aside class="quote no-group" data-post="13" data-topic="6078">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/6f9a4e/40.png" class="avatar"> Tor_Gaming:</div>
+<blockquote>
+<p>I could have up to 16 different addresses there. Can I have up to 16 addresses in Onion v3 too or maybe even more?</p>
+</blockquote>
+</aside>
+<p>The 16 services are a limitation of the client cookie implementation. Since you are not using that with v3 you have no such limitations. You can run as many as your VM resources can handle.</p>
+<aside class="quote no-group" data-post="14" data-topic="6078">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/6f9a4e/40.png" class="avatar"> Tor_Gaming:</div>
+<blockquote>
+<p>As far as I know monero is as close as we can get to something like zcash and that works, am I right?</p>
+</blockquote>
+</aside>
+<p>Monero is architected from the ground up to counter surveillance. There were soome quirks discovered but those tend to be quickly handled.</p>
+<p>I appreciate your generosity, but please forward any such funds to Patrick. He is more worthy.</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/17</link>
+        <pubDate>Sun, 02 Dec 2018 17:28:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-17</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/arguments-for-excluding-non-free-software-from-wiki/6419" class="onebox" target="_blank">http://forums.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/t/arguments-for-excluding-non-free-software-from-wiki/6419</a></p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/16</link>
+        <pubDate>Sun, 02 Dec 2018 17:12:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-16</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="12" data-topic="6078">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>IMO we should not endorse closed source games or any kind of proprietary software if possible (a notable exception is firmware however we don’t have much choice).</p>
+</blockquote>
+</aside>
+<p>This needs a separate discussion. One where it is clear what is being discussed. It’s not about inclusion / non-inclusion of non-free software in Whonix, it’s about a ban on Whonix wiki to not document non-free software. For the latter, I am not yet convinced and would like to see arguments.</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/15</link>
+        <pubDate>Sun, 02 Dec 2018 03:36:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-15</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[Tor_Gaming]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="12" data-topic="6078">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>v2 will be deprecated in less than 2 years and render this guide obsolete</p>
+</blockquote>
+</aside>
+<p>2 years for the team, you and me to figure out how to make game servers being able to utilize Onion v3. I’m positive we’ll eventually make it work, but I know Onion v2. Maybe I should buy some Monero so I could give you a tip after you are done teaching me this. As far as I know monero is as close as we can get to something like zcash and that works, am I right?</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/14</link>
+        <pubDate>Sun, 02 Dec 2018 00:41:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-14</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[Tor_Gaming]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="12" data-topic="6078">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Could you please update it to use Onion v3?</p>
+</blockquote>
+</aside>
+<p>Will I use information from <a href="http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services#Server_Setup" rel="nofollow noopener">this section</a> to learn how to do that?(though it might be outdated, cause Tor refused to re-start after </p><pre>HiddenServiceVersion 3</pre> got enabled)
+<p>On <strong>Whonix Workstation</strong>…<br>
+Go to “See the following example. Adjust it for your purposes and add it.” and copy the information from the example into /usr/local/etc/torrc.d/50_user.conf (you can backup your old 50_user.conf) and try to restart Tor. For me it did not work. Does it work for you?</p>
+<p>Actually it would be super cool to learn how to make multiple Onion v3 addresses for my game servers like I managed to do with my Onion v2 ones in stealth authentication mode. I could have up to 16 different addresses there. Can I have up to 16 addresses in Onion v3 too or maybe even more?(how does it work in practice? Anybody tried on low end hardware how many addresses can be handled before the system starts encountering bottlenecks?)</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/13</link>
+        <pubDate>Sat, 01 Dec 2018 20:45:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-13</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/tor_gaming">@Tor_Gaming</a></p>
+<p>Accepted for now. Could you please update it to use Onion v3? v2 will be deprecated in less than 2 years and render this guide obsolete. With v3 you don’t need to use client authorization as an onion is inaccessible unless its address is known by a third party unlike the old protocol.</p>
+<p>Also for style guidelines, please use &lt; pre&gt; and &lt; pre/&gt; to highlight commands for users (No spaces).</p>
+<hr>
+<p>IMO we should not endorse closed source games or any kind of proprietary software if possible (a notable exception is firmware however we don’t have much choice). I know TEG isn’t, but there is a note saying closed games are OK too.</p>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> any opinion on this?</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/12</link>
+        <pubDate>Sat, 01 Dec 2018 17:52:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-12</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Sure.</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/11</link>
+        <pubDate>Sat, 01 Dec 2018 16:27:42 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-11</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Would you like to become maintainer of <a href="https://www.whonix.org/wiki/Onion_Services_Guides">https://www.whonix.org/wiki/Onion_Services_Guides</a> and/or like to review <a href="https://www.whonix.org/w/index.php?title=Onion_Services_Guides&amp;oldid=39827&amp;diff=cur">https://www.whonix.org/w/index.php?title=Onion_Services_Guides&amp;oldid=39827&amp;diff=cur</a>? <a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a></p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/10</link>
+        <pubDate>Sat, 01 Dec 2018 16:17:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-10</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Sure. Just go ahead and copy the wikicode from this section:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Time_Attacks#GNU.2FLinux_Host" target="_blank">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/452;"><img src="https://www.whonix.org/w/images/2/28/Clock-359985640.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Time_Attacks#GNU.2FLinux_Host" target="_blank">Time Attacks</a></h3>
+
+<p>Time Related Security Issues and Solutions</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/9</link>
+        <pubDate>Fri, 30 Nov 2018 17:23:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-9</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[Tor_Gaming]]></dc:creator>
+        <description><![CDATA[
+            <p>Maybe the guide should be transcluded on the page because the guide I’m building on takes up a large amount of wiki space, which could prevent people from editing the other parts in the future due to having to deal with a large ‘blob’ of information…</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/8</link>
+        <pubDate>Fri, 30 Nov 2018 13:22:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-8</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[Tor_Gaming]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="6" data-topic="6078">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>See if you want to make it collapsible too for better space efficiency.</p>
+</blockquote>
+</aside>
+<p>Do you know the wikicode to make a section collapsible?</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/7</link>
+        <pubDate>Fri, 30 Nov 2018 13:06:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-7</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Makes sense. Sure go ahead and create a separate section. See if you want to make it collapsible too for better space efficiency.</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/6</link>
+        <pubDate>Wed, 28 Nov 2018 18:29:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-6</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[Tor_Gaming]]></dc:creator>
+        <description><![CDATA[
+            <p>Ok, I’m gonna add it, but in such a case it will be the longest guide on the entire page. I was thinking about adding a == Multiplayer Games == which is kinda contradictory since I’m only adding one game at the moment. I’m hoping though to add more multiplayer games in the future. If I set a deadline myself for when I’ll not only finish this guide but also add another game, I’d say I’ll be finished before this year ends.(in which case a == Multiplayer Games == section could make more sense than what I propose currently)</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/5</link>
+        <pubDate>Wed, 28 Nov 2018 11:04:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-5</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-post="3" data-topic="6078">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/6f9a4e/40.png" class="avatar"> Tor_Gaming:</div>
+<blockquote>
+<p>My next plan is to learn this technology to use as a ddos protection against potential future ddos attacks(by irritated players, although I hope the games I host won’t make players irritated)</p>
+</blockquote>
+</aside>
+<p>Interesting! That takes gameplay moderation to a whole new level <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=6" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<aside class="quote no-group" data-post="3" data-topic="6078">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/t/6f9a4e/40.png" class="avatar"> Tor_Gaming:</div>
+<blockquote>
+<p>I’ve decided against moving it to the wiki as of yet. You are free to though. I need to put in serious work before linking from the wiki I think</p>
+</blockquote>
+</aside>
+<p>Ready when you are. No rush.</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/4</link>
+        <pubDate>Fri, 26 Oct 2018 15:18:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-4</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[Tor_Gaming]]></dc:creator>
+        <description><![CDATA[
+            <p>According to <a href="https://www.wikidata.org/w/index.php?title=Q335874&amp;oldid=739235669" rel="nofollow noopener">wikidata page for teg</a> the game is an instance of <a href="https://www.wikidata.org/wiki/Q21125433" rel="nofollow noopener">free or open-source video game (Q21125433)</a> and the license is <a href="https://www.wikidata.org/wiki/Q10513450" rel="nofollow noopener">GPLv2</a> as claimed on aforementioned item page for teg</p>
+<h2><a href="http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services#Onion_Service_Authentication" rel="nofollow noopener">Onion Service Authentication</a></h2>
+<p><a class="mention" href="http://forums.whonix.org/u/hulahoop">@HulaHoop</a></p>
+<p>My next plan is to learn this technology to use as a ddos protection against potential future ddos attacks(by irritated players, although I hope the games I host won’t make players irritated), probably starting with a game I’m interested in hosting(teg or another game I find more interesting). My aim is to write a full fledged guide from start to finish for a specific game. Then when that guide is finished(or in the works) I could link to it from <a href="http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services_Guides" rel="nofollow noopener">Onion Services Guides</a></p>
+<p>I’ve decided against moving it to the wiki as of yet. You are free to though. I need to put in serious work before linking from the wiki I think…and I also need to make a basic popularity test to see how many actually are going to use the service, so I think it’s wise to use the tactic ‘wait and see’</p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/3</link>
+        <pubDate>Mon, 08 Oct 2018 07:42:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-3</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>If this is a libre game please feel free to add your guide to this page on our wiki:</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Onion_Services_Guides" target="_blank">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:84/57;"><img src="https://www.whonix.org/w/images/3/3a/Onionservice.jpg" class="thumbnail"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Onion_Services_Guides" target="_blank">Onion Services Guides</a></h3>
+
+<p>Collection of various Onion Services Guides</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/2</link>
+        <pubDate>Sat, 29 Sep 2018 13:50:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-2</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+      <item>
+        <title>multiplayer onion &gt; TEG</title>
+        <dc:creator><![CDATA[Tor_Gaming]]></dc:creator>
+        <description><![CDATA[
+            <p>TEG or “Tenes Empanadas Graciela” is a <a href="https://www.wikidata.org/wiki/Q335874" rel="nofollow noopener">turn-based strategy video game</a> which is played through a server / client system.</p>
+<p>Whonix 14 is what this guide is about regarding when you host a TEG server. If you are only a player it shouldn’t matter much what Whonix version you run, though Whonix 13 is no longer supported so try to run version 14 if you can.<br>
+You can play the game even if you aren’t running Whonix 14, but this guide will focus mostly on that and specifically running Whonix 14 on VirtualBox.</p>
+<blockquote>
+<p>CONNECTING TO THE GAME</p>
+</blockquote>
+<p>If you are on Whonix 14 you first need to install teg so type this in a terminal:</p>
+<p><code>sudo apt-get install teg</code> (if it asks for a password type “<code>changeme</code>” if you haven’t changed it already and hit enter)</p>
+<p>After it’s installed open up the game from the system menu “K” =&gt; Applications =&gt; Games =&gt; Tactics &amp; Strategy =&gt; Tenes Empanadas Graciela client or type this in a terminal window:<br>
+<code>tegclient</code></p>
+<p>When it starts it should open a “Connect to server” window. Otherwise open it from the menu “Game” =&gt; “Connect” or press “Connect”.</p>
+<p>If it already says “2000” in the Server port field leave it as is.<br>
+Where it says “Server name” add the onion address, ie. <code>w7jnpxhu3re5qarr.onion</code><br>
+Then choose a “Name” in that field for your playername and you’re good to go, press OK if you want to join the server.</p>
+<p>In case you are the shy type hit the checkbox “Dont play, just observe” and then hit the OK button. This concludes this guide…if you want to host a teg server  continue reading the guide by following the instructions below.</p>
+<blockquote>
+<p>TEG SERVER</p>
+</blockquote>
+<p>The initial setup is based on instructions from the Whonix Wiki called “<a href="http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services" rel="nofollow noopener">Onion Services</a>”</p>
+<blockquote>
+<blockquote>
+<p>Go to the VirtualBox Whonix <strong>Gateway</strong> 14.x &gt;&gt;</p>
+</blockquote>
+</blockquote>
+<p>and open up a terminal and type<br>
+<code>sudo kwrite /usr/local/etc/torrc.d/50_user.conf</code> (after which you type your password which if not changed from the original is “changeme”)<br>
+and modify that file so it looks<br>
+like this:</p>
+<pre><code>HiddenServiceDir /var/lib/tor/hidden_service/
+HiddenServicePort 2000 10.152.152.11:2000
+
+DisableNetwork 0
+</code></pre>
+<p>Save and close the file. For the changes to take effect open a terminal and type  this command:<br>
+<code>sudo service tor@default reload</code> (enter the password mentioned previously if it asks for it)</p>
+<p>To check if everything is ok type this command in a terminal:<br>
+<code>sudo service tor@default status</code> (enter the password if it asks for it)</p>
+<p>If it says “<code>Active: active (running) since</code>” where “<code>active (running)</code>” should be in green, that means everything is just fine. If something went wrong please <a href="http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services#Step_3:_make_changes_to_Tor_config_take_effect" rel="nofollow noopener">troubleshoot</a></p>
+<p>Now it’s time to find out which .onion address you can share with your friends so open up a terminal and type the command:<br>
+<code>sudo cat /var/lib/tor/hidden_service/hostname</code> (might ask for password)</p>
+<p>The output of that command should be an .onion address with alphanumeric characters like this example that you can share with your friends so they can play on your server:<br>
+<code>w7jnpxhu3re5qarr.onion</code></p>
+<p>Everything you did here was in Whonix Gateway 14. Now it is time to go to Whonix <strong>Workstation</strong> 14 to edit the firewall!</p>
+<blockquote>
+<blockquote>
+<p>Go to the VirtualBox Whonix <strong>Workstation</strong> 14.x &gt;&gt;</p>
+</blockquote>
+</blockquote>
+<p>Open a terminal and type this command:<br>
+<code>sudo kwrite /etc/whonix_firewall.d/50_user.conf</code> (enter the password if it asks for one)</p>
+<p>then enter this:<br>
+<code>EXTERNAL_OPEN_PORTS+=" 2000 "</code> and save.<br>
+in case you already have a webserver on port 80 and you also want to have this<br>
+game server then just change it to<br>
+<code>EXTERNAL_OPEN_PORTS+=" 80 2000 "</code></p>
+<p>Now time to reload the firewall so type this command for that:<br>
+<code>sudo whonix_firewall</code> (enter the password if it asks for it)</p>
+<p>Ok…now we are ready to begin starting the actual game server software because most of the previous section was related to setting up your whonix gateway so let’s begin!</p>
+<p>Still in the Whonix Workstation 14.x open a console and type:<br>
+<code>tegserver</code></p>
+<p>The server is running now and you can share the .onion address that you got earlier.<br>
+In this example it is <code>w7jnpxhu3re5qarr.onion</code> but for you it will(most probably) be different. If you do these instructions too quickly the link that was generated for you might not work…in such a case you will have to be more patient and wait until your onion link has been copied enough times across the Tor network. Patience is a good attribute <img src="//forums.whonix.org/images/emoji/twitter/wink.png?v=6" title=":wink:" class="emoji" alt=":wink:"> when dealing with Tor.</p>
+<blockquote>
+<p>“Some DDOS protection” guide</p>
+</blockquote>
+<p>Very basic protection against DDOS attacks done versus your server so follow this guide if you want to abandon the ‘single point of failure’ that is your only .onion address that all your players know(as of the previous “normal guide”). This section is to protect you against at least 1 bad player who wants to ddos your game server(regardless of reason). Let’s get to how this extra protection is gonna be set in motion:</p>
+<blockquote>
+<blockquote>
+<p>Go to the VirtualBox Whonix <strong>Gateway</strong> 14.x &gt;&gt;</p>
+</blockquote>
+</blockquote>
+<p>and open up a terminal and type<br>
+<code>sudo kwrite /usr/local/etc/torrc.d/50_user.conf</code> (after which you type your password which if not changed from the original is “changeme”)<br>
+and modify that file so it looks<br>
+like this:</p>
+<pre><code>HiddenServiceDir /var/lib/tor/hidden_service/
+HiddenServicePort 2000 10.152.152.11:2000
+
+#1234567890123400 ends with 00 because this I plan to be the 'public address'
+#In the event the server gets a ddos attack the public address should be disabled
+#and if not done already give individual players that you trust
+#the addresses that are generated from the numbers ending with 01,02 etc.
+#max amount of addresses is until 1234567890123415 is reached because that amount+00
+#means 16 different .onion addresses which is the current max 
+#on this specific anti ddos design
+HiddenServiceAuthorizeClient stealth 1234567890123400,1234567890123401,1234567890123402,1234567890123403,1234567890123404,1234567890123405,1234567890123406,1234567890123407,1234567890123408,1234567890123409,1234567890123410,1234567890123411,1234567890123412,1234567890123413,1234567890123414,1234567890123415
+
+#The above long line is a total of 16 numbers. If you add another number 
+#Tor will refuse to reload so stick with 16.
+
+#not sure if we really need "DisableNetwork 0" but let's leave it as is. I didn't have it before but I re-added it just in case it is needed.
+DisableNetwork 0
+</code></pre>
+<p>Save and close the file. For the changes to take effect open a terminal and type this command:<br>
+<code>sudo service tor@default reload</code> (enter the password mentioned previously if it asks for it)<br>
+<strong>or open the K menu, search for reload and click on “Reload Tor”(this is basically <em>sudo service tor@default reload</em> +  <em>sudo service tor@default status</em> in one go)</strong></p>
+<p>Now it’s time to find out which .onion addresses you can share with your friends so open up a terminal and type the command:<br>
+<code>sudo cat /var/lib/tor/hidden_service/hostname</code> (might ask for password)</p>
+<p>Since I’m going to regenerate all my .onion addresses by making new ones I’m posting what this might actually look like when you try it yourself. Your ‘player invites’ will look something like this:</p>
+<pre><code>aokofajrpe4g2zrf.onion QlQlXlPdXyTUf6WIOf1tfR # client: 1234567890123400
+3wsajgpzqxytcsjo.onion Whi+D0Y/352YqMK3uTJNWx # client: 1234567890123401
+umaenixqbqevdk5a.onion TE1Biv1JFjveN/mQqWOmSh # client: 1234567890123402
+gwumcsrrfkc3kne5.onion VYzN3LVk9DVhbp3TRQuDXB # client: 1234567890123403
+vuhiosfqgegorbkh.onion P5ns2xtCC+VJAVeW3FrC+x # client: 1234567890123404
+jye4cftpe6xq2eka.onion vnCPwf6RWWMkv9iCKDZHlh # client: 1234567890123405
+gvzl37orywkzxtr7.onion H+izJm1pwnt+FMdJnL2MWh # client: 1234567890123406
+hdtjcfdpcnnnxws3.onion H6XIO5+ts0mz2AtBcbEJOx # client: 1234567890123407
+gdgj2p5k7jqgv3k7.onion RvnG94Blww6jDLSpQSZW1B # client: 1234567890123408
+6np4ynkdqg7e2cmx.onion X1st9nX4486nwJ9LmbJDNx # client: 1234567890123409
+ywabarc6ziuwdhbl.onion ym9me7GXGUctLJwTgyWhgh # client: 1234567890123410
+agyinmgx7qeodrx2.onion 6YUDbaghoXr0LWSoso7MeR # client: 1234567890123411
+6xsjhpgrmf2rbnka.onion JP7giIIzLmhhn2r3EcbWWB # client: 1234567890123412
+5fixfx3mvvj5cu7u.onion wmxp4ZoPmFb31WoCS2d/8B # client: 1234567890123413
+rczg4s5reivwhd7p.onion pl/3phzLLB4hHsknnfOOxB # client: 1234567890123414
+yl6ulm2lzvtsvdfx.onion G0v/YtNeaCgBuvFw6QfTTR # client: 1234567890123415
+</code></pre>
+<p>I posted the above because I’ve already changed the client numbers for all my 16 addresses already to begin with and reloading Tor after changing something in your client numbers makes Tor regenerating a new address for each of those 16 possible clients/‘groups of players’ where you changed an id. Right now I don’t have the above addresses so I took the step to post how it actually looked like when I followed the guide myself and that’s what you see above. Also when Tor generates new addresses it also generates the ‘gibberish’ that you see right next to each .onion address, let’s take the .onion address yl6ulm2lzvtsvdfx.onion as an example. To the right of that address there is this number “G0v/YtNeaCgBuvFw6QfTTR” which is going to be explained later in this guide.</p>
+<p>The guide will be expanded on later but for now cheers and don’t forget that if you’re interested in the guide you can subscribe to the thread or like the post. Thanks</p>
+<blockquote>
+<p><em>Credits</em></p>
+</blockquote>
+<p>This guide wouldn’t be possible without <a href="http://dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/wiki/Onion_Services#Tor_Onion_Services_-_EASY" rel="nofollow noopener">Tor Onion Services - EASY guide</a></p>
+          <p><a href="http://forums.whonix.org/t/multiplayer-onion-teg/6078/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/multiplayer-onion-teg/6078/1</link>
+        <pubDate>Sat, 29 Sep 2018 03:51:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-6078-1</guid>
+        <source url="http://forums.whonix.org/t/multiplayer-onion-teg/6078.rss">multiplayer onion &gt; TEG</source>
+      </item>
+  </channel>
+</rss>

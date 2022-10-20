@@ -1,0 +1,999 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>vitor - safely edit the Tor configuration file</title>
+    <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213</link>
+    <description>what if sudoedit is not used (not just it) for editing the tor configuration files but a visudo for tor?
+`vitor` (cough bad name I invented)
+
+It creates a copy of the tor configuration file you want to edit, you open with the editor the copy, you can open with sudoedit which will use the default environment variables for the editor as specified on the sudo manual, but then after closing the editor, run `tor -f file --verify-config --hush` to see if configuration is valid and tor will not break because of invalid configuration?
+
+Updated script: `https://github.com/nyxnor/onionjuggler/blob/main/bin/vitor`
+Manual page: `https://github.com/nyxnor/onionjuggler/blob/main/docs/vitor.8.md`
+
+Some changes are &quot;needed&quot; for whonix as in change the default configuration to 50_user_conf instead of /etc/tor/torrc, removing doas option and only use sudo, use the default tor user
+```sh
+#!/usr/bin/env sh
+
+## Copy tor config to temp, lock the original file, modify the temp,
+## verify it is ok then save back to original place and remove temporary and lock file.
+
+## Inspired by https://github.com/slicer69/doas/blob/master/vidoas
+
+
+file_mode=&quot;644&quot;
+me=&quot;${0##*/}&quot;
+
+## colors
+#nocolor=&quot;\033[0m&quot;
+#bold=&quot;\033[1m&quot;
+#nobold=&quot;\033[22m&quot;
+#underline=&quot;\033[4m&quot;
+#nounderline=&quot;\033[24m&quot;
+#red=&quot;\033[31m&quot;
+#green=&quot;\033[32m&quot;
+#yellow=&quot;\033[33m&quot;
+#blue=&quot;\033[34m&quot;
+#magenta=&quot;\033[35m&quot;
+#cyan=&quot;\033[36m&quot;
+
+## display error message with instructions to use the script correctly.
+notice(){ printf %s&quot;${me}: ${1}\n&quot; 1&gt;&amp;2; }
+error_msg(){ notice &quot;${1}&quot;; exit 1; }
+usage(){ printf &#39;%s\n&#39; &quot;Usage: [sudo|doas] ${me} [-f tor_conf] [-u tor_user]
+Note:
+  ${me}               run ${me} as the root user with &#39;sudo&#39; or &#39;doas&#39;
+  -f tor_conf         if &#39;tor_conf&#39; is not set, default to /etc/tor/torrc
+                      if the file doesn&#39;t exist, will create it after passing all tests.
+  -u tor_user         if &#39;tor_user&#39; is not set, the tor_conf must contain the \&quot;User\&quot; option
+                      else it tor fails to validate the configuration&quot;
+  exit 1
+}
+
+get_arg(){ case &quot;${2}&quot; in &quot;&quot;|-*) error_msg &quot;Option &#39;${1}&#39; requires an argument.&quot;;; esac; }
+
+[ -n &quot;${1}&quot; ] &amp;&amp; [ -z &quot;${2}&quot; ] &amp;&amp; tor_conf=&quot;${1}&quot;
+while :; do
+  case &quot;${1}&quot; in
+    -f) get_arg &quot;${1}&quot; &quot;${2}&quot;; tor_conf=&quot;${2}&quot;; shift 2;;
+    -u) get_arg &quot;${1}&quot; &quot;${2}&quot;; tor_user=&quot;${2}&quot;; shift 2;;
+    &quot;&quot;) break;;
+    *) usage;;
+  esac
+done
+
+[ -n &quot;${SUDO_USER}&quot; ] &amp;&amp; su_cmd=&quot;sudo&quot;
+[ -n &quot;${DOAS_USER}&quot; ] &amp;&amp; su_cmd=&quot;doas&quot;
+{ [ -z &quot;${su_cmd}&quot; ] || [ &quot;$(id -u)&quot; -ne 0 ]; } &amp;&amp; error_msg &quot;Run ${me} as the root user with &#39;sudo&#39; or &#39;doas&#39;.&quot;
+
+## get editor. First try environment variables [SUDO|DOAS]_EDITOR, if empty try VISUAL, if empty try EDITOR, if empty use Vi
+eval PRIVILEGED_EDITOR=&#39;$&#39;&quot;$(printf %s&quot;${su_cmd##*/}&quot; | tr &#39;[:lower:]&#39; &#39;[:upper:]&#39;)_EDITOR&quot;
+editor=&quot;${PRIVILEGED_EDITOR:-&quot;${VISUAL:-&quot;${EDITOR:-vi}&quot;}&quot;}&quot;
+## get interrupt signal
+#get_intr=&quot;$(stty -a | sed -n &#39;/.*intr = / {s///;s/;.*$//;p;}&#39;)&quot;
+
+## get first argument, if empty, onionjuggler.conf variable, if empty, fallback to default torrc
+file=&quot;${tor_conf:-&quot;/etc/tor/torrc&quot;}&quot;
+## remove last backlash if inserted by mistake
+file=&quot;${file%*/}&quot;
+
+if [ -f &quot;${file}&quot; ]; then
+  tor_user_check=&quot;$(grep &quot;^User&quot; &quot;${file}&quot; | sed &quot;s/^User //&quot;)&quot;
+  if [ -n &quot;${tor_user_check}&quot; ] &amp;&amp; [ -n &quot;${tor_user}&quot; ] &amp;&amp; [ &quot;${tor_user_check}&quot; != &quot;${tor_user}&quot; ]; then
+    notice &quot;The tor configuration file contains the user ${tor_user_check}, but you specified the tor user ${tor_user}.&quot;
+    error_msg &quot;Are you running tor as the correct user?&quot;
+  fi
+  if [ -z &quot;${tor_user_check}&quot; ] &amp;&amp; [ -z &quot;${tor_user}&quot; ]; then
+    notice &quot;\&quot;User\&quot; option is not set on the tor configuration file nor in the command line.&quot;
+    notice &quot;Specify the tor user with:&quot;
+    error_msg &quot;$ ${me} -u tor_user&quot;
+  fi
+fi
+
+
+## get just the directory
+file_dir=&quot;${file%/*}&quot;
+
+## check permissions
+[ ! -d &quot;${file_dir}&quot; ] &amp;&amp; error_msg &quot;${file_dir} is not a directory or doesnt exist.&quot;
+[ ! -w &quot;${file_dir}&quot; ] &amp;&amp; error_msg &quot;${file_dir} is not writable by ${USER}.&quot;
+[ ! -r &quot;${file_dir}&quot; ] &amp;&amp; error_msg &quot;${file_dir} is not readble by ${USER}.&quot;
+
+## file is the first argument, replace &#39;.&#39; and &#39;-&#39; for &#39;_&#39;.
+file_name=&quot;$(printf %s&quot;${file##*/}&quot; | tr &quot;.&quot; &quot;_&quot; | tr &quot;-&quot; &quot;_&quot;)&quot;
+file_name_tmp=&quot;$(printf %s&quot;mkstemp(${file_dir}/${file_name}.XXXXXX)&quot; | m4)&quot;
+chmod &quot;${file_mode}&quot; &quot;${file_name_tmp}&quot;
+
+file_locked=&quot;${file}.lck&quot;
+## test if file is already in use.
+ln &quot;${file}&quot; &quot;${file_locked}&quot; || error_msg &quot;${file} is busy, try again later.&quot;
+
+if [ -f &quot;${file}&quot; ]; then
+  [ ! -r &quot;${file}&quot; ] &amp;&amp; error_msg &quot;${file} is not readable.&quot;
+  [ ! -w &quot;${file}&quot; ] &amp;&amp; error_msg &quot;${file} is not writable.&quot;
+  cp -p &quot;${file}&quot; &quot;${file_name_tmp}&quot;
+fi
+
+check_tmp_tor_user(){
+  tor_user_check=&quot;$(grep &quot;^User&quot; &quot;${file_name_tmp}&quot; | sed &quot;s/^User //&quot;)&quot;
+  if [ -n &quot;${tor_user_check}&quot; ]; then
+    su_tor_cmd=&quot;${su_cmd}&quot;
+  else
+    if [ -z &quot;${tor_user}&quot; ]; then
+      notice &quot;You probably commented or deleted the \&quot;User\&quot; option, but you can only do that if you specify the tor user.&quot;
+      notice &quot;If that is what you want, exit and run:&quot;
+      notice &quot;$ ${me} -u tor_user&quot;
+    else
+      su_tor_cmd=&quot;${su_cmd} -u ${tor_user}&quot;
+    fi
+  fi
+}
+
+trap &#39;&#39; INT
+trap &#39;rm -f ${file_name_tmp} ${file_locked}&#39; EXIT
+
+## open temporary file to be edited
+&quot;${editor}&quot; &quot;${file_name_tmp}&quot; || true
+check_tmp_tor_user
+
+## while the config is not ok, loop to enter and continue to edit or signal to interrupt.
+while ! ${su_tor_cmd} tor -f &quot;${file_name_tmp}&quot; --verify-config --hush; do
+  tor_check=&quot;$(${su_tor_cmd} tor -f &quot;${file_name_tmp}&quot; --verify-config --hush)&quot;
+  printf &#39;%s\n&#39; &quot;${tor_check}&quot; | grep -q &quot;Permission denied&quot; &amp;&amp; notice &quot;Got permission denied to read tor directories, did you specify the tor user? If yes, maybe the directories do not have the right owner.&quot;
+  printf &#39;%s\n&#39; &quot;${tor_check}&quot; | grep -q &quot;You are running Tor as root. You don&#39;t need to, and you probably shouldn&#39;t.&quot; &amp;&amp; notice &quot;Do not run tor as root if you did not set the \&quot;User\&quot; option.&quot;
+  notice &quot;The temporary copy on ${file_name_tmp} is not a valid configuration.&quot;
+  notice &quot;Options are:&quot;
+  notice &quot;  (e)enter to edit again.&quot;
+  notice &quot;  e(x)it to cancel without saving changes.&quot;
+  while :; do
+  printf %s&quot;${me}: Your choice: &quot;
+    # shellcheck disable=SC2034
+    read -r status
+    case &quot;${status}&quot; in
+      e|E) break;;
+      x|X) exit;;
+    esac
+  done
+  &quot;${editor}&quot; &quot;${file_name_tmp}&quot; || true
+  check_tmp_tor_user
+done
+
+! cmp -s &quot;${file_name_tmp}&quot; &quot;${file}&quot; &amp;&amp; cp -p &quot;${file_name_tmp}&quot; &quot;${file}&quot; &amp;&amp; notice &quot;${file} updated.&quot; &amp;&amp; exit 0
+```</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 18 Jun 2022 10:26:08 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>Vitor is not gonna be included by TPO because now they are focusing on Rust for Arti, so unless someone contributes, it is not gonna happen upstream.</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://gitlab.torproject.org/tpo/core/tor/-/issues/40536#note_2814833">
+  <header class="source">
+      <img src="https://gitlab.torproject.org/uploads/-/system/appearance/favicon/1/favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://gitlab.torproject.org/tpo/core/tor/-/issues/40536#note_2814833" target="_blank" rel="noopener nofollow ugc">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:246/362;"><img src="https://gitlab.torproject.org/uploads/-/system/project/avatar/426/tor_logo.png" class="thumbnail" width="246" height="362"></div>
+
+<h3><a href="https://gitlab.torproject.org/tpo/core/tor/-/issues/40536#note_2814833" target="_blank" rel="noopener nofollow ugc">Feature request: add a vitor, like visudo or vidoas but for the tor...</a></h3>
+
+  <p>Summary vidoas visudo These programs allow the user to...</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/28">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/28</link>
+        <pubDate>Sat, 18 Jun 2022 10:26:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-28</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>Pointing out “it’s a symlink” would be good for usability. If you like implementing this. Small usability gain.</p>
+</blockquote>
+<p>Done with info messages.</p>
+<aside class="onebox githubcommit" data-onebox-src="https://github.com/nyxnor/onionwash/commit/0c64bf962c4f962ea4bec1cb2f3f2092399d1f28">
+  <header class="source">
+
+      <a href="https://github.com/nyxnor/onionwash/commit/0c64bf962c4f962ea4bec1cb2f3f2092399d1f28" target="_blank" rel="noopener nofollow ugc">github.com/nyxnor/onionwash</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/nyxnor/onionwash/commit/0c64bf962c4f962ea4bec1cb2f3f2092399d1f28" target="_blank" rel="noopener nofollow ugc">block all non regular files</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2022-02-25" data-time="14:57:07" data-timezone="UTC">02:57PM - 25 Feb 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/nyxnor" target="_blank" rel="noopener nofollow ugc">
+          <img alt="nyxnor" src="https://avatars.githubusercontent.com/u/69700936?v=4" class="onebox-avatar-inline" width="20" height="20">
+          nyxnor
+        </a>
+      </div>
+
+      <div class="lines" title="changed 1 files with 23 additions and 2 deletions">
+        <a href="https://github.com/nyxnor/onionwash/commit/0c64bf962c4f962ea4bec1cb2f3f2092399d1f28" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+23</span>
+          <span class="removed">-2</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">https://github.com/nyxnor/onionwash/issues/8</p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>
+<p>So in case of editing a torrc file on the gateway (maybe even any Debian) it’s hard to come up with a realistic threat where this would prevent security compromise.</p>
+</blockquote>
+<p>Yeah, no way to cover all possible security ground. What could be done was done.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/27">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/27</link>
+        <pubDate>Mon, 28 Feb 2022 22:51:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-27</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="nyxnor" data-post="20" data-topic="13213">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>To keep vitor safe, I was studying some of sudoedit and visudo security features.</p>
+</blockquote>
+</aside>
+<p>Well, a lot of this is for quite advanced threat models. The problem is, while many geeks assume that threat model, I haven’t seen it fully spelled out.</p>
+<p>It’s for very nuanced, advanced threat models. See:</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://www.kicksecure.com/wiki/Login_spoofing">
+  <header class="source">
+      <img src="https://www.kicksecure.com/favicon.ico" class="site-icon" width="" height="">
+
+      <a href="https://www.kicksecure.com/wiki/Login_spoofing" target="_blank" rel="noopener" title="01:19PM - 06 December 2021">Kicksecure – 6 Dec 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/360;"><img src="https://www.kicksecure.com/w/images/c/cc/Loginspoofing132.png" class="thumbnail" width="640" height="360"></div>
+
+<h3><a href="https://www.kicksecure.com/wiki/Login_spoofing" target="_blank" rel="noopener">Login Spoofing</a></h3>
+
+  <p>Prevent Malware from Sniffing the Root Password. Using SysRq + r. (unraw)</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://www.kicksecure.com/wiki/Dev/Strong_Linux_User_Account_Isolation">
+  <header class="source">
+      <img src="https://www.kicksecure.com/favicon.ico" class="site-icon" width="" height="">
+
+      <a href="https://www.kicksecure.com/wiki/Dev/Strong_Linux_User_Account_Isolation" target="_blank" rel="noopener" title="03:12PM - 21 February 2022">Kicksecure – 21 Feb 22</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/430;"><img src="https://www.kicksecure.com/w/images/0/0a/Useraccountisolatiom123123.jpg" class="thumbnail" width="640" height="430"></div>
+
+<h3><a href="https://www.kicksecure.com/wiki/Dev/Strong_Linux_User_Account_Isolation" target="_blank" rel="noopener">Strong Linux User Account Isolation</a></h3>
+
+  <p>Protect Linux User Accounts against Brute Force Attacks, Root Account Locking, Console Lockdown, sudo password sniffing, X Windows System Password Sniffing, /proc/pid/sched spy on keystrokes, Linux user account cracking, pam-tally2, pam-cracklib,...</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>There are good arguments between “all sudo is security theater”, “malware running under user account is as good as root compromise” as well as</p>
+<p>So in case of editing a torrc file on the gateway (maybe even any Debian) it’s hard to come up with a realistic threat where this would prevent security compromise.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/26">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/26</link>
+        <pubDate>Wed, 23 Feb 2022 11:06:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-26</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>More answers to come soon, probably.</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="23" data-topic="13213">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>From all of the file alternatives, I don’t think vitor should edit anything that is not a a <code>-f</code> regular file. What do you think?</p>
+</blockquote>
+</aside>
+<p>Yes, edit regular file only.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/25">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/25</link>
+        <pubDate>Wed, 23 Feb 2022 10:46:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-25</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="nyxnor" data-post="23" data-topic="13213">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>I was thinking of just checking if the file is a regular, because that would block all others types of files.</p>
+</blockquote>
+</aside>
+<p>That is OK.</p>
+<p>Pointing out “it’s a symlink” would be good for usability. If you like implementing this. Small usability gain.</p>
+<pre><code class="lang-auto">if test -L /path/to/filename ; then
+   echo something
+fi
+</code></pre>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/24">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/24</link>
+        <pubDate>Wed, 23 Feb 2022 10:45:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-24</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="22" data-topic="13213">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>…checks symlinks.</p>
+</blockquote>
+</aside>
+<p>I was thinking of just checking if the file is a regular, because that would block all others types of files.</p>
+<p><a href="https://github.com/dylanaraps/pure-bash-bible#file-conditionals" rel="noopener nofollow ugc">pure-bash-bible - file conditionals</a></p>
+<ul>
+<li>
+<code>-b</code> block special file</li>
+<li>
+<code>-c</code> character special file</li>
+<li>
+<code>-d</code> directory</li>
+<li>
+<code>-h</code>, <code>-L</code> symbolic link</li>
+<li>
+<code>-p</code> named pipe</li>
+<li>
+<code>-t</code> open file descriptor</li>
+<li>
+<code>-S</code> socket</li>
+</ul>
+<p>From all of the file alternatives, I don’t think vitor should edit anything  that is not a a <code>-f</code> regular file. What do you think?</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/23</link>
+        <pubDate>Wed, 23 Feb 2022 10:16:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-23</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group quote-modified" data-username="nyxnor" data-post="20" data-topic="13213">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<blockquote>
+<p>• Symbolic links may not be edited (version 1.8.15 and<br>
+higher).</p>
+</blockquote>
+<p>The file could be not created yet, but if the file exists <code>-e</code>, then vitor should test if it is a regular file <code>-f</code>.</p>
+</blockquote>
+</aside>
+<pre><code>test -L filename
+</code></pre>
+<p>…checks symlinks.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/22</link>
+        <pubDate>Wed, 23 Feb 2022 09:34:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-22</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="nyxnor" data-post="19" data-topic="13213" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>Asked on IRC if TPO has interest in producing a vitor, visudo for tor, if they reply something, I will post here, if not, then at least I tried.</p>
+</blockquote>
+</aside>
+<p>Excellent!</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/21</link>
+        <pubDate>Wed, 23 Feb 2022 09:31:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-21</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>To keep vitor safe, I was studying some of sudoedit and visudo security features. I don’t know if I can tackle then all but some of vitor functionality and features are based on this tools for safety, as I am more than sure those developers have spent much more time hardening over the years than vitor has with its few months.</p>
+<p><strong>Sudoedit</strong></p>
+<pre><code class="lang-auto"> To help prevent the editing of unauthorized files, the fol‐
+ lowing restrictions are enforced unless explicitly allowed by
+ the security policy:
+</code></pre>
+<p>Let’s take it bit by bit.</p>
+<blockquote>
+<p>•  Symbolic links may not be edited (version 1.8.15 and<br>
+higher).</p>
+</blockquote>
+<p>The file could be not created yet, but if the file exists <code>-e</code>, then vitor should test if it is a regular file <code>-f</code>.</p>
+<blockquote>
+<p>•  Symbolic links along the path to be edited are not fol‐<br>
+lowed when the parent directory is writable by the invok‐<br>
+ing user unless that user is root (version 1.8.16 and<br>
+higher).</p>
+</blockquote>
+<p>Isn’t symlinks going to be blocked anyway?</p>
+<blockquote>
+<p>•  Files located in a directory that is writable by the in‐<br>
+voking user may not be edited unless that user is root<br>
+(version 1.8.16 and higher).</p>
+</blockquote>
+<p>Why is this a security feature on sudoedit? What does it protect? Using privileges when not needed? The torrc is owned either by root or debian-tor, so you will need privilege. But if you are in the tor group, this feature is to guard against an attack exploiting the editor you are using with shell escapes? Anyway, using sudo/doas to copy the file and the normal user to edit the file.</p>
+<blockquote>
+<p>Note that unlike most commands run by sudo, the editor is run<br>
+with the invoking user’s environment unmodified.</p>
+</blockquote>
+<p>Done in vitor.</p>
+<blockquote>
+<p>If the temporary file becomes empty after editing, the user will be<br>
+prompted before it is installed.</p>
+</blockquote>
+<p>Not done, I don’t see a reason, maybe this is my pov.</p>
+<blockquote>
+<p>If, for some reason, sudo is unable to update a file with its edited version, the user will receive a warning and the edited copy will remain in a temporary file.</p>
+</blockquote>
+<p>Done in vitor.</p>
+<p><strong>visudo</strong></p>
+<pre><code class="lang-auto">In addition to reporting sudoers syntax errors, visudo may produce the
+following messages:
+
+sudoers file busy, try again later.
+     Someone else is currently editing the sudoers file.
+</code></pre>
+<p>This is done in vitor, more like a info feature than a security feature.<br>
+As the file name may vary because of mktemp, the file.lck is displayed so you can know the path to delete the lock if you know it is a bug.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/20</link>
+        <pubDate>Wed, 23 Feb 2022 00:46:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-20</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>Asked on IRC if TPO has interest in producing a vitor, visudo for tor, if they reply something, I will post here, if not, then at least I tried.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/19</link>
+        <pubDate>Wed, 23 Feb 2022 00:23:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-19</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubcommit" data-onebox-src="https://github.com/nyxnor/onion-wash/commit/b3dac4bee622a0c7d0255109b9b941c6afdc1109">
+  <header class="source">
+
+      <a href="https://github.com/nyxnor/onion-wash/commit/b3dac4bee622a0c7d0255109b9b941c6afdc1109" target="_blank" rel="noopener nofollow ugc">github.com/nyxnor/onion-wash</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/nyxnor/onion-wash/commit/b3dac4bee622a0c7d0255109b9b941c6afdc1109" target="_blank" rel="noopener nofollow ugc">add onion-parser</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2022-02-11" data-time="02:35:07" data-timezone="UTC">02:35AM - 11 Feb 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/nyxnor" target="_blank" rel="noopener nofollow ugc">
+          <img alt="nyxnor" src="https://avatars.githubusercontent.com/u/69700936?v=4" class="onebox-avatar-inline" width="20" height="20">
+          nyxnor
+        </a>
+      </div>
+
+      <div class="lines" title="changed 4 files with 410 additions and 11 deletions">
+        <a href="https://github.com/nyxnor/onion-wash/commit/b3dac4bee622a0c7d0255109b9b941c6afdc1109" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+410</span>
+          <span class="removed">-11</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">very nice script to verify tor configuration and see how it is parsed</p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/18</link>
+        <pubDate>Fri, 11 Feb 2022 02:39:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-18</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="nyxnor" data-post="15" data-topic="13213">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>Adrelanos, what is the reason for a part of the script to be in <code>/usr/libexec</code>?</p>
+</blockquote>
+</aside>
+<p>Specifically why <code>/usr/libexec</code> and not some other folder? If some other folder, which one? Debian’s <code>lintian</code> complained about <code>/usr/lib</code> being the wrong location.</p>
+<p>Or why is it split into two folders? Not sure what <a class="mention" href="http://forums.whonix.org/u/iry">@iry</a> had in mind. Perhaps <code>source</code>ing that script from other scripts but that didn’t happen yet. So could also be all in 1 file, I guess.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/17</link>
+        <pubDate>Thu, 10 Feb 2022 17:46:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-17</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubissue" data-onebox-src="https://github.com/nyxnor/vitor/issues/5">
+  <header class="source">
+
+      <a href="https://github.com/nyxnor/vitor/issues/5" target="_blank" rel="noopener nofollow ugc">github.com/nyxnor/vitor</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/nyxnor/vitor/issues/5" target="_blank" rel="noopener nofollow ugc">add anon-verify and change project name</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2022-02-10" data-time="01:31:53" data-timezone="UTC">01:31AM - 10 Feb 22 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="https://github.com/nyxnor" target="_blank" rel="noopener nofollow ugc">
+          <img alt="nyxnor" src="https://avatars.githubusercontent.com/u/69700936?v=4" class="onebox-avatar-inline" width="20" height="20">
+          nyxnor
+        </a>
+      </div>
+    </div>
+
+    <div class="labels">
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">https://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/26
+<span class="show-more-container"><a href="http://forums.whonix.org" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">
+
+- [anon-verify](https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/bin/anon-verify)
+  - [torrc-parser](https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/libexec/anon-gw-anonymizer-config/torrc-parser)
+- [anon-info](https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/bin/anon-info)
+
+
+Anon-verify will be done, seems useful and can be system agnostic.
+Anon-info not sure, it depends on debian hosts and having a sources list named torproject.list.</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Have not commited changes to github, but I am discussing with myself there.<br>
+Some fixes  being done, if any new feature is wanted, just open an issue.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/16</link>
+        <pubDate>Thu, 10 Feb 2022 16:59:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-16</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>Adrelanos, what is the reason for a part of the script to be in <code>/usr/libexec</code>?</p>
+<p><a href="https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s07.html" class="onebox" target="_blank" rel="noopener nofollow ugc">https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s07.html</a></p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/15</link>
+        <pubDate>Thu, 10 Feb 2022 03:00:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-15</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote quote-modified" data-post="26" data-topic="8074">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img loading="lazy" alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/26">tor-ctrl - Tor control port command line tool</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development/8"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of components looking for maintainer)">Development</span></a>
+  </div>
+  <blockquote>
+    Sure. 
+
+I don’t like anon- prefix instead of tor- prefix myself. Just couldn’t come up with a better idea, though. It’s not really whonix- specific either. 
+tor- obviously the most convenient, best and easiest to discover naming prefix but I don’t know if trademark issues could become an issue. (<a href="https://www.whonix.org/wiki/Dev/TPO_Trademark" class="inline-onebox" rel="noopener nofollow ugc">The Tor Project Trademark versus TorBOX / Whonix</a>) 
+According to <a href="https://www.torproject.org/about/trademark/" class="inline-onebox" rel="noopener nofollow ugc">Tor Project | Trademark</a> 
+
+<a href="https://www.torproject.org/about/trademark/#trademark-faq-3" rel="noopener nofollow ugc">Can I use the word “Tor” as part of the name of my product or my domain name?</a>
+Please don’t use Tor in your produ…
+  </blockquote>
+</aside>
+
+<p>add anon-verify and torrc-parser. Anon-info maybe because it is only for debian hosts, or include on installation if debian system is detected.</p>
+<p>rename vitor to a broader name to serve tor configuration files checker/parser/verifier.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/14</link>
+        <pubDate>Thu, 10 Feb 2022 01:38:04 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-14</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I am not much of a GUI developer. I can maintain / bugfix things but I think didn’t invent a sophisticated GUI from scratch myself yet. The GUI applications by Whonix where contributed by other developers.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/13</link>
+        <pubDate>Mon, 24 Jan 2022 14:20:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-13</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>I see the problem now if no terminal is opened, can you instruct on how to do a gui like application such as <a href="https://github.com/adrelanos/sdwdate-gui" rel="noopener nofollow ugc">https://github.com/adrelanos/sdwdate-gui</a> for this case? I will read the code nonetheless.</p>
+<p>This will lead to two repos, one with gui and other without as it happens on sdwdate.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/12</link>
+        <pubDate>Mon, 24 Jan 2022 13:32:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-12</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>How would it work if started from start menu if there is no terminal output available?</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/11</link>
+        <pubDate>Mon, 24 Jan 2022 13:17:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-11</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubblob">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/anon-gw-anonymizer-config/blob/59e5d82385062fa827aa4191911cdd6e928c3231/usr/libexec/gateway-shortcuts/torrc#L17" target="_blank" rel="noopener nofollow ugc">github.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/anon-gw-anonymizer-config/blob/59e5d82385062fa827aa4191911cdd6e928c3231/usr/libexec/gateway-shortcuts/torrc#L17" target="_blank" rel="noopener nofollow ugc">Whonix/anon-gw-anonymizer-config/blob/59e5d82385062fa827aa4191911cdd6e928c3231/usr/libexec/gateway-shortcuts/torrc#L17</a></h4>
+
+
+
+  <pre class="onebox">    <code class="lang-">
+      <ol class="start lines" start="7" style="counter-reset: li-counter 6 ;">
+          <li>
+          </li>
+<li>#### meta start</li>
+          <li>#### project Whonix</li>
+          <li>#### category tor and usability</li>
+          <li>#### gateway_only yes</li>
+          <li>#### description</li>
+          <li>
+          </li>
+<li>## https://bugzilla.xfce.org/show_bug.cgi?id=15282</li>
+          <li>## https://github.com/lxqt/lxqt-sudo/issues/114</li>
+          <li>## https://forums.whonix.org/t/use-sudoedit-in-whonix-documentation-and-whonix-software/7599/30</li>
+          <li class="selected">lxsudo sudo -u "$(whoami)" env VISUAL="$VISUAL" sudoedit /usr/local/etc/torrc.d/50_user.conf</li>
+          <li>
+          </li>
+<li>#### meta end</li>
+      </ol>
+    </code>
+  </pre>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>This would become:</p>
+<pre><code class="lang-auto">lxsudo sudo -u "$(whoami)" env VISUAL="$VISUAL" vitor -u debian-tor /usr/local/etc/torrc.d/50_user.conf
+</code></pre>
+<p><a href="https://asciinema.org/a/463445?autoplay=1" rel="noopener nofollow ugc"><img src="https://asciinema.org/a/463445.svg" alt="demo video" width="78" height="17"></a></p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/10</link>
+        <pubDate>Sun, 23 Jan 2022 23:48:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-10</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>I created a separate repo because it has nothing to do with tor-ctrl, it is for editing the torrc or any other tor configuration file (excluding files inside HiddenServiceDir/authorized_clients and ClientOnionAuthDir or course). Just the tor run commands file.</p>
+<aside class="onebox githubfolder">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="16" height="16">
+
+      <a href="https://github.com/nyxnor/vitor" target="_blank" rel="noopener nofollow ugc">github.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://opengraph.githubassets.com/c78c1ca0340dfe13b48d0b2b28bb7048405b50b7ff0c86b7b96357fb98c12abc/nyxnor/vitor" class="thumbnail onebox-full-image" width="60" height="60">
+
+<h3><a href="https://github.com/nyxnor/vitor" target="_blank" rel="noopener nofollow ugc">GitHub - nyxnor/vitor: Vi for Tor configuration files to be edited in safe...</a></h3>
+
+
+  <p><span class="label1">Vi for Tor configuration files to be edited in safe manner - GitHub - nyxnor/vitor: Vi for Tor configuration files to be edited in safe manner</span></p>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/9</link>
+        <pubDate>Fri, 21 Jan 2022 22:56:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-9</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>the problem with using gsudoedit, sudoedit and doasedit is that the copy of the file is deleted as soon as the editor is closed.</p>
+<p>vitor mini architecture:</p>
+<p>input file to be edited or fallback tor /etc/tor/torrc. Whonix could make a wrapper to call vitor -f /usr/local/bin/etc/tor/50_user.conf.</p>
+<p>then create a copy of this file, symlink it to a lock file. This prevents vitor trying to open the same file on another session at the same time the file is being edited.</p>
+<p>then it opens the file with your preferred editor,</p>
+<p>after closing the editor, the file is verified with tor options. But if the temporary file is removed as it happens with gsudoedit, sudoedit, doasedit, it is not possible to verify the temporary file cause this programs save the file directly without warning, only if they were changed.</p>
+<p>I need to remove the possibility to use these wrappers as it will fail. Anyway, using environment variables is the way for anyone to select their preferred editor, eve if is mousepad if installed.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/8</link>
+        <pubDate>Fri, 21 Jan 2022 15:54:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-8</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="5" data-topic="13213">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Why not simply all of this refer to <code>sudoedit</code>?<br>
+Then you wouldn’t need any editor auto detection code as well manual file copy to temporary location and copying back.</p>
+</blockquote>
+</aside>
+<p>Because I was running it on OpenBSD and they use doas there, which does not come with doasedit, but can be installed from a third party.</p>
+<p>But I can detect if sudoedit or doasedit is installed and use it.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/7</link>
+        <pubDate>Mon, 17 Jan 2022 19:53:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-7</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="5" data-topic="13213">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Any chance to move this to the tor-ctrl package instead? Because then it would be easier to pre-install in Whonix.</p>
+</blockquote>
+</aside>
+<p>that can be done I just don’t see how the files are related in any way but ok.</p>
+<blockquote>
+<p>onionjuggler dunno but I guess it’s not (yet) compatible with Whonix, doing something more specialized and might be harder to make compatible with Whonix.</p>
+</blockquote>
+<p>OnionJuggler manages HiddenServiceDir, HiddenServicePort and HiddenServiceVersion, as well as ClientOnionAuthDir. It was initially built for Debian but it has become system agnostic, using the configuration file for your own operating system. Anyway, Vitor is just a single script of it and putting in a separate repo other than OnionJuggler (will be on tor-ctrl) won’t affect negatively. But as I’ve seen happening with tor-ctrl, being specialized in Whonix is a whole work for it.</p>
+<blockquote>
+<p>Separate package for vitor is probably too much. 1 file = 1 package has very little chances of inclusion into <a href="http://packages.debian.org" rel="noopener nofollow ugc">packages.debian.org</a> due to overhead per package. I’ve read somewhere at Debian “it has to be justified”.</p>
+</blockquote>
+<p>I was thinking of just having that package for personal use and Whonix, but if still better to put on <a href="http://packages.debian.org" rel="noopener nofollow ugc">packages.debian.org</a>, than later could be done after the script is good enough.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/6</link>
+        <pubDate>Mon, 17 Jan 2022 19:49:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-6</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>feature requests:</p>
+<ul>
+<li>respect <code>$EDITOR</code>
+</li>
+<li>respect <code>$VISUAL</code>
+</li>
+<li>respect <code>sensible-editor</code>?</li>
+<li>use <code>sudoedit</code> (<a href="https://forums.whonix.org/t/use-sudoedit-in-whonix-documentation-and-whonix-software/7599" class="inline-onebox">use sudoedit in Whonix documentation and Whonix software</a>)</li>
+</ul>
+<p>Why not simply all of this refer to <code>sudoedit</code>?<br>
+Then you wouldn’t need any editor auto detection code as well manual file copy to temporary location and copying back.</p>
+<p>Whonix ships also <code>gsudoedit</code>.</p>
+<ul>
+<li><a href="https://github.com/Whonix/usability-misc/blob/master/usr/bin/gsudoedit">https://github.com/Whonix/usability-misc/blob/master/usr/bin/gsudoedit</a></li>
+<li><a href="https://github.com/Whonix/usability-misc/blob/master/man/gsudoedit.8.ronn">https://github.com/Whonix/usability-misc/blob/master/man/gsudoedit.8.ronn</a></li>
+</ul>
+<p>Any chance to move this to the tor-ctrl package instead? Because then it would be easier to pre-install in Whonix.</p>
+<p>onionjuggler dunno but I guess it’s not (yet) compatible with Whonix, doing something more specialized and might be harder to make compatible with Whonix.</p>
+<p>Separate package for vitor is probably too much. 1 file = 1 package has very little chances of inclusion into <a href="http://packages.debian.org">packages.debian.org</a> due to overhead per package. I’ve read somewhere at Debian “it has to be justified”.</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/5</link>
+        <pubDate>Mon, 17 Jan 2022 19:03:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-5</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+      <item>
+        <title>vitor - safely edit the Tor configuration file</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>I could make <code>vitor</code> a debian package just like did with <code>tor-ctrl</code>, not gonna be in the debian repo of course, but would separe vitor script to its own repo.</p>
+<p>Vitor is now possible to use on the Workstation because <code>--verify-config</code> was allowed here <a href="https://github.com/adrelanos/anon-ws-disable-stacked-tor/commit/7a1e0b59d39bc705c1e39be69a2c3dedb04c0f04#diff-9b27e6c527cdf6ccd683c118613281be4320dfa0f7595bb5511bd731946e248f" rel="noopener nofollow ugc">https://github.com/adrelanos/anon-ws-disable-stacked-tor/commit/7a1e0b59d39bc705c1e39be69a2c3dedb04c0f04#diff-9b27e6c527cdf6ccd683c118613281be4320dfa0f7595bb5511bd731946e248f</a></p>
+<p>and <code>-f</code> combined with <code>--verify-config</code> was allowed here <a href="https://github.com/adrelanos/anon-ws-disable-stacked-tor/commit/e6c05d99006849caf4326d58d4cca4cb0e001c1b#diff-9b27e6c527cdf6ccd683c118613281be4320dfa0f7595bb5511bd731946e248f" rel="noopener nofollow ugc">https://github.com/adrelanos/anon-ws-disable-stacked-tor/commit/e6c05d99006849caf4326d58d4cca4cb0e001c1b#diff-9b27e6c527cdf6ccd683c118613281be4320dfa0f7595bb5511bd731946e248f</a></p>
+<p>(–verify-config needs to be before <code>-f FILE</code>, for this to work, which will need to correct on vitor or maybe on tor.anondist.)</p>
+<p>anyway, don’t try it yet, or if you dare, don’t blame me (but the there are some important bugs to fix).</p>
+          <p><a href="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213/4</link>
+        <pubDate>Mon, 17 Jan 2022 14:09:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13213-4</guid>
+        <source url="http://forums.whonix.org/t/vitor-safely-edit-the-tor-configuration-file/13213.rss">vitor - safely edit the Tor configuration file</source>
+      </item>
+  </channel>
+</rss>

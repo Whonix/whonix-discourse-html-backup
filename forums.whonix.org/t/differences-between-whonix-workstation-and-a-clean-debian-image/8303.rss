@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Differences Between Whonix Workstation and a Clean Debian Image</title>
+    <link>http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303</link>
+    <description>*Forgive me if this question is not in the correct thread*
+
+What are the specific differences between Whonix Workstation and a clean Debian image? I&#39;m aware that the Workstation&#39;s networking settings are set to route its traffic through the Gateway, but other than that what is the incentive to use the Workstation over a Debian VM with its network settings configured to use the Gateway?
+
+Thank you in advance.</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 17 Oct 2019 20:45:55 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Differences Between Whonix Workstation and a Clean Debian Image</title>
+        <dc:creator><![CDATA[anonytor]]></dc:creator>
+        <description><![CDATA[
+            <p>To add to the discussion, frytoli, the Workstation is running only an internal network connected to the Gateway. It has no way of knowing what the identity (IP) of the host is.  this is because all of its traffic is handled by the Tor process running on the gateway.<br>
+Also, Both Gateway and Workstation are firewalled with iptables and cut off from any non-Tor access. The Workstation firewall works to redirect traffic to the applicable ports on the Gate. Each program that is installed on the Workstation has its own SocksPort. This means that it has its own, isolated stream in Tor that is separate from all other programs. On a regular Buster install, you would have to do this yourself. Not only would you have to configure each application to communicate with the Gateway, also you would need to write your firewall rules.<br>
+The Tor Browser running on the Workstation is set so that its own native Tor process does not run. On a regular Tor Browser on Buster, you would need to configure this yourself by altering several about:config preferences and ENV values on your machine. Also you would need to point the Tor Browser to the correct socket on the gateway.<br>
+We cannot forget about time synchronization either. On regular Buster, you would be responsible for making sure you cannot be easily fingerprinted by the behavior of your system time. You would have to set the timezone to UTC and configure sdwdate to communicate with Tor running on the Gateway.<br>
+Package management is handled by the Apt package manager, which is the same on Debian Buster, but you would have to make sure to have apt-transport-tor and apt-transport-https installed and working on your machine. Also, you would need to import Whonix’s signing key and point your repositories to connect through Tor only. This can be done all manually or you could use a program called “uwt” that the Workstation uses to wrap certain applications (ssh, apt-get, gpg, and more) with torsocks so that they only connect through Tor.<br>
+Uwt is a nice program, and I can tell you from my own experience that it integrates well into Buster, but that’s your responsibility to make sure everything is set up.<br>
+The Workstation has many kernel-hardened features built into it as well. On a Buster install, this would be up to you. There are certain values that become part of your newly created /etc/sysctl.conf.d/harden.conf and there are also root system settings and account/pam permissions that you need to be mindful of and configure also.<br>
+When you make these type of mods to a stock system, you will end up with a lot of extra “stuff” that you no longer need. What do I mean by this? Well, I mean such things as systemd services that are no longer relevant for example. These will need to be found, disabled and possibly masked so they do not interfere with your system in any way. Try sudo systemctl list-unit-files to get a list of the systemd services on your system.<br>
+You will need to remove potentially harmful packages as well. Things like avahi-daemon, bluetooth modules-- “bluez,” and dhcp servers, for example. Install Synaptic and go through your “Installed” list of packages one by one…<br>
+You have to examine your Grub configuration with regard to certain boot parameters to lock down memory allocation (slub alignment and debug for example), memory page table isolation, handling of free-ram by “poisoning,” among others…I can say from my own experience that the kernel parameters and grub boot parameters will require you to do some homework to make sure they integrate with your system. Some tweaks and adjustments will be needed.<br>
+There are many more characteristics that make the Whonix Workstation different from a fresh Debian Buster install, but these ones are some of the major ones you need to configure. You are encouraged to browse the Whonix Github pages to see a comprehensive list.</p>
+          <p><a href="http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303/5</link>
+        <pubDate>Thu, 17 Oct 2019 20:45:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8303-5</guid>
+        <source url="http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303.rss">Differences Between Whonix Workstation and a Clean Debian Image</source>
+      </item>
+      <item>
+        <title>Differences Between Whonix Workstation and a Clean Debian Image</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>As an addendum to what was already said:<br>
+That is a good question. One that I was wondering lately how to answer in an accessible way. Please have a look:</p>
+<aside class="quote quote-modified" data-post="1" data-topic="8274">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/whonix-networking-implementation-developer-documentation-feedback-wanted/8274">Whonix Networking Implementation - Developer Documentation - Feedback Wanted!</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/news"><span class="badge-category-bg" style="background-color: #AB9364;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="News posted by Whonix staff. The Whonix Blog. Stay Tuned. (rss)">News</span></a>
+  </div>
+  <blockquote>
+    The diff between Debian buster and Whonix related to changes to network configuration. 
+Whonix Networking Implementation - Developer Documentation was just now updated. 
+
+
+On above page you can find all changes that Whonix applies related to networking: 
+
+Location of the files on the disk in installed Whonix.
+The location of the file in Whonix source code on the disk.
+A link to the web version of the file on github.
+A comment if
+
+not installed by default
+gateway or workstation only
+Non-Qubes-Who…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303/4</link>
+        <pubDate>Wed, 16 Oct 2019 16:58:01 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8303-4</guid>
+        <source url="http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303.rss">Differences Between Whonix Workstation and a Clean Debian Image</source>
+      </item>
+      <item>
+        <title>Differences Between Whonix Workstation and a Clean Debian Image</title>
+        <dc:creator><![CDATA[frytoli]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for your quick reply!</p>
+          <p><a href="http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303/3</link>
+        <pubDate>Wed, 16 Oct 2019 16:35:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8303-3</guid>
+        <source url="http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303.rss">Differences Between Whonix Workstation and a Clean Debian Image</source>
+      </item>
+      <item>
+        <title>Differences Between Whonix Workstation and a Clean Debian Image</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>The Workstation is specially configured for anonymity and security.</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Design" target="_blank" rel="nofollow noopener">Whonix</a>
+  </header>
+  <article class="onebox-body">
+    
+
+<h3><a href="https://www.whonix.org/wiki/Design" target="_blank" rel="nofollow noopener">Design</a></h3>
+
+<p>Technical Design and Conception of the Whonix ™ Anonymous Operating System</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>I’d recommend looking over the packages at <a href="https://github.com/Whonix" rel="nofollow noopener">https://github.com/Whonix</a> too.</p>
+<p>Due to the way Whonix is made (everything is split into individual packages), it isn’t hard to turn a clean Debian image into a near replica of the Workstation.</p>
+          <p><a href="http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303/2</link>
+        <pubDate>Wed, 16 Oct 2019 15:45:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8303-2</guid>
+        <source url="http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303.rss">Differences Between Whonix Workstation and a Clean Debian Image</source>
+      </item>
+      <item>
+        <title>Differences Between Whonix Workstation and a Clean Debian Image</title>
+        <dc:creator><![CDATA[frytoli]]></dc:creator>
+        <description><![CDATA[
+            <p><em>Forgive me if this question is not in the correct thread</em></p>
+<p>What are the specific differences between Whonix Workstation and a clean Debian image? I’m aware that the Workstation’s networking settings are set to route its traffic through the Gateway, but other than that what is the incentive to use the Workstation over a Debian VM with its network settings configured to use the Gateway?</p>
+<p>Thank you in advance.</p>
+          <p><a href="http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303/1</link>
+        <pubDate>Wed, 16 Oct 2019 15:34:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8303-1</guid>
+        <source url="http://forums.whonix.org/t/differences-between-whonix-workstation-and-a-clean-debian-image/8303.rss">Differences Between Whonix Workstation and a Clean Debian Image</source>
+      </item>
+  </channel>
+</rss>

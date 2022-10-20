@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Forwarding workststation nginx to gateway and host</title>
+    <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653</link>
+    <description>Hi!
+
+I do not want to do something really complex but in Whonix maybe it is not easy. I want to expose the port of my nginx (running inside of Workstation) into my host machine, so basically if I do curl 127.0.0.1:80 in my host machine I can get the output of the nginx running in Workstation.
+
+I already read the documentation about how to SSH into Whonix Workstation an I understood that it is not an option adding a NAT interface to Whonix Workstation. So the schema I am looking for should be:
+`host → Whonix-Gateway ™ → Whonix-Workstation ™ (nginx)`
+
+Accessing Whonix Gateway&#39;s ports from Host is not a problem following this tutorial:
+[Access Gateway Port From Host](https://www.whonix.org/wiki/Access_Gateway_Port_From_Host) 
+
+I tested the example provided and everything worked fine. I want to do the same with the nginx port but before forwarding the port I must be able to access the nginx port from the Gateway, which currently is not possible because the gateway is not listening in that port (according with the output from netstat and when trying to curl it I get `curl: (7) Failed to connect to 127.0.0.1 port 80: Connection refused`)
+
+So, unless that I am missing something what I need would be to redirect the traffic between Workstation and Gateway. If so, adding the following iptables route inside Whonix Gateway should be enough to have access the traffic from nginx inside the gateway?
+
+`sudo iptables -t nat -I PREROUTING -i eth0 -d 10.152.152.11 (the assigned ip of the workstation) -p tcp --dport 80 -j DNAT --to 127.0.0.1:80`
+
+I am new to iptables so any advice I really appreciate it @Patrick 
+
+Thanks!</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 29 Oct 2021 14:43:58 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[acis]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="16" data-topic="12653">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Other files in folder <code>After=network.target</code> use it too. See these for proper syntax. Has to be in the <code>[Unit]</code> block.</p>
+</blockquote>
+</aside>
+<p>Ok perfect, I updated my post with the proper syntax</p>
+<aside class="quote no-group" data-username="Patrick" data-post="17" data-topic="12653">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p><img src="https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png" alt="" width="131" height="68"></p>
+<h3><a href="https://www.whonix.org/wiki/Access_Workstation_Port_From_Host" rel="noopener nofollow ugc">Access Whonix-Workstation ™ Ports from the Host</a></h3>
+<p>Access Whonix-Workstation ™ Port From Host (Esoteric Documentation)</p>
+</blockquote>
+</aside>
+<p>Perfect! I am happy to contribute to this project <img src="//forums.whonix.org/images/emoji/twitter/raised_hands.png?v=9" title=":raised_hands:" class="emoji" alt=":raised_hands:"> <img src="//forums.whonix.org/images/emoji/twitter/grinning_face_with_smiling_eyes.png?v=9" title=":grinning_face_with_smiling_eyes:" class="emoji" alt=":grinning_face_with_smiling_eyes:"></p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/18</link>
+        <pubDate>Fri, 29 Oct 2021 14:43:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-18</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="acis" data-post="15" data-topic="12653">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/d26b3c/40.png" class="avatar"> acis:</div>
+<blockquote>
+<p>Type=simple<br>
+ExecStart=socat TCP-LISTEN:80,fork,bind=10.152.152.10 TCP:10.152.152.11:8083</p>
+</blockquote>
+</aside>
+<p><code>fork</code> should likely be avoided for <code>Type=simple</code>.<br>
+("<code>Type=forking</code> style" is outdated.)</p>
+<hr>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Access_Workstation_Port_From_Host" target="_blank" rel="noopener" title="08:13AM - 29 October 2021">Whonix – 29 Oct 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/68;"><img src="https://www.whonix.org/w/images/4/47/Whonix_Facebook_Social_Share.png" class="thumbnail" width="131" height="68"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Access_Workstation_Port_From_Host" target="_blank" rel="noopener">Access Whonix-Workstation ™ Ports from the Host</a></h3>
+
+  <p>Access Whonix-Workstation ™ Port From Host (Esoteric Documentation)</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/17</link>
+        <pubDate>Fri, 29 Oct 2021 08:23:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-17</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you!</p>
+<p>systemd is parallelized and starts that service before even networking is up.</p>
+<pre><code>After=network.target
+</code></pre>
+<p>Other files in folder <code>After=network.target</code> use it too. See these for proper syntax. Has to be in the <code>[Unit]</code> block.</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/16</link>
+        <pubDate>Fri, 29 Oct 2021 08:10:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-16</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[acis]]></dc:creator>
+        <description><![CDATA[
+            <p>Reproduce following steps if you want to forward nginx (or any other service) from Whonix Workstation to your Whonix Gateway and Host</p>
+<p>In this example, I am also configuring a hidden service for Nginx (although you can skip this)</p>
+<ol>
+<li>Editing Tor Configuration in Whonix Gateway:</li>
+</ol>
+<p><code>sudo nano /usr/local/etc/torrc.d/50_user.conf</code></p>
+<p><code>HiddenServiceDir /var/lib/tor/hidden_service/</code><br>
+<code>HiddenServicePort 80 10.152.152.11:8083 # IP assigned in Workstation</code></p>
+<p>Restarted tor and get the generated onion domain (my_onion_domain)</p>
+<ol start="2">
+<li>Opening external port in Whonix Gateway:</li>
+</ol>
+<p><code>sudo mkdir -p /usr/local/etc/whonix_firewall.d</code><br>
+<code>nano /usr/local/etc/whonix_firewall.d/50_user.conf</code></p>
+<p><code>EXTERNAL_OPEN_PORTS+=" 80 "</code></p>
+<p><code>sudo whonix_firewall</code></p>
+<ol start="3">
+<li>Prepare Nginx in Whonix Workstation</li>
+</ol>
+<p>In Nginx config add:</p>
+<blockquote>
+<p>server {<br>
+server_name my_onion_domain;<br>
+listen 8083;<br>
+…</p>
+</blockquote>
+<p>I restarted nginx and at that point I could access my onion domain in Tor Browser</p>
+<ol start="4">
+<li>At this point we can test using curl if we can connect to Nginx directly from inside Whonix Gateway</li>
+</ol>
+<p>To test that the connection is working we must circumvent stream isolation in the Gateway using the following command:</p>
+<p><code>UWT_DEV_PASSTHROUGH=1 curl --output - 10.152.152.11:8083</code></p>
+<p>Curl’s output must be the same than you get in your Workstation or accessing your hidden service in Tor Browser, in case not double check that Nginx is working and that you are using the proper ports</p>
+<ol start="5">
+<li>Port Forwarding from Workstation to Gateway</li>
+</ol>
+<p>Once we can access our nginx directly from our Gateway we need to forward the IP and Port from our Whonix Workstation to our Whonix Gateway. Patrick suggested <code>systemd-socket-proxyd</code>, <code>socat</code> or <code>ssh port forwarding</code> (maybe it is possible to use sshuttle and faster than traditional openssh’s port forwarding but it is untested as mentioned before footnotes here: <a href="https://www.whonix.org/wiki/Tunnels/Connecting_to_Tor_before_SSH" class="inline-onebox" rel="noopener nofollow ugc">Connecting to Tor before SSH</a>). In my case I decided to use socat because it seemed easier to me, it was a personal choice</p>
+<p><code>socat TCP-LISTEN:80,fork,bind=10.152.152.10 TCP:10.152.152.11:8083</code></p>
+<p>10.152.152.10 assigned to eth1 Gateway internal interface<br>
+10.152.152.11 assigned to my Workstation</p>
+<p>Before continuing we must test if the port forwarding is working. We repeat the process as the previous step<br>
+<code>UWT_DEV_PASSTHROUGH=1 curl --output - 10.152.152.10:80</code></p>
+<ol start="6">
+<li>Port forwarding from Gateway to Host</li>
+</ol>
+<p>In Whonix Gateway we go to Settings &gt; Network &gt; Adapter 1 &gt; Advanced &gt; Port Forwarding and added</p>
+<blockquote>
+<p>Name: Nginx<br>
+Protocol: TCP<br>
+Host IP: 127.0.0.1<br>
+Host Port: 80<br>
+Guest IP: 10.152.152.10<br>
+Guest Port: 8083</p>
+</blockquote>
+<p>In case you want to do it from the command line check it here: <a href="https://www.whonix.org/wiki/Access_Gateway_Port_From_Host" class="inline-onebox" rel="noopener nofollow ugc">Access Whonix-Gateway ™ Ports from the Host</a></p>
+<p>After restarting Whonix Gateway we can test from our host if we have direct access to our Nginx running in the Workstation</p>
+<p><code>curl 127.0.0.1:80</code></p>
+<ol start="7">
+<li>Use systemd to start automatically socat at boot</li>
+</ol>
+<p>If you want to start automatically your socat command follow next steps to create a new service and start it automatically at boot using systemd</p>
+<p>sudo nano /lib/systemd/system/socat_autostart.service</p>
+<blockquote>
+<p>[Unit]<br>
+Description=Start at boot socat command<br>
+After=network.target</p>
+<p>[Service]<br>
+ExecStart=socat TCP-LISTEN:80,fork,bind=10.152.152.10 TCP:10.152.152.11:8083</p>
+<p>[Install]<br>
+WantedBy=multi-user.target</p>
+</blockquote>
+<p><code>chmod 644 /lib/systemd/system/socat_autostart.service</code></p>
+<p><code>sudo systemctl enable socat_autostart</code></p>
+<p><code>sudo systemctl start socat_autostart</code></p>
+<p>You can check if your service is working fine with</p>
+<p><code>sudo systemctl status socat_autostart</code></p>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> feel to free to move this post or modify it if you see some typo.</p>
+<p>P.S. I am facing a small issue with systemd when booting the system<br>
+My service is working fine if I start/stops when Whonix Gateway is on but after restarting the Gateway, my service is executed but socat is failing with the following output (from <code>systemctl status socat_autostart</code>):</p>
+<p><code>E bind(5, {AF=2 10.152.152.10:80}, 16): Cannot assign requested address</code></p>
+<p>Any idea about how maybe delay the execution of my service after the reboot? (Edited: now it is fixed in my edit)</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/15</link>
+        <pubDate>Fri, 29 Oct 2021 00:19:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-15</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[acis]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="13" data-topic="12653" data-full="true">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>If you’re up for it, would be nice if you could document the whole thing.</p>
+</blockquote>
+</aside>
+<p>Sure, I do not think today I can do it but tomorrow or during the weekend I will do it. Do I post in this thread or in other place?</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/14</link>
+        <pubDate>Thu, 28 Oct 2021 18:34:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-14</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>If you’re up for it, would be nice if you could document the whole thing.</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/13</link>
+        <pubDate>Thu, 28 Oct 2021 18:01:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-13</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="acis" data-post="11" data-topic="12653">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/d26b3c/40.png" class="avatar"> acis:</div>
+<blockquote>
+<p>What is the best practice to execute always my socat command each time I restart the Gateway?</p>
+</blockquote>
+</aside>
+<p>A systemd unit file.</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/12</link>
+        <pubDate>Thu, 28 Oct 2021 18:00:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-12</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[acis]]></dc:creator>
+        <description><![CDATA[
+            <p>Just one last question <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> ! What is the best practice to execute always my socat command each time I restart the Gateway? Using <code>nohup</code> will work but if it is executed automatically once the system is restarted would be perfect</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/11</link>
+        <pubDate>Thu, 28 Oct 2021 17:21:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-11</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[acis]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for your reply and your time <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> now I see the error on my socat command and once I specified the same ip it worked! <img src="//forums.whonix.org/images/emoji/twitter/smiley.png?v=9" title=":smiley:" class="emoji" alt=":smiley:"></p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/10</link>
+        <pubDate>Thu, 28 Oct 2021 17:18:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-10</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>recommended pre exercise: using <a href="https://www.whonix.org/wiki/Access_Gateway_Port_From_Host" class="inline-onebox">Access Whonix-Gateway ™ Ports from the Host</a> as is</p>
+<blockquote>
+<p>socat TCP-LISTEN:8083,fork TCP:10.152.152.10:80</p>
+</blockquote>
+<p>Listens on gateway 8083 and forwards to gateway internal interface IP 10.152.152.10 port 80. And then? I don’t see how it would connect to the workstation.</p>
+<hr>
+<p>The idea is:</p>
+<ol>
+<li>listen on workstation all interfaces using nginx</li>
+<li>test: make sure gateway curl can connect to above (uwt circumvention required)</li>
+<li>listen on gateway external interface and connect it to the workstation (same IP/port as for 2)) using socat or similar mention tool</li>
+<li>test: make sure gateway uwt circumventing curl can connect to above</li>
+<li><a href="https://www.whonix.org/wiki/Access_Gateway_Port_From_Host" class="inline-onebox">Access Whonix-Gateway ™ Ports from the Host</a></li>
+</ol>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/9</link>
+        <pubDate>Thu, 28 Oct 2021 16:36:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-9</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[acis]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="7" data-topic="12653">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>socat IP might be wrong. Listen on Whonix-Gateway and forward to Whonix-Workstation IP.</p>
+</blockquote>
+</aside>
+<p>I do not understand it, if I already have access to Whonix-Workstation IP where nginx is running ( <code>10.152.152.11:8083</code>) Why do I have to forward it to Whonix-Workstation IP? I thought that I needed to forward it from Whonix-Workstation IP ( <code>10.152.152.11:8083</code>) to Whonix-Gateway IP (<code>127.0.0.1:80</code>)</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/8</link>
+        <pubDate>Thu, 28 Oct 2021 16:19:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-8</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="acis" data-post="6" data-topic="12653">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/d26b3c/40.png" class="avatar"> acis:</div>
+<blockquote>
+<p>And now I execute socat inside Whonix Gateway:</p>
+<p><code>socat TCP-LISTEN:8083,fork TCP:10.152.152.10:80</code></p>
+<p>In another terminal I try to curl the forwarded ip but it does not work:</p>
+<pre><code class="lang-auto">UWT_DEV_PASSTHROUGH=1 curl --output - 10.152.152.10:80
+curl: (7) Failed to connect to 10.152.152.10 port 80: Connection refused
+</code></pre>
+</blockquote>
+</aside>
+<p>socat IP might be wrong. Listen on Whonix-Gateway and forward to Whonix-Workstation IP.</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/7</link>
+        <pubDate>Thu, 28 Oct 2021 15:59:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-7</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[acis]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> , it seems that I am really close to what I am looking for but I still need one more step.</p>
+<p>I decided to circumvent stream isolation (I do not want to disable it, just test if I can access nginx inside the Gateway). So I executed:</p>
+<p><code>UWT_DEV_PASSTHROUGH=1 curl --output - 10.152.152.11:8083</code></p>
+<p>And it is giving me the nginx’s output inside the Whonix Gateway!</p>
+<p>To do port forwarding between my host and Whonix Gateway I followed next steps:</p>
+<p>In Whonix Gateway I went to Settings &gt; Network &gt; Adapter 1 &gt; Advanced &gt; Port Forwarding and added</p>
+<blockquote>
+<p>Name: Nginx<br>
+Protocol: TCP<br>
+Host IP: 127.0.0.1<br>
+Host Port: 80<br>
+Guest IP: 10.152.152.10<br>
+Guest Port: 8083</p>
+</blockquote>
+<p>And now I execute socat inside Whonix Gateway:</p>
+<p><code>socat TCP-LISTEN:8083,fork TCP:10.152.152.10:80</code></p>
+<p>In another terminal I try to curl the forwarded ip but it does not work:</p>
+<pre><code>UWT_DEV_PASSTHROUGH=1 curl --output - 10.152.152.10:80
+curl: (7) Failed to connect to 10.152.152.10 port 80: Connection refused
+</code></pre>
+<p>(Same result if I replace the gateway ip with localhost)</p>
+<p>And if I curl localhost in my host:</p>
+<pre><code>curl --output - 127.0.0.1:80
+curl: (56) Recv failure: Connection reset by peer
+</code></pre>
+<p>So it seems the port forwarding is not being done between whonix gateway and the host, probably because I am not executing properly the socat command</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/6</link>
+        <pubDate>Thu, 28 Oct 2021 03:23:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-6</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Has to be done on Whonix-Gateway. Accept the connection and forward to host.</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/5</link>
+        <pubDate>Wed, 27 Oct 2021 16:11:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-5</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[acis]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> After checking all resources, I decided to try socat to forward it. I think that I am missing something important because I have my nginx listening on port 8083 (nginx is working fine and I can access the hidden service in tor). So I am using the following command in the Workstation:</p>
+<p><code>socat TCP-LISTEN:8083,fork TCP:10.152.152.10:80</code></p>
+<p>And it is giving me the following output:</p>
+<p><code>socat[145032] E bind(5, {AF=2 0.0.0.0:8083}, 16): Address already in use</code></p>
+<p>Which makes sense for me, because nginx is listening in that port and I can check it through netstat too, but how can I forward that nginx port if I am listening in that port too? (Probably I am asking something really basic but I swear that I do not see it)</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/4</link>
+        <pubDate>Wed, 27 Oct 2021 01:39:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-4</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[acis]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for your reply! I will carefully review all the information that you have sent me and the different options that you have presented to me. I hope I can implement it!</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/3</link>
+        <pubDate>Tue, 26 Oct 2021 17:11:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-3</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Prerequisite knowledge:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Stream_Isolation/Easy" target="_blank" rel="noopener" title="10:01AM - 26 December 2020">Whonix – 26 Dec 20</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/169;"><img src="https://www.whonix.org/w/images/e/eb/Streamisolationme.jpg" class="thumbnail" width="131" height="169"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Stream_Isolation/Easy" target="_blank" rel="noopener">Stream Isolation: Easy</a></h3>
+
+  <p>Whonix ™ Tor Stream Isolation Short Introduction</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<ol>
+<li>i.e. don’t use plain <code>curl</code> for this. Disabling or circumventing stream isolation for <code>curl</code> required.</li>
+</ol>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Stream_Isolation/Disable_Easy" target="_blank" rel="noopener" title="10:01AM - 26 December 2020">Whonix – 26 Dec 20</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/98;"><img src="https://www.whonix.org/w/images/d/d9/Streamisolation213123.png" class="thumbnail" width="131" height="98"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Stream_Isolation/Disable_Easy" target="_blank" rel="noopener">Disable Stream Isolation: Easy</a></h3>
+
+  <p>How to disable stream isolation. Easiest and most common methods only.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<ol start="2">
+<li>Open port in Whonix-Workstation firewall:</li>
+</ol>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Whonix-Workstation_Firewall" target="_blank" rel="noopener" title="06:40PM - 24 October 2021">Whonix – 24 Oct 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/140;"><img src="https://www.whonix.org/w/images/9/9e/Firewall-34227640.png" class="thumbnail" width="131" height="140"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Whonix-Workstation_Firewall" target="_blank" rel="noopener">Whonix-Workstation Firewall</a></h3>
+
+  <p>How to open a Port in Whonix-Workstation ™ Firewall</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<ol start="3">
+<li>Open port in Whonix-Gatway firewall:</li>
+</ol>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Whonix-Gateway_Firewall" target="_blank" rel="noopener" title="09:47AM - 11 July 2021">Whonix – 11 Jul 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/65;"><img src="https://www.whonix.org/w/images/a/a0/Firewall146529640.png" class="thumbnail" width="131" height="65"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Whonix-Gateway_Firewall" target="_blank" rel="noopener">Whonix-Gateway Firewall</a></h3>
+
+  <p>How to open a Port in Whonix-Gateway ™ Firewall</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="quote no-group" data-username="acis" data-post="1" data-topic="12653">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/d26b3c/40.png" class="avatar"> acis:</div>
+<blockquote>
+<p>I must be able to access the nginx port from the Gateway, which currently is not possible because the gateway is not listening in that port</p>
+</blockquote>
+</aside>
+<ol start="4">
+<li>Options:</li>
+</ol>
+<ul>
+<li><code>systemd-socket-proxyd</code></li>
+<li><code>socat</code></li>
+<li>
+<code>ssh</code> port forwarding</li>
+</ul>
+<p>Not what you’re looking for but you might be able to figure out the <code>systemd-socket-proxyd</code> / <code>socat</code> of by reading and then looking how it’s done in the source code:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Redirect_Whonix-Workstation_Ports_or_Unix_Domain_Socket_Files_to_Whonix-Gateway" target="_blank" rel="noopener" title="10:08PM - 29 September 2021">Whonix – 29 Sep 21</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/73;"><img src="https://www.whonix.org/w/images/2/23/Redirect12123.png" class="thumbnail" width="131" height="73"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Redirect_Whonix-Workstation_Ports_or_Unix_Domain_Socket_Files_to_Whonix-Gateway" target="_blank" rel="noopener">Redirect Whonix-Workstation Ports or Unix Domain Socket Files to Whonix-Gateway</a></h3>
+
+  <p>redirect ports of unix domain socket files from Whonix-Gateway ™ localhost to Whonix-Workstation ™</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Or perhaps easier, duplicate/modify/emulate based on the following files:</p>
+<ul>
+<li><code>/lib/systemd/system/anon-ws-disable-stacked-tor_autogen_port_9050.service</code></li>
+<li><code>/lib/systemd/system/anon-ws-disable-stacked-tor_autogen_port_9050.socket</code></li>
+</ul>
+<p>Something similar to this would have to run on Whonix-Gateway.</p>
+<aside class="quote no-group" data-username="acis" data-post="1" data-topic="12653">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/a/d26b3c/40.png" class="avatar"> acis:</div>
+<blockquote>
+<p>I already read the documentation about how to SSH into Whonix Workstation</p>
+</blockquote>
+</aside>
+<p>Or different method based on that: tunnel nginx through SSH.</p>
+<hr>
+<p>related:</p>
+<aside class="onebox allowlistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+
+      <a href="https://www.whonix.org/wiki/Ports" target="_blank" rel="noopener" title="10:01AM - 26 December 2020">Whonix – 26 Dec 20</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:131/87;"><img src="https://www.whonix.org/w/images/8/88/Buttons-1688111640.jpg" class="thumbnail" width="131" height="87"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Ports" target="_blank" rel="noopener">Ports</a></h3>
+
+  <p>How to open a port in Whonix ™ / port forwarding / opening ports</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/2</link>
+        <pubDate>Tue, 26 Oct 2021 16:25:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-2</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+      <item>
+        <title>Forwarding workststation nginx to gateway and host</title>
+        <dc:creator><![CDATA[acis]]></dc:creator>
+        <description><![CDATA[
+            <p>Hi!</p>
+<p>I do not want to do something really complex but in Whonix maybe it is not easy. I want to expose the port of my nginx (running inside of Workstation) into my host machine, so basically if I do curl 127.0.0.1:80 in my host machine I can get the output of the nginx running in Workstation.</p>
+<p>I already read the documentation about how to SSH into Whonix Workstation an I understood that it is not an option adding a NAT interface to Whonix Workstation. So the schema I am looking for should be:<br>
+<code>host → Whonix-Gateway ™ → Whonix-Workstation ™ (nginx)</code></p>
+<p>Accessing Whonix Gateway’s ports from Host is not a problem following this tutorial:<br>
+<a href="https://www.whonix.org/wiki/Access_Gateway_Port_From_Host" rel="noopener nofollow ugc">Access Gateway Port From Host</a></p>
+<p>I tested the example provided and everything worked fine. I want to do the same with the nginx port but before forwarding the port I must be able to access the nginx port from the Gateway, which currently is not possible because the gateway is not listening in that port (according with the output from netstat and when trying to curl it I get <code>curl: (7) Failed to connect to 127.0.0.1 port 80: Connection refused</code>)</p>
+<p>So, unless that I am missing something what I need would be to redirect the traffic between Workstation and Gateway. If so, adding the following iptables route inside Whonix Gateway should be enough to have access the traffic from nginx inside the gateway?</p>
+<p><code>sudo iptables -t nat -I PREROUTING -i eth0 -d 10.152.152.11 (the assigned ip of the workstation) -p tcp --dport 80 -j DNAT --to 127.0.0.1:80</code></p>
+<p>I am new to iptables so any advice I really appreciate it <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a></p>
+<p>Thanks!</p>
+          <p><a href="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653/1</link>
+        <pubDate>Tue, 26 Oct 2021 15:50:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-12653-1</guid>
+        <source url="http://forums.whonix.org/t/forwarding-workststation-nginx-to-gateway-and-host/12653.rss">Forwarding workststation nginx to gateway and host</source>
+      </item>
+  </channel>
+</rss>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Interacively --pass-io to Whonix Template when using costom script to update.</title>
+    <link>http://forums.whonix.org/t/interacively-pass-io-to-whonix-template-when-using-costom-script-to-update/8089</link>
+    <description>When updating Qubes-Whonix TemplateVMs from dom0  using a custom script.  Is it possible (or even advisable) to `interactively` interact when prompted with something like.
+
+
+```
+Configuration file &#39;/etc/machine-id&#39;
+ ==&gt; File on system created by you or by a script.
+ ==&gt; File also in package provided by package maintainer.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer&#39;s version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+*** machine-id (Y/I/N/O/D/Z) [default=N] ? 
+```
+
+Obviously its not a good idea to put `-y` (yes to all) when updating.</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 21 Sep 2019 08:14:09 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/interacively-pass-io-to-whonix-template-when-using-costom-script-to-update/8089.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Interacively --pass-io to Whonix Template when using costom script to update.</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Did this work for you?</p>
+<p>In short</p>
+<pre><code>sudo apt-get-noninteractive --yes dist-upgrade
+</code></pre>
+<p>should not ask any questions.</p>
+          <p><a href="http://forums.whonix.org/t/interacively-pass-io-to-whonix-template-when-using-costom-script-to-update/8089/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/interacively-pass-io-to-whonix-template-when-using-costom-script-to-update/8089/3</link>
+        <pubDate>Sat, 21 Sep 2019 08:14:09 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8089-3</guid>
+        <source url="http://forums.whonix.org/t/interacively-pass-io-to-whonix-template-when-using-costom-script-to-update/8089.rss">Interacively --pass-io to Whonix Template when using costom script to update.</source>
+      </item>
+      <item>
+        <title>Interacively --pass-io to Whonix Template when using costom script to update.</title>
+        <dc:creator><![CDATA[Patrick_mobile]]></dc:creator>
+        <description><![CDATA[
+            <p>Possible yes.</p>
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/usability-misc/blob/master/man/apt-get-noninteractive.8.ronn" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/usability-misc/blob/master/man/apt-get-noninteractive.8.ronn" target="_blank" rel="nofollow noopener">Whonix/usability-misc/blob/master/man/apt-get-noninteractive.8.ronn</a></h4>
+<pre><code class="lang-ronn">apt-get-noninteractive(8) -- wrapper to run `apt-get` non-interactively
+=============================================
+
+&lt;span class="comment"&gt;
+# Copyright (C) 2012 - 2019 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+# See the file COPYING for copying conditions.
+&lt;/span&gt;
+
+## SYNOPSIS
+`apt-get-noninteractive` [option]s
+
+## Description
+Simple wrapper that sets environment variables and adds --yes,
+-o Dpkg::Options::=--force-confnew then forwards all arguments to apt-get.
+Does not pass --force-yes.
+
+If you like to keep old configuration files, add the following parameter.
+
+-o Dpkg::Options::=--force-confold
+
+</code></pre>
+
+  This file has been truncated. <a href="https://github.com/Whonix/usability-misc/blob/master/man/apt-get-noninteractive.8.ronn" target="_blank" rel="nofollow noopener">show original</a>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/usability-misc/blob/master/usr/bin/apt-get-noninteractive" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/usability-misc/blob/master/usr/bin/apt-get-noninteractive" target="_blank" rel="nofollow noopener">Whonix/usability-misc/blob/master/usr/bin/apt-get-noninteractive</a></h4>
+<pre><code class="lang-">#!/bin/bash
+
+## Copyright (C) 2012 - 2018 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+set -e
+
+[ -n "$POLICYRCD" ] || POLICYRCD="/usr/share/usability-misc/policy-rc.d"
+[ -n "$DEBIAN_FRONTEND" ] || DEBIAN_FRONTEND="noninteractive"
+[ -n "$DEBIAN_PRIORITY" ] || DEBIAN_PRIORITY="critical"
+[ -n "$DEBCONF_NOWARNINGS" ] || DEBCONF_NOWARNINGS="yes"
+[ -n "$APT_LISTCHANGES_FRONTEND" ] || APT_LISTCHANGES_FRONTEND="text"
+export POLICYRCD DEBIAN_FRONTEND DEBIAN_PRIORITY DEBCONF_NOWARNINGS APT_LISTCHANGES_FRONTEND
+
+apt-get -o Dpkg::Options::=--force-confnew "$@"
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/interacively-pass-io-to-whonix-template-when-using-costom-script-to-update/8089/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/interacively-pass-io-to-whonix-template-when-using-costom-script-to-update/8089/2</link>
+        <pubDate>Wed, 11 Sep 2019 13:00:37 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8089-2</guid>
+        <source url="http://forums.whonix.org/t/interacively-pass-io-to-whonix-template-when-using-costom-script-to-update/8089.rss">Interacively --pass-io to Whonix Template when using costom script to update.</source>
+      </item>
+      <item>
+        <title>Interacively --pass-io to Whonix Template when using costom script to update.</title>
+        <dc:creator><![CDATA[0brand]]></dc:creator>
+        <description><![CDATA[
+            <p>When updating Qubes-Whonix TemplateVMs from dom0  using a custom script.  Is it possible (or even advisable) to <code>interactively</code> interact when prompted with something like.</p>
+<pre><code class="lang-auto">Configuration file '/etc/machine-id'
+ ==&gt; File on system created by you or by a script.
+ ==&gt; File also in package provided by package maintainer.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+*** machine-id (Y/I/N/O/D/Z) [default=N] ? 
+</code></pre>
+<p>Obviously its not a good idea to put <code>-y</code> (yes to all) when updating.</p>
+          <p><a href="http://forums.whonix.org/t/interacively-pass-io-to-whonix-template-when-using-costom-script-to-update/8089/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/interacively-pass-io-to-whonix-template-when-using-costom-script-to-update/8089/1</link>
+        <pubDate>Wed, 11 Sep 2019 10:16:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8089-1</guid>
+        <source url="http://forums.whonix.org/t/interacively-pass-io-to-whonix-template-when-using-costom-script-to-update/8089.rss">Interacively --pass-io to Whonix Template when using costom script to update.</source>
+      </item>
+  </channel>
+</rss>

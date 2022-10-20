@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>[SOLVED] Whonix 8 Broke the SSHFS Instructions</title>
+    <link>http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205</link>
+    <description>I consistently rely upon the SSHFS instructions and just upgraded my Whonix install from version 7 to 8. Everything in the instructions worked well under Whonix 7. Under Whonix 8 the instructions don&#39;t seem to be compatible anymore. Also the two following pages have conflicting instructions in them.
+
+
+http://kkkkkkkkkk63ava6.onion/wiki/File_Transfer#SSH_into_Whonix-Gateway
+
+http://kkkkkkkkkk63ava6.onion/wiki/Sshfs_into_Whonix-Workstation
+
+
+
+&quot;Look at the /etc/whonix_firewall.d/30_default config file.&quot;
+
+vs.
+
+&quot;echo &quot;GATEWAY_ALLOW_INCOMING_SSH=1&quot; | sudo tee -a &quot;/etc/whonix_firewall.d/50_user&quot;&quot;
+
+In Whonix 8, I modified the 30_default file, which seems to be the right one. Host to Gateway SSH working this way.
+
+
+
+&quot;/usr/bin/ssh.real user@192.168.0.11&quot;
+
+vs. 
+
+&quot;ssh.real 192.168.0.11&quot;
+
+In Whonix 8, with &quot;/usr/bin/ssh.real user@192.168.0.11&quot; I get the following error:
+
+&quot;bash: /usr/bin/ssh.real: No such file or directory&quot;
+
+In Whonix 8, with &quot;ssh.real 192.168.0.11&quot; I get the following error:
+
+&quot;libtorsocks(12021): connect: Connection is to a local address (192.168.0.11), may be a TCP DNS request to a local DNS server so have to reject to be safe. Please report a bug to http://code.google.com/p/torsocks/issues/entry if this is preventing a program from working properly with torsocks
+ssh: connect to host 192.168.0.11 port 22: No such file or directory&quot;
+
+
+
+I&#39;m blocked at the &quot;ssh.real&quot; step not working with the libtorsocks error.
+
+I can SSH and SSHFS into the Gateway fine, but the hop to the Workstation is not working yet.
+
+I&#39;ve been using SSHFS successfully on a daily basis with Whonix 7, so could the SSHFS instructions be updated to work with Whonix 8, please?
+
+Thanks!</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 29 Mar 2014 00:06:17 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>[SOLVED] Whonix 8 Broke the SSHFS Instructions</title>
+        <dc:creator><![CDATA[GregGlue]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you.</p>
+<p>I’ve got it working now on stock Whonix 8.</p>
+<p>Beyond the “ssh.whonix-orig” change, issues were likely to do with my personal configuration.</p>
+<p>Reset everything to clean state on host, imported new Whonix 8 VMs, and got it working with updated instructions.</p>
+<p>Thanks again, Patrick!</p>
+          <p><a href="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/9</link>
+        <pubDate>Sat, 29 Mar 2014 00:06:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-205-9</guid>
+        <source url="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205.rss">[SOLVED] Whonix 8 Broke the SSHFS Instructions</source>
+      </item>
+      <item>
+        <title>[SOLVED] Whonix 8 Broke the SSHFS Instructions</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://www.whonix.org/wiki/Sshfs_into_Whonix-Workstation">https://www.whonix.org/wiki/Sshfs_into_Whonix-Workstation</a> instructions are working for me with Whonix 8. Some notes:</p>
+<ul>
+<li>i needed to add myself to the fuse group, though (I extended the instructions)</li>
+<li>i run into a “read: Connection reset by peer”, which I could fix by<br>
+– killall ssh<br>
+– killall sshfs<br>
+– mv ~/.ssh ~/__.ssh</li>
+</ul>
+<p>sshfs is urgently waiting for someone to report this bug. Countless work hours worldwide must have been wasted on this already.</p>
+          <p><a href="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/8</link>
+        <pubDate>Fri, 28 Mar 2014 20:07:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-205-8</guid>
+        <source url="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205.rss">[SOLVED] Whonix 8 Broke the SSHFS Instructions</source>
+      </item>
+      <item>
+        <title>[SOLVED] Whonix 8 Broke the SSHFS Instructions</title>
+        <dc:creator><![CDATA[GregGlue]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>The only changed part was the ".whonix-org part". The ssh/sshfs commands are unchanged.</blockquote>
+<p>Correct. Yet, it’s funny that the normal SSH hop statement does currently require passing in the “ssh.whonix-orig” command name in order to successfully complete a second hop from Gateway to Workstation.</p>
+<pre><code class="lang-auto">ssh -t user@127.0.0.1 -p 2200 "ssh.whonix-orig user@192.168.0.11"</code></pre>
+<blockquote>As far I understand "ssh -f user@127.0.0.1 -p 2200 -L 2222:192.168.0.11:22 -N" uses ssh from the host. It doesn't need the ssh binary from Whonix-Gateway.</blockquote>
+<p>Ok, then this would nullify my theory, if that is the case.</p>
+<p>Has been a while since I looked at the man page for the inner mechanics of the SSHFS hop statement, so I’m not currently sure.</p>
+<blockquote>But since seeing is beveling and since your idea is not unreasonable, feel free to restore the original ssh command. See:
+https://www.whonix.org/wiki/Stream_Isolation#Deactivating_an_uwt_wrapper</blockquote>
+<p>Looks like I might have to go this route next in order to get it working again. Thank you.</p>
+<p>It would be nice if someone could at least confirm a successful attempt to SSHFS into Whonix-Workstation with a stock Whonix 8 install, so that we can know that the “ssh” rename to “ssh.whonix-orig” does not break the SSHFS File Transfer instructions.</p>
+          <p><a href="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/7</link>
+        <pubDate>Fri, 28 Mar 2014 19:36:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-205-7</guid>
+        <source url="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205.rss">[SOLVED] Whonix 8 Broke the SSHFS Instructions</source>
+      </item>
+      <item>
+        <title>[SOLVED] Whonix 8 Broke the SSHFS Instructions</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“GregGlue, post:5, topic:205”]However, let’s examine the first ssh part of the SSHFS hop command…</p>
+<pre><code class="lang-auto">ssh -f user@127.0.0.1 -p 2200 -L 2222:192.168.0.11:22 -N</code></pre>
+<p>On the Host to Gateway step, this “ssh” command should work fine, as you mentioned.</p>
+<p>However, once this hop statement gets to the Gateway to Workstation step, isn’t it just going to repeat another “ssh” command inside the Gateway, instead of the now renamed “ssh.whonix-orig”?</p>
+<p>There seems to be nothing here telling the Gateway to use the renamed “ssh.whonix-orig” statement.[/quote]<br>
+As far I understand “ssh -f <a href="mailto:user@127.0.0.1">user@127.0.0.1</a> -p 2200 -L 2222:192.168.0.11:22 -N” uses ssh from the host. It doesn’t need the ssh binary from Whonix-Gateway. The binary required in memory for ssh’ing has already been loaded on the host. Another reason why I think this is not the case is that these instructions worked for Whonix 7 as well. The only changed part was the “.whonix-org part”. The ssh/sshfs commands are unchanged.</p>
+<p>But since seeing is beveling and since your idea is not unreasonable, feel free to restore the original ssh command. See:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Stream_Isolation#Deactivating_an_uwt_wrapper" target="_blank" title="11:57AM - 07 May 2020">Whonix – 7 May 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:386/500;"><img src="https://www.whonix.org/w/images/e/eb/Streamisolationme.jpg" class="thumbnail" width="386" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Stream_Isolation#Deactivating_an_uwt_wrapper" target="_blank">Stream Isolation</a></h3>
+
+<p>Prevent Identity Correlation through Circuit Sharing by using Tor Stream Isolation</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>After applying this, there will be no more Whonix specific additions to that ssh command. And when you run “ssh 192.168.0.10” in Whonix-Gateway for testing, it won’t show that torsocks error anymore. Then you removed all Whonix specific changes and are back to a basic sshfs problem.</p>
+          <p><a href="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/6</link>
+        <pubDate>Fri, 28 Mar 2014 19:16:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-205-6</guid>
+        <source url="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205.rss">[SOLVED] Whonix 8 Broke the SSHFS Instructions</source>
+      </item>
+      <item>
+        <title>[SOLVED] Whonix 8 Broke the SSHFS Instructions</title>
+        <dc:creator><![CDATA[GregGlue]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you for the follow up, Patrick…</p>
+<blockquote>On the host you never need this ".whonix-org", because there is not yet a Whonix host operating system,</blockquote>
+<p>Correct. I do realize this distinction. My host operating system is generic Debian Wheezy.</p>
+<blockquote>I experienced this bug in Whonix 7 already sometimes. It is a bug in ssh or sshfs. It has to do with what fingerprints ssh(fs) is (not) trusting, I think. Search engines are full with it. This issue can be very difficult to fix. I wasted some hours on it already. Hence, this sshfs thing is unfortunately for frustration tollerant / advanced users only. Sorry to say.</blockquote>
+<p>Correct. I too, originally spent many many hours dealing with this in Whonix 7 to get SSH/SSHFS hopping to work for me.</p>
+<blockquote>On the host. Try this if you are having problems. This might not be neccessary.
+<p>For troubleshooting, the article contains these changes.</p>
+<h2>THINK FIRST!</h2>
+<p>killall ssh<br>
+killall sshfs</p>
+<p>On the host. Try this if you are having problems. This might not be neccessary. There seems to be a bug with existing ssh known_hosts files.</p>
+<h2>THINK FIRST!</h2>
+<h2>or “rm” if you know what you are doing</h2>
+<p>trash-put ~/.ssh/known_hosts<br>
+trash-put ~/.ssh/known_hosts.old</p>
+<p><span class="hashtag">#rm</span> ~/.ssh/known_hosts<br>
+<span class="hashtag">#rm</span> ~/.ssh/known_hosts.old</p>
+<p>If you don’t have trash-put installed, comment out “rm” and try this. When having these files deleted, you may be lucky and able to fix this issue.</p>
+</blockquote>
+<p>Correct. I had originally done these steps, as I’ve always done them with my Whonix 7 SSHFS setup as well. No current SSH/SSHFS processes existed (killed them). No current known_hosts files existed (rm’d them).</p>
+<p>Here’s my thinking about the SSH/SSHFS commands…</p>
+<p>Currently, in Whonix 8, I can successfully SSH hop from Host to Gateway to Workstation. SSH hopping is working fine, if I include the “ssh.whonix-orig” command into the hop statement for the Gateway to Workstation step…</p>
+<pre><code class="lang-auto">ssh -t user@127.0.0.1 -p 2200 "ssh.whonix-orig user@192.168.0.11"</code></pre>
+<p>However, let’s examine the first ssh part of the SSHFS hop command…</p>
+<pre><code class="lang-auto">ssh -f user@127.0.0.1 -p 2200 -L 2222:192.168.0.11:22 -N</code></pre>
+<p>On the Host to Gateway step, this “ssh” command should work fine, as you mentioned.</p>
+<p>However, once this hop statement gets to the Gateway to Workstation step, isn’t it just going to repeat another “ssh” command inside the Gateway, instead of the now renamed “ssh.whonix-orig”?</p>
+<p>There seems to be nothing here telling the Gateway to use the renamed “ssh.whonix-orig” statement.</p>
+<p>In the normal SSH (non-SSHFS) hop command, the “ssh.whonix-orig” statement gets put into the second part of the command…</p>
+<pre><code class="lang-auto">ssh -t user@127.0.0.1 -p 2200 "ssh.whonix-orig user@192.168.0.11"</code></pre>
+<p>So, why wouldn’t the SSHFS hop command also need to be instructed of this renamed “ssh.whonix-orig” command once it gets to the second Gateway to Workstation hopping step?</p>
+<p>It just seems like the Gateway to Workstation step can no longer use the “ssh” command, but somehow needs to be instructed to use the renamed “ssh.whonix-orig” command.</p>
+          <p><a href="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/5</link>
+        <pubDate>Fri, 28 Mar 2014 18:55:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-205-5</guid>
+        <source url="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205.rss">[SOLVED] Whonix 8 Broke the SSHFS Instructions</source>
+      </item>
+      <item>
+        <title>[SOLVED] Whonix 8 Broke the SSHFS Instructions</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <pre><code class="lang-auto">Unlikely. It was a simple rename. And when you use ssh.whonix-orig, you're using the real ssh command.
+
+(You can also entirely uninstall this uwt wrapper, see: https://www.whonix.org/wiki/Stream_Isolation#Deactivating_an_uwt_wrapper But I don't think this is required or the root of this issue.)
+
+&lt;blockquote&gt;In the SSHFS instructions, there is no input of the "ssh.whonix-orig" command, since the host machine does not use "ssh.whonix-orig", but the Whonix-Gateway needs it.&lt;/blockquote&gt;
+There is no need for sshfs.whonix-orig, because there is no sshfs uwt wrapper. On the host you never need this ".whonix-org", because there is not yet a Whonix host operating system, therefore there won't be any uwt wrappers on the host, therefore normal "ssh" / "sshfs" commands can be used on the host.
+
+&lt;blockquote&gt;"channel 2: open failed: administratively prohibited: open failed"
+read: Connection reset by peer"&lt;/blockquote&gt;
+I experienced this bug in Whonix 7 already sometimes. It is a bug in ssh or sshfs. It has to do with what fingerprints ssh(fs) is (not) trusting, I think. Search engines are full with it. This issue can be very difficult to fix. I wasted some hours on it already. Hence, this sshfs thing is unfortunately for frustration tollerant / advanced users only. Sorry to say.
+
+On the host. Try this if you are having problems. This might not be neccessary.
+
+For troubleshooting, the article contains these changes.
+
+## THINK FIRST!
+killall ssh
+killall sshfs
+
+On the host. Try this if you are having problems. This might not be neccessary. There seems to be a bug with existing ssh known_hosts files.
+
+## THINK FIRST!
+## or "rm" if you know what you are doing
+trash-put ~/.ssh/known_hosts
+trash-put ~/.ssh/known_hosts.old
+
+#rm ~/.ssh/known_hosts
+#rm ~/.ssh/known_hosts.old
+
+If you don't have trash-put installed, comment out "rm" and try this. When having these files deleted, you may be lucky and able to fix this issue.</code></pre>
+<p>Unlikely. It was a simple rename. And when you use ssh.whonix-orig, you’re using the real ssh command.</p>
+<p>(You can also entirely uninstall this uwt wrapper, see: <a href="https://www.whonix.org/wiki/Stream_Isolation#Deactivating_an_uwt_wrapper">https://www.whonix.org/wiki/Stream_Isolation#Deactivating_an_uwt_wrapper</a> But I don’t think this is required or the root of this issue.)</p>
+<blockquote>In the SSHFS instructions, there is no input of the "ssh.whonix-orig" command, since the host machine does not use "ssh.whonix-orig", but the Whonix-Gateway needs it.</blockquote>
+There is no need for sshfs.whonix-orig, because there is no sshfs uwt wrapper. On the host you never need this ".whonix-org", because there is not yet a Whonix host operating system, therefore there won't be any uwt wrappers on the host, therefore normal "ssh" / "sshfs" commands can be used on the host.
+<blockquote>"channel 2: open failed: administratively prohibited: open failed"
+read: Connection reset by peer"</blockquote>
+I experienced this bug in Whonix 7 already sometimes. It is a bug in ssh or sshfs. It has to do with what fingerprints ssh(fs) is (not) trusting, I think. Search engines are full with it. This issue can be very difficult to fix. I wasted some hours on it already. Hence, this sshfs thing is unfortunately for frustration tollerant / advanced users only. Sorry to say.
+<p>On the host. Try this if you are having problems. This might not be neccessary.</p>
+<p>For troubleshooting, the article contains these changes.</p>
+<h2>THINK FIRST!</h2>
+<p>killall ssh<br>
+killall sshfs</p>
+<p>On the host. Try this if you are having problems. This might not be neccessary. There seems to be a bug with existing ssh known_hosts files.</p>
+<h2>THINK FIRST!</h2>
+<h2>or “rm” if you know what you are doing</h2>
+<p>trash-put ~/.ssh/known_hosts<br>
+trash-put ~/.ssh/known_hosts.old</p>
+<p><span class="hashtag">#rm</span> ~/.ssh/known_hosts<br>
+<span class="hashtag">#rm</span> ~/.ssh/known_hosts.old</p>
+<p>If you don’t have trash-put installed, comment out “rm” and try this. When having these files deleted, you may be lucky and able to fix this issue.</p>
+          <p><a href="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/4</link>
+        <pubDate>Fri, 28 Mar 2014 18:14:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-205-4</guid>
+        <source url="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205.rss">[SOLVED] Whonix 8 Broke the SSHFS Instructions</source>
+      </item>
+      <item>
+        <title>[SOLVED] Whonix 8 Broke the SSHFS Instructions</title>
+        <dc:creator><![CDATA[GregGlue]]></dc:creator>
+        <description><![CDATA[
+            <p>Thank you for the assistance…</p>
+<p>Okay, after reviewing the updated instructions, with the ssh.whonix-orig command…</p>
+<p>ssh -t <a href="mailto:user@127.0.0.1">user@127.0.0.1</a> -p 2200 “ssh.whonix-orig <a href="mailto:user@192.168.0.11">user@192.168.0.11</a>”</p>
+<p>Normal SSHing from Host to Gateway to Workstation is now working.</p>
+<p>However, SSHFS is not working.</p>
+<p>ssh -f <a href="mailto:user@127.0.0.1">user@127.0.0.1</a> -p 2200 -L 2222:192.168.0.11:22 -N<br>
+sshfs -p 2222 <a href="mailto:user@127.0.0.1">user@127.0.0.1</a><img src="//forums.whonix.org/images/emoji/twitter/confused.png?v=5" title=":confused:" class="emoji" alt=":confused:"> ~/mountworkstation</p>
+<p>I get the following error after the second command:</p>
+<p>“channel 2: open failed: administratively prohibited: open failed"<br>
+read: Connection reset by peer”</p>
+<p>Maybe this is due to the “ssh” command being replaced by the “ssh.whonix-orig” command?</p>
+<p>In the SSHFS instructions, there is no input of the “ssh.whonix-orig” command, since the host machine does not use “ssh.whonix-orig”, but the Whonix-Gateway needs it.</p>
+          <p><a href="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/3</link>
+        <pubDate>Fri, 28 Mar 2014 17:53:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-205-3</guid>
+        <source url="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205.rss">[SOLVED] Whonix 8 Broke the SSHFS Instructions</source>
+      </item>
+      <item>
+        <title>[SOLVED] Whonix 8 Broke the SSHFS Instructions</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="GregGlue" data-post="1" data-topic="205">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/g/779978/40.png" class="avatar"> GregGlue:</div>
+<blockquote>
+<p>I consistently rely upon the SSHFS instructions and just upgraded my Whonix install from version 7 to 8. Everything in the instructions worked well under Whonix 7. Under Whonix 8 the instructions don’t seem to be compatible anymore. Also the two following pages have conflicting instructions in them.</p>
+</blockquote>
+</aside>
+<p>ssh.real changed to ssh.whonix-orig. Updated the articles.</p>
+<blockquote>"Look at the /etc/whonix_firewall.d/30_default config file."</blockquote>
+Look at means, please read the file. Then the conflict between 30_ and 50_ becomes a non-conflict.
+<blockquote>In Whonix 8, I modified the 30_default file, which seems to be the right one.</blockquote>
+Both works. Generally, it is better to modify "50_" files. Reason for this and background knowledge is a bit better documented here:
+https://www.whonix.org/wiki/Whonix_Configuration_Files
+<blockquote>"bash: /usr/bin/ssh.real: No such file or directory"</blockquote>
+ssh.real changed to ssh.whonix-orig. Updated the articles.
+<blockquote>libtorsocks(12021): connect: Connection is to a local address (192.168.0.11), may be a TCP DNS request to a local DNS server so have to reject to be safe. Please report a bug to http://code.google.com/p/torsocks/issues/entry if this is preventing a program from working properly with torsocks</blockquote>
+The usual "ssh" command is socksified by default (for stream isolation https://www.whonix.org/wiki/Stream_Isolation). The non-socksified version must be used.
+<p>It should be fixed now. But I haven’t tested it.</p>
+<p>This is a quite common misconception when using default-socksified applications for local connections. I opened a github issue:<br>
+<a href="https://github.com/Whonix/Whonix/issues/164" class="onebox" target="_blank">https://github.com/Whonix/Whonix/issues/164</a></p>
+          <p><a href="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/2</link>
+        <pubDate>Fri, 28 Mar 2014 17:20:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-205-2</guid>
+        <source url="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205.rss">[SOLVED] Whonix 8 Broke the SSHFS Instructions</source>
+      </item>
+      <item>
+        <title>[SOLVED] Whonix 8 Broke the SSHFS Instructions</title>
+        <dc:creator><![CDATA[GregGlue]]></dc:creator>
+        <description><![CDATA[
+            <p>I consistently rely upon the SSHFS instructions and just upgraded my Whonix install from version 7 to 8. Everything in the instructions worked well under Whonix 7. Under Whonix 8 the instructions don’t seem to be compatible anymore. Also the two following pages have conflicting instructions in them.</p>
+<p><a href="http://kkkkkkkkkk63ava6.onion/wiki/File_Transfer#SSH_into_Whonix-Gateway" class="onebox" target="_blank" rel="nofollow noopener">http://kkkkkkkkkk63ava6.onion/wiki/File_Transfer#SSH_into_Whonix-Gateway</a></p>
+<p><a href="http://kkkkkkkkkk63ava6.onion/wiki/Sshfs_into_Whonix-Workstation" class="onebox" target="_blank" rel="nofollow noopener">http://kkkkkkkkkk63ava6.onion/wiki/Sshfs_into_Whonix-Workstation</a></p>
+<p>“Look at the /etc/whonix_firewall.d/30_default config file.”</p>
+<p>vs.</p>
+<p>“echo “GATEWAY_ALLOW_INCOMING_SSH=1” | sudo tee -a “/etc/whonix_firewall.d/50_user””</p>
+<p>In Whonix 8, I modified the 30_default file, which seems to be the right one. Host to Gateway SSH working this way.</p>
+<p>“/usr/bin/ssh.real <a href="mailto:user@192.168.0.11">user@192.168.0.11</a>”</p>
+<p>vs.</p>
+<p>“ssh.real 192.168.0.11”</p>
+<p>In Whonix 8, with “/usr/bin/ssh.real <a href="mailto:user@192.168.0.11">user@192.168.0.11</a>” I get the following error:</p>
+<p>“bash: /usr/bin/ssh.real: No such file or directory”</p>
+<p>In Whonix 8, with “ssh.real 192.168.0.11” I get the following error:</p>
+<p>“libtorsocks(12021): connect: Connection is to a local address (192.168.0.11), may be a TCP DNS request to a local DNS server so have to reject to be safe. Please report a bug to <a href="http://code.google.com/p/torsocks/issues/entry" rel="nofollow noopener">http://code.google.com/p/torsocks/issues/entry</a> if this is preventing a program from working properly with torsocks<br>
+ssh: connect to host 192.168.0.11 port 22: No such file or directory”</p>
+<p>I’m blocked at the “ssh.real” step not working with the libtorsocks error.</p>
+<p>I can SSH and SSHFS into the Gateway fine, but the hop to the Workstation is not working yet.</p>
+<p>I’ve been using SSHFS successfully on a daily basis with Whonix 7, so could the SSHFS instructions be updated to work with Whonix 8, please?</p>
+<p>Thanks!</p>
+          <p><a href="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205/1</link>
+        <pubDate>Thu, 27 Mar 2014 19:25:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-205-1</guid>
+        <source url="http://forums.whonix.org/t/solved-whonix-8-broke-the-sshfs-instructions/205.rss">[SOLVED] Whonix 8 Broke the SSHFS Instructions</source>
+      </item>
+  </channel>
+</rss>

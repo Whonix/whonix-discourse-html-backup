@@ -1,0 +1,805 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+    <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597</link>
+    <description>The parameters...
+[code]
+--virtualbox
+--qcow2
+--install-to-root
+[/code]
+...are called &quot;build targets&quot;. And mandatory. At least one has to be chosen. --virtualbox and --qcow2 can be combined.
+
+Additionally I plan on introducing a mandatory &quot;distribution&quot; parameter.
+
+[code]
+--whonix
+--whodeb
+[/code]
+
+&quot;--whonix&quot; would be just what the build script builds as of Whonix 9. Usual Whonix build.
+
+&quot;--whodeb&quot; would be a plain Debian system without Whonix&#39;s Debian packages, without [url=https://www.whonix.org/wiki/Dev/Source_Code_Intro#Chroot_Scripts]Whonix&#39;s chroot scripts[/url].
+
+That would probably more generic and less confusing than a &quot;--no-install-whonix-packages&quot; parameter.
+
+(&quot;--whodeb&quot; builds are needed for debugging purposes (ex: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=735932) and it&#39;s low effort to add. Not planing to support this officially.)
+
+1) Is &quot;build targets&quot; a good term for that use case?
+
+2) Is &quot;distribution&quot; a good term for that use case?
+
+3) Is &quot;--whodeb&quot;  a good term for that use case? Other suggestions?
+
+(Cannot use &quot;--debian&quot;. I&#39;d like to use that term &quot;whodeb&quot; or else as part of the resulting file name. And one not being the Debian project must not redistribute images named &quot;debian&quot;. Debian trademark policy: https://www.debian.org/trademark)
+
+(Comparison: http://manpages.ubuntu.com/manpages/hardy/man1/ubuntu-vm-builder.1.html)</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 31 Oct 2014 09:35:41 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>This is done in:<br>
+10.0.0.0.9-developers-only</p>
+<pre><code class="lang-auto"></code></pre>
+<pre><code class="lang-auto">## whonix_build main script
+##
+## Syntax:
+## whonix_build &lt;parameters for whonix_build&gt; -- &lt;parameters for help-steps/whonix_build_one&gt;
+##
+## --all
+## Builds Whonix-Gateway, Whonix-Workstation and Whonix-Custom-Workstation.
+##
+## --gnw
+## Builds Whonix-Gateway and Whonix-Workstation.
+##
+## --flavor whonix-gateway|whonix-workstation|whonix-custom-workstation
+## whonix-gateway: Builds Whonix-Gateway.
+## whonix-workstation: Builds Whonix-Workstation.
+## whonix-custom-workstation: Builds Whonix-Custom-Workstation.
+##
+## Run
+## ./whonix_build --flavor whonix-gateway -- --help
+## to find out whonix_build_one parameters.</code></pre>
+<pre><code class="lang-auto"></code></pre>
+<pre><code class="lang-auto">## help-steps/whonix_build_one script
+##
+## Syntax:
+## help-steps/whonix_build_one --flavor flavor --target target
+##
+## creates separate build folder
+## /whonix_binary
+##
+## For verbose documentation on build configuration parameters please have a
+## look at the full build documentation.
+##
+## FLAGS:
+## --build
+## Build Whonix.
+##
+## --clean
+## Deletes build products (.raw, .ova and VirtualBox VM'\''s).
+##
+## --flavor whonix-gateway|whonix-workstation|whonix-custom-workstation|none
+## whonix-gateway: Builds Whonix-Gateway.
+## whonix-workstation: Builds Whonix-Workstation.
+## whonix-custom-workstation: Builds Whonix-Custom-Workstation.
+## none: not yet implemented
+##
+## --target virtualbox|qcow2|root
+## virtualbox: Use this to build VirtualBox .ovas.
+## qcow2: Use this to build qcow2 images.
+## root: Use this for Whonix with physical or install to root installations.
+##
+## vmram, vram, vmsize examples.
+## --vmram 128
+## --vram 12
+## --vmsize 200G
+##
+## --gui kde|none
+## kde: Install KDE specific packages.
+## none: Skip installation of gui specific packages.
+##
+## --apps true|false
+## true: Install recommended packages.
+## false: Install fewer packages. (Don'\''t complain about missing packages then.)
+##
+## --freshness frozen|current
+## frozen: Use frozen sources.
+## current: Use current sources.
+##
+## --whonix-repo off|wheezy|testers|developers
+## Whonix APT Repository.
+## off: Disabled by default.
+## wheezy
+## testers
+## developers
+##
+## --report full|minimal
+## full
+## minimal: Skip most of the create-report build step. (Related to Verifiable Builds.)
+##
+## --verifiable true|false
+## true
+## false: Skip deletion of non-determinstic files in the cleanup chroot script.
+##        (These files are later automatically re-created by First Run Initializer.)
+##
+## --sanity-tests true|false
+## true
+## false: Skip chroot script sanity tests.
+##
+## --retry-max 1|0|2|[...]
+## attempts
+##
+## --retry-wait 5|1|2|[...]
+## Seconds between attempts.
+##
+## --retry-before script
+## --retry-after script
+## Dispatch command or script.
+##
+## --allow-uncommitted false|true
+## false: Break when uncommitted changes are found. Default.
+## true: Do not use unless you know what you are doing.
+##
+## --arch
+## Only of interest for VM builds. Not for installations to root.
+## i386: default, best tested.
+## amd64: less tested.
+## kfreebsd-i386: entirely untested and most likely needs work.
+## kfreebsd-amd64: entirely untested and most likely needs work.
+##
+## --kernel &lt;Quoted space delimited list of packages.&gt;
+## Only of interest for VM builds. Not for installations to root.
+## Defaults to linux-image-486 linux-image-686-pae.
+## none: Do not install kernel packages.
+## linux-image-486
+## linux-image-686-pae
+## linux-image-amd64
+## Possibly others. (Unmaintained!)
+##
+## --headers &lt;Quoted space delimited list of packages.&gt;
+## Only of interest for VM builds. Not for installations to root.
+## Defaults to linux-headers-486 linux-headers-686-pae.
+## none: Do not install kernel header packages.
+## linux-headers-486
+## linux-headers-686-pae
+## linux-headers-amd64
+## Possibly others. (Unmaintained!)
+##
+## --confdir /path/to/config/dir
+## Will get sourced after
+## $WHONIX_SOURCE_FOLDER/buildconfig.d /etc/whonix_buildconfig.d ../buildconfig.d
+## and before --conffile.
+##
+## --conffile /path/to/config/file
+## Will get sourced after all other files.</code></pre>
+<p>Textual strings are here:</p>
+<ul>
+<li><a href="https://github.com/Whonix/Whonix/blob/master/help-steps/parse-cmd#L97">https://github.com/Whonix/Whonix/blob/master/help-steps/parse-cmd#L97</a></li>
+<li><a href="https://github.com/Whonix/Whonix/blob/master/help-steps/parse-cmd#L121">https://github.com/Whonix/Whonix/blob/master/help-steps/parse-cmd#L121</a></li>
+</ul>
+<p>Please review. I am sure --help sux. <img src="//forums.whonix.org/images/emoji/twitter/expressionless.png?v=5" title=":expressionless:" class="emoji" alt=":expressionless:"></p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/16</link>
+        <pubDate>Fri, 31 Oct 2014 09:35:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-16</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>All you can do using CLI, you can also do using (stackable) config files - and vice versa. What the CLI at the moment does is translating</p>
+<pre><code class="lang-auto">--cli-switch param</code></pre>
+<p>to</p>
+<pre><code class="lang-auto">some_variable="variable_content"</code></pre>
+<p>We kinda support something like something similra to Whakefiles already. See:<br>
+<a href="https://www.whonix.org/wiki/Dev/Build_Documentation/10_full#Introduction_.28Optional.29" class="onebox" target="_blank">https://www.whonix.org/wiki/Dev/Build_Documentation/10_full#Introduction_.28Optional.29</a></p>
+<pre><code class="lang-auto">buildconfig.d
+../buildconfig.d
+/etc/whonix_buildconfig.d</code></pre>
+<p>In recent versions the build script has been improved by me. I spared builders from needing to use those build config folders for “popular” switches, because those creating those build configs was apparently much more difficult for builders than just using cli. Those mechanism are still usable, though.</p>
+<p>It would probably be trivial to add some --config /path/to/whonix_build.conf feature. I think I’ll add this anyhow. Personally I still prefer cli. But that doesn’t mean, we couldn’t easily support both use cases.</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/15</link>
+        <pubDate>Tue, 28 Oct 2014 20:45:05 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-15</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[JasonJAyalaP]]></dc:creator>
+        <description><![CDATA[
+            <p>They way you’re going, CLI switches won’t be enough to handle the complexity and length… We’ll need a makefile format. Whakefile <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"> And then parse, check for sanity, check for compatibility between the options.</p>
+<p>Standard:<br>
+BASE=DEBIAN<br>
+SYSTEM=WHONIX-WORKSTATION<br>
+TARGET=VIRTUALBOX<br>
+GUI=KDE<br>
+VRAM=512</p>
+<p>./whake common-builds.whake standard</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/14</link>
+        <pubDate>Tue, 28 Oct 2014 20:17:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-14</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="12" data-topic="597">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/j/ecb155/40.png" class="avatar"> JasonJAyalaP:</div>
+<blockquote>
+<p>I’m ok with flavor, but we might need a word that suggests much more than different defaults or KDE vs GNOME.</p>
+</blockquote>
+</aside>
+<p>Good point. Do we want to replace</p>
+<pre><code class="lang-auto"></code></pre>
+<p>with</p>
+<pre><code class="lang-auto"></code></pre>
+<p>then?</p>
+<p>Or perhaps we should have a --flavor that can be in theory used multiple times?</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/13</link>
+        <pubDate>Tue, 28 Oct 2014 17:13:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-13</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[JasonJAyalaP]]></dc:creator>
+        <description><![CDATA[
+            <p>According to their terminology, “flavor” is closer than “blend”.</p>
+<p>I’m ok with flavor, but we might need a word that suggests much more than different defaults or KDE vs GNOME.</p>
+<p>How about --system?</p>
+<p>./build --os Gentoo --system hardened-experimental<br>
+./build --os Debian --system whonix-workstation</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/12</link>
+        <pubDate>Tue, 28 Oct 2014 15:03:31 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-12</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>What about “blend”?</p>
+<p>Comparison:<br>
+<a href="https://wiki.debian.org/DebianPureBlends" class="onebox" target="_blank">https://wiki.debian.org/DebianPureBlends</a><br>
+(<a href="http://blends.debian.org/blends/">http://blends.debian.org/blends/</a>)</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/11</link>
+        <pubDate>Tue, 28 Oct 2014 01:24:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-11</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[JasonJAyalaP]]></dc:creator>
+        <description><![CDATA[
+            <p>Hmm. Apparently I keep saying --whonix and you say “but it’s more!” and then I forget and say “–whonix would work here”.</p>
+<p>Well, what do you call this “layer” on top of the “base os”? spin; remix; flavor; layer…</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/10</link>
+        <pubDate>Mon, 27 Oct 2014 21:26:18 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-10</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Consider simply "--os". The shorter the better (but I have no problem with 
+base-os)</blockquote>
+Ok.
+<blockquote>How about "whonix" ? :)
+--whonix gateway|workstation|custom|none</blockquote>
+Wrote this above, but eventually you missed it.
+"I would like to think of the build script as for, well, hard to say. Not just a tool to build VMs, because it also supports --install-to-root. To think of it as a tool to build operating systems, physical or vm. For such a tool you wouldn't have a --whonix parameter."
+<blockquote>    --all
+    --&gt; ???
+<p>I don’t like “all”. It sounds error prone. But you’ll have to answer: “Can the user build more than one image at a time?”. For simplicity and sanity, I say no. If you want to build multiple images in one command, use &amp;&amp;</p>
+</blockquote><br>
+Implemented this not long ago.
+<pre><code class="lang-auto">whonix_build &lt;parameters for whonix_build&gt; -- &lt;parameters for help-steps/whonix_build_one&gt;</code></pre>
+<p>Please see details usage here:<br>
+<a href="https://www.whonix.org/wiki/Dev/Build_Documentation/10_full#VM_Creation" class="onebox" target="_blank">https://www.whonix.org/wiki/Dev/Build_Documentation/10_full#VM_Creation</a></p>
+<p>Implementation on the source code level seems simple and sane to me. At doesn’t build at the same time, but in sequential order. And as soon one build breaks, it stops. Useful for test and redistributable builds. (Otherwise as a builder you end up with an extra script in your home folder that just does building multiple images one after another.) But if all cords break, this can be changed.</p>
+<blockquote>    --internalrun
+    --&gt; as is
+<p>Hrm. Is this like “–dry-run” (simulate effects?)</p>
+</blockquote><br>
+No, more like “when recursively calling itself or steps that don’t care about gw|ws we can use --internalrun”.
+<blockquote>    --no-default-applications
+    --&gt; --default-applications true|false
+<p>–applications or --apps</p>
+<pre><code>--current-sources
+--testing-frozen-sources
+--&gt; --sources-freshness frozen|current
+</code></pre>
+<p>–freshness</p>
+</blockquote><br>
+Ok.
+<blockquote>Damn. The i and amd and x86_64 stuff always confuses me. i386 is 32-bit and amb64 is 64-bit, right?</blockquote>
+<p>Yes. But then there are also 486, 686, 686-pae and amd64 kernels.</p>
+<blockquote>Can we just say that? --arch (or --bit) 32|64. Hrmph.  
+But what about when we do ARM builds? --arch arm8|32|64 ?</blockquote>
+--arch is the term used by [grml-]debootstrap and others. Many possible values, those are listed here:
+https://www.debian.org/ports/
+<blockquote>    --whonix-apt-repository-distribution wheezy
+    --whonix-apt-repository-distribution testers
+    --whonix-apt-repository-distribution developers
+    --&gt; as is --whonix-apt-repository-distribution wheezy|testers|developers
+<p>–whonix-repo</p>
+<pre><code>--enable-whonix-apt-repository
+--&gt; ???
+</code></pre>
+<p>Merge with above:</p>
+<p>–whonix-repo disable|wheezy|testers|developers</p>
+<p>“off” or “disable”. You pick.</p>
+</blockquote><br>
+Agreed. (“off” is slightly better, because then it never gets enabled, therefore not really disabled.)
+<blockquote>    --auto-retry
+    --&gt; auto-retry-max 0|1|2|...
+<pre><code>--wait-auto-retry
+--&gt; auto-retry-wait 0|1|2|...
+</code></pre>
+<p>Or just --retry-wait and --retry-max</p>
+<pre><code>--dispatch-before-retry
+--&gt; auto-retry-dispatch-before script
+
+--dispatch-after-retry
+--&gt; auto-retry-dispatch-after script
+</code></pre>
+<p>–retry-before ? Dunno.<br>
+–retry-after</p>
+</blockquote><br>
+Agreed.
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/9</link>
+        <pubDate>Mon, 27 Oct 2014 16:01:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-9</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[JasonJAyalaP]]></dc:creator>
+        <description><![CDATA[
+            <pre><code>--build
+--clean
+--&gt; ???
+</code></pre>
+<p>These seem to be the “operating modes” (my term). Many CLIs use subcommands for<br>
+these situations: <code>git commit</code> <code>git add</code>. So it could be:</p>
+<pre><code class="lang-auto">./whonix build --param v --param v
+./whonix clean</code></pre>
+<p>But if that adds to much complexity to the CLI, you can keep them as<br>
+–build|–clean</p>
+<pre><code>--base-os debian|ubuntu|gentoo
+</code></pre>
+<p>Consider simply “–os”. The shorter the better (but I have no problem with<br>
+base-os)</p>
+<pre><code class="lang-auto">./whonix build --os debian</code></pre>
+<pre><code>--virtualbox
+--qcow2
+--install-to-root
+--&gt; --target virtualbox|qcow2|root
+</code></pre>
+<p>Agreed.</p>
+<pre><code class="lang-auto">./whonix build --os debian --target virtualbox</code></pre>
+<pre><code>--whonix-gateway
+--whonix-workstation
+--whonix-custom-workstation
+--"plain"
+--&gt; --extra whonix-gateway|whonix-workstation|whonix-custom-workstation|none
+</code></pre>
+<p>How about “whonix” ? <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"><br>
+–whonix gateway|workstation|custom|none</p>
+<pre><code class="lang-auto">./whonix build --os debian --whonix gateway</code></pre>
+<pre><code>--all
+--&gt; ???
+</code></pre>
+<p>I don’t like “all”. It sounds error prone. But you’ll have to answer: “Can the<br>
+user build more than one image at a time?”. For simplicity and sanity, I say no.<br>
+If you want to build multiple images in one command, use &amp;&amp;</p>
+<pre><code>--internalrun
+--&gt; as is
+</code></pre>
+<p>Hrm. Is this like “–dry-run” (simulate effects?)</p>
+<pre><code>--vmram 128
+--vram 12
+--vmsize 200G
+--&gt; as is
+</code></pre>
+<p>Agreed.</p>
+<pre><code>--terminal-only
+--&gt; --gui true|false
+</code></pre>
+<p>Agreed.</p>
+<pre><code>--no-default-applications
+--&gt; --default-applications true|false
+</code></pre>
+<p>–applications or --apps</p>
+<pre><code>--current-sources
+--testing-frozen-sources
+--&gt; --sources-freshness frozen|current
+</code></pre>
+<p>–freshness</p>
+<pre><code>--486-linux
+--32bit-linux
+--64bit-linux
+--64bit-kfreebsd
+--32bit-kfreebsd
+--&gt; --kernel-flavor linux|kfreebsd ????????????
+--&gt; --arch i386|amd64
+</code></pre>
+<p>–kernel<br>
+Damn. The i and amd and x86_64 stuff always confuses me. i386 is 32-bit and<br>
+amb64 is 64-bit, right? Can we just say that? --arch (or --bit) 32|64. Hrmph.<br>
+But what about when we do ARM builds? --arch arm8|32|64 ?</p>
+<pre><code>--whonix-apt-repository-distribution wheezy
+--whonix-apt-repository-distribution testers
+--whonix-apt-repository-distribution developers
+--&gt; as is --whonix-apt-repository-distribution wheezy|testers|developers
+</code></pre>
+<p>–whonix-repo</p>
+<pre><code>--enable-whonix-apt-repository
+--&gt; ???
+</code></pre>
+<p>Merge with above:</p>
+<p>–whonix-repo disable|wheezy|testers|developers</p>
+<p>“off” or “disable”. You pick.</p>
+<pre><code>--minimal-report
+-&gt; minimal|full
+</code></pre>
+<p>–report minimal|full</p>
+<pre><code>--verifiable
+--&gt; true|false
+
+--skip-sanity-tests
+--&gt; sanity-tests true|false
+
+--help
+--&gt; as is
+
+--no-validate-libvirt-xml
+--&gt; validate-libvirt-xml true|false
+
+--fast1
+--fast2
+--&gt; --fast 1|2
+
+--file-system
+--hostname
+--os-password
+--debopt
+</code></pre>
+<p>All agreed.</p>
+<pre><code>--auto-retry
+--&gt; auto-retry-max 0|1|2|...
+
+--wait-auto-retry
+--&gt; auto-retry-wait 0|1|2|...
+</code></pre>
+<p>Or just --retry-wait and --retry-max</p>
+<pre><code>--dispatch-before-retry
+--&gt; auto-retry-dispatch-before script
+
+--dispatch-after-retry
+--&gt; auto-retry-dispatch-after script
+</code></pre>
+<p>–retry-before ? Dunno.<br>
+–retry-after</p>
+<pre><code>--ignore-uncommitted
+--&gt; --allow-uncommitted false|true
+</code></pre>
+<p>Looks good.</p>
+<p>Edit by Patrick:<br>
+Disabled smileys.</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/8</link>
+        <pubDate>Mon, 27 Oct 2014 15:21:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-8</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Ok, changed my mind. I want to fix this command line parameter mess relatively soon. The current state is confusing. Not to be advertised. And hinders wider adoption. Here comes a proposal.</p>
+<p>Legend:</p>
+<pre><code class="lang-auto">--old-param-notation
+--another-old-param-notation
+--&gt; --new-parameter-proposal default-option|another-option|yet-another-option</code></pre>
+<p>Proposal:</p>
+<pre><code class="lang-auto">--build
+--clean
+--&gt; ???
+
+new
+--&gt; --base-os debian|ubuntu|gentoo
+
+--virtualbox
+--qcow2
+--install-to-root
+--&gt; --target virtualbox|qcow2|root
+
+--whonix-gateway
+--whonix-workstation
+--whonix-custom-workstation
+--"plain"
+--&gt; --extra whonix-gateway|whonix-workstation|whonix-custom-workstation|none
+
+--all
+--&gt; ???
+
+--internalrun
+--&gt; as is
+
+--vmram 128
+--vram 12
+--vmsize 200G
+--&gt; as is
+
+--terminal-only
+--&gt; --gui true|false
+
+--no-default-applications
+--&gt; --default-applications true|false
+
+--current-sources
+--testing-frozen-sources
+--&gt; --sources-freshness frozen|current
+
+--486-linux
+--32bit-linux
+--64bit-linux
+--64bit-kfreebsd
+--32bit-kfreebsd
+--&gt; --kernel-flavor linux|kfreebsd ????????????
+--&gt; --arch i386|amd64
+
+--whonix-apt-repository-distribution wheezy
+--whonix-apt-repository-distribution testers
+--whonix-apt-repository-distribution developers
+--&gt; as is --whonix-apt-repository-distribution wheezy|testers|developers
+
+--enable-whonix-apt-repository
+--&gt; ???
+
+--minimal-report
+-&gt; minimal|full
+
+--verifiable
+--&gt; true|false
+
+--skip-sanity-tests
+--&gt; sanity-tests true|false
+
+--help
+--&gt; as is
+
+--no-validate-libvirt-xml
+--&gt; validate-libvirt-xml true|false
+
+--fast1
+--fast2
+--&gt; --fast 1|2
+
+--file-system
+--hostname
+--os-password
+--debopt
+
+--auto-retry
+--&gt; auto-retry-max 0|1|2|...
+
+--wait-auto-retry
+--&gt; auto-retry-wait 0|1|2|...
+
+--dispatch-before-retry
+--&gt; auto-retry-dispatch-before script
+
+--dispatch-after-retry
+--&gt; auto-retry-dispatch-after script
+
+--ignore-uncommitted
+--&gt; --allow-uncommitted false|true</code></pre>
+<p>There are still some “???”. Please help fill them out. Please review. Looks good overall or like a new mess? I’d be also open to a separate proposal.</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/7</link>
+        <pubDate>Mon, 27 Oct 2014 07:01:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-7</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="5" data-topic="597">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/j/ecb155/40.png" class="avatar"> JasonJAyalaP:</div>
+<blockquote>
+<p>Isn’t Debian/Fedora/Gentoo the “flavor” and workstation/gateway/custom the, uh, do we have a word for it?</p>
+</blockquote>
+</aside>
+<p>Yes, that’s it. I am looking for a word.</p>
+<blockquote>(I simply did --vm in my example but that's not very clear).</blockquote>
+Yes, --vm is bad, because one could want to use --install-to-root.
+<aside class="quote" data-post="5" data-topic="597">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/j/ecb155/40.png" class="avatar"> JasonJAyalaP:</div>
+<blockquote>
+<p>In any case, I think you’re right: “no whonix” could be moved from debug to --vm (Maybe… “–whonix none”? That would be similar to what you’re doing now).</p>
+</blockquote>
+</aside>
+<p>I would like to think of the build script as for, well, hard to say. Not just a tool to build VMs, because it also supports --install-to-root. To think of it as a tool to build operating systems, physical or vm. For such a tool you wouldn’t have a --whonix parameter.</p>
+<p>What about this?</p>
+<p><code>
+--base-os debian|ubuntu|gentoo
+--suite wheezy|jessie
+--extra whonix-gateway|whonix-workstation|whonix-host|none</code></p>
+<p>(–suite is a term used by <code>debootstrap</code> and Ubuntu VM builder, and I think reusing them makes sense.)</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/6</link>
+        <pubDate>Mon, 27 Oct 2014 04:52:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-6</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[JasonJAyalaP]]></dc:creator>
+        <description><![CDATA[
+            <p>Isn’t Debian/Fedora/Gentoo the “flavor” and workstation/gateway/custom the, uh, do we have a word for it? (I simply did --vm in my example but that’s not very clear).</p>
+<p>In any case, I think you’re right: “no whonix” could be moved from debug to --vm (Maybe… “–whonix none”? That would be similar to what you’re doing now).</p>
+<p>./build --flavor [Gentoo|Debian] --whonix [gateway|workstation|none]</p>
+<p>Going with your current all-parameter-design, I suggest:<br>
+–whonix-gateway<br>
+–whonix-workstation<br>
+–whonix-none</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/5</link>
+        <pubDate>Fri, 17 Oct 2014 19:08:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-5</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>“flavor neutral” sounds good. You’ll never know if Whonix’s build script develops into a general tool to build VMs / os’s. I have a feeling, one day there might be options and maintainers for plain Debian, Fedora (+Whonix), (Hardened) Gentoo (+Whonix) and more. Either way it’s a good plan to leave that door open.</p>
+<p>But to be really flavor neutral, “whonix” should be be an opt-in (–flavor whonix-…), not opt-out (–debug no-whonix). So what about this?</p>
+<pre><code class="lang-auto">--flavor whonix-gateway
+--flavor whonix-workstation
+--flavor whonix-custom-workstation
+--flavor whodeb</code></pre>
+<aside class="quote" data-post="3" data-topic="597">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/j/ecb155/40.png" class="avatar"> JasonJAyalaP:</div>
+<blockquote>
+<p>As you can see, I prefer “–parameter value” than --everything-is-a-parameter.</p>
+</blockquote>
+</aside>
+<p>I totally agree with that and keep it in mind for further development.</p>
+<p>The “-tg” is still a historic legacy from the early TorBOX build script.</p>
+<aside class="quote" data-post="3" data-topic="597">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/j/ecb155/40.png" class="avatar"> JasonJAyalaP:</div>
+<blockquote>
+<p>But that’s a separate issue (though I am willing to design and or implement this CLI if you think it’s cleaner and more memorable).</p>
+</blockquote>
+</aside>
+<p>As per a total redesign, it’s not a high priority for me, but feel free to go for designing / implementing it.</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/4</link>
+        <pubDate>Fri, 17 Oct 2014 02:08:26 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-4</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[JasonJAyalaP]]></dc:creator>
+        <description><![CDATA[
+            <h2>Quick and dirty:</h2>
+<p>–debug-debian   Builds without chroot scripts. Useful for reporting Debian bugs.</p>
+<h2>But this could be a good time to add a “debug” parameter.</h2>
+<p>–debug debian    Builds without chroot scripts. Useful for reporting Debian bugs.</p>
+<p>But I propose making this “flavor neutral”:</p>
+<p>–debug no-whonix    Builds without Whonix pakcages. Useful for reporting upstream bugs.</p>
+<p>And in the future, you could add additional --debug options:</p>
+<p>–debug blah      Disables blah blah blah</p>
+<h2>A confounding issue is how to deal with Whonix flavors (when we get there).</h2>
+<p>My imaginary, ideal build parameters (though I’m probably missing something):</p>
+<p>./whonix-build --vm gateway --flavor debian --target qcow2 --debug no-whonix</p>
+<p>As you can see, I prefer “–parameter value” than --everything-is-a-parameter. But that’s a separate issue (though I am willing to design and or implement this CLI if you think it’s cleaner and more memorable).</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/3</link>
+        <pubDate>Fri, 17 Oct 2014 01:16:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-3</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Since the builder has to choose a mandatory VM parameter such as</p>
+<pre><code class="lang-auto">--whonix-gateway
+--whonix-workstation
+--whonix-custom-workstation</code></pre>
+<p>anyway, I guess a separate mandatory “distribution” parameter does not make sense.</p>
+<p>What about an additional VM parameter</p>
+<pre><code class="lang-auto"></code></pre>
+<p>?</p>
+<p>I am not sure “-plain-” implicates anything confusing.</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/2</link>
+        <pubDate>Thu, 16 Oct 2014 22:59:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-2</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+      <item>
+        <title>Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>The parameters…</p>
+<pre><code class="lang-auto">--virtualbox
+--qcow2
+--install-to-root</code></pre>
+<p>…are called “build targets”. And mandatory. At least one has to be chosen. --virtualbox and --qcow2 can be combined.</p>
+<p>Additionally I plan on introducing a mandatory “distribution” parameter.</p>
+<pre><code class="lang-auto">--whonix
+--whodeb</code></pre>
+<p>“–whonix” would be just what the build script builds as of Whonix 9. Usual Whonix build.</p>
+<p>“–whodeb” would be a plain Debian system without Whonix’s Debian packages, without <a href="https://www.whonix.org/wiki/Dev/Source_Code_Intro#Chroot_Scripts" data-bbcode="true">Whonix’s chroot scripts</a>.</p>
+<p>That would probably more generic and less confusing than a “–no-install-whonix-packages” parameter.</p>
+<p>("–whodeb" builds are needed for debugging purposes (ex: <a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=735932">https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=735932</a>) and it’s low effort to add. Not planing to support this officially.)</p>
+<ol>
+<li>
+<p>Is “build targets” a good term for that use case?</p>
+</li>
+<li>
+<p>Is “distribution” a good term for that use case?</p>
+</li>
+<li>
+<p>Is “–whodeb”  a good term for that use case? Other suggestions?</p>
+</li>
+</ol>
+<p>(Cannot use “–debian”. I’d like to use that term “whodeb” or else as part of the resulting file name. And one not being the Debian project must not redistribute images named “debian”. Debian trademark policy: <a href="https://www.debian.org/trademark">https://www.debian.org/trademark</a>)</p>
+<p>(Comparison: <a href="http://manpages.ubuntu.com/manpages/hardy/man1/ubuntu-vm-builder.1.html">http://manpages.ubuntu.com/manpages/hardy/man1/ubuntu-vm-builder.1.html</a>)</p>
+          <p><a href="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597/1</link>
+        <pubDate>Thu, 16 Oct 2014 03:27:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-597-1</guid>
+        <source url="http://forums.whonix.org/t/terminology-building-plain-debian-using-whonixs-build-script-whodeb/597.rss">Terminology: building plain Debian using Whonix&#39;s build script --whodeb?</source>
+      </item>
+  </channel>
+</rss>

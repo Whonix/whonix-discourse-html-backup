@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>how to unset firewall array</title>
+    <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604</link>
+    <description>I want to be able to close all firewall ports that are used by default for whonix and open just a select few, and this of course has to be done solely on `/usr/local/etc/torrc.d/50_user.conf`.
+
+This is targeted to single use Workstations that should only have access to the internet if a socksport is specified to the application.
+
+I tried on the gateway:
+`unset INTERNAL_OPEN_PORTS`
+`INTERNAL_OPEN_PORTS=&quot;&quot;`
+and browsed for how to unset array. It works on the cli if I test with arrays, but not with whonix firewall, maybe it is the way the firewall is parsed?
+
+----
+
+
+It is a problem with how the firewall is parsed.
+
+`source_config_folder` function is called before the defaults is assigned.
+
+The correct function order is:
+
+```
+main() {
+   init
+   firewall_mode_detection
+   variables_defaults ## defaults first
+   source_config_folder ## user conf later
+  ......
+}
+
+main
+```
+
+If this is not done, user can not reset the firewall with `INTERNAL_OPEN_PORTS=&quot;&quot;`
+then the next firewall ports that he user wants open are specified below that line:
+```sh
+INTERNAL_OPEN_PORTS=&quot;&quot;
+INTERNAL_OPEN_PORTS+=&quot; 91XY &quot;
+INTERNAL_OPEN_PORTS+=&quot; 91XZ
+```
+
+can this be done?</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 26 Sep 2022 19:48:35 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="12" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Yes. No big deal in this case. In the future, would it be good to assume that the previous PR will be merged?</p>
+</blockquote>
+</aside>
+<p>Ok, I just have the habit of branching from <code>upstream/master</code>, but I can do <code>origin/last-pr-branch</code>.</p>
+<aside class="quote no-group" data-username="Patrick" data-post="12" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>Added some minor commits on top. Would be good if you could have a look if these make sense.</p>
+</blockquote>
+</aside>
+<p>Saw it, makes sense.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/13</link>
+        <pubDate>Mon, 26 Sep 2022 19:48:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-13</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes. No big deal in this case. In the future, would it be good to assume that the previous PR will be merged?</p>
+<p>Added some minor commits on top. Would be good if you could have a look if these make sense.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/12</link>
+        <pubDate>Mon, 26 Sep 2022 19:31:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-12</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="10" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>There’s merge conflict.</p>
+</blockquote>
+</aside>
+<p>probably because of two consecutive PRs without one first merging upstream, so I couldn’t rebase that.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/11</link>
+        <pubDate>Mon, 26 Sep 2022 19:24:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-11</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>There’s merge conflict.</p>
+<p>But manually done now. The order of functions is now:</p>
+<p>init<br>
+variables_defaults<br>
+source_config_folder<br>
+firewall_mode_detection</p>
+<p>Also firewall_mode_detection seems to make more sense after variables_defaults and source_config_folder.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/10</link>
+        <pubDate>Mon, 26 Sep 2022 19:23:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-10</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="onebox githubpullrequest" data-onebox-src="https://github.com/Whonix/whonix-firewall/pull/2">
+  <header class="source">
+
+      <a href="https://github.com/Whonix/whonix-firewall/pull/2" target="_blank" rel="noopener nofollow ugc">github.com/Whonix/whonix-firewall</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Pull Request">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 12 16" aria-hidden="true"><path d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/whonix-firewall/pull/2" target="_blank" rel="noopener nofollow ugc">correct variable assignment order</a>
+    </h4>
+
+    <div class="branches">
+      <code>Whonix:master</code> ← <code>nyxnor:unset-array</code>
+    </div>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2022-09-26" data-time="17:01:22" data-timezone="UTC">05:01PM - 26 Sep 22 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/nyxnor" target="_blank" rel="noopener nofollow ugc">
+          <img alt="nyxnor" src="https://avatars.githubusercontent.com/u/69700936?v=4" class="onebox-avatar-inline" width="20" height="20">
+          nyxnor
+        </a>
+      </div>
+
+      <div class="lines" title="1 commits changed 2 files with 2 additions and 2 deletions">
+        <a href="https://github.com/Whonix/whonix-firewall/pull/2/files" target="_blank" rel="noopener nofollow ugc">
+          <span class="added">+2</span>
+          <span class="removed">-2</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">https://forums.whonix.org/t/how-to-unset-firewall-array/15604
+
+no diff in the <span class="show-more-container"><a href="https://github.com/Whonix/whonix-firewall/pull/2" target="_blank" rel="noopener nofollow ugc" class="show-more">…</a></span><span class="excerpt hidden">iptables.</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/9</link>
+        <pubDate>Mon, 26 Sep 2022 17:01:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-9</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>yes</p>
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/8</link>
+        <pubDate>Sat, 24 Sep 2022 21:17:58 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-8</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Yes, please.</p>
+<p>Could you please check as per <a href="https://www.kicksecure.com/wiki/Dev/Firewall_Refactoring#How_to_refactor_the_firewall_script_while_being_sure_there_are_no_iptables_changes">How to refactor the firewall script while being sure there are no iptables changes</a> that the actual firewall rules are unchanged after the change?</p>
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/7</link>
+        <pubDate>Sat, 24 Sep 2022 20:51:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-7</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="nyxnor" data-post="5" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>WORKSTATION_ALLOW_SOCKSIFIED</p>
+</blockquote>
+</aside>
+<p>This does not allow me to set my close all socks ports and only allow my custom ports.</p>
+<pre><code class="lang-auto">ipv4_input_rules(){
+      ...
+
+      ## Allow socksified applications.
+      if [ "$WORKSTATION_ALLOW_SOCKSIFIED" = "1" ]; then
+         for socks_port in $INTERNAL_OPEN_PORTS; do
+            true "socks_port: $socks_port"
+            $iptables_cmd -A INPUT -i "$int_tif_item" -p tcp --dport "$socks_port" -j ACCEPT
+         done
+
+     ...
+}
+</code></pre>
+<p>because no socks port is allowed by this method, which I can’t deny I a good behavior from the expectation I have from the name of the variable, to not allow any socks port.</p>
+<p>This brings me back to my first post.</p>
+<ol>
+<li>change the functions order, defaults should be called before user config, as it happens for user to override system config on other packages</li>
+<li>unset  <code>INTERNAL_OPEN_PORTS</code>
+</li>
+<li>set only the ports you want on <code>INTERNAL_OPEN_PORTS</code>
+</li>
+<li>adrelanos: plus disable transparent tcp and dns with <code>WORKSTATION_TRANSPARENT_TCP=0</code>  and <code>WORKSTATION_TRANSPARENT_DNS=0</code>
+</li>
+</ol>
+<p>Change the script to source defaults before user config and include this in the user config:</p>
+<pre><code class="lang-auto">WORKSTATION_TRANSPARENT_TCP=0
+WORKSTATION_TRANSPARENT_DNS=0
+# either option works to unset internal open ports:
+# unset is the most explicit and easy way to notice
+#   unset INTERNAL_OPEN_PORTS
+# also easy to notice
+#   INTERNAL_OPEN_PORTS=""
+# or setting the below to not use the plus sign before the equal.
+# it may be too simple that you don't even notice the missing
+# plus sign so I recommend not using it and prefer one of the
+# above methods instead
+#   INTERNAL_OPEN_PORTS=" PORTS YOU WANT "
+
+unset INTERNAL_OPEN_PORTS
+INTERNAL_OPEN_PORTS+=" PORTS YOU WANT "
+INTERNAL_OPEN_PORTS+=" OTHER PORTS YOU WANT "
+</code></pre>
+<p>So the question is, can I PR to change script sourcing order for defaults first and then user config so the above can work?</p>
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/6</link>
+        <pubDate>Sat, 24 Sep 2022 19:50:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-6</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="4" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<pre><code class="lang-auto">   if [ ! "$WORKSTATION_ALLOW_SOCKSIFIED" = "1" ]; then
+      return 0
+   fi
+</code></pre>
+<p>So in the gateway firewall config just set:</p>
+<pre><code class="lang-auto">WORKSTATION_ALLOW_SOCKSIFIED=0
+</code></pre>
+<p>In result, no <code>INTERNAL_OPEN_PORTS</code> will be set at all. Then it would be up to the user to configure <code>INTERNAL_OPEN_PORTS</code> or not use any of these ports.</p>
+<p>How does that sound?</p>
+</blockquote>
+</aside>
+<p>Sounds good, exactly that what I want. I was searching in the wrong place.</p>
+<aside class="quote no-group quote-modified" data-username="Patrick" data-post="4" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<aside class="quote no-group" data-username="nyxnor" data-post="2" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>So people will be recommended to use that instead of <code>INTERNAL_OPEN_PORT=""</code> that will reset everything because there is no plug sign.</p>
+</blockquote>
+</aside>
+<p>Then we’d have to check if that variable is unset versus set to <code>""</code> (empty). Would also be an interesting. Contributions welcome.</p>
+</blockquote>
+</aside>
+<p>Seeing the code, I don’t think it is possible to check it was set to empty because the scripts are sourced in <code>source_config_folder</code>, so at the end, the calling script will only know the result of the array that could be non empty if the person set it first to be empty then only assigned certain ports.</p>
+<p>[quote=“Patrick, post:4, topic:15604”]</p>
+<p>[quote=“nyxnor, post:1, topic:15604”]<br>
+This is targeted to single use Workstations that should only have access to the internet if a socksport is specified to the application.</p>
+<aside class="quote no-group quote-modified" data-username="Patrick" data-post="4" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<aside class="quote no-group" data-username="nyxnor" data-post="3" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>But anyway, maybe it is important to inform in the firewall message that an option to close all ports was set, even if that option is overriden by the next option that includes some ports.</p>
+</blockquote>
+</aside>
+<p>If WORKSTATION_ALLOW_SOCKSIFIED=0 is set for sure would be good to have an info message for that.</p>
+</blockquote>
+</aside>
+<p>I think this is a better solution.</p>
+<aside class="quote no-group quote-modified" data-username="Patrick" data-post="4" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<aside class="quote no-group" data-username="nyxnor" data-post="1" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>This is targeted to single use Workstations that should only have access to the internet if a socksport is specified to the application.</p>
+</blockquote>
+</aside>
+<p><a href="https://www.whonix.org/wiki/Stream_Isolation#Disable_Transparent_Proxying" rel="noopener nofollow ugc">Disable Transparent Proxying</a>?</p>
+</blockquote>
+</aside>
+<p>Yest. I think this applies also, not alone, but in combination with <code>WORKSTATION_ALLOW_SOCKSIFIED=0</code>.</p>
+<p>Example: I want only socks ports that have a specified set of isolation flags, so not using <code>9050</code> because it doesn’t have one. This would enforce me to set the correct socks port per application, not configuring 9050 for everything because it is just easy to remember.</p>
+<p>Edit: another example is an application that defaults to SocksPort 9050, but I only want applications to work with the ports with isolation flags that I want to be used.</p>
+<hr>
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/5</link>
+        <pubDate>Sat, 24 Sep 2022 17:42:02 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-5</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Reminds me… On variable initialization generally…</p>
+<aside class="quote" data-post="1" data-topic="15608">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img loading="lazy" alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/bash-scripts-set-o-nounset-n-versus-v/15608">bash scripts - set -o nounset / -n versus -v</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development/8"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of components looking for maintainer)">Development</span></a>
+  </div>
+  <blockquote>
+    The style… 
+[ -n "$VARNAME" ] || VARNAME="xxx"
+
+in Whonix source code served well but is not the most ideal. The following would be a bit better. 
+[[ -v VARNAME ]] || VARNAME="xxx"
+
+That is because then scripts could be improved and use: 
+set -o nounset
+  </blockquote>
+</aside>
+
+<hr>
+<p>whonix-gateway-firewall currently only using this style:</p>
+<pre><code class="lang-auto">   ## Socks Ports for per application circuits.
+   ## SOCKS_PORT_TOR_DEFAULT
+   INTERNAL_OPEN_PORTS+=" 9050 "
+   ## SOCKS_PORT_TB
+   INTERNAL_OPEN_PORTS+=" 9100 "
+   ## SOCKS_PORT_IRC
+   INTERNAL_OPEN_PORTS+=" 9101 "
+</code></pre>
+<p>I liked that style because nobody was asking how to remove any such ports ever and because then each port could be easily commented.</p>
+<p>It’s run in function <code>variables_defaults</code>. But function <code>source_config_folder</code> runs before that. Therefore you cannot unset it in config but no worries you can do it another way. On top of it there is:</p>
+<pre><code class="lang-auto">   if [ ! "$WORKSTATION_ALLOW_SOCKSIFIED" = "1" ]; then
+      return 0
+   fi
+</code></pre>
+<p>So in the gateway firewall config just set:</p>
+<pre><code>WORKSTATION_ALLOW_SOCKSIFIED=0
+</code></pre>
+<p>In result, no <code>INTERNAL_OPEN_PORTS</code> will be set at all. Then it would be up to the user to configure <code>INTERNAL_OPEN_PORTS</code> or not use any of these ports.</p>
+<p>How does that sound?</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="2" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>If you are afraid someone will close all their internal firewall ports, then I suggest a new variable <code>INTERNAL_CLOSE_ALL=[0|1]</code>.</p>
+</blockquote>
+</aside>
+<p>WORKSTATION_ALLOW_SOCKSIFIED=0 already has the same purpose, good?</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="2" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>So people will be recommended to use that instead of <code>INTERNAL_OPEN_PORT=""</code> that will reset everything because there is no plug sign.</p>
+</blockquote>
+</aside>
+<p>Then we’d have to check if that variable is unset versus set to <code>""</code> (empty). Would also be an interesting. Contributions welcome.</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="3" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>But anyway, maybe it is important to inform in the firewall message that an option to close all ports was set, even if that option is overriden by the next option that includes some ports.</p>
+</blockquote>
+</aside>
+<p>If WORKSTATION_ALLOW_SOCKSIFIED=0 is set for sure would be good to have an info message for that.</p>
+<aside class="quote no-group" data-username="nyxnor" data-post="1" data-topic="15604">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/nyxnor/40/2874_2.png" class="avatar"> nyxnor:</div>
+<blockquote>
+<p>This is targeted to single use Workstations that should only have access to the internet if a socksport is specified to the application.</p>
+</blockquote>
+</aside>
+<p><a href="https://www.whonix.org/wiki/Stream_Isolation#Disable_Transparent_Proxying">Disable Transparent Proxying</a>?</p>
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/4</link>
+        <pubDate>Sat, 24 Sep 2022 11:30:24 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-4</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>No external port is open by default. So I don’t see a need to use it with external open ports, but maybe good to add for compatibility.</p>
+<p>But anyway, maybe it is important to inform in the firewall message that an option to close all ports was set, even if that option is overriden by the next option that includes some ports.<br>
+Or not, because that option should only be set on <code>/usr/local/etc/whonix_firewall.d/50_user.conf</code>, so it is easier to debug.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/3</link>
+        <pubDate>Sat, 24 Sep 2022 10:35:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-3</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>If you are afraid someone will close all their internal firewall ports, then I suggest a new variable <code>INTERNAL_CLOSE_ALL=[0|1]</code>.<br>
+So people will be recommended to use that instead of <code>INTERNAL_OPEN_PORT=""</code> that will reset everything because there is no plug sign.</p>
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/2</link>
+        <pubDate>Sat, 24 Sep 2022 10:30:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-2</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+      <item>
+        <title>how to unset firewall array</title>
+        <dc:creator><![CDATA[nyxnor]]></dc:creator>
+        <description><![CDATA[
+            <p>I want to be able to close all firewall ports that are used by default for whonix and open just a select few, and this of course has to be done solely on <code>/usr/local/etc/torrc.d/50_user.conf</code>.</p>
+<p>This is targeted to single use Workstations that should only have access to the internet if a socksport is specified to the application.</p>
+<p>I tried on the gateway:<br>
+<code>unset INTERNAL_OPEN_PORTS</code><br>
+<code>INTERNAL_OPEN_PORTS=""</code><br>
+and browsed for how to unset array. It works on the cli if I test with arrays, but not with whonix firewall, maybe it is the way the firewall is parsed?</p>
+<hr>
+<p>It is a problem with how the firewall is parsed.</p>
+<p><code>source_config_folder</code> function is called before the defaults is assigned.</p>
+<p>The correct function order is:</p>
+<pre><code class="lang-auto">main() {
+   init
+   firewall_mode_detection
+   variables_defaults ## defaults first
+   source_config_folder ## user conf later
+  ......
+}
+
+main
+</code></pre>
+<p>If this is not done, user can not reset the firewall with <code>INTERNAL_OPEN_PORTS=""</code><br>
+then the next firewall ports that he user wants open are specified below that line:</p>
+<pre><code class="lang-auto">INTERNAL_OPEN_PORTS=""
+INTERNAL_OPEN_PORTS+=" 91XY "
+INTERNAL_OPEN_PORTS+=" 91XZ
+</code></pre>
+<p>can this be done?</p>
+          <p><a href="http://forums.whonix.org/t/how-to-unset-firewall-array/15604/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/how-to-unset-firewall-array/15604/1</link>
+        <pubDate>Sat, 24 Sep 2022 10:10:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15604-1</guid>
+        <source url="http://forums.whonix.org/t/how-to-unset-firewall-array/15604.rss">how to unset firewall array</source>
+      </item>
+  </channel>
+</rss>

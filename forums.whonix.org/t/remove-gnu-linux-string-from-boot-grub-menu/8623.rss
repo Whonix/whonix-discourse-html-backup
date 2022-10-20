@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>remove GNU/Linux string from boot grub menu</title>
+    <link>http://forums.whonix.org/t/remove-gnu-linux-string-from-boot-grub-menu/8623</link>
+    <description>I would like to remove the `GNU/Linux` part from grub boot menu too. That&#39;s just too much and a distraction to mention it for each and every grub boot menu entry. Just too much text and not relevant to what the user is focusing on.
+
+Related `/etc/grub.d/10_linux` code snippet:
+
+    if [ &quot;x${GRUB_DISTRIBUTOR}&quot; = &quot;x&quot; ] ; then
+      OS=GNU/Linux
+    else
+      case ${GRUB_DISTRIBUTOR} in
+        Ubuntu|Kubuntu)
+          OS=&quot;${GRUB_DISTRIBUTOR}&quot;
+          ;;
+        *)
+          OS=&quot;${GRUB_DISTRIBUTOR} GNU/Linux&quot;
+          ;;
+      esac
+      CLASS=&quot;--class $(echo ${GRUB_DISTRIBUTOR} | tr &#39;A-Z&#39; &#39;a-z&#39; | cut -d&#39; &#39; -f1|LC_ALL=C sed &#39;s,[^[:alnum:]_],_,g&#39;) ${CLASS}&quot;
+    fi
+
+We&#39;re either called `Ubuntu` or `Kubuntu` which is obviously not an option or string `GNU/Linux` gets injected into variable `OS` either way.
+
+Translating that code snippet into human speech:
+
+* if `GRUB_DISTRIBUTOR` is unset, set OS to `GNU/Linux`
+* otherwise if `GRUB_DISTRIBUTOR` is set to `Ubuntu` or `Kubuntu` set OS to either of that
+* otherwise set OS  to content of variable `GRUB_DISTRIBUTOR` and append ` GNU/Linux`.
+
+This would require an upstream patch. Change from:
+
+&gt; Ubuntu|Kubuntu)
+
+to
+
+&gt; Ubuntu|Kubuntu|Whonix|Kicksecure)
+
+or some other, more generic, non-hardcoded mechanism to be allowed to set variable `OS`.
+
+(Discussion on `Linux` vs `GNU/Linux` see here from this post: https://forums.whonix.org/t/remodeling-fixing-whonix-homepage-ui/5905/7)</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 13 Dec 2019 11:05:08 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/remove-gnu-linux-string-from-boot-grub-menu/8623.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>remove GNU/Linux string from boot grub menu</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Found a solution using an APT hook. Not an ideal solution but good enough.</p>
+<aside class="onebox githubcommit">
+  <header class="source">
+      <a href="https://github.com/Whonix/anon-base-files/commit/7949b134329be04702274321c277ef4efb005a50" target="_blank">github.com/Whonix/anon-base-files</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Commit">
+    <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/anon-base-files/commit/7949b134329be04702274321c277ef4efb005a50" target="_blank">remove string GNU/Linux from grub boot menu entries</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        committed <span class="discourse-local-date" data-format="ll" data-date="2019-12-13" data-time="11:02:32" data-timezone="UTC">11:02AM - 13 Dec 19 UTC</span>
+      </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+        
+      </div>
+
+      <div class="lines" title="changed 2 files with 18 additions and 0 deletions">
+        <a href="https://github.com/Whonix/anon-base-files/commit/7949b134329be04702274321c277ef4efb005a50" target="_blank">
+          <span class="added">+18</span>
+          <span class="removed">-0</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/anon-base-files/blob/master/etc/apt/apt.conf.d/50grub-ungnu" target="_blank">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/anon-base-files/blob/master/etc/apt/apt.conf.d/50grub-ungnu" target="_blank">Whonix/anon-base-files/blob/master/etc/apt/apt.conf.d/50grub-ungnu</a></h4>
+<pre><code class="lang-d/50grub-ungnu">## Copyright (C) 2019 - 2019 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+DPkg::Post-Invoke {"/usr/lib/distro-base-files/grub-ungnu";};
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/Whonix/anon-base-files/blob/master/usr/lib/distro-base-files/grub-ungnu" target="_blank">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Whonix/anon-base-files/blob/master/usr/lib/distro-base-files/grub-ungnu" target="_blank">Whonix/anon-base-files/blob/master/usr/lib/distro-base-files/grub-ungnu</a></h4>
+<pre><code class="lang-">#!/bin/bash
+
+## Copyright (C) 2019 - 2019 ENCRYPTED SUPPORT LP &lt;adrelanos@riseup.net&gt;
+## See the file COPYING for copying conditions.
+
+set -x
+
+if test -w /boot/grub/grub.cfg ; then
+   str_replace " GNU/Linux" "" /boot/grub/grub.cfg &amp;&gt;/dev/null || echo "$0: failed"
+fi
+
+true "OK."
+
+exit 0
+</code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>(I was previously mistaken. <code>DPkg::Post-Invoke</code> runs once only at the end of APT. Not after each invocation of dpkg by APT.)</p>
+          <p><a href="http://forums.whonix.org/t/remove-gnu-linux-string-from-boot-grub-menu/8623/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/remove-gnu-linux-string-from-boot-grub-menu/8623/5</link>
+        <pubDate>Fri, 13 Dec 2019 11:05:08 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8623-5</guid>
+        <source url="http://forums.whonix.org/t/remove-gnu-linux-string-from-boot-grub-menu/8623.rss">remove GNU/Linux string from boot grub menu</source>
+      </item>
+      <item>
+        <title>remove GNU/Linux string from boot grub menu</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I’ve tried various stuff to remove <code>GNU/Linux</code> using a <code>/etc/grub.d/</code> folder drop-in configuration script.</p>
+<p>file <code>/etc/grub.d/50_ungnu</code></p>
+<pre><code>sudo touch /etc/grub.d/50_ungnu
+sudo chmod +x /etc/grub.d/50_ungnu
+
+
+#!/bin/bash
+
+set -x
+
+cp /boot/grub/grub.cfg.new /boot/grub/grub.cfg.new.tmp
+sed -i 's# GNU/Linux##g' /boot/grub/grub.cfg.new.tmp
+cp /boot/grub/grub.cfg.new.tmp /boot/grub/grub.cfg.new
+</code></pre>
+<p>file <code>/etc/grub.d/90_end</code></p>
+<pre><code>sudo touch /etc/grub.d/90_end
+sudo chmod +x /etc/grub.d/90_end
+
+#!/bin/bash
+
+echo "### TEST"
+</code></pre>
+<p>But that adds some weird characters.</p>
+<pre><code class="lang-auto">### BEGIN /etc/grub.d/50_ungnu ###
+\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00### END /etc/grub.d/50_ungnu ###
+
+### BEGIN /etc/grub.d/90_end ###
+### TEST
+### END /etc/grub.d/90_end ###
+</code></pre>
+<p>Alternatively</p>
+<pre><code>sed -i 's# GNU/Linux##g' /boot/grub/grub.cfg.new
+</code></pre>
+<p>But that breaks grub-mkconfig. The only thing that gets added.</p>
+<pre><code class="lang-auto">### BEGIN /etc/grub.d/50_ungnu ###
+</code></pre>
+<p>Any files after it such as <code>/etc/grub.d/90_end</code> will not be properly processed anymore.</p>
+<p>I guess that could be because <code>/usr/sbin/grub-mkconfig</code> is using:</p>
+<pre><code>exec &gt; "${grub_cfg}.new"
+</code></pre>
+<p>Patching <code>/boot/grub/grub.cfg</code> would also be interesting to change (after above works) default menu entry <code>Whonix</code> to <code>Whonix Persistent</code> which would be useful for <a href="https://forums.whonix.org/t/multiple-boot-modes-for-better-security-persistent-root-persistent-noroot-live-root-live-noroot/7708" class="inline-onebox">multiple boot modes for better security: persistent + root | persistent + noroot | live + root | live + noroot</a>.</p>
+<p>Any solution for above? Or any other hook that could be used to patch <code>/boot/grub/grub.cfg</code>?</p>
+          <p><a href="http://forums.whonix.org/t/remove-gnu-linux-string-from-boot-grub-menu/8623/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/remove-gnu-linux-string-from-boot-grub-menu/8623/2</link>
+        <pubDate>Fri, 13 Dec 2019 09:22:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8623-2</guid>
+        <source url="http://forums.whonix.org/t/remove-gnu-linux-string-from-boot-grub-menu/8623.rss">remove GNU/Linux string from boot grub menu</source>
+      </item>
+      <item>
+        <title>remove GNU/Linux string from boot grub menu</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I would like to remove the <code>GNU/Linux</code> part from grub boot menu too. That’s just too much and a distraction to mention it for each and every grub boot menu entry. Just too much text and not relevant to what the user is focusing on.</p>
+<p>Related <code>/etc/grub.d/10_linux</code> code snippet:</p>
+<pre><code>if [ "x${GRUB_DISTRIBUTOR}" = "x" ] ; then
+  OS=GNU/Linux
+else
+  case ${GRUB_DISTRIBUTOR} in
+    Ubuntu|Kubuntu)
+      OS="${GRUB_DISTRIBUTOR}"
+      ;;
+    *)
+      OS="${GRUB_DISTRIBUTOR} GNU/Linux"
+      ;;
+  esac
+  CLASS="--class $(echo ${GRUB_DISTRIBUTOR} | tr 'A-Z' 'a-z' | cut -d' ' -f1|LC_ALL=C sed 's,[^[:alnum:]_],_,g') ${CLASS}"
+fi
+</code></pre>
+<p>We’re either called <code>Ubuntu</code> or <code>Kubuntu</code> which is obviously not an option or string <code>GNU/Linux</code> gets injected into variable <code>OS</code> either way.</p>
+<p>Translating that code snippet into human speech:</p>
+<ul>
+<li>if <code>GRUB_DISTRIBUTOR</code> is unset, set OS to <code>GNU/Linux</code>
+</li>
+<li>otherwise if <code>GRUB_DISTRIBUTOR</code> is set to <code>Ubuntu</code> or <code>Kubuntu</code> set OS to either of that</li>
+<li>otherwise set OS  to content of variable <code>GRUB_DISTRIBUTOR</code> and append <code> GNU/Linux</code>.</li>
+</ul>
+<p>This would require an upstream patch. Change from:</p>
+<blockquote>
+<p>Ubuntu|Kubuntu)</p>
+</blockquote>
+<p>to</p>
+<blockquote>
+<p>Ubuntu|Kubuntu|Whonix|Kicksecure)</p>
+</blockquote>
+<p>or some other, more generic, non-hardcoded mechanism to be allowed to set variable <code>OS</code>.</p>
+<p>(Discussion on <code>Linux</code> vs <code>GNU/Linux</code> see here from this post: <a href="https://forums.whonix.org/t/remodeling-fixing-whonix-homepage-ui/5905/7" class="inline-onebox">remodeling/fixing whonix homepage ui</a>)</p>
+          <p><a href="http://forums.whonix.org/t/remove-gnu-linux-string-from-boot-grub-menu/8623/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/remove-gnu-linux-string-from-boot-grub-menu/8623/1</link>
+        <pubDate>Fri, 13 Dec 2019 07:57:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8623-1</guid>
+        <source url="http://forums.whonix.org/t/remove-gnu-linux-string-from-boot-grub-menu/8623.rss">remove GNU/Linux string from boot grub menu</source>
+      </item>
+  </channel>
+</rss>

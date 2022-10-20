@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</title>
+    <link>http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992</link>
+    <description>Something interesting here?
+
+https://github.com/hardenedlinux/STIG-4-Debian
+
+https://en.wikipedia.org/wiki/Security_Technical_Implementation_Guide
+
+Similar to:
+
+https://forums.whonix.org/t/harbian-audit-hardened-debian-gnu-linux-distro-auditing/8513</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 26 Feb 2020 05:49:57 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="madaidan" data-post="4" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Went through all the “fails”.</p>
+</blockquote>
+</aside>
+<p>Me too as per <a href="https://www.whonix.org/wiki/Dev/STIG#Commented_Output">https://www.whonix.org/wiki/Dev/STIG#Commented_Output</a></p>
+<aside class="quote no-group" data-username="madaidan" data-post="4" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>Seems like verified boot?</p>
+</blockquote>
+</aside>
+<p><a href="https://www.whonix.org/wiki/Dev/STIG#Commented_Output">https://www.whonix.org/wiki/Dev/STIG#Commented_Output</a></p>
+<blockquote>
+<p>bash scripts/check-package-verify.sh &gt;/dev/null 2&gt;&amp;1 &amp; spinner $! output “SV-86479r2_rule” $?</p>
+<p>Probably porting issue. <a href="https://github.com/hardenedlinux/STIG-4-Debian/blob/master/scripts/check-package-verify.sh">check-package-verify.sh</a> <a href="https://web.archive.org/web/https://github.com/hardenedlinux/STIG-4-Debian/blob/master/scripts/check-package-verify.sh">[archive]</a> does not test anything security relevant.</p>
+</blockquote>
+<aside class="quote no-group" data-username="madaidan" data-post="4" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>pam_cracklib has been discussed before.</p>
+</blockquote>
+</aside>
+<p>Yes, comments added there and linked to open discussions.</p>
+<blockquote>
+<p>[1] Defended in other ways. See [[Dev/Permissions]]. Unclear rationale. Discussed here: <a href="https://forums.whonix.org/t/enforce-minimum-password-strength-pam-cracklib/8972/4" class="inline-onebox">enforce minimum password strength / pam-cracklib</a></p>
+</blockquote>
+<aside class="quote no-group quote-modified" data-username="madaidan" data-post="4" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<blockquote>
+<p>[ FAIL ] The operating system must disable account identifiers (individuals, groups, roles, and devices) if the password expires.</p>
+</blockquote>
+<p>We don’t set password expiry limits and they’re more likely to just annoy users.</p>
+</blockquote>
+</aside>
+<p>Agreed. Added comment:</p>
+<blockquote>
+<p>Same as [1].</p>
+</blockquote>
+<blockquote>
+<p>Expiry limits would likely just annoy users. This might be more useful in an enterprise context where shoulder surfing might be an issue.</p>
+</blockquote>
+<blockquote>
+<p>TODO: document shoulder surfing</p>
+</blockquote>
+<aside class="quote no-group quote-modified" data-username="madaidan" data-post="4" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<blockquote>
+<p>[ FAIL ] Accounts subject to three unsuccessful logon attempts within 15 minutes must be locked for the maximum configurable period.<br>
+[ FAIL ] If three unsuccessful root logon attempts within 15 minutes occur the associated account must be locked.</p>
+</blockquote>
+<p>We do lock accounts although after 50 failed logins rather than 3.</p>
+</blockquote>
+</aside>
+<p>Right. Added comment:</p>
+<blockquote>
+<p>Same as [1].</p>
+<p>Set to 50 before unlockk procedure is required. 50 attempts is far to less for bruteforce.</p>
+<p>Setting it to 3 might fall victim to some bugs. There are cases involving sudo where 1 login attempt is recognized as 3 due to pasting text by mistake into the terminal emulator. We might incrementally lower 50 over the releases if that seems worthwhile but not to 3. Can be discussed in <a href="https://forums.whonix.org/t/protect-linux-user-accounts-against-brute-force-attacks/7698" class="inline-onebox">protect Linux user accounts against brute force attacks</a></p>
+</blockquote>
+<aside class="quote no-group quote-modified" data-username="madaidan" data-post="4" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<blockquote>
+<p>[ FAIL ] The delay between logon prompts following a failed console logon attempt must be at least four seconds.</p>
+</blockquote>
+<p>pam_faildelay has been discussed before.</p>
+</blockquote>
+</aside>
+<blockquote>
+<p>Same as [1].</p>
+</blockquote>
+<aside class="quote no-group quote-modified" data-username="madaidan" data-post="4" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<blockquote>
+<p>[ FAIL ] The operating system must prevent the installation of software, patches, service packs, device drivers, or operating system components of local packages without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization.</p>
+</blockquote>
+<p>Apt does signature verification.</p>
+</blockquote>
+</aside>
+<p>Likely a false positive but should check the code of the test just to make sure.</p>
+<aside class="quote no-group quote-modified" data-username="madaidan" data-post="4" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<blockquote>
+<p>[ FAIL ] The operating system must define default permissions for all authenticated users in such a way that the user can only read and modify their own files.</p>
+</blockquote>
+<p>permission-lockdown does this.</p>
+</blockquote>
+</aside>
+<p>Likely also a false positive but need to check the test code. Similar for other false positives.</p>
+<aside class="quote no-group quote-modified" data-username="madaidan" data-post="4" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<blockquote>
+<p>[ FAIL ] File systems that contain user home directories must be mounted to prevent files with the setuid and setgid bit set from being executed.</p>
+</blockquote>
+<p>remount-secure does this.</p>
+</blockquote>
+</aside>
+<p>needs development, tracked in <a href="https://forums.whonix.org/t/re-mount-home-and-other-with-noexec-and-nosuid-among-other-useful-mount-options-for-better-security/7707" class="inline-onebox">(re-)mount home [and other?] with noexec (and nosuid [among other useful mount options]) for better security?</a></p>
+<p>Mostly agreed with your other comments</p>
+<aside class="quote no-group" data-username="madaidan" data-post="4" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>TLDR: Nothing useful and this is why I really dislike these types of hardening guides.</p>
+</blockquote>
+</aside>
+<p><a href="https://www.whonix.org/wiki/Dev/STIG#Conclusion">https://www.whonix.org/wiki/Dev/STIG#Conclusion</a></p>
+<blockquote>
+<p>Initial impression:</p>
+<ul>
+<li>Mostly applicable to governmental or enterprise environments.</li>
+<li>Whonix / Kicksecure is not an enterprise operating system yet. Such a flavor might be possible in future if an enterprise pays for implementation of these features / such a flavor.</li>
+<li>Lots of false positives.</li>
+<li>Doesn’t test for and/or find anything catastrophic such as remote exploitable vulnerabilities.</li>
+<li>Would still be useful to work through the list and add comments for any reported failure.</li>
+</ul>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/7</link>
+        <pubDate>Wed, 26 Feb 2020 05:49:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8992-7</guid>
+        <source url="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992.rss">DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</source>
+      </item>
+      <item>
+        <title>DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group quote-modified" data-username="madaidan" data-post="4" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<blockquote>
+<p>I see no security benefit for this at all but if you want to, it can be disabled via the <code>kernel.ctrl-alt-del</code> sysctl.</p>
+</blockquote>
+<p>Found this.</p>
+<p><a href="https://help.ubuntu.com/lts/serverguide/console-security.html">https://help.ubuntu.com/lts/serverguide/console-security.html</a></p>
+<blockquote>
+<p>Anyone that has physical access to the keyboard can simply use the <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Delete</kbd> key combination to reboot the server without having to log on. While someone could simply unplug the power source, you should still prevent the use of this key combination on a production server. This forces an attacker to take more drastic measures to reboot the server, and will prevent accidental reboots at the same time.</p>
+</blockquote>
+</blockquote>
+</aside>
+<p>We can document that here (new page):<br>
+<a href="https://www.whonix.org/wiki/Server_Security_Guide">https://www.whonix.org/wiki/Server_Security_Guide</a></p>
+<aside class="quote no-group" data-username="madaidan" data-post="5" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>This doesn’t seem very helpful to me.</p>
+</blockquote>
+</aside>
+<p>Threat models where this is useful are limited indeed. Makes more sense when there are visitors who could use a keyboard but power plug is considered secured (in a case). Maybe kiosk mode or something.</p>
+          <p><a href="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/6</link>
+        <pubDate>Wed, 26 Feb 2020 05:28:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8992-6</guid>
+        <source url="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992.rss">DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</source>
+      </item>
+      <item>
+        <title>DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="madaidan" data-post="4" data-topic="8992">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/m/ea5d25/40.png" class="avatar"> madaidan:</div>
+<blockquote>
+<p>I see no security benefit for this at all but if you want to, it can be disabled via the <code>kernel.ctrl-alt-del</code> sysctl.</p>
+</blockquote>
+</aside>
+<p>Found this.</p>
+<p><a href="https://help.ubuntu.com/lts/serverguide/console-security.html" class="onebox" target="_blank">https://help.ubuntu.com/lts/serverguide/console-security.html</a></p>
+<blockquote>
+<p>Anyone that has physical access to the keyboard can simply use the <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Delete</kbd> key combination to reboot the server without having to log on. While someone could simply unplug the power source, you should still prevent the use of this key combination on a production server. This forces an attacker to take more drastic measures to reboot the server, and will prevent accidental reboots at the same time.</p>
+</blockquote>
+<p>This doesn’t seem very helpful to me.</p>
+          <p><a href="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/5</link>
+        <pubDate>Tue, 25 Feb 2020 20:55:47 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8992-5</guid>
+        <source url="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992.rss">DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</source>
+      </item>
+      <item>
+        <title>DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>Went through all the “fails”.</p>
+<blockquote>
+<p>[ FAIL ] The cryptographic hash of system files and commands must match vendor values.</p>
+</blockquote>
+<p>Seems like verified boot?</p>
+<blockquote>
+<p>[ FAIL ] The operating system must have the screen package installed.</p>
+</blockquote>
+<p>I don’t see how this is relevant.</p>
+<blockquote>
+<p>[ FAIL ] When passwords are changed …<br>
+[ FAIL ] Passwords for new users must be restricted to a 24 hours/1 day minimum lifetime.<br>
+[ FAIL ] Passwords must be restricted to a 24 hours/1 day minimum lifetime.<br>
+[ FAIL ] Existing passwords must be restricted to a 60-day maximum lifetime.<br>
+[ FAIL ] Passwords must be prohibited from reuse for a minimum of five generations.<br>
+[ FAIL ] Passwords must be a minimum of 15 characters in length.<br>
+[ FAIL ] When passwords are changed or new passwords are established, pwquality must be used.</p>
+</blockquote>
+<p>pam_cracklib has been discussed before.</p>
+<blockquote>
+<p>[ FAIL ] The operating system must disable account identifiers (individuals, groups, roles, and devices) if the password expires.</p>
+</blockquote>
+<p>We don’t set password expiry limits and they’re more likely to just annoy users.</p>
+<blockquote>
+<p>[ FAIL ] Accounts subject to three unsuccessful logon attempts within 15 minutes must be locked for the maximum configurable period.<br>
+[ FAIL ] If three unsuccessful root logon attempts within 15 minutes occur the associated account must be locked.</p>
+</blockquote>
+<p>We do lock accounts although after 50 failed logins rather than 3.</p>
+<blockquote>
+<p>[ FAIL ] The delay between logon prompts following a failed console logon attempt must be at least four seconds.</p>
+</blockquote>
+<p>pam_faildelay has been discussed before.</p>
+<blockquote>
+<p>[ FAIL ] The SSH daemon must …<br>
+[ FAIL ] The operating system must not allow users to override SSH environment variables.<br>
+[ FAIL ] The operating system must not allow a non-certificate trusted host SSH logon to the system.<br>
+[ FAIL ] All networked systems must have SSH installed.<br>
+[ FAIL ] All networked systems must use SSH for confidentiality and integrity of transmitted and received information as well as information during preparation for transmission.<br>
+[ FAIL ] All network connections associated with SSH traffic must …<br>
+[ FAIL ] The system must display the date and time of the last successful account logon upon an SSH logon.<br>
+[ FAIL ] The system must not permit direct logons to the root account using remote access via SSH.<br>
+[ FAIL ] A FIPS 140-2 approved cryptographic algorithm must be used for SSH communications.</p>
+</blockquote>
+<p>We don’t use SSH.</p>
+<blockquote>
+<p>[ FAIL ] The operating system must prevent the installation of software, patches, service packs, device drivers, or operating system components of local packages without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization.</p>
+</blockquote>
+<p>Apt does signature verification.</p>
+<blockquote>
+<p>[ FAIL ] The x86 Ctrl-Alt-Delete key sequence must be disabled.</p>
+</blockquote>
+<p>I see no security benefit for this at all but if you want to, it can be disabled via the <code>kernel.ctrl-alt-del</code> sysctl.</p>
+<blockquote>
+<p>[ FAIL ] The operating system must define default permissions for all authenticated users in such a way that the user can only read and modify their own files.</p>
+</blockquote>
+<p>permission-lockdown does this.</p>
+<blockquote>
+<p>[ FAIL ] The system must not have accounts configured with blank or null passwords.<br>
+[ FAIL ] Users must provide a password for privilege escalation.<br>
+[ FAIL ] The operating system must enable AppArmor.<br>
+[ FAIL ] The operating system must be a vendor supported release.<br>
+[ FAIL ] Vendor packaged system security patches and updates must be installed and up to date.<br>
+[ FAIL ] All local interactive user accounts, upon creation, must be assigned a home directory.<br>
+[ FAIL ] All local interactive user home directories defined in the /etc/passwd file must exist.</p>
+</blockquote>
+<p>False positives.</p>
+<blockquote>
+<p>[ FAIL ] All files and directories contained in local interactive user home directories must be owned by the owner of the home directory.<br>
+[ FAIL ] All files and directories contained in local interactive user home directories must be group-owned by a group of which the home directory owner is a member.<br>
+[ FAIL ] All files and directories contained in local interactive user home directories must have mode 0750 or less permissive.<br>
+[ FAIL ] All local initialization files must have mode 0740 or less permissive.</p>
+</blockquote>
+<p>Doesn’t matter if the home directory itself is only accessible by the user which is done via permission-lockdown.</p>
+<blockquote>
+<p>[ FAIL ] File systems that contain user home directories must be mounted to prevent files with the setuid and setgid bit set from being executed.</p>
+</blockquote>
+<p>remount-secure does this.</p>
+<blockquote>
+<p>[ FAIL ] File systems that are being imported via Network File System (NFS) must be mounted to prevent files with the setuid and setgid bit set from being executed.<br>
+[ FAIL ] File systems that are being imported via Network File System (NFS) must be mounted to prevent binary files from being executed.</p>
+</blockquote>
+<p>We don’t use NFS.</p>
+<blockquote>
+<p>[ FAIL ] The umask must be set to 077 for all local interactive user accounts.</p>
+</blockquote>
+<p>Was discussed before and permission-lockdown is a better approach.</p>
+<blockquote>
+<p>[ FAIL ] The system must use a separate file system for /var.<br>
+[ FAIL ] The system must use a separate file system for the system audit data path.<br>
+[ FAIL ] The system must use a separate file system for /tmp (or equivalent).</p>
+</blockquote>
+<p><a href="https://phabricator.whonix.org/T522" class="onebox" target="_blank">https://phabricator.whonix.org/T522</a></p>
+<blockquote>
+<p>[ FAIL ] Cron logging must be implemented.<br>
+[ FAIL ] The file integrity tool must be configured to verify Access Control Lists (ACLs).<br>
+[ FAIL ] The file integrity tool must use FIPS 140-2 approved cryptographic hashes for validating file contents and directories.<br>
+[ FAIL ] Auditing must be configured to produce records containing information to establish what type of events occurred, where the events occurred, the source of the events, and the outcome of the events.<br>
+[ FAIL ] The operating system must shut down upon audit processing failure, unless availability is an overriding concern. If availability is a concern, the system must alert the designated staff (System Administrator [SA] and Information System Security Officer [ISSO] at a minimum) in the event of an audit processing failure.<br>
+[ FAIL ] The operating system must off-load audit records onto a different system or media from the system being audited.<br>
+[ FAIL ] The operating system must encrypt the transfer of audit records off-loaded onto a different system or media from the system being audited.<br>
+[ FAIL ] The audit system must take appropriate action when the audit storage volume is full.<br>
+[ FAIL ] The operating system must immediately notify the System Administrator …<br>
+[ FAIL ] All uses of the … command must be audited.<br>
+[ FAIL ] The operating system must generate audit records for all …<br>
+[ FAIL ] The audit system must take appropriate action when there is an error sending audit records to a remote system.<br>
+[ FAIL ] The system must send rsyslog output to a log aggregation server.</p>
+</blockquote>
+<p>We don’t use any auditing/integrity/logging/etc. tools and I don’t think we should.</p>
+<blockquote>
+<p>[ FAIL ] The system must use a DoD-approved virus scan program.<br>
+[ FAIL ] The system must update the DoD-approved virus scan program every seven days or more frequently.</p>
+</blockquote>
+<p>Virus scanners are essentially useless.</p>
+<blockquote>
+<p>[ FAIL ] The operating system must limit the number of concurrent sessions to 10 for all accounts and/or account types.<br>
+[ FAIL ] All network connections associated with a communication session must be terminated at the end of the session or after 10 minutes of inactivity from the user at a command prompt, except to fulfill documented and validated mission requirements.</p>
+</blockquote>
+<p>Vague. What’s a “session”?</p>
+<blockquote>
+<p>[ FAIL ] The Standard Mandatory DoD Notice and Consent Banner must be displayed immediately prior to, or as part of, remote access logon prompts.</p>
+</blockquote>
+<p>Attackers won’t care about a banner.</p>
+<blockquote>
+<p>[ FAIL ] The operating system must, for networked systems, synchronize clocks with a server that is synchronized to one of the redundant United States Naval Observatory (USNO) time servers, a time server designated for the appropriate DoD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS).</p>
+</blockquote>
+<p>Sdwdate is far better.</p>
+<blockquote>
+<p>[ FAIL ] The operating system must protect against or limit the effects of Denial of Service (DoS) attacks by validating the operating system is implementing rate-limiting measures on impacted network interfaces.</p>
+</blockquote>
+<p>The firewall doesn’t even allow incoming connections.</p>
+<blockquote>
+<p>[ FAIL ] The system must display the date and time of the last successful account logon upon logon.</p>
+</blockquote>
+<p>This is only useful on multi-user systems.</p>
+<blockquote>
+<p>[ FAIL ] Remote X connections for interactive users must be encrypted.</p>
+</blockquote>
+<p>We don’t use any remote X connections.</p>
+<blockquote>
+<p>[ FAIL ] An X Windows display manager must not be installed unless approved.</p>
+</blockquote>
+<p>We need X.</p>
+<p>TLDR: Nothing useful and this is why I really dislike these types of hardening guides.</p>
+          <p><a href="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/4</link>
+        <pubDate>Tue, 25 Feb 2020 20:50:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8992-4</guid>
+        <source url="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992.rss">DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</source>
+      </item>
+      <item>
+        <title>DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</title>
+        <dc:creator><![CDATA[Patrick_mobile]]></dc:creator>
+        <description><![CDATA[
+            <p>A lot things worth checking. Started.</p>
+<p><a href="https://www.whonix.org/wiki/Dev/STIG" class="onebox" target="_blank">https://www.whonix.org/wiki/Dev/STIG</a></p>
+          <p><a href="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/3</link>
+        <pubDate>Tue, 25 Feb 2020 19:02:50 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8992-3</guid>
+        <source url="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992.rss">DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</source>
+      </item>
+      <item>
+        <title>DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</title>
+        <dc:creator><![CDATA[madaidan]]></dc:creator>
+        <description><![CDATA[
+            <p>These type of guides are usually aimed at servers and not desktop computers. Hence a lot of the content is securing things like mail servers and not stuff that would apply to us.</p>
+          <p><a href="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/2</link>
+        <pubDate>Mon, 24 Feb 2020 17:51:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8992-2</guid>
+        <source url="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992.rss">DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</source>
+      </item>
+      <item>
+        <title>DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Something interesting here?</p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://github.githubassets.com/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://github.com/hardenedlinux/STIG-4-Debian" target="_blank">GitHub</a>
+  </header>
+  <article class="onebox-body">
+    <img src="https://avatars2.githubusercontent.com/u/12395326?s=400&amp;v=4" class="thumbnail" width="" height="">
+
+<h3><a href="https://github.com/hardenedlinux/STIG-4-Debian" target="_blank">hardenedlinux/STIG-4-Debian</a></h3>
+
+<p>Security Technical Implementation Guide for Debian - hardenedlinux/STIG-4-Debian</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox wikipedia">
+  <header class="source">
+      <a href="https://en.wikipedia.org/wiki/Security_Technical_Implementation_Guide" target="_blank">en.wikipedia.org</a>
+  </header>
+  <article class="onebox-body">
+    
+
+<h3><a href="https://en.wikipedia.org/wiki/Security_Technical_Implementation_Guide" target="_blank">Security Technical Implementation Guide</a></h3>
+
+<p>A Security Technical Implementation Guide (STIG) is a cybersecurity methodology for standardizing security protocols within networks, servers, computers, and logical designs to enhance overall security. These guides, when implemented, enhance security for software, hardware, physical and logical architectures to further reduce vulnerabilities.
+ Examples where STIGs would be of benefit is in the configuration of a desktop computer or an enterprise server. Most operating systems are not inherently ...</p>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Similar to:</p>
+<aside class="quote quote-modified" data-post="1" data-topic="8513">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/harbian-audit-hardened-debian-gnu-linux-distro-auditing/8513">harbian-audit - Hardened Debian GNU/Linux distro auditing</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    This looks interesting: 
+
+
+"They somewhat implement <a href="https://github.com/Whonix/security-misc">security-misc</a>" but using a different approach as far as I can see after looking into it for 10 minutes. harbian-audit audits and show if hardening settings are missing or apply the hardening settings using a script. security-misc sets security settings through settings files. The latter approach may be less flexible (we don’t have hardening levels - only different packages) but imo more easy to review and maintain and more suitable for installa…
+  </blockquote>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992/1</link>
+        <pubDate>Mon, 24 Feb 2020 06:10:32 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8992-1</guid>
+        <source url="http://forums.whonix.org/t/disa-stig-security-technical-implementation-guides-audit-tool-for-debian/8992.rss">DISA STIG (Security Technical Implementation Guides) Audit Tool for Debian</source>
+      </item>
+  </channel>
+</rss>

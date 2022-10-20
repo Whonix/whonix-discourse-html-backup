@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>GuixSD Distro preview</title>
+    <link>http://forums.whonix.org/t/guixsd-distro-preview/11727</link>
+    <description>I have been using Guix distro for couple of months on VM within Qubes (HVM) and i will report here issues that i faced using it: 
+
+No question that Guix package manager so as the distro is great way to have the latest upgrades available, This will solve as well issues like this: (i wont mention what are the benefits of having guix, there is website users can check and see)
+
+https://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653
+
+But guix wont come without issues as well: 
+
+- TLS/DNS issues for the package manager/website
+
+The package manager rely on git which is hosted on gnu.org called [savannah](https://savannah.gnu.org/), It misses many security features related to TLS so as DNS: 
+
+** Sent an email to [webmasters[at]gnu.org](mailto:webmasters@gnu.org) on 11/9/2020 with no reply until now.
+
+** Opened ticked on guix ticketing system date 11/4/2021 [#47823](https://issues.guix.gnu.org/47823), Still no action been taken until now.
+
+** No support provided yet to Hidden Services [#47647](https://issues.guix.gnu.org/47647)
+
+- Guix Package Manager Security
+
+** Guix doesnt support yet or properly MAC (SElinux): 
+
+https://guix.gnu.org/manual/en/html_node/SELinux-Support.html
+
+and no support mentioned for apparmor. 
+
+** Guix doesnt sandbox their packages, I have suggested to implement a design which help put the packages into isolated VM but it seems wont happen unless someone contribute to do it [#43770](https://issues.guix.gnu.org/43770)
+
+Note: There is a project working on implementing this idea on Nix called [Spectrum](https://spectrum-os.org/design.html):
+
+&gt; The current plan is to implement compartmentalization in Spectrum by running each application inside [crosvm](https://chromium.googlesource.com/chromiumos/platform/crosvm/), the hypervisor used by ChromiumOS.
+
+- Guix package manager usability
+
+Since guix will download the source code and build it in user machine it will drain the resources to the level which exceed the resources provided by average PCs and some other issues: 
+
+** LibreOffice upgrade will freeze the machine (OOM,EarlyOOM needed but not yet added) [#47717](https://issues.guix.gnu.org/47717)
+
+** Icedove wont build due to the need of high resources [#48273](https://issues.guix.gnu.org/48273)
+
+** Using Guix commands for updates can lead to unknown crashes (only once happened) [#47782](https://issues.guix.gnu.org/47782)
+
+** If there is a failure build for one package the whole entire upgrade process will cut off [#48166](https://issues.guix.gnu.org/48166)
+
+** Guix Package Manager tested on Debian 11 it wont show or run the installed application from guix [#48796](https://issues.guix.gnu.org/48796)
+
+** It give messages which if you do what it says (copy/paste to what need to be done) it wont work [#47724](https://issues.guix.gnu.org/47724) &lt;- wont fix. 
+
+- Guix packages
+
+** Icecat after one upgrade it came out with no icons for the extensions and fixing it need manual work or more work from icecat maintainer to fix it [#48169](https://issues.guix.gnu.org/48169). The issue actually known from 18/9/2020 [#43487](https://issues.guix.gnu.org/43487).
+
+** Some packages wont give proper readings because it didnt expect to see not traditional stuff like the very long path read of the package using htop/top [#47749](https://issues.guix.gnu.org/47749).
+
+- GuixSD the distro (currently called guix only)
+
+** Has its own service manager called [Shepherd](https://www.gnu.org/software/shepherd/). (Not an issue, But just something different from what used traditionally in known GNU/Linux Distros).
+
+** You cant install it using guided GUI way unless there is internet connection in the installation process. No support yet for static ip configuration within the installation process [#37005](https://issues.guix.gnu.org/37005) , [#43049](https://issues.guix.gnu.org/43049). 
+
+** No support for live mode or testing to the distro before installation only guided installation similar to debian [#47631](https://issues.guix.gnu.org/47631) (wont fix).
+
+** To install the distro with static ip you need to install it using cli way but the issue with the documentation is not really easy for end user if hes average or want to use copy/paste steps [#47630](https://issues.guix.gnu.org/47630).
+
+** If the internet went off during the installation of the distro there is no reversible way to fix it [#47714](https://issues.guix.gnu.org/47714)
+
+** The distro comes with bloated packages (not necessary packages) which we dont see by default in minimal distro like debian (packages like mesa, nouveau...etc).
+
+** You cant delete system packages using guix package manager, instead you do it manually [#47748](https://issues.guix.gnu.org/47748).
+
+** Annoying bug after the installation (using cli way) that prevent the NetworkManager to save network preferences (you need to do the manual commands every time after reboot to have internet connection) [#47687](https://issues.guix.gnu.org/47687).
+
+** Guix commands for update/upgrade are not friendly chosen [#47971](https://issues.guix.gnu.org/47971). &lt;- Wont fix
+
+** Due to the feature which save generation/cache for the packages it wont work well with low disk space (not less than 100-200 GB) which makes it sorta hard to be used on light VMs or Mobile devices. Requested feature to have the ability to disable the caching and keep only the rolling/continues upgrade for the packages [#47846](https://issues.guix.gnu.org/47846).
+
+** No simple firewall by default like ufw/gufw [#47645](https://issues.guix.gnu.org/47645). 
+
+- Guix Ticketing system/Bug tracker is a disaster
+
+Its purely email based ticketing system which mean: 
+
+** You cant modify what have been sent
+
+** If you want to close or reopen the ticket you need to do it with special way (no clear docs saying that in guix) e.g: 
+
+Ticket can be reopened by sending a message containing &quot;reopen 47748&quot; to [&lt;control[at]debbugs.gnu.org&gt;](mailto:control@debbugs.gnu.org). 
+
+- Conclusion
+
+** Not useful for old or weak resources PCs
+** Not useful for low/limited disk space 
+** Not useful for slow Internet Connection
+** No friendly installation for static ip cases yet.
+** I wouldnt call it friendly distro (yet, as maybe in the future this change)
+** I wouldnt consider it stable for production, I still see it in beta phase.
+** I wouldnt consider it secure as there is no way invented yet to secure the installed packages.
+
+- How it can be useful to whonix? 
+
+Only way i can think of now is to use guixsd as whonix host but not whonix main distro why: 
+
+** Host can be minimalised to specific packages only to make it running this will reduce the impact of storage issue
+** We can say that whonix host can require high resources pc, But it would be very bad experience if we say whonix main distro require high resources pc (imagine each VM ws/gw should at least has 8GB or more of ram with 100+GB storage)
+** It will resolve new hypervisor package issues specially like vbox one (roll back feature to the older version can be temporary solution until whonix fix the issue for the newest one)
+** Host kernel , DE ,...etc will be always running the latest upgrades available.
+
+we cant use guixsd to be the distro for main whonix os due to the issues above.</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 27 Jul 2021 10:16:34 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/guixsd-distro-preview/11727.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>GuixSD Distro preview</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>Additional point:</p>
+<ul>
+<li>No easy way to install an outside package (not from guix) for example if user downloaded TB from TorProject he cant open it/wont work. (user need to use tools like PatchELF to change stuff because libs/glibc not the same as in normal distros).</li>
+</ul>
+<p>This is the same with nixos,fedora silverblue not only in guix.</p>
+          <p><a href="http://forums.whonix.org/t/guixsd-distro-preview/11727/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/guixsd-distro-preview/11727/5</link>
+        <pubDate>Tue, 27 Jul 2021 10:16:34 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11727-5</guid>
+        <source url="http://forums.whonix.org/t/guixsd-distro-preview/11727.rss">GuixSD Distro preview</source>
+      </item>
+      <item>
+        <title>GuixSD Distro preview</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>TNT_BOM_BOM via Whonix Forum:</p>
+<blockquote>
+<blockquote>
+<p>Dunno. Unless you can point me to a weak dependencies or similar feature.</p>
+</blockquote>
+<p>talked to them and they answered:</p>
+<blockquote>
+<p>Guix doesn’t have the concept of conflicts or recommendations at all,<br>
+so everything is ‘fixed’. Package A either refers to package B or it<br>
+doesn’t.</p>
+</blockquote>
+</blockquote>
+<p>Sounds like it has no weak dependencies feature.</p>
+<blockquote>
+<blockquote>
+<p>If Guix upstream has packaged A to require B, and you don’t like<br>
+that, you could create a custom A variant with (say) --disable-b if A<br>
+supports that.</p>
+</blockquote>
+</blockquote>
+<p>Not sure what that means. Building a custom package?</p>
+<blockquote>
+<p>But there’s no ‘Installing A will ask you whether you<br>
+want B, and if so will treat B as a heisendep of A’ nonsense like in<br>
+Debian and I’m grateful for it.</p>
+</blockquote>
+<p>That I very much agree with. Debian <code>Recommends:</code> are heisendep. Similar<br>
+heisenbug. You’ll never know if users got the <code>Recommends:</code>ed packages<br>
+or not.</p>
+<p>I don’t like Debian “heisendep” but a weak dependencies feature would be<br>
+great.</p>
+          <p><a href="http://forums.whonix.org/t/guixsd-distro-preview/11727/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/guixsd-distro-preview/11727/4</link>
+        <pubDate>Tue, 08 Jun 2021 19:20:25 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11727-4</guid>
+        <source url="http://forums.whonix.org/t/guixsd-distro-preview/11727.rss">GuixSD Distro preview</source>
+      </item>
+      <item>
+        <title>GuixSD Distro preview</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>
+<p>Dunno. Unless you can point me to a weak dependencies or similar feature.</p>
+</blockquote>
+<p>talked to them and they answered:</p>
+<blockquote>
+<p>Guix doesn’t have the concept of conflicts or recommendations at all,<br>
+so everything is ‘fixed’. Package A either refers to package B or it<br>
+doesn’t.<br>
+If Guix upstream has packaged A to require B, and you don’t like<br>
+that, you could create a custom A variant with (say) --disable-b if A<br>
+supports that. But there’s no ‘Installing A will ask you whether you<br>
+want B, and if so will treat B as a heisendep of A’ nonsense like in<br>
+Debian and I’m grateful for it.<br>
+Removing a Guix package can’t remove other packages. Guix doesn’t<br>
+work like that.<br>
+Guix knows what needs to remain in /gnu/store because it has a record<br>
+of all references.<br>
+“guix upgrade” operates on user profiles such as ~/.guix-profile<br>
+“guix system reconfigure” builds a system (it also ends up in<br>
+/gnu/store) and switches the current system symlink to the new one,<br>
+restarts some services etc</p>
+</blockquote>
+<p>So i believe it fix that debian issue.</p>
+<p>Patrick via Whonix Forum:</p>
+          <p><a href="http://forums.whonix.org/t/guixsd-distro-preview/11727/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/guixsd-distro-preview/11727/3</link>
+        <pubDate>Tue, 08 Jun 2021 17:05:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11727-3</guid>
+        <source url="http://forums.whonix.org/t/guixsd-distro-preview/11727.rss">GuixSD Distro preview</source>
+      </item>
+      <item>
+        <title>GuixSD Distro preview</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="TNT_BOM_BOM" data-post="1" data-topic="11727">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tnt_bom_bom/40/2148_2.png" class="avatar"> TNT_BOM_BOM:</div>
+<blockquote>
+<p>This will solve as well issues like this</p>
+</blockquote>
+</aside>
+<p>Dunno. Unless you can point me to a weak dependencies or similar feature.</p>
+<aside class="quote no-group" data-username="TNT_BOM_BOM" data-post="1" data-topic="11727">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/tnt_bom_bom/40/2148_2.png" class="avatar"> TNT_BOM_BOM:</div>
+<blockquote>
+<p>Only way i can think of now is to use guixsd as whonix host but not whonix main distro why:</p>
+</blockquote>
+</aside>
+<p>See related Whonix development wiki entry <a href="https://www.whonix.org/wiki/Dev/Default_Application_Policy#guix">guix</a>.</p>
+          <p><a href="http://forums.whonix.org/t/guixsd-distro-preview/11727/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/guixsd-distro-preview/11727/2</link>
+        <pubDate>Sat, 29 May 2021 09:17:13 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11727-2</guid>
+        <source url="http://forums.whonix.org/t/guixsd-distro-preview/11727.rss">GuixSD Distro preview</source>
+      </item>
+      <item>
+        <title>GuixSD Distro preview</title>
+        <dc:creator><![CDATA[TNT_BOM_BOM]]></dc:creator>
+        <description><![CDATA[
+            <p>I have been using Guix distro for couple of months on VM within Qubes (HVM) and i will report here issues that i faced using it:</p>
+<p>No question that Guix package manager so as the distro is great way to have the latest upgrades available, This will solve as well issues like this: (i wont mention what are the benefits of having guix, there is website users can check and see)</p>
+<aside class="quote quote-modified" data-post="1" data-topic="653">
+  <div class="title">
+    <div class="quote-controls"></div>
+    <img alt="" width="20" height="20" src="/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar">
+    <a href="https://forums.whonix.org/t/issues-with-removal-of-specific-packages-by-users-builders/653">Issues with removal of specific packages by users / builders</a> <a class="badge-wrapper  bullet" href="http://forums.whonix.org/c/development/8"><span class="badge-category-bg" style="background-color: #25AAE2;"></span><span style="" data-drop-close="true" class="badge-category clear-badge" title="Hacking on the Whonix software and code. (devs) (list of unmaintained components)">Development</span></a>
+  </div>
+  <blockquote>
+    It is a real pity. Now that Whonix’s functionality is split into multiple packages, which made Whonix’s source code much simpler to grasp, we still cannot tell users who wish to remove certain functionality to simply uninstall the package. Each package still needs a mechanism to disable its functionality while being enabled. 
+For example, a common use case were users wish to tunnel all their traffic through something… ( <a href="https://www.whonix.org/wiki/Tunnels/Introduction" rel="noopener nofollow ugc">https://www.whonix.org/wiki/Tunnels/Introduction</a> ) 
+uwt ( <a href="https://github.com/Whonix/uwt" rel="noopener nofollow ugc">https://github.com…</a>
+  </blockquote>
+</aside>
+
+<p>But guix wont come without issues as well:</p>
+<ul>
+<li>TLS/DNS issues for the package manager/website</li>
+</ul>
+<p>The package manager rely on git which is hosted on <a href="http://gnu.org" rel="noopener nofollow ugc">gnu.org</a> called <a href="https://savannah.gnu.org/" rel="noopener nofollow ugc">savannah</a>, It misses many security features related to TLS so as DNS:</p>
+<p>** Sent an email to <a href="mailto:webmasters@gnu.org">webmasters[at]gnu.org</a> on 11/9/2020 with no reply until now.</p>
+<p>** Opened ticked on guix ticketing system date 11/4/2021 <a href="https://issues.guix.gnu.org/47823" rel="noopener nofollow ugc">#47823</a>, Still no action been taken until now.</p>
+<p>** No support provided yet to Hidden Services <a href="https://issues.guix.gnu.org/47647" rel="noopener nofollow ugc">#47647</a></p>
+<ul>
+<li>Guix Package Manager Security</li>
+</ul>
+<p>** Guix doesnt support yet or properly MAC (SElinux):</p>
+<p><a href="https://guix.gnu.org/manual/en/html_node/SELinux-Support.html" class="onebox" target="_blank" rel="noopener nofollow ugc">https://guix.gnu.org/manual/en/html_node/SELinux-Support.html</a></p>
+<p>and no support mentioned for apparmor.</p>
+<p>** Guix doesnt sandbox their packages, I have suggested to implement a design which help put the packages into isolated VM but it seems wont happen unless someone contribute to do it <a href="https://issues.guix.gnu.org/43770" rel="noopener nofollow ugc">#43770</a></p>
+<p>Note: There is a project working on implementing this idea on Nix called <a href="https://spectrum-os.org/design.html" rel="noopener nofollow ugc">Spectrum</a>:</p>
+<blockquote>
+<p>The current plan is to implement compartmentalization in Spectrum by running each application inside <a href="https://chromium.googlesource.com/chromiumos/platform/crosvm/" rel="noopener nofollow ugc">crosvm</a>, the hypervisor used by ChromiumOS.</p>
+</blockquote>
+<ul>
+<li>Guix package manager usability</li>
+</ul>
+<p>Since guix will download the source code and build it in user machine it will drain the resources to the level which exceed the resources provided by average PCs and some other issues:</p>
+<p>** LibreOffice upgrade will freeze the machine (OOM,EarlyOOM needed but not yet added) <a href="https://issues.guix.gnu.org/47717" rel="noopener nofollow ugc">#47717</a></p>
+<p>** Icedove wont build due to the need of high resources <a href="https://issues.guix.gnu.org/48273" rel="noopener nofollow ugc">#48273</a></p>
+<p>** Using Guix commands for updates can lead to unknown crashes (only once happened) <a href="https://issues.guix.gnu.org/47782" rel="noopener nofollow ugc">#47782</a></p>
+<p>** If there is a failure build for one package the whole entire upgrade process will cut off <a href="https://issues.guix.gnu.org/48166" rel="noopener nofollow ugc">#48166</a></p>
+<p>** Guix Package Manager tested on Debian 11 it wont show or run the installed application from guix <a href="https://issues.guix.gnu.org/48796" rel="noopener nofollow ugc">#48796</a></p>
+<p>** It give messages which if you do what it says (copy/paste to what need to be done) it wont work <a href="https://issues.guix.gnu.org/47724" rel="noopener nofollow ugc">#47724</a> ← wont fix.</p>
+<ul>
+<li>Guix packages</li>
+</ul>
+<p>** Icecat after one upgrade it came out with no icons for the extensions and fixing it need manual work or more work from icecat maintainer to fix it <a href="https://issues.guix.gnu.org/48169" rel="noopener nofollow ugc">#48169</a>. The issue actually known from 18/9/2020 <a href="https://issues.guix.gnu.org/43487" rel="noopener nofollow ugc">#43487</a>.</p>
+<p>** Some packages wont give proper readings because it didnt expect to see not traditional stuff like the very long path read of the package using htop/top <a href="https://issues.guix.gnu.org/47749" rel="noopener nofollow ugc">#47749</a>.</p>
+<ul>
+<li>GuixSD the distro (currently called guix only)</li>
+</ul>
+<p>** Has its own service manager called <a href="https://www.gnu.org/software/shepherd/" rel="noopener nofollow ugc">Shepherd</a>. (Not an issue, But just something different from what used traditionally in known GNU/Linux Distros).</p>
+<p>** You cant install it using guided GUI way unless there is internet connection in the installation process. No support yet for static ip configuration within the installation process <a href="https://issues.guix.gnu.org/37005" rel="noopener nofollow ugc">#37005</a> , <a href="https://issues.guix.gnu.org/43049" rel="noopener nofollow ugc">#43049</a>.</p>
+<p>** No support for live mode or testing to the distro before installation only guided installation similar to debian <a href="https://issues.guix.gnu.org/47631" rel="noopener nofollow ugc">#47631</a> (wont fix).</p>
+<p>** To install the distro with static ip you need to install it using cli way but the issue with the documentation is not really easy for end user if hes average or want to use copy/paste steps <a href="https://issues.guix.gnu.org/47630" rel="noopener nofollow ugc">#47630</a>.</p>
+<p>** If the internet went off during the installation of the distro there is no reversible way to fix it <a href="https://issues.guix.gnu.org/47714" rel="noopener nofollow ugc">#47714</a></p>
+<p>** The distro comes with bloated packages (not necessary packages) which we dont see by default in minimal distro like debian (packages like mesa, nouveau…etc).</p>
+<p>** You cant delete system packages using guix package manager, instead you do it manually <a href="https://issues.guix.gnu.org/47748" rel="noopener nofollow ugc">#47748</a>.</p>
+<p>** Annoying bug after the installation (using cli way) that prevent the NetworkManager to save network preferences (you need to do the manual commands every time after reboot to have internet connection) <a href="https://issues.guix.gnu.org/47687" rel="noopener nofollow ugc">#47687</a>.</p>
+<p>** Guix commands for update/upgrade are not friendly chosen <a href="https://issues.guix.gnu.org/47971" rel="noopener nofollow ugc">#47971</a>. ← Wont fix</p>
+<p>** Due to the feature which save generation/cache for the packages it wont work well with low disk space (not less than 100-200 GB) which makes it sorta hard to be used on light VMs or Mobile devices. Requested feature to have the ability to disable the caching and keep only the rolling/continues upgrade for the packages <a href="https://issues.guix.gnu.org/47846" rel="noopener nofollow ugc">#47846</a>.</p>
+<p>** No simple firewall by default like ufw/gufw <a href="https://issues.guix.gnu.org/47645" rel="noopener nofollow ugc">#47645</a>.</p>
+<ul>
+<li>Guix Ticketing system/Bug tracker is a disaster</li>
+</ul>
+<p>Its purely email based ticketing system which mean:</p>
+<p>** You cant modify what have been sent</p>
+<p>** If you want to close or reopen the ticket you need to do it with special way (no clear docs saying that in guix) e.g:</p>
+<p>Ticket can be reopened by sending a message containing “reopen 47748” to <a href="mailto:control@debbugs.gnu.org">&lt;control[at]debbugs.gnu.org&gt;</a>.</p>
+<ul>
+<li>Conclusion</li>
+</ul>
+<p>** Not useful for old or weak resources PCs<br>
+** Not useful for low/limited disk space<br>
+** Not useful for slow Internet Connection<br>
+** No friendly installation for static ip cases yet.<br>
+** I wouldnt call it friendly distro (yet, as maybe in the future this change)<br>
+** I wouldnt consider it stable for production, I still see it in beta phase.<br>
+** I wouldnt consider it secure as there is no way invented yet to secure the installed packages.</p>
+<ul>
+<li>How it can be useful to whonix?</li>
+</ul>
+<p>Only way i can think of now is to use guixsd as whonix host but not whonix main distro why:</p>
+<p>** Host can be minimalised to specific packages only to make it running this will reduce the impact of storage issue<br>
+** We can say that whonix host can require high resources pc, But it would be very bad experience if we say whonix main distro require high resources pc (imagine each VM ws/gw should at least has 8GB or more of ram with 100+GB storage)<br>
+** It will resolve new hypervisor package issues specially like vbox one (roll back feature to the older version can be temporary solution until whonix fix the issue for the newest one)<br>
+** Host kernel , DE ,…etc will be always running the latest upgrades available.</p>
+<p>we cant use guixsd to be the distro for main whonix os due to the issues above.</p>
+          <p><a href="http://forums.whonix.org/t/guixsd-distro-preview/11727/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/guixsd-distro-preview/11727/1</link>
+        <pubDate>Fri, 28 May 2021 16:24:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-11727-1</guid>
+        <source url="http://forums.whonix.org/t/guixsd-distro-preview/11727.rss">GuixSD Distro preview</source>
+      </item>
+  </channel>
+</rss>

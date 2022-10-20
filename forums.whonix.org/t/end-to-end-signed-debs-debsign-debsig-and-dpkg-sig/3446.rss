@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>end-to-end signed debs. debsign, debsig and dpkg-sig</title>
+    <link>http://forums.whonix.org/t/end-to-end-signed-debs-debsign-debsig-and-dpkg-sig/3446</link>
+    <description>I have been refreshing my knowledge on `debsign`, `debsig` and `dpkg-sig`.
+
+`debsig` and `dpkg-sig` make the package non-deterministic since they embed the signatures into the package. (And most of package.debian.org packages don&#39;t `debsig` or `dpkg-sig` either.) So not useful in context of Whonix.
+
+- http://unix.stackexchange.com/questions/285635/how-is-the-authenticity-of-debian-packages-guaranteed
+- https://blog.packagecloud.io/eng/2014/10/28/howto-gpg-sign-verify-deb-packages-apt-repositories/
+- https://wiki.debian.org/UntrustedDebs
+
+`debsign` doesn&#39;t bring more security in context of Whonix either. It&#39;s useful to secure the communication between package maintainers and (Debian) build servers. Since Whonix uses no build servers, using `debsign` would only silence a `dpkg-source` warning.
+
+Whonix already provides end-to-end package integrity by signing apt repository metadata.
+
+Debian does not end-to-end verify packages from maintainer package signature to dpkg installation on user&#39;s systems yet. ( https://wiki.debian.org/UntrustedDebs#End-to-end_signatures_with_TOFU )
+
+Therefore when building Whonix from source code the warning during Whonix build process such as:
+
+&gt; `dpkg-source: warning: extracting unsigned source package` 
+
+&gt; `dpkg-source: warning: extracting unsigned source package (anon-gw-anonymizer-config_5.0-1.dsc)`
+
+can be safely ignored.
+
+This is because the `Debian source package` (a technical term in Debian packaging) for packages by Whonix is created from the local git repository only. No files from remote locations are involved except the git repository itself which gets verified when using the usual build from Whonix source code instructions.
+
+1. The user downloads Whonix source code including all Whonix package source code from git.
+2. The user verifies all of Whonix source code from git.
+3. The Whonix build script builds all Whonix packages using `genmkfile`.
+4. Building a Debian package requires an upstream archive (also called upstream tarball) as well as a Debian archive (also called Debian tarball).
+5. `genmkfile` creates all the archives and files required for the creation of a Debian `.deb` package from the local git repository only.
+6. `genmkfile` runs `cowbuilder` which results in running `dpkg-source` to extract the `Debian source package` inside a clean `chroot`. At that point `dpkg-source` notices that  the `Debian source package` lacks a signature file.
+
+While checking the signature makes sense for Debian upstream build servers it makes no sense when building packages locally with locally already verified files. Signing the file would require the user to needlessly (auto) generate a signing key which would not be used for anything but silencing a non-applicable warning.</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 03 Aug 2021 10:47:00 +0000</lastBuildDate>
+    <category>Development</category>
+    <atom:link href="http://forums.whonix.org/t/end-to-end-signed-debs-debsign-debsig-and-dpkg-sig/3446.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>end-to-end signed debs. debsign, debsig and dpkg-sig</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I have been refreshing my knowledge on <code>debsign</code>, <code>debsig</code> and <code>dpkg-sig</code>.</p>
+<p><code>debsig</code> and <code>dpkg-sig</code> make the package non-deterministic since they embed the signatures into the package. (And most of <a href="http://package.debian.org">package.debian.org</a> packages don’t <code>debsig</code> or <code>dpkg-sig</code> either.) So not useful in context of Whonix.</p>
+<ul>
+<li><a href="http://unix.stackexchange.com/questions/285635/how-is-the-authenticity-of-debian-packages-guaranteed">http://unix.stackexchange.com/questions/285635/how-is-the-authenticity-of-debian-packages-guaranteed</a></li>
+<li><a href="https://blog.packagecloud.io/eng/2014/10/28/howto-gpg-sign-verify-deb-packages-apt-repositories/" class="inline-onebox">HOWTO: GPG sign and verify deb packages and APT repositories - Packagecloud Blog</a></li>
+<li><a href="https://wiki.debian.org/UntrustedDebs" class="inline-onebox">UntrustedDebs - Debian Wiki</a></li>
+</ul>
+<p><code>debsign</code> doesn’t bring more security in context of Whonix either. It’s useful to secure the communication between package maintainers and (Debian) build servers. Since Whonix uses no build servers, using <code>debsign</code> would only silence a <code>dpkg-source</code> warning.</p>
+<p>Whonix already provides end-to-end package integrity by signing apt repository metadata.</p>
+<p>Debian does not end-to-end verify packages from maintainer package signature to dpkg installation on user’s systems yet. ( <a href="https://wiki.debian.org/UntrustedDebs#End-to-end_signatures_with_TOFU" class="inline-onebox">UntrustedDebs - Debian Wiki</a> )</p>
+<p>Therefore when building Whonix from source code the warning during Whonix build process such as:</p>
+<blockquote>
+<p><code>dpkg-source: warning: extracting unsigned source package</code></p>
+</blockquote>
+<blockquote>
+<p><code>dpkg-source: warning: extracting unsigned source package (anon-gw-anonymizer-config_5.0-1.dsc)</code></p>
+</blockquote>
+<p>can be safely ignored.</p>
+<p>This is because the <code>Debian source package</code> (a technical term in Debian packaging) for packages by Whonix is created from the local git repository only. No files from remote locations are involved except the git repository itself which gets verified when using the usual build from Whonix source code instructions.</p>
+<ol>
+<li>The user downloads Whonix source code including all Whonix package source code from git.</li>
+<li>The user verifies all of Whonix source code from git.</li>
+<li>The Whonix build script builds all Whonix packages using <code>genmkfile</code>.</li>
+<li>Building a Debian package requires an upstream archive (also called upstream tarball) as well as a Debian archive (also called Debian tarball).</li>
+<li>
+<code>genmkfile</code> creates all the archives and files required for the creation of a Debian <code>.deb</code> package from the local git repository only.</li>
+<li>
+<code>genmkfile</code> runs <code>cowbuilder</code> which results in running <code>dpkg-source</code> to extract the <code>Debian source package</code> inside a clean <code>chroot</code>. At that point <code>dpkg-source</code> notices that  the <code>Debian source package</code> lacks a signature file.</li>
+</ol>
+<p>While checking the signature makes sense for Debian upstream build servers it makes no sense when building packages locally with locally already verified files. Signing the file would require the user to needlessly (auto) generate a signing key which would not be used for anything but silencing a non-applicable warning.</p>
+          <p><a href="http://forums.whonix.org/t/end-to-end-signed-debs-debsign-debsig-and-dpkg-sig/3446/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/end-to-end-signed-debs-debsign-debsig-and-dpkg-sig/3446/1</link>
+        <pubDate>Wed, 18 Jan 2017 17:25:40 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-3446-1</guid>
+        <source url="http://forums.whonix.org/t/end-to-end-signed-debs-debsign-debsig-and-dpkg-sig/3446.rss">end-to-end signed debs. debsign, debsig and dpkg-sig</source>
+      </item>
+  </channel>
+</rss>

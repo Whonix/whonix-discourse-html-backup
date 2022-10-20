@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Yggdrasil in WS - Custom IPv6 settings</title>
+    <link>http://forums.whonix.org/t/yggdrasil-in-ws-custom-ipv6-settings/13562</link>
+    <description>I installed Yggdrasil (connects over Tor) in Whonix WS. The setup needs IPv6 firewall rules to allow tun0 traffic. This works well when I load the rules manually. Now I want to make them load automatically on startup and when running &quot;Reload Firewall&quot; from the menu. Where is the correct place in Whonix WS to put custom IPv6 rules?</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 15 Apr 2022 17:01:07 +0000</lastBuildDate>
+    <category>Support</category>
+    <atom:link href="http://forums.whonix.org/t/yggdrasil-in-ws-custom-ipv6-settings/13562.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Yggdrasil in WS - Custom IPv6 settings</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>iptables to my knowledge isn’t really “plugin friendly”.</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://www.whonix.org/wiki/Unspecific">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/a/a4/Whonix-home-favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener" title="11:34AM - 26 January 2022">Whonix – 26 Jan 22</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:250/500;"><img src="https://www.whonix.org/w/images/7/74/Booster132.png" class="thumbnail" width="250" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener">Information Booster might be Available!</a></h3>
+
+  <p>Utilizing other resources to help solve questions/issues unspecific to Whonix ™.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>Whonix at time of writing doesn’t have a feature to easily add custom firewall rules. You’d have to invent such a mechanism yourself such as with a custom systemd unit that runs after <code>whonix-firewall.service</code>. Maybe a systemd drop-in would work.</p>
+<p>Added to wiki just now:</p>
+<p><a href="https://www.whonix.org/wiki/Whonix-Workstation_Firewall#Additional_User_Custom_Firewall_Rules">Additional User Custom Firewall Rules</a></p>
+<hr>
+<p>Information for developers:</p>
+<p>related package:</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://gitlab.com/whonix/whonix-firewall">
+  <header class="source">
+      <img src="https://gitlab.com/assets/favicon-7901bd695fb93edb07975966062049829afb56cf11511236e61bcf425070e36e.png" class="site-icon" width="32" height="32">
+
+      <a href="https://gitlab.com/whonix/whonix-firewall" target="_blank" rel="noopener">GitLab</a>
+  </header>
+
+  <article class="onebox-body">
+    <img src="https://gitlab.com/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png" class="thumbnail onebox-avatar" width="128" height="128">
+
+<h3><a href="https://gitlab.com/whonix/whonix-firewall" target="_blank" rel="noopener">Whonix / whonix-firewall</a></h3>
+
+  <p>GitLab.com</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>related source code file:</p>
+<aside class="onebox gitlabblob" data-onebox-src="https://gitlab.com/whonix/whonix-firewall/-/blob/master/usr/bin/whonix-workstation-firewall">
+  <header class="source">
+
+      <a href="https://gitlab.com/whonix/whonix-firewall/-/blob/master/usr/bin/whonix-workstation-firewall" target="_blank" rel="noopener">gitlab.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <h4><a href="https://gitlab.com/whonix/whonix-firewall/-/blob/master/usr/bin/whonix-workstation-firewall" target="_blank" rel="noopener">whonix/whonix-firewall/-/blob/master/usr/bin/whonix-workstation-firewall</a></h4>
+
+  <pre><code class="lang-"></code></pre>
+
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>genmkfile has a function which might be useful to port to <code>whonxi-firewall</code>. Function <code>make_function_run</code> has a:</p>
+<ul>
+<li>
+<code>_hook_pre</code>, and a</li>
+<li><code>_hook_post</code></li>
+</ul>
+<p>might be helpful.</p>
+<aside class="onebox githubblob" data-onebox-src="https://github.com/Kicksecure/genmkfile/blob/master/usr/share/genmkfile/make-helper-one.bsh#L1684-L1702">
+  <header class="source">
+
+      <a href="https://github.com/Kicksecure/genmkfile/blob/master/usr/share/genmkfile/make-helper-one.bsh#L1684-L1702" target="_blank" rel="noopener">github.com</a>
+  </header>
+
+  <article class="onebox-body">
+    <h4><a href="https://github.com/Kicksecure/genmkfile/blob/master/usr/share/genmkfile/make-helper-one.bsh#L1684-L1702" target="_blank" rel="noopener">Kicksecure/genmkfile/blob/master/usr/share/genmkfile/make-helper-one.bsh#L1684-L1702</a></h4>
+
+
+
+    <pre class="onebox">      <code class="lang-bsh">
+        <ol class="start lines" start="1684" style="counter-reset: li-counter 1683 ;">
+            <li>make_function_run() {</li>
+            <li>   local function_name function_name_return_code</li>
+            <li>   function_name="$1"</li>
+            <li>   shift</li>
+            <li>   if type -t "${function_name}_hook_pre" &gt;/dev/null ; then</li>
+            <li>      "${function_name}_hook_pre" "$@"</li>
+            <li>   fi</li>
+            <li>   if true ; then</li>
+            <li>      "$function_name" "$@"</li>
+            <li>      function_name_return_code="$?"</li>
+            <li>      if [ ! "$function_name_return_code" = "0" ]; then</li>
+            <li>         true "${green}INFO:${reset} function_name_return_code: $function_name_return_code"</li>
+            <li>         return "$function_name_return_code"</li>
+            <li>      fi</li>
+            <li>   fi</li>
+            <li>   if type -t "${function_name}_hook_post" &gt;/dev/null ; then</li>
+            <li>      "${function_name}_hook_post" "$@"</li>
+            <li>   fi</li>
+            <li>}</li>
+        </ol>
+      </code>
+    </pre>
+
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p><a href="https://www.whonix.org/wiki/Reporting_Bugs#Contributions">Patches welcome.</a></p>
+          <p><a href="http://forums.whonix.org/t/yggdrasil-in-ws-custom-ipv6-settings/13562/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/yggdrasil-in-ws-custom-ipv6-settings/13562/2</link>
+        <pubDate>Fri, 15 Apr 2022 17:01:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13562-2</guid>
+        <source url="http://forums.whonix.org/t/yggdrasil-in-ws-custom-ipv6-settings/13562.rss">Yggdrasil in WS - Custom IPv6 settings</source>
+      </item>
+      <item>
+        <title>Yggdrasil in WS - Custom IPv6 settings</title>
+        <dc:creator><![CDATA[ZeroFlag]]></dc:creator>
+        <description><![CDATA[
+            <p>I installed Yggdrasil (connects over Tor) in Whonix WS. The setup needs IPv6 firewall rules to allow tun0 traffic. This works well when I load the rules manually. Now I want to make them load automatically on startup and when running “Reload Firewall” from the menu. Where is the correct place in Whonix WS to put custom IPv6 rules?</p>
+          <p><a href="http://forums.whonix.org/t/yggdrasil-in-ws-custom-ipv6-settings/13562/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/yggdrasil-in-ws-custom-ipv6-settings/13562/1</link>
+        <pubDate>Fri, 15 Apr 2022 09:02:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13562-1</guid>
+        <source url="http://forums.whonix.org/t/yggdrasil-in-ws-custom-ipv6-settings/13562.rss">Yggdrasil in WS - Custom IPv6 settings</source>
+      </item>
+  </channel>
+</rss>

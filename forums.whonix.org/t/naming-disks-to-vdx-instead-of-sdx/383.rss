@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Naming disks to vdX instead of sdX</title>
+    <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383</link>
+    <description>I don&#39;t understand:
+https://www.whonix.org/wiki/Dev/KVM#Well_what.27ya_know_It.27s_a_bug.21
+
+Who wrote it?
+
+Is it supposed to be a sub chapter of &quot;How to get virtio running for storage?&quot;?
+
+Why is a test image required, why can&#39;t the existing image be changed after it has been booted just for testing? Or alternatively, why not mount the image, make the change, then boot it?
+
+Please elaborate.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 03 Aug 2014 00:33:12 +0000</lastBuildDate>
+    <category>KVM</category>
+    <atom:link href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Let's use 2) instead of 1) for next testers-only release?
+<p>Can you please update out kvm xml files from 1) to 2)</p>
+<p>Does qemu support virtio as well?</p>
+</blockquote>
+<p>;D nice work Patrick. Yes lets use this for the next testing release. I will update the xmls.</p>
+<p>virtio still uses a qemu back-end but relies much less on it. There is a purely non-qemu mode  that provides even faster throughput for NICs and disk called vHost. vHost is a kernel module and is automatically leveraged by libvirt if its there and also if libvirt is set to virtio mode for these devices. Removing the ‘name=qemu’ allows use vHost as the backend does not become a hard requirement.</p>
+<p>in summary no more further intervention by us needed after this point.</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/19">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/19</link>
+        <pubDate>Sun, 03 Aug 2014 00:33:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-19</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Breaking news!</p>
+<p>Fix available since git tag 8.6.4.4 (in dev-only repo <a href="http://github.com/adrelanos/nothing-to-see">github.com/adrelanos/nothing-to-see</a>).</p>
+<p>Technically speaking, this is the fix:<br>
+<a href="https://github.com/Whonix/anon-shared-build-fix-grub/commit/e7e50d18f6269eb983cc36f469478478e10815b8" class="onebox" target="_blank">https://github.com/Whonix/anon-shared-build-fix-grub/commit/e7e50d18f6269eb983cc36f469478478e10815b8</a></p>
+<p>Changelog (related to grub/kvm only):</p>
+<ul>
+<li>/etc/fstab required no more changes.</li>
+<li>no more /boot/grub/device.map</li>
+<li>/boot/grub/grub.cfg will use UUID only. No need to change sda/vda. No more changes required to /boot/grub/grub.cfg.</li>
+</ul>
+<p>We can now change</p>
+<ol>
+<li>
+</li>
+</ol>
+<pre><code class="lang-auto">    &lt;disk type='file' device='disk'&gt;
+      &lt;driver name='qemu' type='qcow2'/&gt;
+      &lt;source file='/var/lib/libvirt/images/Whonix-Gateway.qcow2'/&gt;
+      &lt;target dev='hda' bus='ide'/&gt;
+    &lt;/disk&gt;</code></pre>
+<p>to</p>
+<ol start="2">
+<li>
+</li>
+</ol>
+<pre><code class="lang-auto">    &lt;disk type='file' device='disk'&gt;
+      &lt;driver name='qemu' type='qcow2'/&gt;
+      &lt;source file='/var/lib/libvirt/images/Whonix-Gateway.qcow2'/&gt;
+      &lt;target dev='vda' bus='virtio'/&gt;
+    &lt;/disk&gt;</code></pre>
+<p>No changes in the images required anymore! You can use whatever you wish and boot. You can even toggle from hda to vda. Bonus: somehow you can even still toggle from hda / vda after you have run “sudo update-grub” in the image.</p>
+<p>Let’s use 2) instead of 1) for next testers-only release?</p>
+<p>Can you please update out kvm xml files from 1) to 2)</p>
+<p>Does qemu support virtio as well?</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/18">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/18</link>
+        <pubDate>Sat, 02 Aug 2014 20:34:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-18</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="15" data-topic="383">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>As for your question I have looked up and posted on Dev/KVM about how to verify which drivers are in use for a given piece of hardware. Please read the stuff I posted in there. It took some time and effort to find this info and incorporate it.</p>
+</blockquote>
+</aside>
+<p>Sorry. I missed it. I was only reading this:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/KVM#How_to_check_if_virtio_storage_access_is_in_use_or_an_eventually_existing_fallback_driver.3F" target="_blank" title="01:47PM - 23 April 2020">Whonix – 23 Apr 20</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="" height="">
+
+<h3><a href="https://www.whonix.org/wiki/Dev/KVM#How_to_check_if_virtio_storage_access_is_in_use_or_an_eventually_existing_fallback_driver.3F" target="_blank">Dev/KVM - Whonix</a></h3>
+
+<p>Development Notes for adding KVM support to Whonix ™.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/17">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/17</link>
+        <pubDate>Sat, 02 Aug 2014 19:41:10 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-17</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="15" data-topic="383">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Also are the answers posted for the blocker satisfactory? Could we close them now as solved after adding the relevant tidbits to the user wiki?</p>
+</blockquote>
+</aside>
+<p>Yes.</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/16">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/16</link>
+        <pubDate>Sat, 02 Aug 2014 17:30:03 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-16</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>You were using Whonix 8, not 8.6.2.8?</blockquote>
+<p>Yes</p>
+<blockquote>So no more changes to /etc/fstab required either way?</blockquote>
+<p>Yes</p>
+<p>As for your question I have looked up and posted on Dev/KVM about how to verify which drivers are in use for a given piece of hardware. Please read the stuff I posted in there. It took some time and effort to find this info and incorporate it.</p>
+<p>see: <code>hwinfo --short</code></p>
+<p>Also are the answers posted for the blocker satisfactory? Could we close them now as solved after adding the relevant tidbits to the user wiki?</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/15</link>
+        <pubDate>Sat, 02 Aug 2014 16:54:56 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-15</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Asked on stackexchange a vital question before acting blindfolded:<br>
+</p><aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://unix.stackexchange.com/questions/148055/how-to-check-if-virtio-storage-access-is-in-use" target="_blank">unix.stackexchange.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://unix.stackexchange.com/users/49297/adrelanos" target="_blank">
+    <img alt="adrelanos" src="https://www.gravatar.com/avatar/83f6805262f0dcc117814487c5b2d1c4?s=128&amp;d=identicon&amp;r=PG" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://unix.stackexchange.com/questions/148055/how-to-check-if-virtio-storage-access-is-in-use" target="_blank">How to check if virtio storage access is in use?</a>
+</h4>
+
+<div class="tags">
+  <strong>kvm</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://unix.stackexchange.com/users/49297/adrelanos" target="_blank">
+    adrelanos
+  </a>
+  on <a href="https://unix.stackexchange.com/questions/148055/how-to-check-if-virtio-storage-access-is-in-use" target="_blank">04:40PM - 02 Aug 14 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/14</link>
+        <pubDate>Sat, 02 Aug 2014 16:41:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-14</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>## Whonix /etc/fstab changes.</blockquote>
+<p>You were using Whonix 8, not 8.6.2.8? Because 8.6.2.8 doesn’t modify /etc/fstab anymore. swap-file-creator (<a href="https://github.com/Whonix/swap-file-creator">https://github.com/Whonix/swap-file-creator</a>) encrypts and mounts the swap file on boot without any changes to /etc/fstab required.</p>
+<p>Whonix 8.6.2.8</p>
+<pre><code class="lang-auto">user@host:~$ cat /etc/fstab
+/dev/disk/by-uuid/26ada0c0-1165-4098-884d-aafd2220c2c6 /  auto    defaults,errors=remount-ro 0   1
+proc           /proc        proc    defaults                      0   0
+/dev/cdrom     /mnt/cdrom0  iso9660 ro,user,noauto                0   0
+# some other examples:                                                                                                                                                              
+# /dev/sda2       none         swap    sw,pri=0             0   0
+# /dev/hda1       /Grml        ext3    dev,suid,user,noauto 0  2
+# //1.2.3.4/pub   /smb/pub     cifs    user,noauto,uid=grml,gid=grml 0 0
+# linux:/pub      /beer        nfs     defaults             0  0
+# tmpfs           /tmp         tmpfs   size=300M            0  0
+# /dev/sda5       none         swap    sw                   0  0</code></pre>
+<p>26ada0c0-1165-4098-884d-aafd2220c2c6 is fixed.</p>
+<p>So no more changes to /etc/fstab required either way?</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/13</link>
+        <pubDate>Sat, 02 Aug 2014 16:35:59 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-13</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="HulaHoop" data-post="11" data-topic="383">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Is VirtualBox a dependency for Whonix builds?</p>
+</blockquote>
+</aside>
+<p>Only when using the --vbox switch.</p>
+<aside class="quote no-group" data-username="HulaHoop" data-post="11" data-topic="383">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v4/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Why else would the disk id had VBOX_HARDDISK in there?</p>
+</blockquote>
+</aside>
+<p>Nice catch. This is a bug.</p>
+<p>hard drive serial of build machine leaks into image <span class="hashtag">#249:</span><br>
+</p><aside class="onebox githubissue">
+  <header class="source">
+      <a href="https://github.com/Whonix/Whonix/issues/249" target="_blank">github.com/Whonix/Whonix</a>
+  </header>
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/Whonix/Whonix/issues/249" target="_blank">hard drive serial of build machine leaks into image</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2014-08-02" data-time="16:13:55" data-timezone="UTC">04:13PM - 02 Aug 14 UTC</span>
+      </div>
+
+        <div class="date">
+          closed <span class="discourse-local-date" data-format="ll" data-date="2014-08-03" data-time="13:13:08" data-timezone="UTC">01:13PM - 03 Aug 14 UTC</span>
+        </div>
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank">
+          <img alt="adrelanos" src="https://avatars3.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="github-row">
+  <p class="github-content">HulaHoop made an observation. (https://www.whonix.org/forum/index.php/topic,401.msg3082.html#msg3082)
+inside a Whonix VM:
+cat /boot/grub/device.map
+(hd0) /dev/disk/by-id/ata-VBOX_HARDDISK_VB3680cb3a-83f0b2f8
+
+in my build VBox machine:
+sudo hdparm -i /dev/sda | grep SerialNo
+ Model=VBOX...</p>
+</div>
+
+<div class="labels">
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">bug</span>
+    <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">security</span>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Next testers-only version will most likely not include a /boot/grub/device.map anymore.</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/12</link>
+        <pubDate>Sat, 02 Aug 2014 16:15:14 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-12</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>There is also KVM mailing list.
+<p>And also <a href="http://unix.stackexchange.com/">http://unix.stackexchange.com/</a> has often given me good answers to development questions (<a href="http://unix.stackexchange.com/users/49297/adrelanos?tab=questions">http://unix.stackexchange.com/users/49297/adrelanos?tab=questions</a>) - just need to ask them in a generic, non-Whonix way.</p>
+</blockquote>
+<p>I am not sure what to ask. Could you please post what it is you are trying to find out on SE?<br>
+The patching works and is stable after the many conditionsI tested above kernel, grub upgrades and the update-grub command all in that order. From what I’ve seen its a problem that doesn’t depend so much on KVM as it does on the way the qcow2 image partition identifiers are generated in the images.</p>
+<p>Is VirtualBox a dependency for Whonix builds? Why else would the disk id had VBOX_HARDDISK in there?<br>
+What I’ve posted above is what I am seeing before changing all root paths to vda based nomenclature. Same works if that uuid is inserted instead in these three files.</p>
+<p>What is needed is just the patching of root paths in  <span class="bbcode-b">/boot/grub/device.map   /boot/grub/grub.cfg   /etc/fstab</span></p>
+<p>What my files look like now:</p>
+<p>/boot/grub/device.map<br>
+After update-grub the file is blank</p>
+<p>/boot/grub/grub.cfg</p>
+<p>[code]#</p>
+<h1>DO NOT EDIT THIS FILE</h1>
+<h1></h1>
+<h1>It is automatically generated by grub-mkconfig using templates</h1>
+<h1>from /etc/grub.d and settings from /etc/default/grub</h1>
+<h1></h1>
+<h3>BEGIN /etc/grub.d/00_header</h3>
+<p>if [ -s $prefix/grubenv ]; then<br>
+load_env<br>
+fi<br>
+set default=“0"<br>
+if [ “${prev_saved_entry}” ]; then<br>
+set saved_entry=”${prev_saved_entry}"<br>
+save_env saved_entry<br>
+set prev_saved_entry=<br>
+save_env prev_saved_entry<br>
+set boot_once=true<br>
+fi</p>
+<p>function savedefault {<br>
+if [ -z “${boot_once}” ]; then<br>
+saved_entry="${chosen}"<br>
+save_env saved_entry<br>
+fi<br>
+}</p>
+<p>function load_video {<br>
+insmod vbe<br>
+insmod vga<br>
+insmod video_bochs<br>
+insmod video_cirrus<br>
+}</p>
+<p>insmod part_msdos<br>
+insmod ext2<br>
+set root=’(/dev/vda,msdos1)'<br>
+search --no-floppy --fs-uuid --set=root 040e91c3-400d-406c-bbfd-b5e08b5945b6<br>
+if loadfont /usr/share/grub/unicode.pf2 ; then<br>
+set gfxmode=640x480<br>
+load_video<br>
+insmod gfxterm<br>
+fi<br>
+terminal_output gfxterm<br>
+set timeout=5</p>
+<h3>END /etc/grub.d/00_header</h3>
+<h3>BEGIN /etc/grub.d/05_debian_theme</h3>
+<p>set menu_color_normal=cyan/blue<br>
+set menu_color_highlight=white/blue</p>
+<h3>END /etc/grub.d/05_debian_theme</h3>
+<h3>BEGIN /etc/grub.d/10_linux</h3>
+<p>menuentry ‘Debian GNU/Linux, with Linux 3.2.0-4-686-pae’ --class debian --class gnu-linux --class gnu --class os {<br>
+load_video<br>
+insmod gzio<br>
+insmod part_msdos<br>
+insmod ext2<br>
+set root=’(/dev/vda,msdos1)'<br>
+search --no-floppy --fs-uuid --set=root 040e91c3-400d-406c-bbfd-b5e08b5945b6<br>
+echo	'Loading Linux 3.2.0-4-686-pae …'<br>
+linux	/boot/vmlinuz-3.2.0-4-686-pae root=UUID=040e91c3-400d-406c-bbfd-b5e08b5945b6 ro selinux=1 enforcing=1 vga=0x0317<br>
+echo	'Loading initial ramdisk …‘<br>
+initrd	/boot/initrd.img-3.2.0-4-686-pae<br>
+}<br>
+menuentry ‘Debian GNU/Linux, with Linux 3.2.0-4-686-pae (recovery mode)’ --class debian --class gnu-linux --class gnu --class os {<br>
+load_video<br>
+insmod gzio<br>
+insmod part_msdos<br>
+insmod ext2<br>
+set root=’(/dev/vda,msdos1)'<br>
+search --no-floppy --fs-uuid --set=root 040e91c3-400d-406c-bbfd-b5e08b5945b6<br>
+echo	'Loading Linux 3.2.0-4-686-pae …'<br>
+linux	/boot/vmlinuz-3.2.0-4-686-pae root=UUID=040e91c3-400d-406c-bbfd-b5e08b5945b6 ro single selinux=1 enforcing=1<br>
+echo	'Loading initial ramdisk …‘<br>
+initrd	/boot/initrd.img-3.2.0-4-686-pae<br>
+}<br>
+menuentry ‘Debian GNU/Linux, with Linux 3.2.0-4-486’ --class debian --class gnu-linux --class gnu --class os {<br>
+load_video<br>
+insmod gzio<br>
+insmod part_msdos<br>
+insmod ext2<br>
+set root=’(/dev/vda,msdos1)'<br>
+search --no-floppy --fs-uuid --set=root 040e91c3-400d-406c-bbfd-b5e08b5945b6<br>
+echo	'Loading Linux 3.2.0-4-486 …'<br>
+linux	/boot/vmlinuz-3.2.0-4-486 root=UUID=040e91c3-400d-406c-bbfd-b5e08b5945b6 ro selinux=1 enforcing=1 vga=0x0317<br>
+echo	'Loading initial ramdisk …‘<br>
+initrd	/boot/initrd.img-3.2.0-4-486<br>
+}<br>
+menuentry ‘Debian GNU/Linux, with Linux 3.2.0-4-486 (recovery mode)’ --class debian --class gnu-linux --class gnu --class os {<br>
+load_video<br>
+insmod gzio<br>
+insmod part_msdos<br>
+insmod ext2<br>
+set root=’(/dev/vda,msdos1)'<br>
+search --no-floppy --fs-uuid --set=root 040e91c3-400d-406c-bbfd-b5e08b5945b6<br>
+echo	'Loading Linux 3.2.0-4-486 …'<br>
+linux	/boot/vmlinuz-3.2.0-4-486 root=UUID=040e91c3-400d-406c-bbfd-b5e08b5945b6 ro single selinux=1 enforcing=1<br>
+echo	'Loading initial ramdisk …'<br>
+initrd	/boot/initrd.img-3.2.0-4-486<br>
+}</p>
+<h3>END /etc/grub.d/10_linux</h3>
+<h3>BEGIN /etc/grub.d/20_linux_xen</h3>
+<h3>END /etc/grub.d/20_linux_xen</h3>
+<h3>BEGIN /etc/grub.d/30_os-prober</h3>
+<h3>END /etc/grub.d/30_os-prober</h3>
+<h3>BEGIN /etc/grub.d/40_custom</h3>
+<h1>This file provides an easy way to add custom menu entries.  Simply type the</h1>
+<h1>menu entries you want to add after this comment.  Be careful not to change</h1>
+<h1>the ‘exec tail’ line above.</h1>
+<h3>END /etc/grub.d/40_custom</h3>
+<h3>BEGIN /etc/grub.d/41_custom</h3>
+<p>if [ -f  $prefix/custom.cfg ]; then<br>
+source $prefix/custom.cfg;<br>
+fi</p>
+<h3>END /etc/grub.d/41_custom</h3>
+<p>[/code]</p>
+<p>/etc/fstab</p>
+<p>[code]/dev/disk/by-uuid/040e91c3-400d-406c-bbfd-b5e08b5945b6 /  auto    defaults,errors=remount-ro 0   1<br>
+proc           /proc        proc    defaults                      0   0<br>
+/dev/cdrom     /mnt/cdrom0  iso9660 ro,user,noauto                0   0</p>
+<h1>some other examples:</h1>
+<h1>/dev/sda2       none         swap    sw,pri=0             0   0</h1>
+<h1>/dev/hda1       /Grml        ext3    dev,suid,user,noauto 0  2</h1>
+<h1>
+<a href="//1.2.3.4/pub">//1.2.3.4/pub</a>   /smb/pub     smbfs   defaults,user,noauto,uid=grml,gid=grml 0 0</h1>
+<h1>linux:/pub      /beer        nfs     defaults             0  0</h1>
+<h1>tmpfs           /tmp         tmpfs   size=300M            0  0</h1>
+<h1>/dev/sda5       none         swap    sw                   0  0</h1>
+<h2>Whonix /etc/fstab changes.</h2>
+<h2>Swap file created by Whonix.</h2>
+<h2>UUID=0615ba72-85b0-4183-8d54-300bb0d2e491</h2>
+<p>/swapfile1 swap swap defaults 0 0</p>
+<h2>End of Whonix /etc/fstab changes.</h2>
+<p>[/code]</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/11</link>
+        <pubDate>Sat, 02 Aug 2014 14:55:00 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-11</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="7" data-topic="383">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>2.  I never found a solutio to this from the IRC channel. Even though there’s 400 people on there at any given time, they never reply. The only time someone did, they had no idea what was wrong, but recommended this as a way to label drives. From KVM’s official documentation thy recommend using a UUID based system to avoid issues.</p>
+</blockquote>
+</aside>
+<p>There is also KVM mailing list.</p>
+<p>And also <a href="http://unix.stackexchange.com/">http://unix.stackexchange.com/</a> has often given me good answers to development questions (<a href="http://unix.stackexchange.com/users/49297/adrelanos?tab=questions">http://unix.stackexchange.com/users/49297/adrelanos?tab=questions</a>) - just need to ask them in a generic, non-Whonix way.</p>
+<blockquote>Breaking news!</blockquote>
+<p>Can you say please which file you have changed to what? Post the modified files?</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/10</link>
+        <pubDate>Sat, 02 Aug 2014 08:02:52 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-10</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Confirmed. When the same uuid is used in all places in these three files it works.</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/9</link>
+        <pubDate>Sat, 02 Aug 2014 02:45:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-9</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Breaking news!</p>
+<p>Here is what works so far:</p>
+<p>As per <a href="https://www.whonix.org/wiki/Dev/KVM#Initial_Instructions">https://www.whonix.org/wiki/Dev/KVM#Initial_Instructions</a><br>
+unifying all disk references in these files including additionally /etc/fstab to vda<br>
+works with virtio-blk. the machine makes it past the point where it always hung up.</p>
+<p>I tried a kernel and grub update followed by running: “sudo update-grub” and the changes survived with no ill effects and the vm boots all right.</p>
+<p>One thing I noticed before changing the values was tht they all differed from one another probably causing all this:</p>
+<p>[code]/boot/grub/device.map<br>
+/dev/disk/by-id/ata-VBOX_HARDDISK_VB3680cb3a-83f0b2f8</p>
+<p>/boot/grub/grub.cfg<br>
+/dev/sda1</p>
+<p>/etc/fstab<br>
+/dev/disk/by-uuid/040e91c3-400d-406c-bbfd-b5e08b5945b6[/code]</p>
+<p>I’ll try changing them all according to the uuid in /fstab and report back. If all copies of Whonix have this uuid then we can subsitiute it for all refernces in these files and be done with it.</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/8</link>
+        <pubDate>Sat, 02 Aug 2014 02:38:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-8</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Sure thing! As a perfectionist, I also must have this!</blockquote>
+<p>Good to know  <img src="//forums.whonix.org/images/emoji/twitter/smiley.png?v=9" title=":smiley:" class="emoji" alt=":smiley:"></p>
+<blockquote>First question, have you tested https://www.whonix.org/wiki/Dev/KVM#System_gets_unbootable.3F ?
+<p>Second question, what is the official suggestion by kvm devs to solve this as a distro?</p>
+</blockquote>
+<ol>
+<li>
+<p>No I haven’t done it but, but maybe the UUID fix works and so we simply bypass all this fiddling with the grub files.</p>
+</li>
+<li>
+<p>I never found a solutio to this from the IRC channel. Even though there’s 400 people on there at any given time, they never reply. The only time someone did, they had no idea what was wrong, but recommended this as a way to label drives. From KVM’s official documentation thy recommend using a UUID based system to avoid issues.</p>
+</li>
+</ol>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/index.php/images/favicon.ico" class="site-icon" width="" height="">
+      <a href="https://www.whonix.org/w/index.php?title=Dev%2FKVM&amp;stable=0&amp;shownotice=1&amp;fromsection=Using_UUIDs#Initial_Instructions" target="_blank" title="01:47PM - 23 April 2020">Whonix – 23 Apr 20</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="" height="">
+
+<h3><a href="https://www.whonix.org/w/index.php?title=Dev%2FKVM&amp;stable=0&amp;shownotice=1&amp;fromsection=Using_UUIDs#Initial_Instructions" target="_blank">Dev/KVM - Whonix</a></h3>
+
+<p>Development Notes for adding KVM support to Whonix ™.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/7</link>
+        <pubDate>Sat, 02 Aug 2014 00:07:57 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-7</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="5" data-topic="383">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>Considering the time investment I put into this particular feature to work, I am really eager to have it in some way.</p>
+</blockquote>
+</aside>
+<p>Sure thing! As a perfectionist, I also must have this!</p>
+<aside class="quote" data-post="4" data-topic="383">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/h/edb3f5/40.png" class="avatar"> HulaHoop:</div>
+<blockquote>
+<p>I see. What about the mechanism you propose at the end of: <a href="https://www.whonix.org/wiki/Dev/KVM#System_gets_unbootable.3F">https://www.whonix.org/wiki/Dev/KVM#System_gets_unbootable.3F</a>  Its best if we at least try that and revert  back if its not robust enough?</p>
+</blockquote>
+</aside>
+<p>I would like to pursue this.</p>
+<p>First question, have you tested <a href="https://www.whonix.org/wiki/Dev/KVM#System_gets_unbootable.3F">https://www.whonix.org/wiki/Dev/KVM#System_gets_unbootable.3F</a> ?</p>
+<p>Second question, what is the official suggestion by kvm devs to solve this as a distro?</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/6</link>
+        <pubDate>Fri, 01 Aug 2014 22:20:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-6</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Considering the time investment I put into this particular feature to work, I am really eager to have it in some way.</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/5</link>
+        <pubDate>Fri, 01 Aug 2014 04:23:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-5</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>I see. What about the mechanism you propose at the end of: <a href="https://www.whonix.org/wiki/Dev/KVM#System_gets_unbootable.3F">https://www.whonix.org/wiki/Dev/KVM#System_gets_unbootable.3F</a>  Its best if we at least try that and revert  back if its not robust enough?</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/4</link>
+        <pubDate>Fri, 01 Aug 2014 04:21:49 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-4</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“HulaHoop, post:2, topic:383”][quote]b.) linux/udev : you could suggest that the vdX devices should be<br>
+symlinked or other to sdX so that your fstab finds the devices independent<br>
+of how they’re connected.[/quote][/quote]<br>
+This is a suggestion to be taken to linux/udev developers. Outside my ability.</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/3</link>
+        <pubDate>Thu, 31 Jul 2014 22:26:46 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-3</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Who wrote it?
+<p>Is it supposed to be a sub chapter of “How to get virtio running for storage?”?</p>
+<p>Why is a test image required, why can’t the existing image be changed after it has been booted just for testing? Or alternatively, why not mount the image, make the change, then boot it?</p>
+<p>Please elaborate.</p>
+</blockquote>
+<p>I did. Yes its meant to be under that heading but it ended up somewhere by mistake.</p>
+<p>The OP’s description of the bug exactly matches everything I’ve been thru when trying to get this to work.<br>
+What I mean by ‘test image’ is a beta build of Whonix that incorporates symlinking as described here:<br>
+That should work apparently.</p>
+<blockquote>b.) linux/udev : you could suggest that the vdX devices should be
+symlinked or other to sdX so that your fstab finds the devices independent
+of how they're connected.</blockquote>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/2</link>
+        <pubDate>Thu, 31 Jul 2014 22:03:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-2</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+      <item>
+        <title>Naming disks to vdX instead of sdX</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I don’t understand:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Dev/KVM#Well_what.27ya_know_It.27s_a_bug.21" target="_blank" title="01:47PM - 23 April 2020">Whonix – 23 Apr 20</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail" width="" height="">
+
+<h3><a href="https://www.whonix.org/wiki/Dev/KVM#Well_what.27ya_know_It.27s_a_bug.21" target="_blank">Dev/KVM - Whonix</a></h3>
+
+<p>Development Notes for adding KVM support to Whonix ™.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>Who wrote it?</p>
+<p>Is it supposed to be a sub chapter of “How to get virtio running for storage?”?</p>
+<p>Why is a test image required, why can’t the existing image be changed after it has been booted just for testing? Or alternatively, why not mount the image, make the change, then boot it?</p>
+<p>Please elaborate.</p>
+          <p><a href="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383/1</link>
+        <pubDate>Thu, 31 Jul 2014 13:46:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-383-1</guid>
+        <source url="http://forums.whonix.org/t/naming-disks-to-vdx-instead-of-sdx/383.rss">Naming disks to vdX instead of sdX</source>
+      </item>
+  </channel>
+</rss>

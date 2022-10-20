@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Issue Setting up hidden services on Qubes</title>
+    <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901</link>
+    <description>Steps taken so far:
+
+1. Clone gateway template.
+2. sudo nano /etc/tor/torrc
+2a. HiddenServiceDir /var/lib/tor/hidden_service
+2b. HiddenServicePort 80 WS-VM-IP**:80
+3. sudo service tor reload.
+4. sudo cat /var/lib/tor/hidden_service/hostname
+4-error. cat: /var/lib/tor/hidden_service/hostname: No such file or directory.
+4-debug-a: ls -la /var/lib/tor/hidden_service/
+error: ls: cannot access /var/lib/tor/hidden_service/: Permission denied
+4-debug-b: sudo chown debian-tor:debian-tor /var/lib/tor/hidden_service/
+error: chown cannot access `/var/lib/tor/hidden_service/&#39;: No such file or directory
+
+**workstation appvm ip address</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 26 May 2022 11:03:02 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[stman]]></dc:creator>
+        <description><![CDATA[
+            <p>It’s back operational, but I had to do it “the ugly way” using the /rw/config/rc.local script another way :</p>
+<code>
+#!/bin/sh
+<p>sudo service tor stop<br>
+sudo cp -r /home/user/QubesIncoming/vault/var-lib-tor-mumble_service/mumble_service /var/lib/tor<br>
+sudo service tor reload<br>
+sudo service tor start</p>
+</code>
+<p>Those dinb dirs suck. Really.</p>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/15">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/15</link>
+        <pubDate>Thu, 26 May 2022 11:01:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-15</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>AppArmor indeed might interact with mount binds as well as symlinks.</p>
+<p>No wiki updates for mumble planned. Mumble instructions or any onion service instructions should work as is. See also <a href="https://www.whonix.org/wiki/Introduction#User_Expectations">Wiki User Expectations</a>.</p>
+<p>I think the only issue here is the non-default use of bind-dirs. Users aren’t required/recommended/instructions to change bind-dirs settings. If bind-dirs is left alone, instructions should work as is.</p>
+<p>When messing with bind-dirs, then, this applies:</p>
+<aside class="quote no-group" data-username="Patrick" data-post="12" data-topic="901">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>The following skills you’d have to master:</p>
+</blockquote>
+</aside>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/14">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/14</link>
+        <pubDate>Tue, 24 May 2022 17:38:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-14</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[stman]]></dc:creator>
+        <description><![CDATA[
+            <p>Using bind-dirs did not work better. The “mumble_service” files access rights are correct. So the issue is coming from something else.</p>
+<p>By the way, I don"t see why it would be impossible to have a folder persistant while the parent folder is not : This is what is happening for most folders/files that are made persistent with bind dirs.</p>
+<p>I suspect apparmor.</p>
+<p>Still, it was working before.</p>
+<p>It’s really a pain.</p>
+<p>I hope the documentation can get updated.</p>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/13</link>
+        <pubDate>Tue, 24 May 2022 16:15:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-13</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>I am not aware of any changes by Whonix which would change anything related to Qubes bind-dirs / mumble / onion services.</p>
+<p>Whonix documentation on mumble says nothing about bind-dirs. By removing default bind-dirs configuration entries, issues are quite likely to happen.</p>
+<p>Qubes bind-dirs generally:<br>
+I am not sure a sub folder can be persistent while the parent folder is non-persistent.</p>
+<p>Qubes bind-dirs more specifically:<br>
+I am not sure /var/lib/tor can be non-persistent while /var/lib/tor/mumble_service is persistent.</p>
+<p>bind-dirs is a Qubes feature. Not a Whonix feature. Whonix is only using this. bind-dirs is probably imperfect.</p>
+<p>bind-dirs works for /var/lib/tor since the postinst maintainer script by <code>tor</code> Debian package creates the folder during package installation with the correct linux user account owner as well as linux access rights. By the time bind-dirs is running, access rights are already correct. Doing this for a different folder is certainly possible however owner / access rights need to be correct.</p>
+<p>It’s certainly to use different folders but rather complex and you’d likely run into other issues when trying to use folders other than /var/lib/tor. The following skills you’d have to master:</p>
+<ul>
+<li>Qubes bind-dirs</li>
+<li>linux access rights (read/write; owner)</li>
+<li>apparmor (adds restrictions on which folders are readable / writeable)</li>
+<li>systemd hardening (same as above)</li>
+</ul>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/12</link>
+        <pubDate>Tue, 24 May 2022 12:58:30 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-12</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[stman]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello.</p>
+<p>Thank you for your answer.</p>
+<p>Ok then I am going to try to make the hidden service directory persistent using bind-dirs and I will let you know if it works, but please note that the way I did it is the way it is recommended on Whonix documentation to setup a mumble server hosted through Tor.</p>
+<p>The documentation shall be updated then.</p>
+<p>Please note again that this configg used to work perfectly in the past. It stopped working a few month ago after I upgraded to version 16 of whonix.</p>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/11">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/11</link>
+        <pubDate>Tue, 24 May 2022 09:52:17 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-11</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p><a href="https://www.whonix.org/wiki/Tor#Permissions_Fix">https://www.whonix.org/wiki/Tor#Permissions_Fix</a></p>
+<aside class="quote no-group" data-username="stman" data-post="9" data-topic="901">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/stman/40/2957_2.png" class="avatar"> stman:</div>
+<blockquote>
+<p>/rw/config/rc.local containing :</p>
+<p><code>rm -rf /var/lib/tor/mumble_service</code></p>
+<p><code>ln -s /rw/config/var-lib-tor-mumble_service/mumble_service /var/lib/tor/mumble_service</code></p>
+</blockquote>
+</aside>
+<p>This might not work. I am not sure when rc.local is executed. But it might be bad timing.</p>
+<aside class="quote no-group" data-username="stman" data-post="9" data-topic="901">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/stman/40/2957_2.png" class="avatar"> stman:</div>
+<blockquote>
+<p>There is an error in the rc.local script : It fails on the first line. The rm command on the symlink doesn’t work anymore. There is a persistent error : “Device or ressource busy” …</p>
+</blockquote>
+</aside>
+<aside class="quote no-group" data-username="stman" data-post="9" data-topic="901">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/stman/40/2957_2.png" class="avatar"> stman:</div>
+<blockquote>
+<p>ln -s /rw/config/var-lib-tor-mumble_service/mumble_service /var/lib/tor/mumble_service</p>
+</blockquote>
+</aside>
+<p>Should be done by using bind-dirs, not manually.</p>
+<aside class="quote no-group" data-username="stman" data-post="9" data-topic="901">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/stman/40/2957_2.png" class="avatar"> stman:</div>
+<blockquote>
+<p>(Configured with Tor Entry node NOT persistent by commenting the relevant line in the /usr/lib/qubes-bind-dirs.d/40_qubes-whonix.conf in the corresponding template VM)</p>
+</blockquote>
+</aside>
+<p>This is unsupported by Whonix.</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://www.whonix.org/wiki/Unsupported">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/a/a4/Whonix-home-favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://www.whonix.org/wiki/Unsupported" target="_blank" rel="noopener" title="02:19PM - 09 January 2022">Whonix – 9 Jan 22</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/426;"><img src="https://www.whonix.org/w/images/0/0a/Unsupported.jpg" class="thumbnail" width="640" height="426"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Unsupported" target="_blank" rel="noopener">Undocumented, Untested or Unsupported Features</a></h3>
+
+  <p>This feature is either undocumented, untested, or unsupported. Options: Become a Contributor / Apply Free Support Principle / Purchase Premium Support.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<p>But if you want to do this anyhow, consider this:</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://www.whonix.org/wiki/Unspecific">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/a/a4/Whonix-home-favicon.ico" class="site-icon" width="32" height="32">
+
+      <a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener" title="11:34AM - 26 January 2022">Whonix – 26 Jan 22</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:250/500;"><img src="https://www.whonix.org/w/images/7/74/Booster132.png" class="thumbnail" width="250" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Unspecific" target="_blank" rel="noopener">Information Booster might be Available!</a></h3>
+
+  <p>Utilizing other resources to help solve questions/issues unspecific to Whonix ™.</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/10">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/10</link>
+        <pubDate>Tue, 24 May 2022 07:55:38 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-10</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[stman]]></dc:creator>
+        <description><![CDATA[
+            <p>Hello.</p>
+<p>I used to host a perfectly operational Mumble Server configured with a Tor Onion address in a dedicated Whonix Workstation VM, connected to my sys-whonix VM (Configured with Tor Entry node NOT persistent by commenting the relevant line in the /usr/lib/qubes-bind-dirs.d/40_qubes-whonix.conf in the corresponding template VM) thanks to /rw/config/rc.local containing :</p>
+<code>
+rm -rf /var/lib/tor/mumble_service
+</code><p><code>ln -s /rw/config/var-lib-tor-mumble_service/mumble_service /var/lib/tor/mumble_service<br>
+</code></p>
+<p>With all necessary file correctly placed into /rw/config/var-lib-tor-mumble_service with correct access rights.</p>
+<p>Everything was working perfectly until a few month ago, probably when after a whonix-16 update.</p>
+<p>It is now not working.</p>
+<p>There is an error in the rc.local script : It fails on the first line. The rm command on the symlink doesn’t work anymore. There is a persistent error : “Device or ressource busy” …</p>
+<p>As it is no longer possible to install the symlink ensuring the peristence of the hidden service parameters, the onion address of my mumble server is no longer persistent to the value I wanted.</p>
+<p>There is something weird that appeared on the tor folder access rights in /var/lib/ : it’s like “drwx…S…”<br>
+And this is what is causing the “rm” command to fail, and the impossibility to install the symlink at every sys-whonix reboot.</p>
+<p>Any help welcome.</p>
+<p>Kind regards,</p>
+<p>Frederic.</p>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/9">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/9</link>
+        <pubDate>Mon, 23 May 2022 11:15:29 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-9</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[igijo]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“WhonixQubes, post:4, topic:901”][quote author=igijo link=topic=1004.msg7241#msg7241 date=1425751326]<br>
+Thanks for the breakout! Im still getting stuck at getting the hostname. I don’t think the hidden service is getting created at all.<br>
+[/quote]</p>
+<p>It looks like it is a permissions issue with the TemplateVM that the ProxyVM doesn’t have.</p>
+<p>I’ll have to look into it further later.</p>
+<p>As a quick fix, you could set this up in a Whonix-Gateway ProxyVM initially, then manually create or copy the files over into a cloned TemplateVM afterwards.</p>
+<p>Then run a ProxyVM based on that TemplateVM.</p>
+<p>You may have to retroactively go back and change the AppVM IP once you know the final one.[/quote]</p>
+<p>I managed to get the hostname/private keys in.</p>
+<p>Steps:</p>
+<blockquote>
+<p>Created tempproxyvm.<br>
+sudo nano /etc/tor/torrc<br>
+-HiddenServiceDir /var/lib/tor/hidden_service/<br>
+-HiddenServicePort 80 randomIP:80<br>
+exit<br>
+sudo service tor reload<br>
+i couldn’t navigate to the tor folder using the regular file browser, permissions issue I guess<br>
+sudo dolphin<br>
+navigate to /var/lib/tor/<br>
+copy/cut hidden_service folder<br>
+navigate to the 2gb drive (someone correct me here I cant remember what the folder path is) /usr/home?<br>
+paste hidden_service folder<br>
+sudo qvm-copy-to-vm gateway-clone-templatevm hidden_service<br>
+in gateway-clone-templatevm<br>
+sudo dolphin<br>
+copy hidden_service directory from /QubesIncoming/tempproxyvm/ to /var/lib/tor/</p>
+</blockquote>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/8">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/8</link>
+        <pubDate>Tue, 10 Mar 2015 17:32:45 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-8</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[WhonixQubes]]></dc:creator>
+        <description><![CDATA[
+            <p><a class="mention" href="http://forums.whonix.org/u/igijo">@igijo</a></p>
+<p>Another easier option for you could be to use StandaloneVMs, instead of cloning TemplateVMs.</p>
+<p>The loss here is that your root partition does not reset to a clean state with each VM restart.</p>
+<p>The added convenience is that persistent configurations that don’t affect your other VMs is straightforward.</p>
+<p>You can base it off of your normal Whonix TemplateVMs and check the “Standalone” box in Qubes Manager when creating a new ProxyVM / AppVM for your hidden service implementation.</p>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/7</link>
+        <pubDate>Sun, 08 Mar 2015 20:48:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-7</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[WhonixQubes]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:5, topic:901”]Seems to me the Hidden Services wiki page should be updated accordingly? I was wondering how we handle documentation when those are slightly different for various platforms.</p>
+<p>We could use the [Expand] button. Example use of expand button can be seen here:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Bridges" target="_blank" rel="nofollow noopener" title="05:27PM - 03 May 2020">Whonix – 3 May 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/480;"><img src="https://www.whonix.org/w/images/8/85/Black-and-white-50272-640.jpg" class="thumbnail" width="640" height="480"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Bridges" target="_blank" rel="nofollow noopener">Configure (Private) (Obfuscated) Tor Bridges</a></h3>
+
+<p>Censorship Circumvention. Get around network bans. Using Whonix ™ with (private) (obfuscated) bridges. Useful in case your Internet Service Provider (ISP) bans or throttles connections to the Tor public network.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Then we could write something like this…</p>
+<p>If you are using VirtualBox […], press [Expand].</p>
+<p>If you are using Qubes […], press [Expand].[/quote]</p>
+<p>Great timing, as I am working on new documentation stuff right now.</p>
+<p>I will create a new topic later to discuss this further.</p>
+<p>[quote=“Patrick, post:5, topic:901”][quote author=WhonixQubes link=topic=1004.msg7238#msg7238 date=1425718293]</p>
+<pre><code class="lang-auto">sudo iptables -I INPUT 5 -p tcp --dport 80 -m conntrack --ctstate NEW -j ACCEPT</code></pre>
+<p>[/quote]<br>
+Why is this required? Is Whonix-Workstation in Qubes firewalled by default?[/quote]</p>
+<p>Yes, it seems to be firewalled by default for new unsolicited incoming packets.</p>
+<p>Whonix-Workstation:</p>
+<pre><code class="lang-auto">sudo iptables -L</code></pre>
+<pre><code class="lang-auto">Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+DROP       udp  --  anywhere             anywhere             udp dpt:bootpc
+ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+ACCEPT     icmp --  anywhere             anywhere            
+ACCEPT     all  --  anywhere             anywhere            
+REJECT     all  --  anywhere             anywhere             reject-with icmp-host-prohibited
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination         
+ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+DROP       all  --  anywhere             anywhere            
+ACCEPT     all  --  anywhere             anywhere            
+DROP       all  --  anywhere             anywhere            
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination        </code></pre>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/6</link>
+        <pubDate>Sun, 08 Mar 2015 20:42:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-6</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Seems to me the Hidden Services wiki page should be updated accordingly? I was wondering how we handle documentation when those are slightly different for various platforms.</p>
+<p>We could use the [Expand] button. Example use of expand button can be seen here:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Bridges" target="_blank" title="05:27PM - 03 May 2020">Whonix – 3 May 20</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:640/480;"><img src="https://www.whonix.org/w/images/8/85/Black-and-white-50272-640.jpg" class="thumbnail" width="640" height="480"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Bridges" target="_blank">Configure (Private) (Obfuscated) Tor Bridges</a></h3>
+
+<p>Censorship Circumvention. Get around network bans. Using Whonix ™ with (private) (obfuscated) bridges. Useful in case your Internet Service Provider (ISP) bans or throttles connections to the Tor public network.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>Then we could write something like this…</p>
+<p>If you are using VirtualBox […], press [Expand].</p>
+<p>If you are using Qubes […], press [Expand].</p>
+<p>[quote=“WhonixQubes, post:2, topic:901”]<code>
+sudo iptables -I INPUT 5 -p tcp --dport 80 -m conntrack --ctstate NEW -j ACCEPT
+</code>[/quote]<br>
+Why is this required? Is Whonix-Workstation in Qubes firewalled by default?</p>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/5</link>
+        <pubDate>Sun, 08 Mar 2015 15:16:36 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-5</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[WhonixQubes]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="3" data-topic="901">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/i/838e76/40.png" class="avatar"> igijo:</div>
+<blockquote>
+<p>Thanks for the breakout! Im still getting stuck at getting the hostname. I don’t think the hidden service is getting created at all.</p>
+</blockquote>
+</aside>
+<p>It looks like it is a permissions issue with the TemplateVM that the ProxyVM doesn’t have.</p>
+<p>I’ll have to look into it further later.</p>
+<p>As a quick fix, you could set this up in a Whonix-Gateway ProxyVM initially, then manually create or copy the files over into a cloned TemplateVM afterwards.</p>
+<p>Then run a ProxyVM based on that TemplateVM.</p>
+<p>You may have to retroactively go back and change the AppVM IP once you know the final one.</p>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/4</link>
+        <pubDate>Sun, 08 Mar 2015 00:00:11 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-4</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[igijo]]></dc:creator>
+        <description><![CDATA[
+            <p>Thanks for the breakout! Im still getting stuck at getting the hostname. I don’t think the hidden service is getting created at all.</p>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/3</link>
+        <pubDate>Sat, 07 Mar 2015 18:02:06 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-3</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[WhonixQubes]]></dc:creator>
+        <description><![CDATA[
+            <p>Here is how to setup a hidden service in Qubes + Whonix…</p>
+<p>The VirtualBox instructions here just need a couple changes:</p>
+<ul>
+<li>Swap the Whonix-Workstation AppVM 10.137.X.X IP in for the 10.152.152.11 IP.</li>
+<li>Open Firewall between Whonix-Gateway and Whonix-Workstation using iptables.</li>
+</ul>
+<p><span class="bbcode-b"><a href="https://www.whonix.org/wiki/Hidden_Services#Hidden_Webserver" rel="nofollow noopener">https://www.whonix.org/wiki/Hidden_Services#Hidden_Webserver</a></span></p>
+<p>Will use a web server as an example on port 80, but one can change the port for their service application.</p>
+<p>Also, you can (probably should) create clones of the Whonix-Gateway TemplateVM and Whonix-Workstation TemplateVM to establish your hidden service in. Then create a separate Whonix-Gateway ProxyVM and Whonix-Workstation AppVM for the live hidden service implementation.</p>
+<p><span class="bbcode-b">Whonix-Gateway:</span></p>
+<p>Open /etc/tor/torrc.</p>
+<pre><code class="lang-auto">sudo nano /etc/tor/torrc</code></pre>
+<p>Read the comments. These explain where to find your .onion URL and to backup your hidden service keys. Comment in the following two lines.</p>
+<pre><code class="lang-auto">HiddenServiceDir /var/lib/tor/hidden_service/
+HiddenServicePort 80 WHONIX-WORKSTATION-APPVM-IP:80</code></pre>
+<p>WHONIX-WORKSTATION-APPVM-IP = the 10.137.X.X IP address given to the Whonix-Workstation AppVM in Qubes. You can look this IP up in the Settings of the Qubes Manager or use “sudo ifconfig” to see the eth0 IP in the AppVM terminal.</p>
+<p>If not setting up a web server, change the port number from 80 to whatever your app requires.</p>
+<p>Restart Tor.</p>
+<pre><code class="lang-auto">sudo service tor reload</code></pre>
+<p>Reminder: To get your hidden service url.</p>
+<pre><code class="lang-auto">sudo cat /var/lib/tor/hidden_service/hostname</code></pre>
+<p>Reminder: Backup your hidden service key, in case you want to be able to restore it, on another machine, on a newer Whonix-Gateway, after hdd failure, etc. You can find it here and you require root to access it.</p>
+<pre><code class="lang-auto">/var/lib/tor/hidden_service/private_key</code></pre>
+<p><span class="bbcode-b">Whonix-Workstation:</span></p>
+<p>Run the following commands to install lighttpd web server. Alternatively, you would replace a web server with a different hidden service application.</p>
+<pre><code class="lang-auto">sudo apt-get update
+sudo apt-get install lighttpd</code></pre>
+<p>Open firewall port access for your app between Whonix-Gateway and Whonix-Workstation.</p>
+<pre><code class="lang-auto">sudo iptables -I INPUT 5 -p tcp --dport 80 -m conntrack --ctstate NEW -j ACCEPT</code></pre>
+<p>If not setting up a web server, change the port number from 80 to whatever your app requires.</p>
+<p>To make the firewall rule persistent, add the rule to the rc.local file and make it executable.</p>
+<p>Open /rw/config/rc.local:</p>
+<pre><code class="lang-auto">sudo nano /rw/config/rc.local</code></pre>
+<p>Add the following in the rc.local file:</p>
+<pre><code class="lang-auto">#!/bin/sh
+
+sudo iptables -I INPUT 5 -p tcp --dport 80 -m conntrack --ctstate NEW -j ACCEPT</code></pre>
+<p>Make the rc.local file executable:</p>
+<pre><code class="lang-auto">sudo chmod +x /rw/config/rc.local</code></pre>
+<p>All Done.</p>
+<p>Note, that it may take up to 30 minutes (or so?) until a fresh .onion domain gets reachable.</p>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/2</link>
+        <pubDate>Sat, 07 Mar 2015 08:51:33 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-2</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+      <item>
+        <title>Issue Setting up hidden services on Qubes</title>
+        <dc:creator><![CDATA[igijo]]></dc:creator>
+        <description><![CDATA[
+            <p>Steps taken so far:</p>
+<ol>
+<li>Clone gateway template.</li>
+<li>sudo nano /etc/tor/torrc<br>
+2a. HiddenServiceDir /var/lib/tor/hidden_service<br>
+2b. HiddenServicePort 80 WS-VM-IP**:80</li>
+<li>sudo service tor reload.</li>
+<li>sudo cat /var/lib/tor/hidden_service/hostname<br>
+4-error. cat: /var/lib/tor/hidden_service/hostname: No such file or directory.<br>
+4-debug-a: ls -la /var/lib/tor/hidden_service/<br>
+error: ls: cannot access /var/lib/tor/hidden_service/: Permission denied<br>
+4-debug-b: sudo chown debian-tor:debian-tor /var/lib/tor/hidden_service/<br>
+error: chown cannot access `/var/lib/tor/hidden_service/’: No such file or directory</li>
+</ol>
+<p>**workstation appvm ip address</p>
+          <p><a href="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901/1</link>
+        <pubDate>Sat, 07 Mar 2015 04:33:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-901-1</guid>
+        <source url="http://forums.whonix.org/t/issue-setting-up-hidden-services-on-qubes/901.rss">Issue Setting up hidden services on Qubes</source>
+      </item>
+  </channel>
+</rss>

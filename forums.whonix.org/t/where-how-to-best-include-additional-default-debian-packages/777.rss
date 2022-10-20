@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Where/How to best include additional default Debian packages?</title>
+    <link>http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777</link>
+    <description>Branching off of this discussion....
+
+https://www.whonix.org/forum/index.php/topic,842.0.html
+
+I&#39;d like to sort out where/how we would best include additional Debian packages for default installation into Whonix Qubes going forward?
+
+For example, as mentioned in the other thread above, I would like to have &quot;nautilus-open-terminal&quot; installed by default for Whonix Qubes.
+
+https://packages.debian.org/wheezy/nautilus-open-terminal
+
+It seems by other recent discussions of @Patrick and @nrgaway, that some related issues/components of the new Whonix Qubes are still in flux.
+
+Patrick mentioned the following here:
+
+https://www.whonix.org/forum/index.php/topic,842.msg6272.html#msg6272
+
+[quote=&quot;Patrick, post:6, topic:765&quot;][quote]Maybe better to incorporate into the new &quot;whonix-qubes&quot; package for Whonix Qubes only?[/quote]
+Yes. Maybe as [font=courier]Recommends:[/font]? [font=courier]Depends:[/font] would be weird, having a package that works perfectly well in terminal-only depend on a GUI package, no?
+
+Please note this comment, it&#39;s related:
+https://www.whonix.org/forum/index.php/topic,841.msg6271.html#msg6271[/quote]
+
+Patrick mentioned the following here:
+
+https://www.whonix.org/forum/index.php/topic,841.msg6271.html#msg6271
+
+[quote=&quot;Patrick, post:15, topic:764&quot;]The whonix-qubes packages uses a few Recommends::
+https://github.com/nrgaway/whonix-qubes/blob/master/debian/control#L22
+
+This is fine. Other packages by the Whonix project do this as well. But... You you need to know it has little effect.
+
+Whonix&#39;s build script installs all packages using &quot;apt-get --no-install-recommends&quot;. Reasons for that are a bit weird and difficult, but explained here:
+https://www.whonix.org/wiki/Whonix_Debian_Packages#Technical_Stuff
+
+So care to you get the [font=courier]Recommends:[/font] installed by default and plan to install the whonix-qubes package as part of [font=arial]build-steps.d/1700_install-packages[/font] or some [url=https://github.com/Whonix/anon-meta-packages/]anon-meta-package[/url], then recommends would not be installed by default. We&#39;d have to think of something. If you install it as part of the Qubes build process somehow without using --no-install-recommends then there will be no problem.
+
+It&#39;s just something to be aware of.[/quote]
+
+Patrick mentioned the following here:
+
+https://www.whonix.org/forum/index.php/topic,850.msg6277.html#msg6277
+
+[quote=&quot;Patrick, post:2, topic:771&quot;]I wouldn&#39;t advice making the whonix-qubes package a jack of all trades device, though. I.e. not be 1) ship Whonix specific configs and scripts for Qubes support + 2) depend on lots of custom package selections. (That doesn&#39;t mean, I am opposed to it! Just saying.) It would be better to split the package into 1) and for dependencies (2)) another package. Perhaps package the mainline https://github.com/Whonix/anon-meta-packages better so the whonix-qubes package has to do as little as possible.[/quote]
+
+Note: &quot;whonix-qubes&quot; package has now been renamed to &quot;qubes-whonix&quot;.
+
+So, specific to Whonix Qubes, where exactly would we include such additional default Debian packages and how would they be best implemented?
+
+Thanks! :D</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 07 Jan 2015 18:19:35 +0000</lastBuildDate>
+    <category>Qubes-Whonix</category>
+    <atom:link href="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Where/How to best include additional default Debian packages?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <blockquote>Okay then, I added it to current qubes-whonix package.  Will see how it goes. The only issue I see is if its a depend it can't be removed.  Does the same hold true if it is within the recommend section?</blockquote>
+[font=courier]Recommends:[/font] can be removed.
+<blockquote>I know you mentioned that Whonix does not install recommends by default,</blockquote>
+Yes, here:
+https://www.whonix.org/wiki/Whonix_Debian_Packages#Technical_Stuff
+<p>Note, this only applies to building Whonix and to build-steps.d/1700_install-packages.</p>
+<blockquote>so we could just add a script to install qubes-whonix recommends by default as I would like them to be installed.</blockquote>
+Instead of a new script, better make "--no-install-recommends" conditional in build-steps.d/1700_install-packages and set qubes-whonix to install without "--no-install-recommends".
+<blockquote>Or maybe this is possible... Two versions of qubes-whonix package would exist.</blockquote>
+Sounds like too much of a hack.
+<p>Better make two or more (meta) packages. You don’t even need a new git repository for it. Just ~8 more lines or so in debian/control.</p>
+<p>See <a href="https://github.com/Whonix/anon-meta-packages/blob/master/debian/control">https://github.com/Whonix/anon-meta-packages/blob/master/debian/control</a> for comparison. It’s relatively easy to create such dependency packages.</p>
+<pre><code class="lang-auto">Package: qubes-whonix-packages-recommended
+Architecture: all
+Depends: nautilus-open-terminal, ${misc:Depends}
+Description: Recommended packages for Whonix-Qubes
+ A metapackage, which installs packages, which are recommended for
+ Whonix-Qubes.
+ .
+ Safe to remove, if you know what you are doing.</code></pre>
+<p>Then a package qubes-whonix-packages-recommended will be created during package build.</p>
+<p>That package is supposed to be installed on gateway and workstation? Otherwise package name should be changed. Please check package names in <a href="https://github.com/Whonix/anon-meta-packages/blob/master/debian/control">https://github.com/Whonix/anon-meta-packages/blob/master/debian/control</a> so we can establish a nice, useful naming convention.</p>
+          <p><a href="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777/6</link>
+        <pubDate>Wed, 07 Jan 2015 18:19:35 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-777-6</guid>
+        <source url="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777.rss">Where/How to best include additional default Debian packages?</source>
+      </item>
+      <item>
+        <title>Where/How to best include additional default Debian packages?</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>[quote=“Patrick, post:4, topic:777”]Sounds good to me.</p>
+<aside class="quote">
+<blockquote>
+<aside class="quote">
+<blockquote>
+<p>One thing we need to make sure of is that the Qubes installation mimics as close to possible the original distribution of Whonix.</p>
+</blockquote>
+</aside>
+<p>Part of me intuitively nods my head in affirmation to this statement. The other part of my asks “But Why?” So… Why do you say this statement?</p>
+</blockquote>
+</aside>
+<p>It’s true for some things. But in this case, I do not foresee any fingerprinting issues since it’s just a local thing.[/quote]</p>
+<p>Okay then, I added it to current qubes-whonix package.  Will see how it goes.  The only issue I see is if its a depend it can’t be removed.  Does the same hold true if it is within the recommend section?  I know you mentioned that Whonix does not install recommends by default, so we could just add a script to install qubes-whonix recommends by default as I would like them to be installed.</p>
+<p>Or maybe this is possible… Two versions of qubes-whonix package would exist.  The installation version which gets installed only once when the template is initially created.  This version series would be 0:9.4-1.  Then we could have the download-able version via the apt-get repo with a higher version number or epoc, so either 1:9.4-1 or start at 0:9.40-1, or even add a lesser important tag like -beta which will be seen as a lesser version and be up-gradable.</p>
+<p>Now, first time user goes to update, the higher version package will be made available with all these dependencies removed in debian/control, so after the new package is installed, they would be free to remove those packages.  All futures updates use the higher version number bump as installation package will only every be needed the first time.</p>
+<p>Now this assumes that by reducing the depends would not automatically mark those packages for removal.  Any thoughts on if this would work?  Easy enough to test out I suppose <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777/5">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777/5</link>
+        <pubDate>Wed, 07 Jan 2015 18:02:20 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-777-5</guid>
+        <source url="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777.rss">Where/How to best include additional default Debian packages?</source>
+      </item>
+      <item>
+        <title>Where/How to best include additional default Debian packages?</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Sounds good to me.</p>
+<p>[quote=“WhonixQubes, post:3, topic:777”][quote author=nrgaway link=topic=856.msg6348#msg6348 date=1420503115]<br>
+One thing we need to make sure of is that the Qubes installation mimics as close to possible the original distribution of Whonix.<br>
+[/quote]<br>
+Part of me intuitively nods my head in affirmation to this statement. The other part of my asks “But Why?” So… Why do you say this statement?[/quote]<br>
+It’s true for some things. But in this case, I do not foresee any fingerprinting issues since it’s just a local thing.</p>
+          <p><a href="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777/4">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777/4</link>
+        <pubDate>Wed, 07 Jan 2015 13:10:27 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-777-4</guid>
+        <source url="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777.rss">Where/How to best include additional default Debian packages?</source>
+      </item>
+      <item>
+        <title>Where/How to best include additional default Debian packages?</title>
+        <dc:creator><![CDATA[WhonixQubes]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote" data-post="2" data-topic="777">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"> nrgaway:</div>
+<blockquote>
+<p>The first options is to have [font=courier]<span class="bbcode-b">nautilus-open-terminal</span>[/font] included within the base of Whonix available for everyone.</p>
+</blockquote>
+</aside>
+<p>Patrick, understandably, was not keen on installing this package into Whonix proper for VirtualBox KDE users, as it would only benefit Whonix Qubes and Whonix Gnome users that have Nautilus as their default file manager.</p>
+<aside class="quote" data-post="2" data-topic="777">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"> nrgaway:</div>
+<blockquote>
+<p>Now if this is not just a personal preference, in which you just install the package yourself after installing the Qubes-Whonix template</p>
+</blockquote>
+</aside>
+<p>Correct. Not proposing it as just a personal preference.</p>
+<p>Wrote original proposal for reasons here:<br>
+<a href="https://www.whonix.org/forum/index.php/topic,842.0.html" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/forum/index.php/topic,842.0.html</a></p>
+<p><a class="mention" href="http://forums.whonix.org/u/troubadour">@troubadour</a> responeded in affirmation to this, as he frequently needs this functionality to transition from file manager to terminal in the current working directory of the file manager.</p>
+<p>He pointed out how KDE Dolphin finds this basic feature important enough to include by default.</p>
+<p>However, the file manager with primary Qubes functionality in Whonix Qubes is Nautilus, which Tor Browser (Firefox) natively opens its downloads inside of, and Qubes also implements its Inter-VM File Copy system inside of Nautilus as well.</p>
+<p>So it would be a fundamental basic convenience in many cases to use the primary Nautilus file manager in this way for Whonix Qubes users (including myself). <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=5" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+<aside class="quote" data-post="2" data-topic="777">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"> nrgaway:</div>
+<blockquote>
+<p>I believe that any packages specific to the Qubes installation should be included in the Depends section of the [font=courier]qubes-whonix[/font] package.  That would make sure they are installed by default.</p>
+</blockquote>
+</aside>
+<p>Okay, great. I will look for this place inside the “qubes-whonix” package. Thanks!</p>
+<p>[hr]</p>
+<aside class="quote" data-post="2" data-topic="777">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"> nrgaway:</div>
+<blockquote>
+<p>One thing we need to make sure of is that the Qubes installation mimics as close to possible the original distribution of Whonix.</p>
+</blockquote>
+</aside>
+<p>Part of me intuitively nods my head in affirmation to this statement. The other part of my asks “But Why?” So… Why do you say this statement?</p>
+<p>[hr]</p>
+<aside class="quote" data-post="2" data-topic="777">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/letter_avatar_proxy/v2/letter/n/f17d59/40.png" class="avatar"> nrgaway:</div>
+<blockquote>
+<p>In case you are interested</p>
+</blockquote>
+</aside>
+<p>Always interested in every detail specific to Whonix Qubes! <img src="//forums.whonix.org/images/emoji/twitter/smiley.png?v=5" title=":smiley:" class="emoji" alt=":smiley:"></p>
+<p>[quote=“nrgaway, post:2, topic:777”]the following lists the logical build steps to build the Whonix template using [font=courier]qubes-builder[/font] since at this point Qubes Whonix needs to be built using [font=courier]qubes-builder[/font] (the Qubes package that builds all of Qubes components, including the ability to create a full ISO to install the complete Qubes OS).</p>
+<p>[ol][li]Create a configuration file to build template or use provided default[/li]<br>
+[li]get-sources: Retreives and verifiies all Qubes and Whonix Repos[/li]<br>
+[li]build Qubes modules: Builds all the required Qubes modules required by template[/li]<br>
+[li]build template[/li]<br>
+[list]<br>
+[li]Uses debootstrap to create an initial wheezy template[/li]<br>
+[li]Configure template basics.  Convert to systemd as Qubes uses systemd (and the more I learn about it, the better I like it)[/li]<br>
+[li]Install the Qubes modules we built in step 3 and configure template for Qubes related stuff[/li]<br>
+[li]Run the whonix_build scripts thereby installing Whonix on template[/li]<br>
+[li]Install the qubes-whonix package[/li]<br>
+[/list]</p>
+<p>You see that Whonix builder does not currently install [font=courier]qubes-whonix[/font]; it is installed as a separate step, but that could change when its incorporated into the Whonix repo.  Not that any of this really matters much for your question :)[/ol][/quote]</p>
+<p>Thanks for that overview of the build process!</p>
+<p>At some point I need to get around to deep diving into the code of Whonix Qubes.</p>
+<p>Spent a bit of time getting more familiar with the Whonix code late last year. Need to do that with your Whonix Qubes code at some point.</p>
+<p>Will likely have a number of questions as I get around to doing that.</p>
+          <p><a href="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777/3">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777/3</link>
+        <pubDate>Tue, 06 Jan 2015 22:22:41 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-777-3</guid>
+        <source url="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777.rss">Where/How to best include additional default Debian packages?</source>
+      </item>
+      <item>
+        <title>Where/How to best include additional default Debian packages?</title>
+        <dc:creator><![CDATA[nrgaway]]></dc:creator>
+        <description><![CDATA[
+            <p>The first options is to have [font=courier]<span class="bbcode-b">nautilus-open-terminal</span>[/font] included within the base of Whonix available for everyone.  One thing we need to make sure of is that the Qubes installation mimics as close to possible the original distribution of Whonix.</p>
+<p>Now if this is not just a personal preference, in which you just install the package yourself after installing the Qubes-Whonix template, I believe that any packages specific to the Qubes installation should be included in the Depends section of the [font=courier]qubes-whonix[/font] package.  That would make sure they are installed by default.</p>
+<p>In case you are interested, the following lists the logical build steps to build the Whonix template using [font=courier]qubes-builder[/font] since at this point Qubes Whonix needs to be built using [font=courier]qubes-builder[/font] (the Qubes package that builds all of Qubes components, including the ability to create a full ISO to install the complete Qubes OS).</p>
+<p>[ol][li]Create a configuration file to build template or use provided default[/li]<br>
+[li]get-sources: Retreives and verifiies all Qubes and Whonix Repos[/li]<br>
+[li]build Qubes modules: Builds all the required Qubes modules required by template[/li]<br>
+[li]build template[/li]<br>
+[list]<br>
+[li]Uses debootstrap to create an initial wheezy template[/li]<br>
+[li]Configure template basics.  Convert to systemd as Qubes uses systemd (and the more I learn about it, the better I like it)[/li]<br>
+[li]Install the Qubes modules we built in step 3 and configure template for Qubes related stuff[/li]<br>
+[li]Run the whonix_build scripts thereby installing Whonix on template[/li]<br>
+[li]Install the qubes-whonix package[/li]<br>
+[/list]</p>
+<p>You see that Whonix builder does not currently install [font=courier]qubes-whonix[/font]; it is installed as a separate step, but that could change when its incorporated into the Whonix repo.  Not that any of this really matters much for your question :)[/ol]</p>
+          <p><a href="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777/2</link>
+        <pubDate>Tue, 06 Jan 2015 00:11:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-777-2</guid>
+        <source url="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777.rss">Where/How to best include additional default Debian packages?</source>
+      </item>
+      <item>
+        <title>Where/How to best include additional default Debian packages?</title>
+        <dc:creator><![CDATA[WhonixQubes]]></dc:creator>
+        <description><![CDATA[
+            <p>Branching off of this discussion…</p>
+<p><a href="https://www.whonix.org/forum/index.php/topic,842.0.html" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/forum/index.php/topic,842.0.html</a></p>
+<p>I’d like to sort out where/how we would best include additional Debian packages for default installation into Whonix Qubes going forward?</p>
+<p>For example, as mentioned in the other thread above, I would like to have “nautilus-open-terminal” installed by default for Whonix Qubes.</p>
+<p><a href="https://packages.debian.org/wheezy/nautilus-open-terminal" class="onebox" target="_blank" rel="nofollow noopener">https://packages.debian.org/wheezy/nautilus-open-terminal</a></p>
+<p>It seems by other recent discussions of <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> and <a class="mention" href="http://forums.whonix.org/u/nrgaway">@nrgaway</a>, that some related issues/components of the new Whonix Qubes are still in flux.</p>
+<p>Patrick mentioned the following here:</p>
+<p><a href="https://www.whonix.org/forum/index.php/topic,842.msg6272.html#msg6272" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/forum/index.php/topic,842.msg6272.html#msg6272</a></p>
+<aside class="quote no-group quote-modified" data-username="Patrick" data-post="6" data-topic="765">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"><a href="//forums.whonix.org/t/installing-nautilus-open-terminal-package-by-default/765/6">Installing "nautilus-open-terminal" package by default</a>
+</div>
+<blockquote>
+<p>[quote]Maybe better to incorporate into the new “whonix-qubes” package for Whonix Qubes only?</p>
+</blockquote>
+</aside>
+<p>Yes. Maybe as [font=courier]Recommends:[/font]? [font=courier]Depends:[/font] would be weird, having a package that works perfectly well in terminal-only depend on a GUI package, no?</p>
+<p>Please note this comment, it’s related:<br>
+<a href="https://www.whonix.org/forum/index.php/topic,841.msg6271.html#msg6271%5B/quote%5D" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/forum/index.php/topic,841.msg6271.html#msg6271[/quote]</a></p>
+<p>Patrick mentioned the following here:</p>
+<p><a href="https://www.whonix.org/forum/index.php/topic,841.msg6271.html#msg6271" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/forum/index.php/topic,841.msg6271.html#msg6271</a></p>
+<p>[quote=“Patrick, post:15, topic:764”]The whonix-qubes packages uses a few Recommends::<br>
+</p><aside class="onebox githubblob">
+  <header class="source">
+      <a href="https://github.com/nrgaway/qubes-whonix/blob/master/debian/control#L22" target="_blank" rel="nofollow noopener">github.com</a>
+  </header>
+  <article class="onebox-body">
+    <h4><a href="https://github.com/nrgaway/qubes-whonix/blob/master/debian/control#L22" target="_blank" rel="nofollow noopener">nrgaway/qubes-whonix/blob/master/debian/control#L22</a></h4>
+<pre class="onebox"><code class="lang-"><ol class="start lines" start="12" style="counter-reset: li-counter 11 ;">
+<li>Maintainer: Jason Mehring &lt;nrgaway@gmail.com&gt;</li>
+<li>Uploaders: Patrick Schleizer &lt;adrelanos@riseup.net&gt;</li>
+<li>Build-Depends: debhelper (&gt;= 9), faketime, genmkfile, python, dh-systemd (&gt;= 1.5)</li>
+<li>Homepage: https://github.com/Whonix/qubes-whonix</li>
+<li>Vcs-Browser: https://github.com/Whonix/qubes-whonix</li>
+<li>Vcs-Git: https://github.com/Whonix/qubes-whonix.git</li>
+<li>Standards-Version: 3.9.6</li>
+<li>
+</li><li>Package: qubes-whonix</li>
+<li>Architecture: all</li>
+<li class="selected">Depends: qubes-core-agent (&gt;= 2.1.60), python-guimessages, whonix-setup-wizard, ethtool, initscripts, iptables, lintian, locales, net-tools, notify-osd, python, sudo, systemd, xen-utils-common, xinit, xsettingsd, xdg-user-dirs, ${misc:Depends}</li>
+<li>Recommends: nautilus-open-terminal, gnome-packagekit, gnome-terminal, network-manager (&gt;= 0.8.1-1), network-manager-gnome</li>
+<li>Description: Qubes Configuration for Whonix-Gateway and Whonix-Workstation</li>
+<li> This package contains all the scripts and configuration options to be able</li>
+<li> to run Whonix-Gateway and Whonix-Workstation within a Qubes environment.</li>
+<li> .</li>
+<li> Whonix-Gateway should run as a ProxyVM.</li>
+<li> .</li>
+<li> Whonix-Workstation should run as an AppVM.</li>
+<li> .</li>
+<li> Template updates over Tor.</li>
+</ol></code></pre>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>This is fine. Other packages by the Whonix project do this as well. But… You you need to know it has little effect.</p>
+<p>Whonix’s build script installs all packages using “apt-get --no-install-recommends”. Reasons for that are a bit weird and difficult, but explained here:<br>
+</p><aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <img src="https://www.whonix.org/w/images/favicon.ico" class="site-icon" width="16" height="16">
+      <a href="https://www.whonix.org/wiki/Whonix_Debian_Packages#Technical_Stuff" target="_blank" rel="nofollow noopener" title="10:26PM - 23 November 2019">Whonix – 23 Nov 19</a>
+  </header>
+  <article class="onebox-body">
+    <div class="aspect-image" style="--aspect-ratio:614/500;"><img src="https://www.whonix.org/w/images/a/aa/Box-158523640.png" class="thumbnail" width="614" height="500"></div>
+
+<h3><a href="https://www.whonix.org/wiki/Whonix_Debian_Packages#Technical_Stuff" target="_blank" rel="nofollow noopener">Whonix Debian Packages - Whonix</a></h3>
+
+<p>Which Whonix ™ Debian packages are safe to remove? What is a meta package? What other packages do Whonix ™ meta packages install? Which packages should never be removed? Why is package X installed?</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>So care to you get the [font=courier]Recommends:[/font] installed by default and plan to install the whonix-qubes package as part of [font=arial]build-steps.d/1700_install-packages[/font] or some <a href="https://github.com/Whonix/anon-meta-packages/" data-bbcode="true" rel="nofollow noopener">anon-meta-package</a>, then recommends would not be installed by default. We’d have to think of something. If you install it as part of the Qubes build process somehow without using --no-install-recommends then there will be no problem.</p>
+<p>It’s just something to be aware of.[/quote]</p>
+<p>Patrick mentioned the following here:</p>
+<p><a href="https://www.whonix.org/forum/index.php/topic,850.msg6277.html#msg6277" class="onebox" target="_blank" rel="nofollow noopener">https://www.whonix.org/forum/index.php/topic,850.msg6277.html#msg6277</a></p>
+<aside class="quote no-group" data-username="Patrick" data-post="2" data-topic="771">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/17_2.png" class="avatar"><a href="//forums.whonix.org/t/whonix-installation-triggers/771/2">Whonix Installation Triggers</a>
+</div>
+<blockquote>
+<p>I wouldn’t advice making the whonix-qubes package a jack of all trades device, though. I.e. not be 1) ship Whonix specific configs and scripts for Qubes support + 2) depend on lots of custom package selections. (That doesn’t mean, I am opposed to it! Just saying.) It would be better to split the package into 1) and for dependencies (2)) another package. Perhaps package the mainline <a href="https://github.com/Whonix/anon-meta-packages" rel="nofollow noopener">https://github.com/Whonix/anon-meta-packages</a> better so the whonix-qubes package has to do as little as possible.</p>
+</blockquote>
+</aside>
+<p>Note: “whonix-qubes” package has now been renamed to “qubes-whonix”.</p>
+<p>So, specific to Whonix Qubes, where exactly would we include such additional default Debian packages and how would they be best implemented?</p>
+<p>Thanks! <img src="//forums.whonix.org/images/emoji/twitter/smiley.png?v=9" title=":smiley:" class="emoji" alt=":smiley:"></p>
+          <p><a href="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777/1</link>
+        <pubDate>Mon, 05 Jan 2015 19:04:48 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-777-1</guid>
+        <source url="http://forums.whonix.org/t/where-how-to-best-include-additional-default-debian-packages/777.rss">Where/How to best include additional default Debian packages?</source>
+      </item>
+  </channel>
+</rss>

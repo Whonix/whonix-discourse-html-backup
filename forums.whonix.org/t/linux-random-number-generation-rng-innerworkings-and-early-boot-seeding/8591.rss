@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Linux Random Number Generation (RNG) Innerworkings and Early Boot Seeding</title>
+    <link>http://forums.whonix.org/t/linux-random-number-generation-rng-innerworkings-and-early-boot-seeding/8591</link>
+    <description>
+Interesting thread:
+https://crypto.stackexchange.com/questions/9412/what-to-watch-for-with-openssl-generating-weak-keys-low-entropy
+
+
+That lead to this analysis paper about everything you ever wanted to know about how the Linux RNG works, its security assumptions and precautions for backward and forward security. Particularly of interest is info on reusing urandom output as a seed on next boot:
+
+https://eprint.iacr.org/2012/251.pdf
+
+&gt; 2.5  Initialization
+&gt; 
+&gt; herefore, the designer of the Linux PRNG recommends ascript which, at shutdown, generates data from/dev/urandomand saves it in a file, and at startup, writes the saved data to/dev/urandom. This mixes the same data into the blocking and nonblocking pools without increasing their entropy counters.Such a script is provided in the default installation of most Linux distributions. In situations where this procedure is not possible, for example in Live CD systems, the nonblocking random number generator should be used with caution directly after the boot process since it might not contain enough entropy
+
+
+This is how it is implemented with systemd. Only useful if system had a clean shutdown:
+
+https://unix.stackexchange.com/questions/388803/why-is-the-random-seed-only-saved-to-disk-on-boot-and-shutdown
+
+^^ On why seeds are absolutely important to RNG security:
+&gt; The thing to remember about PRNGs is that *they are not random* . They are entirely deterministic. If one knows the initial input values and the particular PRNG algorithm, one can determine every single future &quot;random&quot; output value.
+&gt; 
+&gt; In this case, the algorithm is well known. It is after all, published as part of an open source kernel. So the key to randomness is the *seed* . The level of &quot;randomness&quot; that is provided is *unpredictability* , from one output to the next. Knowing the algorithm and the previous outputs but not the seed, it is *unfeasibly hard* to predict what the next random output will be. (This is not a formal nor a complete definition of what it means for a PRNG to be *cryptographically secure* ; but will do as a limited approximation for the purposes of this answer.)
+&gt; 
+&gt; This is the basic reason for the widely-discussed problems with Linux&#39;s `/dev/urandom` , which I am just going to gloss over here. At bootstrap, the seed is *also* well known. The random outputs are all entirely predictable *until* the PRNG is *re-seeded* , i.e. supplied with a fresh seed that is unique (or as near as one can get) to that run of that operating system installation, for the first time.
+
+
+Great info on early boot entropy seeding, especially problematic on amnesic systems. *twuewand* is a neat workaround that is unfortunately not packaged for Debian but is small enough:
+
+https://tails.boum.org/blueprint/randomness_seeding/
+
+https://www.finnie.org/2011/09/25/introducing-twuewand/
+
+***
+
+In the meantime until [we can convince upstream to disable hwrng trust on boot](https://forums.whonix.org/t/entropy-config-random-trust-cpu-yes-or-no-rng-core-default-quality/8566/19?u=patrick) which they probably won&#39;t accept until the [changes](https://www.phoronix.com/scan.php?page=news_item&amp;px=Linux-5.4-Actively-Gen-Entropy) by Linus in 5.4 are  in the stable kernel, we should try to drown out the untrusted input as much as possible by installing as many entropy solutions as possible.</description>
+    <language>en</language>
+    <lastBuildDate>Thu, 05 Dec 2019 20:42:19 +0000</lastBuildDate>
+    <category>News</category>
+    <atom:link href="http://forums.whonix.org/t/linux-random-number-generation-rng-innerworkings-and-early-boot-seeding/8591.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>Linux Random Number Generation (RNG) Innerworkings and Early Boot Seeding</title>
+        <dc:creator><![CDATA[anontor]]></dc:creator>
+        <description><![CDATA[
+            <p>This is gold! Thank you!</p>
+          <p><a href="http://forums.whonix.org/t/linux-random-number-generation-rng-innerworkings-and-early-boot-seeding/8591/2">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/linux-random-number-generation-rng-innerworkings-and-early-boot-seeding/8591/2</link>
+        <pubDate>Thu, 05 Dec 2019 20:42:19 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8591-2</guid>
+        <source url="http://forums.whonix.org/t/linux-random-number-generation-rng-innerworkings-and-early-boot-seeding/8591.rss">Linux Random Number Generation (RNG) Innerworkings and Early Boot Seeding</source>
+      </item>
+      <item>
+        <title>Linux Random Number Generation (RNG) Innerworkings and Early Boot Seeding</title>
+        <dc:creator><![CDATA[HulaHoop]]></dc:creator>
+        <description><![CDATA[
+            <p>Interesting thread:<br>
+</p><aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://crypto.stackexchange.com/questions/9412/what-to-watch-for-with-openssl-generating-weak-keys-low-entropy" target="_blank">crypto.stackexchange.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://crypto.stackexchange.com/users/7772/brian-armstrong" target="_blank">
+    <img alt="Brian Armstrong" src="https://www.gravatar.com/avatar/88aaa125be70fd75c1d1b25fa5a2ce2d?s=128&amp;d=identicon&amp;r=PG" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://crypto.stackexchange.com/questions/9412/what-to-watch-for-with-openssl-generating-weak-keys-low-entropy" target="_blank">What to watch for with openssl generating weak keys? (low entropy)</a>
+</h4>
+
+<div class="tags">
+  <strong>random-number-generator, randomness, entropy, openssl</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://crypto.stackexchange.com/users/7772/brian-armstrong" target="_blank">
+    Brian Armstrong
+  </a>
+  on <a href="https://crypto.stackexchange.com/questions/9412/what-to-watch-for-with-openssl-generating-weak-keys-low-entropy" target="_blank">06:48PM - 24 Jul 13 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+<p></p>
+<p>That lead to this analysis paper about everything you ever wanted to know about how the Linux RNG works, its security assumptions and precautions for backward and forward security. Particularly of interest is info on reusing urandom output as a seed on next boot:</p>
+<aside class="onebox pdf">
+  <header class="source">
+      <a href="https://eprint.iacr.org/2012/251.pdf" target="_blank">eprint.iacr.org</a>
+  </header>
+  <article class="onebox-body">
+    <a href="https://eprint.iacr.org/2012/251.pdf" target="_blank"><span class="pdf-onebox-logo"></span></a>
+<h3><a href="https://eprint.iacr.org/2012/251.pdf" target="_blank">251.pdf</a></h3>
+
+<p class="filesize">757.54 KB</p>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>
+<p>2.5  Initialization</p>
+<p>herefore, the designer of the Linux PRNG recommends ascript which, at shutdown, generates data from/dev/urandomand saves it in a file, and at startup, writes the saved data to/dev/urandom. This mixes the same data into the blocking and nonblocking pools without increasing their entropy counters.Such a script is provided in the default installation of most Linux distributions. In situations where this procedure is not possible, for example in Live CD systems, the nonblocking random number generator should be used with caution directly after the boot process since it might not contain enough entropy</p>
+</blockquote>
+<p>This is how it is implemented with systemd. Only useful if system had a clean shutdown:</p>
+<aside class="onebox stackexchange">
+  <header class="source">
+      <a href="https://unix.stackexchange.com/questions/388803/why-is-the-random-seed-only-saved-to-disk-on-boot-and-shutdown" target="_blank">unix.stackexchange.com</a>
+  </header>
+  <article class="onebox-body">
+      <a href="https://unix.stackexchange.com/users/229660/yt7b97q" target="_blank">
+    <img alt="yt7b97q-" src="https://www.gravatar.com/avatar/8b53bb5d7f056e3451dbc7f7d248da82?s=128&amp;d=identicon&amp;r=PG&amp;f=1" class="thumbnail onebox-avatar" width="128" height="128">
+  </a>
+<h4>
+  <a href="https://unix.stackexchange.com/questions/388803/why-is-the-random-seed-only-saved-to-disk-on-boot-and-shutdown" target="_blank">Why is the random seed only saved to disk on boot and shutdown?</a>
+</h4>
+
+<div class="tags">
+  <strong>linux, random</strong>
+</div>
+
+<div class="date">
+  asked by
+  
+  <a href="https://unix.stackexchange.com/users/229660/yt7b97q" target="_blank">
+    yt7b97q-
+  </a>
+  on <a href="https://unix.stackexchange.com/questions/388803/why-is-the-random-seed-only-saved-to-disk-on-boot-and-shutdown" target="_blank">10:59AM - 28 Aug 17 UTC</a>
+</div>
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<p>^^ On why seeds are absolutely important to RNG security:</p>
+<blockquote>
+<p>The thing to remember about PRNGs is that <em>they are not random</em> . They are entirely deterministic. If one knows the initial input values and the particular PRNG algorithm, one can determine every single future “random” output value.</p>
+<p>In this case, the algorithm is well known. It is after all, published as part of an open source kernel. So the key to randomness is the <em>seed</em> . The level of “randomness” that is provided is <em>unpredictability</em> , from one output to the next. Knowing the algorithm and the previous outputs but not the seed, it is <em>unfeasibly hard</em> to predict what the next random output will be. (This is not a formal nor a complete definition of what it means for a PRNG to be <em>cryptographically secure</em> ; but will do as a limited approximation for the purposes of this answer.)</p>
+<p>This is the basic reason for the widely-discussed problems with Linux’s <code>/dev/urandom</code> , which I am just going to gloss over here. At bootstrap, the seed is <em>also</em> well known. The random outputs are all entirely predictable <em>until</em> the PRNG is <em>re-seeded</em> , i.e. supplied with a fresh seed that is unique (or as near as one can get) to that run of that operating system installation, for the first time.</p>
+</blockquote>
+<p>Great info on early boot entropy seeding, especially problematic on amnesic systems. <em>twuewand</em> is a neat workaround that is unfortunately not packaged for Debian but is small enough:</p>
+<p><a href="https://tails.boum.org/blueprint/randomness_seeding/" class="onebox" target="_blank">https://tails.boum.org/blueprint/randomness_seeding/</a></p>
+<aside class="onebox whitelistedgeneric">
+  <header class="source">
+      <a href="https://www.finnie.org/2011/09/25/introducing-twuewand/" target="_blank">Ryan Finnie</a>
+  </header>
+  <article class="onebox-body">
+    <img src="" class="thumbnail">
+
+<h3><a href="https://www.finnie.org/2011/09/25/introducing-twuewand/" target="_blank">Introducing twuewand</a></h3>
+
+<p>twuewand is a true hardware random number generator, written in about a hundred lines of Perl.</p>
+
+
+  </article>
+  <div class="onebox-metadata">
+    
+    
+  </div>
+  <div style="clear: both"></div>
+</aside>
+
+<hr>
+<p>In the meantime until <a href="https://forums.whonix.org/t/entropy-config-random-trust-cpu-yes-or-no-rng-core-default-quality/8566/19">we can convince upstream to disable hwrng trust on boot</a> which they probably won’t accept until the <a href="https://www.phoronix.com/scan.php?page=news_item&amp;px=Linux-5.4-Actively-Gen-Entropy">changes</a> by Linus in 5.4 are  in the stable kernel, we should try to drown out the untrusted input as much as possible by installing as many entropy solutions as possible.</p>
+          <p><a href="http://forums.whonix.org/t/linux-random-number-generation-rng-innerworkings-and-early-boot-seeding/8591/1">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/linux-random-number-generation-rng-innerworkings-and-early-boot-seeding/8591/1</link>
+        <pubDate>Thu, 05 Dec 2019 06:17:16 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-8591-1</guid>
+        <source url="http://forums.whonix.org/t/linux-random-number-generation-rng-innerworkings-and-early-boot-seeding/8591.rss">Linux Random Number Generation (RNG) Innerworkings and Early Boot Seeding</source>
+      </item>
+  </channel>
+</rss>
