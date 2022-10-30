@@ -19,9 +19,179 @@ Sound an interesting project.
 
 @maltfield nice stuff ;)</description>
     <language>en</language>
-    <lastBuildDate>Tue, 05 Jul 2022 15:13:11 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 26 Oct 2022 13:24:15 +0000</lastBuildDate>
     <category>Development</category>
     <atom:link href="http://forums.whonix.org/t/panic-button-panic-shutdown-buskill-the-usb-kill-cord-for-your-laptop/13755.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>panic button / panic shutdown / BusKill - The USB kill cord for your laptop</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>Might be more suitable for the host operating system. That means Whonix-Host and/or Kicksecure.</p>
+<aside class="quote no-group" data-username="maltfield" data-post="6" data-topic="13755">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/maltfield/40/1809_2.png" class="avatar"> maltfield:</div>
+<blockquote>
+<p>Please let me know what you’d like to see to make that happen <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=12" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+</blockquote>
+</aside>
+<p>Inclusion into <a href="http://packages.debian.org">packages.debian.org</a>.</p>
+<aside class="quote no-group quote-modified" data-username="maltfield" data-post="6" data-topic="13755">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/maltfield/40/1809_2.png" class="avatar"> maltfield:</div>
+<blockquote>
+<blockquote>
+<p>Does BusKill already implement RAM wipe on shutdown?</p>
+</blockquote>
+<p>We just added a soft-shutdown to the app (currently CLI-only) in our latest release (v0.6.0). It does not include a RAM wipe.</p>
+<p>Sorry, but I generally do not consider RAM wiping our highest-priority request atm. To quote from our article <a href="https://www.buskill.in/luks-self-destruct/">LUKS Header Shredder (BusKill Self-Destruct Trigger)</a></p>
+</blockquote>
+</aside>
+<p>RAM wipe is very hard to properly implement. We’ve been working on this too but it stalled foor now. Initramfs has an initrd but what’s needed to wipe RAM on shutdown is an exitrd. Dracut has both an initrd and supports exitrd but it doesn’t properly unmount the luks root disk on shutdown. Therefore a dracut RAM wipe module that runs at very end of the boot process cannot fully wipe the RAM either. If you’re ready / wish to discuss this further lets move to the Whonix RAM wipe development forum thread, your github, dracut github or so at any time.</p>
+<p>related:</p>
+<aside class="onebox githubissue" data-onebox-src="https://github.com/dracutdevs/dracut/issues/997">
+  <header class="source">
+
+      <a href="https://github.com/dracutdevs/dracut/issues/997" target="_blank" rel="noopener">github.com/dracutdevs/dracut</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewBox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="https://github.com/dracutdevs/dracut/issues/997" target="_blank" rel="noopener">Wipe LUKS Disk Encryption Key for Root Disk from RAM during Shutdown to defeat Cold Boot Attacks</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2020-12-29" data-time="17:18:06" data-timezone="UTC">05:18PM - 29 Dec 20 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="https://github.com/adrelanos" target="_blank" rel="noopener">
+          <img alt="adrelanos" src="https://avatars.githubusercontent.com/u/1985040?v=4" class="onebox-avatar-inline" width="20" height="20">
+          adrelanos
+        </a>
+      </div>
+    </div>
+
+    <div class="labels">
+        <span style="display:inline-block;margin-top:2px;background-color: #B8B8B8;padding: 2px;border-radius: 4px;color: #fff;margin-left: 3px;">
+          enhancement
+        </span>
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">**Is your feature request related to a problem? Please describe.**
+
+Defeat Col<span class="show-more-container"><a href="http://forums.whonix.org" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden">d Boot Attacks by wiping LUKS disk encryption during shutdown.
+
+What is a Cold Boot Attacks? See:
+
+* https://www.youtube.com/watch?v=JDaicPIgn9U
+* https://en.wikipedia.org/wiki/Cold_boot_attack
+* https://blog.f-secure.com/cold-boot-attacks/
+* https://www.usenix.org/legacy/event/sec08/tech/full_papers/halderman/halderman.pdf
+
+**Describe the solution you'd like**
+Run `cryptsetup close` at end of shutdown procedure.
+
+Quote `cryptsetup close` (previously `cryptsetup lukseClose`) man page (bold added):
+
+&gt; close
+&gt; Removes the existing mapping &lt;name&gt; and **wipes the key from kernel memory**.
+
+Maybe `cryptsetup close` could be done during `dracut-shutdown`?
+
+This would not wipe all secrets from RAM to defeat a cold boot attack but at least remove one of the most important secrets, the root disk LUKS encryption key.
+
+**Describe alternatives you've considered**
+
+Linux kernel feature:
+
+This issue can probably not be redirected at the Linux kernel. While a generic solution `Wipe RAM to defeat Cold Boot Attacks` (https://github.com/systemd/systemd/issues/17242) probably belongs into the kernel, this does not. For the kernel to be able to wipe the memory, encrypted LUKS devices need to be properly closed first. `cryptsetup close` does that.
+
+systemd feature:
+
+systemd does not wipe the LUKS disk encryption key for root disk from RAM during shutdown. And as I understand systemd developer @poettering Lennart Poettering, this isn't up to systemd either. It's up to the initrd / initramfs. (https://github.com/systemd/systemd/issues/17887)
+
+Quote myself (https://github.com/systemd/systemd/issues/17887#issuecomment-750340608):
+
+&gt; Avoiding all sidelines, keeping this simple, for my understanding and for the record and please correct me if I am wrong... Summary:
+&gt; 
+&gt; `"cryptsetup close" of root device during shutdown` is already implemented.
+
+Quote systemd developer @poettering Lennart Poettering (https://github.com/systemd/systemd/issues/17887#issuecomment-751252894):
+
+&gt; &gt; `"cryptsetup close" of root device during shutdown` is already implemented.
+&gt; 
+&gt; iff your initrd/distro of choice do so. For the root disk it doesn't matter what systemd does, it matters what the initrd/distro do. hence ping the maintainers of those.</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>
+<p>If your risk model is high enough to require defenses against cold boot attacks, you should thoroughly consider switching to <a href="https://www.buskill.in/tails">TAILS</a>–which has a <a href="https://tails.boum.org/contribute/design/memory_erasure">well-tested implementation</a> of RAM shredding.</p>
+</blockquote>
+<p>I am afraid this isn’t applicable or easily portable to other non-Tails Linux distributions. Tails doesn’t encrypt the root disk. They don’t need to. The contents of the root disk are the same for all users (except because in rare cases of customized self-made builds). Tails encrypts only the persistent storage. I didn’t check if that encryption is is properly unmounted at shutdown but might be easier. Unmounting an lvm, luks encrypted root disk is much harder.</p>
+          <p><a href="http://forums.whonix.org/t/panic-button-panic-shutdown-buskill-the-usb-kill-cord-for-your-laptop/13755/7">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/panic-button-panic-shutdown-buskill-the-usb-kill-cord-for-your-laptop/13755/7</link>
+        <pubDate>Wed, 26 Oct 2022 13:24:15 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13755-7</guid>
+        <source url="http://forums.whonix.org/t/panic-button-panic-shutdown-buskill-the-usb-kill-cord-for-your-laptop/13755.rss">panic button / panic shutdown / BusKill - The USB kill cord for your laptop</source>
+      </item>
+      <item>
+        <title>panic button / panic shutdown / BusKill - The USB kill cord for your laptop</title>
+        <dc:creator><![CDATA[maltfield]]></dc:creator>
+        <description><![CDATA[
+            <p>Sorry for the super-delayed response.</p>
+<blockquote>
+<p>Does BusKill already implement RAM wipe on shutdown?</p>
+</blockquote>
+<p>We just added a soft-shutdown to the app (currently CLI-only) in our latest release (v0.6.0).  It does not include a RAM wipe.</p>
+<p>Sorry, but I generally do not consider RAM wiping our highest-priority request atm. To quote from our article <a href="https://www.buskill.in/luks-self-destruct/" rel="noopener nofollow ugc">LUKS Header Shredder (BusKill Self-Destruct Trigger)</a></p>
+<blockquote>
+<p>As far as I know, there is no evidence to suggest that a single political prisoner was caught or convicted by an opressive regime due to the results of a cold boot attack. At the time of writing, cold boot attacks exist in a purely academic realm.</p>
+<p>Nevertheless, a welcome improvement to this BusKill self-destruct trigger would be to add a step to overwrite the RAM prior to shutdown. But such an implementation should be very carefully tested to ensure that it actually functions as intended across all linux distros–and that it doesn’t prevent the machine from being able to actually power-off. Otherwise, a poor implementation could actually make your self-destruct sequence <em>less</em> secure.</p>
+<p>If your risk model is high enough to require defenses against cold boot attacks, you should thoroughly consider switching to <a href="https://www.buskill.in/tails" rel="noopener nofollow ugc">TAILS</a>–which has a <a href="https://tails.boum.org/contribute/design/memory_erasure" rel="noopener nofollow ugc">well-tested implementation</a> of RAM shredding.</p>
+<p>Or you could just use an ultrabook with RAM soldered in-place. Or get yourself some superglue.</p>
+</blockquote>
+<p>If you are aware of a case where cold boots were actually used IRL against a victim, please do let me know and I’ll prioritize it…</p>
+<blockquote>
+<ul>
+<li>panic shutdown on user action such as removal of some USB device (similar to BusKill) / USB kill cord</li>
+</ul>
+</blockquote>
+<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> Is there any reason you don’t just use the BusKill app? Are there any features that would be required for you to consider adding it to Whonix?</p>
+<p>btw, one of our users recently submitted an RFP on Debian:</p>
+<ul>
+<li><a href="https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1873862.html" class="inline-onebox" rel="noopener nofollow ugc">Bug#1021693: RFP: buskill -- app for arming/disarming/configuring the BusKill laptop kill cord</a></li>
+</ul>
+<p>But it would be pretty cool to see the BusKill app come OOTB in Whonix. Please let me know what you’d like to see to make that happen <img src="//forums.whonix.org/images/emoji/twitter/slight_smile.png?v=12" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
+          <p><a href="http://forums.whonix.org/t/panic-button-panic-shutdown-buskill-the-usb-kill-cord-for-your-laptop/13755/6">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/panic-button-panic-shutdown-buskill-the-usb-kill-cord-for-your-laptop/13755/6</link>
+        <pubDate>Wed, 26 Oct 2022 03:57:53 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-13755-6</guid>
+        <source url="http://forums.whonix.org/t/panic-button-panic-shutdown-buskill-the-usb-kill-cord-for-your-laptop/13755.rss">panic button / panic shutdown / BusKill - The USB kill cord for your laptop</source>
+      </item>
       <item>
         <title>panic button / panic shutdown / BusKill - The USB kill cord for your laptop</title>
         <dc:creator><![CDATA[Patrick]]></dc:creator>
