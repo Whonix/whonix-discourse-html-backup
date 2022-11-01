@@ -274,7 +274,7 @@ Therefore Whonix 16 is using gdm3. It is also a good choice because it supports 
               <time itemprop='datePublished' datetime='2022-06-24T23:10:43Z' class='post-time'>
                 June 24, 2022, 11:10pm
               </time>
-              <meta itemprop='dateModified' content='2022-06-24T23:10:43Z'>
+              <meta itemprop='dateModified' content='2022-10-31T09:14:04Z'>
           <span itemprop='position'>#4</span>
           </span>
         </div>
@@ -341,10 +341,92 @@ environment:
 * No other desktop environment besides Xfce installed.
 
 bug report:
-Even if `Session=xfce` is not set, xddm should autologin into Xfce.
+Even if `Session=xfce` is not set, sddm should autologin into Xfce.
 Seems like auto detection of the desktop environment is failing.
 
-By comparison, gdm3 display manager does not require a hardcoded `Session=xfce` setting. But of course xddm is nicer because it has much leaner dependencies.</span></p>
+By comparison, gdm3 display manager does not require a hardcoded `Session=xfce` setting. But of course sddm is nicer because it has much leaner dependencies.</span></p>
+  </div>
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<aside class="onebox githubissue" data-onebox-src="../../../external.html?link=https://github.com/sddm/sddm/issues/1607">
+  <header class="source">
+
+      <a href="../../../external.html?link=https://github.com/sddm/sddm/issues/1607" target="_blank" rel="noopener">github.com/sddm/sddm</a>
+  </header>
+
+  <article class="onebox-body">
+    <div class="github-row">
+  <div class="github-icon-container" title="Issue">
+	  <svg width="60" height="60" class="github-icon" viewbox="0 0 14 16" aria-hidden="true"><path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+  </div>
+
+  <div class="github-info-container">
+    <h4>
+      <a href="../../../external.html?link=https://github.com/sddm/sddm/issues/1607" target="_blank" rel="noopener">Autologin in X11 does not work if session name is absolute path</a>
+    </h4>
+
+    <div class="github-info">
+      <div class="date">
+        opened <span class="discourse-local-date" data-format="ll" data-date="2022-10-29" data-time="20:14:09" data-timezone="UTC">08:14PM - 29 Oct 22 UTC</span>
+      </div>
+
+
+      <div class="user">
+        <a href="../../../external.html?link=https://github.com/arvidjaar" target="_blank" rel="noopener">
+          <img alt="arvidjaar" src="../../../external.html?link=https://avatars.githubusercontent.com/u/187138?v=4" class="onebox-avatar-inline" width="20" height="20">
+          arvidjaar
+        </a>
+      </div>
+    </div>
+
+    <div class="labels">
+    </div>
+  </div>
+</div>
+
+  <div class="github-row">
+    <p class="github-body-container">sddm tries to detect session type by searching for session name in corresponding<span class="show-more-container"><a href="#" rel="noopener" class="show-more">…</a></span><span class="excerpt hidden"> directories:
+
+https://github.com/sddm/sddm/blob/fc24321541f6f65b7d1aac89cd82336ffd53e1a0/src/daemon/Display.cpp#L198
+
+`findSessionEntry` simply calls `dir.exists` for session name:
+
+https://github.com/sddm/sddm/blob/fc24321541f6f65b7d1aac89cd82336ffd53e1a0/src/daemon/Display.cpp#L345
+
+which always returns `TRUE` for an absolute pathname. It means autologin is always attempted as Wayland, resulting in
+
+ ```
+Oct 29 19:32:04 uefi sddm-helper[1152]: Starting: "/usr/share/sddm/scripts/wayland-session /usr/bin/startplasma-x11"
+```
+
+Which obviously fails. The problem is, by default autologin session is `NULL` and so sddm reads the last session from state file. But last session name is always stored as the absolute pathname:
+
+```
+uefi:~ # cat /var/lib/sddm/
+.cache/     .config/    .local/     state.conf  
+uefi:~ # cat /var/lib/sddm/state.conf 
+[Last]
+# Name of the last logged-in user.
+# This user will be preselected when the login screen appears
+User=user
+
+
+# Name of the session for the last logged-in user.
+# This session will be preselected when the login screen appears.
+Session=/usr/share/xsessions/plasma5.desktop
+uefi:~ # 
+```
+
+so if the last session was X11, subsequent autologin will always fail.</span></p>
   </div>
 
   </article>
