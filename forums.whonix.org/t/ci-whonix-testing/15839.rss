@@ -11,46 +11,120 @@ I am creating a new thread to log my efforts and progress, so as to keep things 
 
 @Patrick you had a list of desired test cases somewhere right? Can&#39;t seem to find it at the moment.</description>
     <language>en</language>
-    <lastBuildDate>Thu, 10 Nov 2022 13:41:53 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 13 Nov 2022 20:27:07 +0000</lastBuildDate>
     <category>Development</category>
     <atom:link href="http://forums.whonix.org/t/ci-whonix-testing/15839.rss" rel="self" type="application/rss+xml" />
       <item>
         <title>CI Whonix Testing</title>
         <dc:creator><![CDATA[bee]]></dc:creator>
         <description><![CDATA[
-            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> you should apply for this and I will come work for you full time</p>
-<aside class="onebox twitterstatus" data-onebox-src="https://twitter.com/github/status/1590404333480595456?s=21&amp;t=9qTFNIHFkoH9zmKcbdFt4A">
+            <p>Lastly, in the event I am not a good enough engineer to make the GUI testing work, I can definitely spin up some shell testing to check Tor network connectivity, proper system functionality, etc.</p>
+<p>But i am going to fight hard to avoid that outcome</p>
+          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/29">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/29</link>
+        <pubDate>Sun, 13 Nov 2022 20:27:07 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15839-29</guid>
+        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
+      </item>
+      <item>
+        <title>CI Whonix Testing</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>And before i do too much, i need to play with dogtail and ensure it can control the VM guis from the host. Proof of concept required in order for any of this GUI testing to work.</p>
+<p>But i am going to figure out the auto generation of VMs because it will save me some money in the meanwhile.</p>
+<p>Im sorry this is taking so long <a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> , it ended up being much more complicated than anticipated</p>
+<p>But for now at least we have CI to ensure the builds dont break.</p>
+          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/28">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/28</link>
+        <pubDate>Sun, 13 Nov 2022 20:22:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15839-28</guid>
+        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
+      </item>
+      <item>
+        <title>CI Whonix Testing</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="Patrick" data-post="26" data-topic="15839">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/patrick/40/2848_2.png" class="avatar"> Patrick:</div>
+<blockquote>
+<p>You mean WATS? If so…</p>
+</blockquote>
+</aside>
+<p>Yes. Sorry some of the above posts were rubberducking at midnight, and a good nights sleep gave me a lot of much needed clarity. I was very frustrated but see a solution now.</p>
+<p>I like the idea of having the WATS test everything, so having it click through the user agreements and setup makes a lot of sense.</p>
+<p>I am going to try to avoid SSH-ing in to the Whonix VMs for now, too much config to automate if i can just run dogtail on the host and make it point &amp; click.</p>
+<p>For now I am changing my strategy and prioritization, because it makes more sense.</p>
+<h3>
+<a name="new-strategy-1" class="anchor" href="http://forums.whonix.org#new-strategy-1"></a>New Strategy</h3>
+<h4>
+<a name="automated-host-setup-and-teardown-2" class="anchor" href="http://forums.whonix.org#automated-host-setup-and-teardown-2"></a>Automated Host Setup and Teardown</h4>
+<p>I am going to focus on using the digitalocean API to build the host ENTIRELY from scratch, and tear down at end of build. I will also have it create a snapshot automatically so for subsequent runs to be faster.</p>
+<p>This step is important because the GUI setup and everything <em>must</em> be the exact same and automated to avoid flakiness. We need it to be reproducible anywhere so in the event something happens to me, the suite doesn’t end up abandoned.</p>
+<p>Also will save lots of money using a big server. I will write logic to prevent duplicating instances too, and do it all on my account so no risk of crazy accidental cost to whonix.</p>
+<h4>
+<a name="create-lightweight-vps-setup-for-commits-3" class="anchor" href="http://forums.whonix.org#create-lightweight-vps-setup-for-commits-3"></a>Create Lightweight VPS setup for Commits</h4>
+<p>When a developer pushes a commit, create 2 VPS machines that are much smaller, 2gb of ram or so without GUI, have one build the workstation and one build the gateway in parallel. No WATS</p>
+<p>When a tag gets pushed, do it on the single beefed up VPS with GUI, run WATS</p>
+<h4>
+<a name="wats-rework-4" class="anchor" href="http://forums.whonix.org#wats-rework-4"></a>WATS rework</h4>
+<p>Rework WATS to run inside of the host using dogtail to control the GUIs, instead of the workstation. This is the easiest way to solve the issue of running WATS for now, and much easier than using VBoxManage which is clunky and not working with XFCE in the guest machines.</p>
+<h4>
+<a name="document-5" class="anchor" href="http://forums.whonix.org#document-5"></a>Document</h4>
+<p>Document everything very well with diagrams and specific layout of how it works, for future maintainability.</p>
+<h4>
+<a name="setup-for-collaboration-stretch-goal-6" class="anchor" href="http://forums.whonix.org#setup-for-collaboration-stretch-goal-6"></a>Setup for collaboration (stretch goal)</h4>
+<p>Figure out how to make all of it run locally in a single environment so people can collaborate more easily on test cases. God only knows how much of a challenge this could be. Maybe not so bad if it is possible to run whonix VMs inside of a debian virtualbox VM (like the movie Inception… dream in a dream). Or perhaps build it to a single debian ISO that ran on a USB or something.</p>
+<p>Either way, not worth worrying about until the thing works</p>
+          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/27">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/27</link>
+        <pubDate>Sun, 13 Nov 2022 20:13:39 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15839-27</guid>
+        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
+      </item>
+      <item>
+        <title>CI Whonix Testing</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <aside class="quote no-group" data-username="bee" data-post="21" data-topic="15839">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/bee/40/2338_2.png" class="avatar"> bee:</div>
+<blockquote>
+<p>A new VM build stalls because of this.</p>
+</blockquote>
+</aside>
+<p>The build itself stalls? You mean WATS? If so…</p>
+<aside class="quote no-group" data-username="bee" data-post="21" data-topic="15839">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/bee/40/2338_2.png" class="avatar"> bee:</div>
+<blockquote>
+<p>is there a way to programmatically (via CLI) get rid of all the “Understood” boxes and set the gateway VM to connect without bridges?</p>
+</blockquote>
+</aside>
+<p>There is <code>easo</code> which is an abbreviation for easyorca. Was developed for a different context but might be handy here.</p>
+<pre><code>easo
+</code></pre>
+<p>[1] But that command has to be run inside the VM.</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://www.kicksecure.com/wiki/Orca">
   <header class="source">
+      <img src="https://www.kicksecure.com/w/images/4/45/Kicksecure-home-favicon.ico" class="site-icon" width="32" height="32">
 
-      <a href="https://twitter.com/github/status/1590404333480595456?s=21&amp;t=9qTFNIHFkoH9zmKcbdFt4A" target="_blank" rel="noopener nofollow ugc">twitter.com</a>
+      <a href="https://www.kicksecure.com/wiki/Orca" target="_blank" rel="noopener" title="10:05AM - 29 August 2022">Kicksecure – 29 Aug 22</a>
   </header>
 
   <article class="onebox-body">
-    <img src="https://pbs.twimg.com/profile_images/1414990564408262661/r6YemvF9_400x400.jpg" class="thumbnail onebox-avatar" width="400" height="400">
-<h4><a href="https://twitter.com/github/status/1590404333480595456?s=21&amp;t=9qTFNIHFkoH9zmKcbdFt4A" target="_blank" rel="noopener nofollow ugc">GitHub</a></h4>
-<div class="twitter-screen-name"><a href="https://twitter.com/github/status/1590404333480595456?s=21&amp;t=9qTFNIHFkoH9zmKcbdFt4A" target="_blank" rel="noopener nofollow ugc">@github</a></div>
+    <img src="https://www.kicksecure.com/w/images/5/5a/Orcascreenreader131233.png" class="thumbnail onebox-avatar" width="500" height="500">
 
-<div class="tweet">
-  <span class="tweet-description">More ways to support and mentor maintainers? Yes please. 😍GitHub Accelerator will now provide stipends and mentorship for 20 maintainers and teams to launch full-time open source careers. Apply now here: <a target="_blank" href="https://accelerator.github.com/" rel="noopener nofollow ugc">accelerator.github.com</a></span>
-</div>
+<h3><a href="https://www.kicksecure.com/wiki/Orca" target="_blank" rel="noopener">Orca Screen Reader</a></h3>
 
-<div class="date">
-  <a href="https://twitter.com/github/status/1590404333480595456?s=21&amp;t=9qTFNIHFkoH9zmKcbdFt4A" class="timestamp" target="_blank" rel="noopener nofollow ugc">6:01 PM - 9 Nov 2022</a>
+  <p>Using the Orca Screen Reader in Kicksecure ™ Virtual Machines</p>
 
-    <span class="like">
-      <svg viewBox="0 0 512 512" width="14px" height="16px" aria-hidden="true">
-        <path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"></path>
-      </svg>
-      110
-    </span>
-
-    <span class="retweet">
-      <svg viewBox="0 0 640 512" width="14px" height="16px" aria-hidden="true">
-        <path d="M629.657 343.598L528.971 444.284c-9.373 9.372-24.568 9.372-33.941 0L394.343 343.598c-9.373-9.373-9.373-24.569 0-33.941l10.823-10.823c9.562-9.562 25.133-9.34 34.419.492L480 342.118V160H292.451a24.005 24.005 0 0 1-16.971-7.029l-16-16C244.361 121.851 255.069 96 276.451 96H520c13.255 0 24 10.745 24 24v222.118l40.416-42.792c9.285-9.831 24.856-10.054 34.419-.492l10.823 10.823c9.372 9.372 9.372 24.569-.001 33.941zm-265.138 15.431A23.999 23.999 0 0 0 347.548 352H160V169.881l40.416 42.792c9.286 9.831 24.856 10.054 34.419.491l10.822-10.822c9.373-9.373 9.373-24.569 0-33.941L144.971 67.716c-9.373-9.373-24.569-9.373-33.941 0L10.343 168.402c-9.373 9.373-9.373 24.569 0 33.941l10.822 10.822c9.562 9.562 25.133 9.34 34.419-.491L96 169.881V392c0 13.255 10.745 24 24 24h243.549c21.382 0 32.09-25.851 16.971-40.971l-16.001-16z"></path>
-      </svg>
-      36
-    </span>
-</div>
 
   </article>
 
@@ -62,10 +136,142 @@ I am creating a new thread to log my efforts and progress, so as to keep things 
   <div style="clear: both"></div>
 </aside>
 
+<p>Does this still work? Does this help? If broken, that I could certainly fix and/or adjust for the CI purpose.</p>
+<p>On the other hand, the setup-dist-wizard (understood boxes) and anon-connection-wizard could be considered part of stuff that should be CI tested. But if difficult, headache, then also a solution which skips that part (by grammatically accepting it).</p>
+<p>[1] Do you need a command to programatically accept disclaimers (setup-wizard-dist), connect to public Tor network (anon-connection-wizard) that can be run from outside the VM? That might be possible too.</p>
+<p>Would probably be based on configuration an extra VirtualBox setting on the host operating system VBoxManage getextradata / setextradata and then inside the VM reacting to it accordingly such as starting an inside VM shell script or program.</p>
+<p>Not sure needed. VBoxManage can already be used way to execute shell commands inside VM. So that could be used to run <code>easo</code>.</p>
+<aside class="quote no-group" data-username="bee" data-post="22" data-topic="15839">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/bee/40/2338_2.png" class="avatar"> bee:</div>
+<blockquote>
+<p>Another possibility is setting up X11 forwarding SSH from host to workstation through gateway, using VBoxManage to configure it.</p>
+</blockquote>
+</aside>
+<p>It’s possible to SSH into Whonix-Workstation. Not tested for a long time, not sure how easy/reliable it is. See also:</p>
+<ul>
+<li><a href="https://www.whonix.org/wiki/File_Transfer#SSH_into_Whonix-Gateway_.E2.84.A2">File Transfer - Whonix chapter SSH into Whonix-Gateway in Whonix wiki</a></li>
+<li><a href="https://www.whonix.org/wiki/File_Transfer#SSH_into_Whonix-Workstation_.E2.84.A2">File Transfer - Whonix chapter SSH into Whonix-Workstation in Whonix wiki</a></li>
+<li><a href="https://www.whonix.org/wiki/Sshfs_into_Whonix-Workstation" class="inline-onebox">SSHFS into Whonix-Workstation</a></li>
+</ul>
+<aside class="quote no-group" data-username="bee" data-post="22" data-topic="15839">
+<div class="title">
+<div class="quote-controls"></div>
+<img alt="" width="20" height="20" src="//forums.whonix.org/user_avatar/forums.whonix.org/bee/40/2338_2.png" class="avatar"> bee:</div>
+<blockquote>
+<p>Is there a way to run a command INSIDE a GUI XFCE shell from an SSH connection?</p>
+</blockquote>
+</aside>
+<p>I don’t understand.<br>
+You mean inside a Whonix-Gateway Xfce or Whonix-Workstation Xfce. You mean…</p>
+<ol>
+<li>
+<p>ssh into Whonix-Gateway Xfce</p>
+</li>
+<li>
+<p>VNC from host into Whonix-Gateway Xfce</p>
+</li>
+</ol>
+<p>?</p>
+          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/26">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/26</link>
+        <pubDate>Sun, 13 Nov 2022 05:59:23 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15839-26</guid>
+        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
+      </item>
+      <item>
+        <title>CI Whonix Testing</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>thank u 4 attending my ted talk</p>
+          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/25">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/25</link>
+        <pubDate>Fri, 11 Nov 2022 15:51:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15839-25</guid>
+        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
+      </item>
+      <item>
+        <title>CI Whonix Testing</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>I have X11 forwarding set up from CLI via SSH, so I have a new idea. It will probably take a bit of time but I think the best idea is to run WATS from the host instead of the VM</p>
+<p>So basically I will have to rework the Dogtail stuff to run from the host, click inside of the workstation, and run the GUI testing like that.</p>
+<p>This is going to be a pain in the ass but at least there is a path to move forward. I also imagine these tests are going to be pretty flakey with a manually configured host (which is how I set up GUI/vncserver/etc). I will have to add scripts in to ansible to set up <strong>everything</strong> from a brand new VM to ensure it behaves exactly the same every time.</p>
+<p></p><div class="lightbox-wrapper"><a class="lightbox" href="//forums.whonix.org/uploads/default/original/2X/3/3b5fd513bfcde13207106c953a5f176a7a5a4819.png" data-download-href="//forums.whonix.org/uploads/default/3b5fd513bfcde13207106c953a5f176a7a5a4819" title="Screen Shot 2022-11-11 at 8.49.33 AM"><img src="//forums.whonix.org/uploads/default/original/2X/3/3b5fd513bfcde13207106c953a5f176a7a5a4819.png" alt="Screen Shot 2022-11-11 at 8.49.33 AM" data-base62-sha1="8tfupNsSLyO3mfMusTthtvTuNVD" width="690" height="116" data-small-upload="//forums.whonix.org/uploads/default/optimized/2X/3/3b5fd513bfcde13207106c953a5f176a7a5a4819_2_10x10.png"></a></div><p></p>
+          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/24">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/24</link>
+        <pubDate>Fri, 11 Nov 2022 15:50:54 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15839-24</guid>
+        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
+      </item>
+      <item>
+        <title>CI Whonix Testing</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>TL;DR-Headaches, frustration, struggling</p>
+          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/23">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/23</link>
+        <pubDate>Fri, 11 Nov 2022 15:10:43 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15839-23</guid>
+        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
+      </item>
+      <item>
+        <title>CI Whonix Testing</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p><strong>Other Ideas:</strong><br>
+Maybe I could figure out how to give VNC control to CI, and use Dogtail to write more scripts that click through and run everything. I have no idea if this is possible, but seems less hacky. High effort.</p>
+<p>Another possibility is setting up X11 forwarding SSH from host to workstation through gateway, using VBoxManage to configure it. I worry this will lead me to the same GUI issues that I am experiencing currently where the shells are not actually and XFCE shell in the GUI</p>
+<p><strong>Possible Fix for GUI problems</strong></p>
+<p>Is there a way to run a command INSIDE a GUI XFCE shell from an SSH connection? It would be really nice to just skip the bullshit</p>
+          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/22">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/22</link>
+        <pubDate>Fri, 11 Nov 2022 15:10:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15839-22</guid>
+        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
+      </item>
+      <item>
+        <title>CI Whonix Testing</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>Another problem, is there a way to programmatically (via CLI) get rid of all the “Understood” boxes and set the gateway VM to connect without bridges? A new VM build stalls because of this.</p>
+          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/21">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/21</link>
+        <pubDate>Fri, 11 Nov 2022 15:03:51 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15839-21</guid>
+        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
+      </item>
+      <item>
+        <title>CI Whonix Testing</title>
+        <dc:creator><![CDATA[bee]]></dc:creator>
+        <description><![CDATA[
+            <p>Running in to problems with the GUI stuff.</p>
+<p>I can successfully VNC in, open a terminal, and run WATS. But when I do it remotely via VBoxManage it isnt working because the shell (on the host) is not within the Workstation XFCE display.</p>
+<p>Been a huge headache, took a LOT of hours. I am thinking my new strategy is going to be creating a <code>.desktop</code> file and transferring it to Workstation and set it to run WATS on boot. Then after X amount of seconds (I will average how long it takes to run wats and add maybe an extra minute for good luck), have the host grab the WATS logfile, parse, and throw an error if WATS does not pass.</p>
+<p>It’s hacky and I am not proud of the strategy, but I am at a loss what to do otherwise. It has been quite a lift getting this running <img src="//forums.whonix.org/images/emoji/twitter/disappointed.png?v=12" title=":disappointed:" class="emoji" alt=":disappointed:"></p>
+          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/20">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/20</link>
+        <pubDate>Fri, 11 Nov 2022 15:02:55 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15839-20</guid>
+        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
+      </item>
+      <item>
+        <title>CI Whonix Testing</title>
+        <dc:creator><![CDATA[Patrick]]></dc:creator>
+        <description><![CDATA[
+            <p>A post was split to a new topic: <a href="http://forums.whonix.org/t/github-accelerator/15942">GitHub Accelerator</a></p>
           <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/19">Read full topic</a></p>
         ]]></description>
         <link>http://forums.whonix.org/t/ci-whonix-testing/15839/19</link>
-        <pubDate>Thu, 10 Nov 2022 13:41:53 +0000</pubDate>
+        <pubDate>Fri, 11 Nov 2022 06:25:45 +0000</pubDate>
         <guid isPermaLink="false">forums.whonix.org-post-15839-19</guid>
         <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
       </item>
@@ -460,142 +666,6 @@ E: Some index files failed to download. They have been ignored, or old ones used
         <link>http://forums.whonix.org/t/ci-whonix-testing/15839/5</link>
         <pubDate>Fri, 28 Oct 2022 03:30:06 +0000</pubDate>
         <guid isPermaLink="false">forums.whonix.org-post-15839-5</guid>
-        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
-      </item>
-      <item>
-        <title>CI Whonix Testing</title>
-        <dc:creator><![CDATA[bee]]></dc:creator>
-        <description><![CDATA[
-            <p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> can you look at this failed build? I am working on getting everything set up for GUI testing, and am having failing CI when I push a tag. Strange it seems it passed a couple days ago for you.</p>
-<p>It says something about a bad SSL version when trying to grab a package <img src="//forums.whonix.org/images/emoji/twitter/thinking.png?v=12" title=":thinking:" class="emoji" alt=":thinking:"></p>
-<aside class="onebox githubactions" data-onebox-src="https://github.com/Mycobee/derivative-maker/actions/runs/3342157416">
-  <header class="source">
-
-      <a href="https://github.com/Mycobee/derivative-maker/actions/runs/3342157416" target="_blank" rel="noopener nofollow ugc">github.com</a>
-  </header>
-
-  <article class="onebox-body">
-    <div class="github-row">
-  <div class="github-icon-container" title="Commit">
-
-      <svg width="24" height="24" class="github-icon github-icon-pending" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 18a6 6 0 100-12 6 6 0 000 12z"></path></svg>
-
-
-  </div>
-
-  <div class="github-info-container">
-    <h4>
-      <a href="https://github.com/Mycobee/derivative-maker/actions/runs/3342157416" target="_blank" rel="noopener nofollow ugc">Uncomment for full build</a>
-    </h4>
-
-      <div class="github-info">
-        Build VMs <span class="github-run-number">#114</span>
-      </div>
-  </div>
-</div>
-
-  </article>
-
-  <div class="onebox-metadata">
-    
-    
-  </div>
-
-  <div style="clear: both"></div>
-</aside>
-
-          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/4">Read full topic</a></p>
-        ]]></description>
-        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/4</link>
-        <pubDate>Fri, 28 Oct 2022 01:51:18 +0000</pubDate>
-        <guid isPermaLink="false">forums.whonix.org-post-15839-4</guid>
-        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
-      </item>
-      <item>
-        <title>CI Whonix Testing</title>
-        <dc:creator><![CDATA[bee]]></dc:creator>
-        <description><![CDATA[
-            <p>This is a good start. I will try to get all (or most) of that running in CI and report back when it is running <img src="//forums.whonix.org/images/emoji/twitter/+1.png?v=12" title=":+1:" class="emoji" alt=":+1:"></p>
-          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/3">Read full topic</a></p>
-        ]]></description>
-        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/3</link>
-        <pubDate>Mon, 17 Oct 2022 16:21:42 +0000</pubDate>
-        <guid isPermaLink="false">forums.whonix.org-post-15839-3</guid>
-        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
-      </item>
-      <item>
-        <title>CI Whonix Testing</title>
-        <dc:creator><![CDATA[Patrick]]></dc:creator>
-        <description><![CDATA[
-            <p>You mean as in adding additional tests to wats?</p>
-<aside class="onebox allowlistedgeneric" data-onebox-src="https://www.whonix.org/wiki/Dev/Automated_Tests">
-  <header class="source">
-      <img src="https://www.whonix.org/w/images/a/a4/Whonix-home-favicon.ico" class="site-icon" width="32" height="32">
-
-      <a href="https://www.whonix.org/wiki/Dev/Automated_Tests" target="_blank" rel="noopener" title="05:30PM - 27 July 2022">Whonix – 27 Jul 22</a>
-  </header>
-
-  <article class="onebox-body">
-    <div class="aspect-image" style="--aspect-ratio:690/388;"><img src="https://www.whonix.org/w/images/5/59/Whonix-twitter-post.jpg?version=54f067e87f7190deda500f4c79618b61" class="thumbnail" width="690" height="388"></div>
-
-<h3><a href="https://www.whonix.org/wiki/Dev/Automated_Tests" target="_blank" rel="noopener">Dev/Automated Tests</a></h3>
-
-
-
-  </article>
-
-  <div class="onebox-metadata">
-    
-    
-  </div>
-
-  <div style="clear: both"></div>
-</aside>
-
-          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/2">Read full topic</a></p>
-        ]]></description>
-        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/2</link>
-        <pubDate>Mon, 17 Oct 2022 16:02:04 +0000</pubDate>
-        <guid isPermaLink="false">forums.whonix.org-post-15839-2</guid>
-        <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
-      </item>
-      <item>
-        <title>CI Whonix Testing</title>
-        <dc:creator><![CDATA[bee]]></dc:creator>
-        <description><![CDATA[
-            <p>Currently, I have a repo working for automated whonix integration testing. This is a continuation of the WATS senior capstone project, and will be integrated in to the new CI stuff I built.</p>
-<aside class="onebox allowlistedgeneric" data-onebox-src="https://github.com/Mycobee/whonix_automated_test_suite">
-  <header class="source">
-      <img src="https://github.githubassets.com/favicons/favicon.svg" class="site-icon" width="32" height="32">
-
-      <a href="https://github.com/Mycobee/whonix_automated_test_suite" target="_blank" rel="noopener nofollow ugc">GitHub</a>
-  </header>
-
-  <article class="onebox-body">
-    <div class="aspect-image" style="--aspect-ratio:690/345;"><img src="https://opengraph.githubassets.com/ac3cc13952734d679beb4c48f278f622bcb331b69068c3c8042fb81748b3af06/Mycobee/whonix_automated_test_suite" class="thumbnail" width="690" height="345"></div>
-
-<h3><a href="https://github.com/Mycobee/whonix_automated_test_suite" target="_blank" rel="noopener nofollow ugc">GitHub - Mycobee/whonix_automated_test_suite: An automated testing suite...</a></h3>
-
-  <p>An automated testing suite using RSpec and Shell Scripting for the privacy focused Whonix distribution - GitHub - Mycobee/whonix_automated_test_suite: An automated testing suite using RSpec and She...</p>
-
-
-  </article>
-
-  <div class="onebox-metadata">
-    
-    
-  </div>
-
-  <div style="clear: both"></div>
-</aside>
-
-<p>I am creating a new thread to log my efforts and progress, so as to keep things readable and up to date.</p>
-<p><a class="mention" href="http://forums.whonix.org/u/patrick">@Patrick</a> you had a list of desired test cases somewhere right? Can’t seem to find it at the moment.</p>
-          <p><a href="http://forums.whonix.org/t/ci-whonix-testing/15839/1">Read full topic</a></p>
-        ]]></description>
-        <link>http://forums.whonix.org/t/ci-whonix-testing/15839/1</link>
-        <pubDate>Mon, 17 Oct 2022 15:42:56 +0000</pubDate>
-        <guid isPermaLink="false">forums.whonix.org-post-15839-1</guid>
         <source url="http://forums.whonix.org/t/ci-whonix-testing/15839.rss">CI Whonix Testing</source>
       </item>
   </channel>
