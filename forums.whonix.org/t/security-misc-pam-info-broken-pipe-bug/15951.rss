@@ -12,9 +12,83 @@ Happens when closing the lid without locking the screen first.
 https://github.com/Kicksecure/security-misc/blob/master/usr/libexec/security-misc/pam-info#L78
 https://github.com/Kicksecure/security-misc/blob/master/usr/libexec/security-misc/pam-info#L91</description>
     <language>en</language>
-    <lastBuildDate>Wed, 16 Nov 2022 14:29:52 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 17 Nov 2022 10:08:22 +0000</lastBuildDate>
     <category>Development</category>
     <atom:link href="http://forums.whonix.org/t/security-misc-pam-info-broken-pipe-bug/15951.rss" rel="self" type="application/rss+xml" />
+      <item>
+        <title>security-misc pam-info broken pipe bug</title>
+        <dc:creator><![CDATA[grass]]></dc:creator>
+        <description><![CDATA[
+            <p>I haven’t encountered problems with <a href="https://github.com/Kicksecure/security-misc/blob/09e6af5c080f776d56d7e2390f88c4ae7e01bdb7/usr/libexec/security-misc/pam-info#L127-L129" class="inline-onebox" rel="noopener nofollow ugc">security-misc/pam-info at 09e6af5c080f776d56d7e2390f88c4ae7e01bdb7 · Kicksecure/security-misc · GitHub</a> though.</p>
+          <p><a href="http://forums.whonix.org/t/security-misc-pam-info-broken-pipe-bug/15951/13">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/security-misc-pam-info-broken-pipe-bug/15951/13</link>
+        <pubDate>Thu, 17 Nov 2022 10:08:22 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15951-13</guid>
+        <source url="http://forums.whonix.org/t/security-misc-pam-info-broken-pipe-bug/15951.rss">security-misc pam-info broken pipe bug</source>
+      </item>
+      <item>
+        <title>security-misc pam-info broken pipe bug</title>
+        <dc:creator><![CDATA[grass]]></dc:creator>
+        <description><![CDATA[
+            <p>Couldn’t reproduce again, so made a test.</p>
+<p>How to reproduce <code>broken pipe</code>:</p>
+<pre><code class="lang-auto">$ set -o pipefail
+$ v=$(cat /usr/share/keyrings/derivative.asc)
+$ echo "$v" | head -1
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+$ echo $?
+141
+$ echo 141-128 | bc
+13
+$ kill -l 13
+PIPE
+</code></pre>
+<p>Shell exiting with unhandle signal returns exit code 128+signum.</p>
+<aside class="onebox allowlistedgeneric" data-onebox-src="https://tldp.org/LDP/lpg/node20.html">
+  <header class="source">
+
+      <a href="https://tldp.org/LDP/lpg/node20.html" target="_blank" rel="noopener nofollow ugc">tldp.org</a>
+  </header>
+
+  <article class="onebox-body">
+    
+
+<h3><a href="https://tldp.org/LDP/lpg/node20.html" target="_blank" rel="noopener nofollow ugc">6.3.5 The Infamous SIGPIPE Signal</a></h3>
+
+  <p>6.3.5 The Infamous SIGPIPE Signal</p>
+
+
+  </article>
+
+  <div class="onebox-metadata">
+    
+    
+  </div>
+
+  <div style="clear: both"></div>
+</aside>
+
+<blockquote>
+<p>On a last note, pipes must have a reader and a writer. If a process tries to write to a pipe that has no reader, it will be sent the SIGPIPE signal from the kernel. This is imperative when more than two processes are involved in a pipeline.</p>
+</blockquote>
+<p>The reader <code>head</code> closes when it founds its first match, but <code>echo</code> continues to <code>write</code> data to a pipe that doesn’t have a <code>reader</code> anymore, so the kernel sends the pipe signal for the command to stop.</p>
+<p>The above bug does not affect the program, just the visual.<br>
+I believe: <code>/usr/libexec/security-misc/pam-info: line 97: echo: write error: Broken pipe</code>  came from an ERR trap because <code>pipefail</code> is set. If pipefail is not set, the error doesn’t appear.</p>
+<p>If you want to keep pipefail but avoid sig pipe on individual cases, you can do so by not closing the reader (this can be a long process when dealing with a large enough data sent by the writer):</p>
+<pre><code class="lang-auto">$ echo "$v" | while IFS=\n read -r user; do [ ! $i ] &amp;&amp; echo $user; i=1; done
+</code></pre>
+<p>or in the script case:</p>
+<pre><code class="lang-auto">$ pam_faillock_output_first_line="$(echo "$pam_faillock_output" | while IFS=\n read -r line; do [ ! $i ] &amp;&amp; echo $line; i=1; done)"
+</code></pre>
+<p>I know it doesn’t look pretty, but it solves the  individual case while keeping pipefail for other reasons.</p>
+          <p><a href="http://forums.whonix.org/t/security-misc-pam-info-broken-pipe-bug/15951/12">Read full topic</a></p>
+        ]]></description>
+        <link>http://forums.whonix.org/t/security-misc-pam-info-broken-pipe-bug/15951/12</link>
+        <pubDate>Thu, 17 Nov 2022 09:43:12 +0000</pubDate>
+        <guid isPermaLink="false">forums.whonix.org-post-15951-12</guid>
+        <source url="http://forums.whonix.org/t/security-misc-pam-info-broken-pipe-bug/15951.rss">security-misc pam-info broken pipe bug</source>
+      </item>
       <item>
         <title>security-misc pam-info broken pipe bug</title>
         <dc:creator><![CDATA[Patrick]]></dc:creator>
