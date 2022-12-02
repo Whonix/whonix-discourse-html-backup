@@ -13,7 +13,7 @@ https://github.com/Kicksecure/security-misc/blob/master/usr/libexec/security-mis
 https://github.com/Kicksecure/security-misc/blob/master/usr/libexec/security-misc/pam-info#L91</description>
     <language>en</language>
     <lastBuildDate>Thu, 17 Nov 2022 10:08:22 +0000</lastBuildDate>
-    <category>Development</category>
+    <category>Support</category>
     <atom:link href="http://forums.whonix.org/t/security-misc-pam-info-broken-pipe-bug/15951.rss" rel="self" type="application/rss+xml" />
       <item>
         <title>security-misc pam-info broken pipe bug</title>
@@ -388,27 +388,27 @@ But login otherwise functional?</p>
 
     <pre class="onebox">      <code class="lang-">
         <ol class="start lines" start="68" style="counter-reset: li-counter 67 ;">
-            <li>#          echo "$0: ERROR: This is because /etc/securetty is empty." &gt;&amp;2</li>
-            <li>#          echo "$0: See also:" &gt;&amp;2</li>
-            <li>#          echo "https://www.kicksecure.com/wiki/root#login" &gt;&amp;2</li>
-            <li>#          echo "" &gt;&amp;2</li>
+            <li>      fi</li>
+            <li>   fi</li>
+            <li>fi</li>
+            <li>
+            </li><li>## https://forums.whonix.org/t/how-strong-do-linux-user-account-passwords-have-to-be-when-using-full-disk-encryption-fde-too/7698</li>
+            <li>
+            </li><li>## Does not work (yet) for login, pam_securetty runs before and aborts.</li>
+            <li>## Also this should only run for login since securetty covers only login.</li>
+            <li># if [ "$PAM_USER" = "root" ]; then</li>
+            <li>#    if [ -f /etc/securetty ]; then</li>
+            <li class="selected">#       grep_result="$(grep "^[^#]" /etc/securetty)"</li>
+            <li>#       if [ "$grep_result" = "" ]; then</li>
+            <li>#          echo "\</li>
+            <li># $0: ERROR: Root login is disabled.</li>
+            <li># ERROR: This is because /etc/securetty is empty.</li>
+            <li># See also:</li>
+            <li># https://www.kicksecure.com/wiki/root#login</li>
+            <li># " &gt;&amp;2</li>
             <li>#          exit 0</li>
             <li>#       fi</li>
             <li>#    fi</li>
-            <li># fi</li>
-            <li>
-            </li><li>## Using || true to not break read-only disk boot without ro-mode-init or grub-live.</li>
-            <li class="selected">pam_faillock_output="$(faillock --user "$PAM_USER")" || true</li>
-            <li>
-            </li><li>if [ "$pam_faillock_output" = "" ]; then</li>
-            <li>   true "$0: no failed login"</li>
-            <li>   exit 0</li>
-            <li>fi</li>
-            <li>
-            </li><li>## Example:</li>
-            <li>## user:</li>
-            <li>## When                Type  Source                                           Valid</li>
-            <li>## 2021-08-10 16:26:33 RHOST                                                      V</li>
         </ol>
       </code>
     </pre>
@@ -437,27 +437,27 @@ But login otherwise functional?</p>
 
     <pre class="onebox">      <code class="lang-">
         <ol class="start lines" start="81" style="counter-reset: li-counter 80 ;">
-            <li>   true "$0: no failed login"</li>
-            <li>   exit 0</li>
-            <li>fi</li>
+            <li># $0: ERROR: Root login is disabled.</li>
+            <li># ERROR: This is because /etc/securetty is empty.</li>
+            <li># See also:</li>
+            <li># https://www.kicksecure.com/wiki/root#login</li>
+            <li># " &gt;&amp;2</li>
+            <li>#          exit 0</li>
+            <li>#       fi</li>
+            <li>#    fi</li>
+            <li># fi</li>
             <li>
-            </li><li>## Example:</li>
-            <li>## user:</li>
-            <li>## When                Type  Source                                           Valid</li>
-            <li>## 2021-08-10 16:26:33 RHOST                                                      V</li>
-            <li>## 2021-08-10 16:26:54 RHOST                                                      V</li>
-            <li>
-            </li><li class="selected">pam_faillock_output_first_line="$(echo "$pam_faillock_output" | head -1)"</li>
-            <li>user_name="$(echo "$pam_faillock_output_first_line" | LANG=C str_replace ":" "")"</li>
-            <li>
-            </li><li>pam_faillock_output_count="$(echo "$pam_faillock_output" | wc -l)"</li>
-            <li>
-            </li><li>failed_login_counter=$(( pam_faillock_output_count - 2 ))</li>
-            <li>
-            </li><li>if [ ! "$PAM_USER" = "$user_name" ]; then</li>
-            <li>   echo "$0: ERROR: PAM_USER: '$PAM_USER' does not equal user_name: '$user_name'." &gt;&amp;2</li>
-            <li>   echo "$0: ERROR: Please report this bug." &gt;&amp;2</li>
-            <li>   echo "" &gt;&amp;2</li>
+            </li><li class="selected">## as user "user"</li>
+            <li>## /usr/sbin/faillock -u user</li>
+            <li>## faillock: Error opening /var/log/tallylog for update: Permission denied</li>
+            <li>## /usr/sbin/faillock: Authentication error</li>
+            <li>##</li>
+            <li>## xscreensaver runs as user "user", therefore pam_faillock cannot function.</li>
+            <li>## xscreensaver has its own failed login counter.</li>
+            <li>##</li>
+            <li>## https://askubuntu.com/questions/983183/how-lock-the-unlock-screen-after-wrong-password-attempts</li>
+            <li>##</li>
+            <li>## https://www.whonix.org/pipermail/whonix-devel/2019-September/001439.html</li>
         </ol>
       </code>
     </pre>
